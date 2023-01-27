@@ -6,7 +6,7 @@ runs:
   using: composite
   steps:
     - name: Setup self-hosted runner environment
-      shell: bash -x --noprofile --norc -eo pipefail {0}
+      shell: bash --noprofile --norc -xeo pipefail {0}
       run: |
         echo "${{ toJSON(runner) }}"
 
