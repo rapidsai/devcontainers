@@ -31,14 +31,14 @@ runs:
         echo "is_gha_runner=${{ !contains(runner.name, 'rapidsai') }}" >> $GITHUB_ENV
 
     - name: Free up disk space
-      if: env.is_gha_runner != 'true'
+      if: env.is_gha_runner == 'true'
       uses: ./.github/actions/free-disk-space
       with:
         home: "${{ inputs.home }}"
         tool_cache: "${{ runner.tool_cache }}"
 
     - name: Setup runner environment
-      if: env.is_gha_runner == 'true'
+      if: env.is_gha_runner != 'true'
       shell: bash
       run: |
         echo "TMPDIR=/data/_temp" >> $GITHUB_ENV;
@@ -49,7 +49,7 @@ runs:
         sudo chown -R $(id -u):$(id -g) "$data";
 
     - name: Setup Node.js
-      if: env.is_gha_runner == 'true'
+      if: env.is_gha_runner != 'true'
       uses: actions/setup-node@v3
       with:
         node-version: '16'
