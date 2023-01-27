@@ -27,6 +27,8 @@ runs:
     - if: contains(runner.name, 'rapidsai') == true
       name: Setup self-hosted runner environment
       uses: ./.github/actions/setup-runner-env
+      with:
+        home: "${{ inputs.home }}"
 
     - if: contains(runner.name, 'rapidsai') != true
       name: Free up disk space
