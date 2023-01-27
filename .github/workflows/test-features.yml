@@ -48,16 +48,9 @@ jobs:
         with:
           persist-credentials: false
 
-      - name: Setup runner environment
-        if: contains(runner.name, 'rapidsai')
-        shell: bash
-        run: |
-          echo "TMPDIR=/data/_temp" >> $GITHUB_ENV;
-          data="${{ runner.workspace }}/../";
-          data="$(realpath -m "$data")";
-          sudo ln -s "$data" "/data";
-          sudo chown -R $(id -u):$(id -g) "/data";
-          sudo chown -R $(id -u):$(id -g) "$data";
+      - if: contains(runner.name, 'rapidsai') == true
+        name: Setup self-hosted runner environment
+        uses: ./.github/actions/setup-runner-env
 
       - uses: ./.github/actions/install-devcontainers-cli
       - uses: ./.github/actions/copy-common-scripts
@@ -86,16 +79,9 @@ jobs:
         with:
           persist-credentials: false
 
-      - name: Setup runner environment
-        if: contains(runner.name, 'rapidsai')
-        shell: bash
-        run: |
-          echo "TMPDIR=/data/_temp" >> $GITHUB_ENV;
-          data="${{ runner.workspace }}/../";
-          data="$(realpath -m "$data")";
-          sudo ln -s "$data" "/data";
-          sudo chown -R $(id -u):$(id -g) "/data";
-          sudo chown -R $(id -u):$(id -g) "$data";
+      - if: contains(runner.name, 'rapidsai') == true
+        name: Setup self-hosted runner environment
+        uses: ./.github/actions/setup-runner-env
 
       - uses: ./.github/actions/install-devcontainers-cli
       - uses: ./.github/actions/copy-common-scripts
@@ -122,16 +108,9 @@ jobs:
         with:
           persist-credentials: false
 
-      - name: Setup runner environment
-        if: contains(runner.name, 'rapidsai')
-        shell: bash
-        run: |
-          echo "TMPDIR=/data/_temp" >> $GITHUB_ENV;
-          data="${{ runner.workspace }}/../";
-          data="$(realpath -m "$data")";
-          sudo ln -s "$data" "/data";
-          sudo chown -R $(id -u):$(id -g) "/data";
-          sudo chown -R $(id -u):$(id -g) "$data";
+      - if: contains(runner.name, 'rapidsai') == true
+        name: Setup self-hosted runner environment
+        uses: ./.github/actions/setup-runner-env
 
       - uses: ./.github/actions/install-devcontainers-cli
       - uses: ./.github/actions/copy-common-scripts

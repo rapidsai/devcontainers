@@ -1,0 +1,22 @@
+name: image-info
+
+description: Setup self-hosted runner environment
+
+runs:
+  using: composite
+  steps:
+    - name: Setup self-hosted runner environment
+      shell: bash -x --noprofile --norc -eo pipefail {0}
+      run: |
+        echo "${{ toJSON(runner) }}"
+
+        echo "TMPDIR=/data/_temp" >> $GITHUB_ENV;
+        echo "HOME=/data/_work/devcontainers" >> $GITHUB_ENV;
+        sudo sed -ri "s@$HOME@${{ runner.workspace }}@g" /etc/passwd;
+
+        data="${{ runner.workspace }}/../";
+        data="$(realpath -m "$data")";
+        sudo ln -s "$data" "/data";
+
+        sudo chown -R $(id -u):$(id -g) "/data";
+        sudo chown -R $(id -u):$(id -g) "$data";
