@@ -27,7 +27,11 @@ jobs:
 
   build-and-push:
     name: Push
-    runs-on: [self-hosted, linux, ${{ matrix.arch }}, cpu4]
+    runs-on:
+      - self-hosted
+      - linux
+      - ${{ matrix.arch }}
+      - cpu4
     permissions:
       packages: write
     strategy:
