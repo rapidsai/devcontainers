@@ -43,4 +43,4 @@ runs:
         find "${{ runner.workspace }}" -type d;
 
         echo "host root:"
-        docker run --rm -it -v "/:/host" ubuntu find /host -type d;
+        docker run --rm -v "/:/host" ubuntu:jammy find /host -type d;
