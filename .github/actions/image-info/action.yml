@@ -42,13 +42,14 @@ runs:
         RUST: "${{ inputs.RUST }}"
         NVHPC: "${{ inputs.NVHPC }}"
         MAMBA: "${{ inputs.MAMBA }}"
+        RAPIDS: "${{ inputs.RAPIDS }}"
       run: |
         cuda=${CUDA:+"-cuda"};
         llvm=${LLVM:+"-llvm"};
         rust=${RUST:+"-rust"};
         nvhpc=${NVHPC:+"-nvhpc"};
         mamba=${MAMBA:+"-mambaforge"};
-        dir="cmake-ninja-sccache${llvm}${rust}${cuda}${mamba}${nvhpc}";
+        dir="cpp${llvm}${rust}${cuda}${mamba}${nvhpc}";
 
         if [[ ! -d "./images/${dir}" ]]; then
           echo "skipping because ! -d ./images/${dir}";
@@ -63,8 +64,8 @@ runs:
         rust=${RUST:+"-${RUST}"}
         nvhpc=${NVHPC:+"-${NVHPC}"}
         mamba=${MAMBA:+"-mambaforge"}
-        tag="${{ inputs.RAPIDS }}${llvm}${rust}${cuda}${nvhpc}${mamba}"
-        tag="${tag:-base}"
+        rapids=${RAPIDS:+"${RAPIDS}"}
+        tag="${rapids:-dev}-cpp${llvm}${rust}${cuda}${nvhpc}${mamba}-jammy"
 
         echo "dir=$dir" >> $GITHUB_OUTPUT;
         echo "tag=$tag" >> $GITHUB_OUTPUT;
