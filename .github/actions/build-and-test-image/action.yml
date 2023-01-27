@@ -56,6 +56,7 @@ runs:
         skipContainerUserIdUpdate: true
         # Skip setting this so skopeo isn't required
         # platform: linux/${{ inputs.arch }}
+        checkoutPath: .
         subFolder: images/${{ inputs.dir }}
         imageName: ghcr.io/${{ github.repository }}
         imageTag: ${{ inputs.tag }}-${{ inputs.arch }}
