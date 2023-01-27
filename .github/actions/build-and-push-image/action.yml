@@ -36,6 +36,19 @@ runs:
       with:
         node-version: '16'
 
+    - name: Setup Docker Buildx context
+      shell: bash
+      run: |
+        docker context create ${{ matrix.tag }}-${{ matrix.arch }}-builder
+
+    - name: Setup Docker buildx
+      uses: docker/setup-buildx-action@v2
+      with:
+        use: true
+        install: true
+        buildkitd-flags: --debug
+        endpoint: ${{ matrix.tag }}-${{ matrix.arch }}-builder
+
     - name: Login to ghcr.io
       uses: docker/login-action@v2
       with:
@@ -51,7 +64,7 @@ runs:
         # Skip setting this so skopeo isn't required
         # platform: linux/${{ inputs.arch }}
         subFolder: images/${{ inputs.dir }}
-        checkoutPath: ${{ env.HOME }}/devcontainers
+        # checkoutPath: ${{ env.HOME }}/devcontainers
         imageName: ghcr.io/${{ github.repository }}
         imageTag: ${{ inputs.tag }}-${{ inputs.arch }}
         cacheFrom: ghcr.io/${{ github.repository }}:${{ inputs.tag }}-${{ inputs.arch }}
