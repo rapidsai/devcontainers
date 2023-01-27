@@ -3,6 +3,10 @@ name: Build and push devcontainer images
 on:
   workflow_call:
     inputs:
+      home:
+        type: string
+        required: true
+        description: Runner HOME dir
       CUDA:
         type: string
         required: true
@@ -61,7 +65,7 @@ jobs:
       - name: Build and push ${{ steps.info.outputs.tag }}-${{ matrix.arch }}
         uses: ./.github/actions/build-and-push-image
         with:
-          home: "${{ env.HOME }}"
+          home: "${{ inputs.home }}"
           arch: "${{ matrix.arch }}"
           dir: "${{ steps.info.outputs.dir }}"
           tag: "${{ steps.info.outputs.tag }}"
