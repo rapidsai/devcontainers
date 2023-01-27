@@ -1,0 +1,37 @@
+#! /usr/bin/env bash
+
+# Respect --noprofile and --norc
+if [[ ! $(ps -o args= -p $$) =~ (--noprofile) ]]; then
+    # Otherwise, initialize non-login/non-interactive shells like interactive login shells
+    if ! shopt -q login_shell; then
+        if [ -f /etc/profile ]; then
+            . /etc/profile
+        fi
+        for x in "$HOME"/.{bash_profile,bash_login,profile}; do
+            if [ -f "$x" ]; then
+                . "$x"
+                break
+            fi
+        done
+    fi
+elif [[ ! $(ps -o args= -p $$) =~ (--norc|--rcfile|--init-file) ]]; then
+    if [ -f /etc/bash.bashrc ]; then
+        . /etc/bash.bashrc
+    fi
+    for x in "$HOME"/.{bashrc}; do
+        if [ -f "$x" ]; then
+            . "$x"
+            break
+        fi
+    done
+fi
+
+export BASH_ENV=/etc/bash.bash_env
+
+if [ -n "${BASH_ENV_ETC_PROFILE:-}" ]; then
+    if [ -f "$BASH_ENV_ETC_PROFILE" ]              \
+    && [ "$BASH_ENV_ETC_PROFILE" != "$BASH_ENV" ]; \
+    then
+        . "$BASH_ENV_ETC_PROFILE"
+    fi
+fi

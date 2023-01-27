@@ -1,0 +1,25 @@
+{
+  "name": "sccache",
+  "id": "sccache",
+  "version": "1.0.0",
+  "description": "A feature to install sccache",
+  "options": {
+    "version": {
+      "type": "string",
+      "proposals": [
+        "latest",
+        "0.3.1",
+        "0.3.0",
+        "0.2.15"
+      ],
+      "default": "latest",
+      "description": "sccache version to install."
+    }
+  },
+  "containerEnv": {
+    "RUSTC_WRAPPER": "/usr/bin/sccache",
+    "CMAKE_C_COMPILER_LAUNCHER": "/usr/bin/sccache",
+    "CMAKE_CXX_COMPILER_LAUNCHER": "/usr/bin/sccache",
+    "CMAKE_CUDA_COMPILER_LAUNCHER": "/usr/bin/sccache"
+  }
+}

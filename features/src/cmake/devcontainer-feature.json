@@ -1,0 +1,39 @@
+{
+  "name": "CMake",
+  "id": "cmake",
+  "version": "1.0.0",
+  "description": "A feature to install CMake",
+  "options": {
+    "version": {
+      "type": "string",
+      "proposals": [
+        "latest",
+        "3.25.2",
+        "3.25.1",
+        "3.25.0",
+        "3.24.2"
+      ],
+      "default": "latest",
+      "description": "CMake version to install."
+    }
+  },
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "twxs.cmake"
+      ],
+      "settings": {
+        "terminal.integrated.profiles.linux": {
+          "bash": {
+            "path": "bash",
+            "icon": "terminal-bash",
+            "args": [
+              "-li"
+            ]
+          }
+        },
+        "terminal.integrated.defaultProfile.linux": "bash"
+      }
+    }
+  }
+}

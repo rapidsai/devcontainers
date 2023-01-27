@@ -1,0 +1,17 @@
+{
+  "rust_at_pinned_version": {
+    "image": "mcr.microsoft.com/devcontainers/base:jammy",
+    "features": {
+      "llvm": {
+        "version": "15"
+      },
+      "rust": {
+        "version": "1.62.0"
+      }
+    },
+    "overrideFeatureInstallOrder": [
+      "./llvm",
+      "./rust"
+    ]
+  }
+}

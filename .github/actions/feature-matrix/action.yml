@@ -1,0 +1,26 @@
+name: feature-matrix
+
+description: Determine the feature matrix
+
+outputs:
+  matrix:
+    value: ${{ steps.matrix.outputs.matrix }}
+
+runs:
+  using: composite
+  steps:
+    - name: Determine the feature matrix
+      id: matrix
+      shell: bash
+      run: |
+        join_with_delimiter() {
+          local IFS='' delim=$1; shift; echo -n "$1"; shift; echo -n "${*/#/$delim}";
+        }
+
+        features="$(\
+          find ./features/src -mindepth 1 -maxdepth 1 -type d -exec \
+            bash -c 'echo {} | sed s@./features/src/@@' \;)";
+
+        echo "features=[\"$(                  \
+          join_with_delimiter '","' $features \
+        )\"]" | tee -a $GITHUB_OUTPUT;

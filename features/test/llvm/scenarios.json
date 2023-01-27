@@ -1,0 +1,18 @@
+{
+  "llvm_15": {
+    "image": "mcr.microsoft.com/devcontainers/base:jammy",
+    "features": {
+      "llvm": {
+        "version": "15"
+      }
+    }
+  },
+  "llvm_16": {
+    "image": "mcr.microsoft.com/devcontainers/base:jammy",
+    "features": {
+      "llvm": {
+        "version": "16"
+      }
+    }
+  }
+}

@@ -1,0 +1,81 @@
+{
+  "name": "LLVM compilers and tools",
+  "id": "llvm",
+  "version": "1.0.0",
+  "description": "A feature to install LLVM compilers and tools",
+  "options": {
+    "version": {
+      "type": "string",
+      "proposals": [
+        "dev",
+        "16",
+        "15",
+        "14",
+        "13",
+        "12",
+        "11",
+        "10",
+        "9"
+      ],
+      "default": "dev",
+      "description": "LLVM version to install."
+    }
+  },
+  "containerEnv": {
+    "BASH_ENV": "/etc/bash.bash_env"
+  },
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "cschlosser.doxdocgen",
+        "llvm-vs-code-extensions.vscode-clangd",
+        "ms-vscode.cpptools",
+        "vadimcn.vscode-lldb",
+        "xaver.clang-format"
+      ],
+      "settings": {
+        "C_Cpp.vcpkg.enabled": false,
+        "C_Cpp.formatting": "disabled",
+        "C_Cpp.autocomplete": "disabled",
+        "C_Cpp.errorSquiggles": "disabled",
+        "C_Cpp.intelliSenseEngine": "disabled",
+        "C_Cpp.configurationWarnings": "disabled",
+        "C_Cpp.autoAddFileAssociations": false,
+        "clang-format.fallbackStyle": "none",
+        "clang-format.executable": "/usr/bin/clang-format",
+        "clangd.arguments": [
+          "--log=info",
+          "--clang-tidy",
+          "--debug-origin",
+          "--pch-storage=disk",
+          "--use-dirty-headers",
+          "--background-index=true",
+          "--all-scopes-completion",
+          "--header-insertion=iwyu",
+          "--completion-parse=always",
+          "--completion-style=detailed",
+          "--header-insertion-decorators"
+        ],
+        "terminal.integrated.profiles.linux": {
+          "bash": {
+            "path": "bash",
+            "icon": "terminal-bash",
+            "args": [
+              "-li"
+            ]
+          }
+        },
+        "terminal.integrated.defaultProfile.linux": "bash",
+        "[c]": {
+          "editor.defaultFormatter": "xaver.clang-format"
+        },
+        "[cpp]": {
+          "editor.defaultFormatter": "xaver.clang-format"
+        },
+        "[cuda-cpp]": {
+          "editor.defaultFormatter": "xaver.clang-format"
+        }
+      }
+    }
+  }
+}

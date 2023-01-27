@@ -1,0 +1,87 @@
+name: Build and push devcontainer images
+
+on:
+  workflow_call:
+    inputs:
+      CUDA:
+        type: string
+        required: true
+      LLVM:
+        type: string
+        required: true
+      RUST:
+        type: string
+        required: true
+      NVHPC:
+        type: string
+        required: true
+      MAMBA:
+        type: string
+        required: true
+      RAPIDS:
+        type: string
+        required: true
+        description: RAPIDS release version
+
+jobs:
+
+  build-and-push:
+    name: Push
+    runs-on: ubuntu-latest
+    permissions:
+      packages: write
+    strategy:
+      max-parallel: 2
+      fail-fast: true
+      matrix:
+        arch: [amd64, arm64]
+    steps:
+      - name: Checkout ${{ github.repository }}
+        uses: actions/checkout@v3
+        with:
+          persist-credentials: false
+
+      - uses: ./.github/actions/copy-common-scripts
+
+      - name: Determine devcontainer image info
+        uses: ./.github/actions/image-info
+        with: ${{ fromJSON(inputs) }}
+        id: info
+
+      - name: Build and push ${{ steps.info.outputs.tag }}-${{ matrix.arch }}
+        uses: ./.github/actions/build-and-push-image
+        with:
+          home: "${{ env.HOME }}"
+          arch: "${{ matrix.arch }}"
+          dir: "${{ steps.info.outputs.dir }}"
+          tag: "${{ steps.info.outputs.tag }}"
+
+  push-to-dockerhub:
+    name: Push to Docker Hub
+    needs: build-and-push
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout ${{ github.repository }}
+        uses: actions/checkout@v3
+        with:
+          persist-credentials: false
+
+      - id: info
+        name: Determine devcontainer image info
+        uses: ./.github/actions/image-info
+        with:
+          CUDA: "${{ inputs.CUDA }}"
+          LLVM: "${{ inputs.LLVM }}"
+          RUST: "${{ inputs.RUST }}"
+          NVHPC: "${{ inputs.NVHPC }}"
+          MAMBA: "${{ inputs.MAMBA }}"
+          RAPIDS: "${{ inputs.RAPIDS }}"
+
+      - name: Push multiarch manifest to Docker Hub
+        uses: ./.github/actions/push-to-dockerhub
+        with:
+          archs: "amd64 arm64"
+          home: "${{ env.HOME }}"
+          tag: "${{ steps.info.outputs.tag }}"
+          username: ${{ vars.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}

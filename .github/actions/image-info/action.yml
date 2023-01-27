@@ -1,0 +1,83 @@
+name: image-info
+
+description: Determine devcontainer image info
+
+inputs:
+  CUDA:
+    type: string
+    required: true
+  LLVM:
+    type: string
+    required: true
+  RUST:
+    type: string
+    required: true
+  NVHPC:
+    type: string
+    required: true
+  MAMBA:
+    type: string
+    required: true
+  RAPIDS:
+    type: string
+    required: false
+
+outputs:
+  dir:
+    value: ${{ steps.image-info.outputs.dir }}
+  tag:
+    value: ${{ steps.image-info.outputs.tag }}
+  build_image:
+    value: ${{ steps.image-info.outputs.build_image }}
+
+runs:
+  using: composite
+  steps:
+    - id: image-info
+      name: Determine devcontainer image info
+      shell: bash
+      env:
+        CUDA: "${{ inputs.CUDA }}"
+        LLVM: "${{ inputs.LLVM }}"
+        RUST: "${{ inputs.RUST }}"
+        NVHPC: "${{ inputs.NVHPC }}"
+        MAMBA: "${{ inputs.MAMBA }}"
+      run: |
+        cuda=${CUDA:+"-cuda"};
+        llvm=${LLVM:+"-llvm"};
+        rust=${RUST:+"-rust"};
+        nvhpc=${NVHPC:+"-nvhpc"};
+        mamba=${MAMBA:+"-mambaforge"};
+        dir="cmake-ninja-sccache${llvm}${rust}${cuda}${mamba}${nvhpc}";
+
+        if [[ ! -d "./images/${dir}" ]]; then
+          echo "skipping because ! -d ./images/${dir}";
+          echo "build_image=0" >> $GITHUB_OUTPUT;
+          exit 1;
+        fi
+
+        echo "build_image=1" >> $GITHUB_OUTPUT;
+
+        cuda=${CUDA:+"-${CUDA}"}
+        llvm=${LLVM:+"-${LLVM}"}
+        rust=${RUST:+"-${RUST}"}
+        nvhpc=${NVHPC:+"-${NVHPC}"}
+        mamba=${MAMBA:+"-mambaforge"}
+        tag="${{ inputs.RAPIDS }}${llvm}${rust}${cuda}${nvhpc}${mamba}"
+
+        echo "dir=$dir" >> $GITHUB_OUTPUT;
+        echo "tag=$tag" >> $GITHUB_OUTPUT;
+
+        sed -i -re \
+          "s@features/cuda(:[0-9]+)?\": \{\}@features/cuda\1\": \{\"version\": \"${CUDA#cuda}\"\}@" \
+          "./images/${dir}/.devcontainer/devcontainer.json";
+        sed -i -re \
+          "s@features/llvm(:[0-9]+)?\": \{\}@features/llvm\1\": \{\"version\": \"${LLVM#llvm}\"\}@" \
+          "./images/${dir}/.devcontainer/devcontainer.json";
+        sed -i -re \
+          "s@features/nvhpc(:[0-9]+)?\": \{\}@features/nvhpc\1\": \{\"version\": \"${NVHPC#nvhpc}\"\}@" \
+          "./images/${dir}/.devcontainer/devcontainer.json";
+
+        echo "image name: ghcr.io/${{ github.repository }}:${tag}";
+        echo "devcontainer.json:";
+        cat "./images/${dir}/.devcontainer/devcontainer.json";

@@ -1,0 +1,35 @@
+name: Test images
+
+concurrency:
+  group: test-images-on-${{ github.event_name }}-from-${{ github.ref_name }}
+  cancel-in-progress: true
+
+on:
+  pull_request:
+
+jobs:
+
+  matrix:
+    name: Determine matrix
+    runs-on: ubuntu-latest
+    outputs:
+      matrix: ${{ steps.matrix.outputs.matrix }}
+    steps:
+      - name: Checkout ${{ github.repository }}
+        uses: actions/checkout@v3
+        with:
+          persist-credentials: false
+      - id: matrix
+        name: Determine matrix
+        uses: ./.github/actions/image-matrix
+
+  test-images:
+    name: Test
+    needs: matrix
+    uses: ./.github/workflows/build-and-test-images.yml
+    secrets: inherit
+    strategy:
+      max-parallel: 2
+      fail-fast: true
+      matrix: ${{ fromJSON(needs.matrix.outputs.matrix) }}
+    with: ${{ fromJSON(matrix) }}

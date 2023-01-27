@@ -1,0 +1,15 @@
+{
+  "image": "mcr.microsoft.com/devcontainers/javascript-node:0-18",
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "mads-hartmann.bash-ide-vscode"
+      ]
+    }
+  },
+  "features": {
+    "ghcr.io/devcontainers/features/docker-in-docker:2": {}
+  },
+  "remoteUser": "node",
+  "postCreateCommand": "sudo wget --no-hsts -q -O /usr/bin/devcontainer 'https://github.com/trxcllnt/devcontainers-cli/releases/download/v0.29.0-trxcllnt/devcontainer-linux-x64' && sudo chmod +x /usr/bin/devcontainer"
+}
