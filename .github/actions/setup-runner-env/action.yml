@@ -2,12 +2,6 @@ name: image-info
 
 description: Setup self-hosted runner environment
 
-inputs:
-  home:
-    type: string
-    required: true
-    description: Runner HOME dir
-
 runs:
   using: composite
   steps:
@@ -18,7 +12,6 @@ runs:
 
         echo "TMPDIR=/data/_temp" >> $GITHUB_ENV;
         echo "HOME=/data/_work/devcontainers" >> $GITHUB_ENV;
-        sudo sed -ri "s@${{ inputs.home }}@${{ runner.workspace }}@g" /etc/passwd;
 
         data="${{ runner.workspace }}/../";
         data="$(realpath -m "$data")";
@@ -27,4 +20,5 @@ runs:
         sudo chown -R $(id -u):$(id -g) "/data";
         sudo chown -R $(id -u):$(id -g) "$data";
 
-        find "/data/_work/devcontainers" -type d;
+        find /data/ -type d;
+        find $data/ -type d;

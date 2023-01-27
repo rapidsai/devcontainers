@@ -51,8 +51,6 @@ jobs:
       - if: contains(runner.name, 'rapidsai') == true
         name: Setup self-hosted runner environment
         uses: ./.github/actions/setup-runner-env
-        with:
-          home: "${{ env.HOME }}"
 
       - uses: ./.github/actions/install-devcontainers-cli
       - uses: ./.github/actions/copy-common-scripts
@@ -84,8 +82,6 @@ jobs:
       - if: contains(runner.name, 'rapidsai') == true
         name: Setup self-hosted runner environment
         uses: ./.github/actions/setup-runner-env
-        with:
-          home: "${{ env.HOME }}"
 
       - uses: ./.github/actions/install-devcontainers-cli
       - uses: ./.github/actions/copy-common-scripts
@@ -115,8 +111,6 @@ jobs:
       - if: contains(runner.name, 'rapidsai') == true
         name: Setup self-hosted runner environment
         uses: ./.github/actions/setup-runner-env
-        with:
-          home: "${{ env.HOME }}"
 
       - uses: ./.github/actions/install-devcontainers-cli
       - uses: ./.github/actions/copy-common-scripts
