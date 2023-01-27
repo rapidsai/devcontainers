@@ -36,10 +36,17 @@ runs:
       with:
         node-version: '16'
 
+    - name: Setup Docker Buildx context
+      shell: bash
+      run: |
+        docker context create builders
+
     - name: Setup Docker buildx
       uses: docker/setup-buildx-action@v2
       with:
         use: true
+        endpoint: builders
+        buildkitd-flags: --debug
 
     - name: Cache devcontainer user data folder
       uses: actions/cache@v3
