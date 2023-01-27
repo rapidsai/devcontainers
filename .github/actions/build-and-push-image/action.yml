@@ -30,10 +30,6 @@ runs:
         home: "${{ inputs.home }}"
         tool_cache: "${{ runner.tool_cache }}"
 
-    - name: Setup skopeo
-      if: ${{ contains(runner.name, 'rapidsai') }}
-      uses: ./.github/actions/install-skopeo
-
     - name: Setup Node.js
       if: ${{ contains(runner.name, 'rapidsai') }}
       uses: actions/setup-node@v3
@@ -52,12 +48,6 @@ runs:
         endpoint: builders
         buildkitd-flags: --debug
 
-    - name: Cache devcontainer user data folder
-      uses: actions/cache@v3
-      with:
-        key: ${{ inputs.tag }}-${{ inputs.arch }}-userdata
-        path: ${{ runner.temp }}/${{ inputs.tag }}-${{ inputs.arch }}-userdata
-
     - name: Login to ghcr.io
       uses: docker/login-action@v2
       with:
@@ -70,9 +60,9 @@ runs:
       with:
         push: always
         skipContainerUserIdUpdate: true
-        platform: linux/${{ inputs.arch }}
+        # Skip setting this so skopeo isn't required
+        # platform: linux/${{ inputs.arch }}
         subFolder: images/${{ inputs.dir }}
         imageName: ghcr.io/${{ github.repository }}
         imageTag: ${{ inputs.tag }}-${{ inputs.arch }}
-        userDataFolder: ${{ runner.temp }}/${{ inputs.tag }}-${{ inputs.arch }}-userdata
         cacheFrom: ghcr.io/${{ github.repository }}:${{ inputs.tag }}-${{ inputs.arch }}
