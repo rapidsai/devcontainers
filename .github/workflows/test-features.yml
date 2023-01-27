@@ -4,8 +4,8 @@ concurrency:
   group: test-features-on-${{ github.event_name }}-from-${{ github.ref }}
   cancel-in-progress: true
 
-on:
-  pull_request:
+# on:
+#   pull_request:
 
 jobs:
 

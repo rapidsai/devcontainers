@@ -32,12 +32,10 @@ runs:
         cd "${{ runner.workspace }}/devcontainers";
         mkdir -p "./_temp";
 
-        echo "TMPDIR=./_temp" >> $GITHUB_ENV;
-        echo "HOME=${{ runner.workspace }}" >> $GITHUB_ENV;
+        # echo "TMPDIR=./_temp" >> $GITHUB_ENV;
+        # echo "HOME=${{ runner.workspace }}" >> $GITHUB_ENV;
 
-        sudo ln -s "$(realpath -m ../../)" /data;
-
-        find "${{ runner.workspace }}" -type d;
+        # find "${{ runner.workspace }}" -type d;
 
         # echo "TMPDIR=/data/_temp" >> $GITHUB_ENV;
         # echo "HOME=/data/devcontainers" >> $GITHUB_ENV;
@@ -45,10 +43,16 @@ runs:
         # data="${{ runner.workspace }}/../";
         # data="$(realpath -m "$data")";
         # sudo ln -s "$data" "/data";
-        sudo ln -s "$(realpath -m ../../)" /data;
+        # sudo ln -s "$(realpath -m ../../)" /data;
 
-        sudo chown -R $(id -u):$(id -g) "/data";
+        # sudo chown -R $(id -u):$(id -g) "/data";
         # sudo chown -R $(id -u):$(id -g) "$data";
 
-        find /data/ -type d;
+        # find /data/ -type d;
         # find $data/ -type d;
+
+        echo "container workspace:"
+        find "${{ runner.workspace }}" -type d;
+
+        echo "host root:"
+        docker run --rm -it -v "/:/host" ubuntu find /host -type d;
