@@ -48,7 +48,7 @@ runs:
         sudo ln -s "$(realpath -m ../../)" /data;
 
         sudo chown -R $(id -u):$(id -g) "/data";
-        sudo chown -R $(id -u):$(id -g) "$data";
+        # sudo chown -R $(id -u):$(id -g) "$data";
 
         find /data/ -type d;
         # find $data/ -type d;
