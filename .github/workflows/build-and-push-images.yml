@@ -39,6 +39,7 @@ jobs:
       - name: Checkout ${{ github.repository }}
         uses: actions/checkout@v3
         with:
+          fetch-depth: 0
           persist-credentials: false
 
       - uses: ./.github/actions/copy-common-scripts
@@ -70,6 +71,7 @@ jobs:
       - name: Checkout ${{ github.repository }}
         uses: actions/checkout@v3
         with:
+          fetch-depth: 0
           persist-credentials: false
 
       - id: info
