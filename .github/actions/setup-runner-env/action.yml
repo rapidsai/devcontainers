@@ -13,9 +13,8 @@ runs:
 
     - name: Setup self-hosted runner environment
       if: contains(runner.name, 'rapidsai') == true
-      shell: bash --noprofile --norc -xeo pipefail {0}
+      shell: bash -xeo pipefail {0}
       run: |
         echo "${{ toJSON(runner) }}";
-        docker --version && docker buildx --version;
         echo "TMPDIR=${{ runner.temp }}" >> $GITHUB_ENV;
         echo "HOME=${{ runner.workspace }}" >> $GITHUB_ENV;
