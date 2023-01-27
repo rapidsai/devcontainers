@@ -13,10 +13,11 @@ runs:
     - name: Install devcontainers CLI
       shell: bash
       run: |
-        if [[ "${{ contains(runner.arch, 'ARM') }}" == true ]]; then
-          npm install -g @devcontainers/cli;
-        else
-          sudo wget --no-hsts -q -O /usr/bin/devcontainer \
-            "https://github.com/trxcllnt/devcontainers-cli/releases/download/v0.29.0-trxcllnt/devcontainer-linux-x64";
-          sudo chmod +x /usr/bin/devcontainer;
-        fi
+        npm install -g @devcontainers/cli;
+        # if [[ "${{ contains(runner.arch, 'ARM') }}" == true ]]; then
+        #   npm install -g @devcontainers/cli;
+        # else
+        #   sudo wget --no-hsts -q -O /usr/bin/devcontainer \
+        #     "https://github.com/trxcllnt/devcontainers-cli/releases/download/v0.29.0-trxcllnt/devcontainer-linux-x64";
+        #   sudo chmod +x /usr/bin/devcontainer;
+        # fi
