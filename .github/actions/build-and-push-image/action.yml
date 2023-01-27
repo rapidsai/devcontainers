@@ -30,6 +30,14 @@ runs:
         home: "${{ inputs.home }}"
         tool_cache: "${{ runner.tool_cache }}"
 
+    - name: Setup skopeo
+      if: ${{ contains(runner.name, 'rapidsai') }}
+      shell: bash
+      run: |
+        sudo apt update -y;
+        DEBIAN_FRONTEND=noninteractive \
+        sudo apt install -y --no-install-recommends skopeo;
+
     - name: Setup Node.js
       if: ${{ contains(runner.name, 'rapidsai') }}
       uses: actions/setup-node@v3
