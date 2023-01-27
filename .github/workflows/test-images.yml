@@ -32,4 +32,9 @@ jobs:
       max-parallel: 2
       fail-fast: true
       matrix: ${{ fromJSON(needs.matrix.outputs.matrix) }}
-    with: ${{ fromJSON(matrix) }}
+    with:
+      CUDA: "${{ matrix.CUDA }}"
+      LLVM: "${{ matrix.LLVM }}"
+      RUST: "${{ matrix.RUST }}"
+      NVHPC: "${{ matrix.NVHPC }}"
+      MAMBA: "${{ matrix.MAMBA }}"
