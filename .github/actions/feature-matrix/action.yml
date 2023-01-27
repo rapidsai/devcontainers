@@ -3,8 +3,8 @@ name: feature-matrix
 description: Determine the feature matrix
 
 outputs:
-  matrix:
-    value: ${{ steps.matrix.outputs.matrix }}
+  features:
+    value: ${{ steps.matrix.outputs.features }}
 
 runs:
   using: composite
