@@ -32,6 +32,7 @@ jobs:
       packages: write
     strategy:
       fail-fast: true
+      max-parallel: 1
       matrix:
         arch: [amd64, arm64]
     steps:

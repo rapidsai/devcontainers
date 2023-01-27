@@ -8,17 +8,25 @@ runs:
     - name: Setup self-hosted runner environment
       shell: bash --noprofile --norc -xeo pipefail {0}
       run: |
-        echo "${{ toJSON(runner) }}"
+        echo "${{ toJSON(runner) }}";
 
-        echo "TMPDIR=/data/_temp" >> $GITHUB_ENV;
-        echo "HOME=/data/devcontainers" >> $GITHUB_ENV;
+        cd "${{ runner.workspace }}/devcontainers";
+        mkdir -p "./_temp";
 
-        data="${{ runner.workspace }}/../";
-        data="$(realpath -m "$data")";
-        sudo ln -s "$data" "/data";
+        echo "TMPDIR=./_temp" >> $GITHUB_ENV;
+        echo "HOME=${{ runner.workspace }}" >> $GITHUB_ENV;
 
-        sudo chown -R $(id -u):$(id -g) "/data";
-        sudo chown -R $(id -u):$(id -g) "$data";
+        find "${{ runner.workspace }}" -type d;
 
-        find /data/ -type d;
-        find $data/ -type d;
+        # echo "TMPDIR=/data/_temp" >> $GITHUB_ENV;
+        # echo "HOME=/data/devcontainers" >> $GITHUB_ENV;
+
+        # data="${{ runner.workspace }}/../";
+        # data="$(realpath -m "$data")";
+        # sudo ln -s "$data" "/data";
+
+        # sudo chown -R $(id -u):$(id -g) "/data";
+        # sudo chown -R $(id -u):$(id -g) "$data";
+
+        # find /data/ -type d;
+        # find $data/ -type d;
