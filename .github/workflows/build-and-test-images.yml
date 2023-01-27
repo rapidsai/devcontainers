@@ -23,7 +23,7 @@ jobs:
 
   build-and-test:
     name: Test
-    runs-on: ubuntu-latest
+    runs-on: [self-hosted, linux, ${{ matrix.arch }}, cpu4]
     permissions:
       packages: write
     strategy:

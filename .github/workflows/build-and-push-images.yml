@@ -27,7 +27,7 @@ jobs:
 
   build-and-push:
     name: Push
-    runs-on: ubuntu-latest
+    runs-on: [self-hosted, linux, ${{ matrix.arch }}, cpu4]
     permissions:
       packages: write
     strategy:
@@ -90,5 +90,5 @@ jobs:
           archs: "amd64 arm64"
           home: "${{ env.HOME }}"
           tag: "${{ steps.info.outputs.tag }}"
-          username: ${{ vars.DOCKERHUB_USERNAME }}
-          password: ${{ secrets.DOCKERHUB_TOKEN }}
+          username: "${{ secrets.GPUCIBOT_DOCKERHUB_USER }}"
+          password: "${{ secrets.GPUCIBOT_DOCKERHUB_TOKEN }}"

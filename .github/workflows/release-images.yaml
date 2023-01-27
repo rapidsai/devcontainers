@@ -34,7 +34,6 @@ jobs:
     uses: ./.github/workflows/build-and-push-images.yml
     secrets: inherit
     strategy:
-      max-parallel: 6
       fail-fast: true
       matrix: ${{ fromJSON(needs.matrix.outputs.matrix) }}
     with:
