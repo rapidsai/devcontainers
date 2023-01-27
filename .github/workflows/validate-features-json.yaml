@@ -16,7 +16,8 @@ jobs:
         with:
           persist-credentials: false
 
-      - uses: ./.github/actions/install-devcontainers-cli
+      - name: Install devcontainers CLI
+        uses: ./.github/actions/install-devcontainers-cli
 
       - name: Validate devcontainer-feature.json files
         uses: devcontainers/action@v1

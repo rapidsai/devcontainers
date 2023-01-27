@@ -42,7 +42,8 @@ jobs:
           fetch-depth: 0
           persist-credentials: false
 
-      - uses: ./.github/actions/copy-common-scripts
+      - name: Copy common scripts into features
+        uses: ./.github/actions/copy-common-scripts
 
       - id: info
         name: Determine devcontainer image info

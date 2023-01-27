@@ -19,8 +19,10 @@ jobs:
       - name: Checkout ${{ github.repository }}
         uses: actions/checkout@v3
 
-      - uses: ./.github/actions/install-devcontainers-cli
-      - uses: ./.github/actions/copy-common-scripts
+      - name: Copy common scripts into features
+        uses: ./.github/actions/copy-common-scripts
+      - name: Install devcontainers CLI
+        uses: ./.github/actions/install-devcontainers-cli
 
       - name: Release features
         uses: devcontainers/action@v1

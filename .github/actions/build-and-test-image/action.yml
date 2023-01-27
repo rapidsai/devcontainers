@@ -39,7 +39,7 @@ runs:
     - name: Setup Docker Buildx context
       shell: bash
       run: |
-        docker context create ${{ matrix.tag }}-${{ matrix.arch }}-builder
+        docker context create ${{ inputs.tag }}-${{ inputs.arch }}-builder
 
     - name: Setup Docker buildx
       uses: docker/setup-buildx-action@v2
@@ -47,7 +47,7 @@ runs:
         use: true
         install: true
         buildkitd-flags: --debug
-        endpoint: ${{ matrix.tag }}-${{ matrix.arch }}-builder
+        endpoint: ${{ inputs.tag }}-${{ inputs.arch }}-builder
 
     - name: Build ghcr.io/${{ github.repository }}:${{ inputs.tag }}-${{ inputs.arch }}
       uses: devcontainers/ci@v0.2
