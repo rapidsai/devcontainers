@@ -27,8 +27,6 @@ outputs:
     value: ${{ steps.image-info.outputs.dir }}
   tag:
     value: ${{ steps.image-info.outputs.tag }}
-  build_image:
-    value: ${{ steps.image-info.outputs.build_image }}
 
 runs:
   using: composite
@@ -53,11 +51,8 @@ runs:
 
         if [[ ! -d "./images/${dir}" ]]; then
           echo "skipping because ! -d ./images/${dir}";
-          echo "build_image=0" >> $GITHUB_OUTPUT;
           exit 1;
         fi
-
-        echo "build_image=1" >> $GITHUB_OUTPUT;
 
         cuda=${CUDA:+"-${CUDA}"}
         llvm=${LLVM:+"-${LLVM}"}
