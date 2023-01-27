@@ -43,10 +43,16 @@ jobs:
 
       - uses: ./.github/actions/copy-common-scripts
 
-      - name: Determine devcontainer image info
+      - id: info
+        name: Determine devcontainer image info
         uses: ./.github/actions/image-info
-        with: ${{ fromJSON(inputs) }}
-        id: info
+        with:
+          CUDA: "${{ inputs.CUDA }}"
+          LLVM: "${{ inputs.LLVM }}"
+          RUST: "${{ inputs.RUST }}"
+          NVHPC: "${{ inputs.NVHPC }}"
+          MAMBA: "${{ inputs.MAMBA }}"
+          RAPIDS: "${{ inputs.RAPIDS }}"
 
       - name: Build and push ${{ steps.info.outputs.tag }}-${{ matrix.arch }}
         uses: ./.github/actions/build-and-push-image
