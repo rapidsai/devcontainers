@@ -3,10 +3,6 @@ name: Build and test devcontainer images
 on:
   workflow_call:
     inputs:
-      home:
-        type: string
-        required: true
-        description: Runner HOME dir
       CUDA:
         type: string
         required: true
@@ -60,7 +56,7 @@ jobs:
       - name: Build and test ${{ steps.info.outputs.tag }}-${{ matrix.arch }}
         uses: ./.github/actions/build-and-test-image
         with:
-          home: "${{ inputs.home }}"
+          home: "${{ env.HOME }}"
           arch: "${{ matrix.arch }}"
           dir: "${{ steps.info.outputs.dir }}"
           tag: "${{ steps.info.outputs.tag }}"

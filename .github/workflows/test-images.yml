@@ -32,7 +32,6 @@ jobs:
       fail-fast: true
       matrix: ${{ fromJSON(needs.matrix.outputs.matrix) }}
     with:
-      home: "${{ env.HOME }}"
       CUDA: "${{ matrix.CUDA }}"
       LLVM: "${{ matrix.LLVM }}"
       RUST: "${{ matrix.RUST }}"
