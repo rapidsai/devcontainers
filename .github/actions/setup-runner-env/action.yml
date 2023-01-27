@@ -11,7 +11,7 @@ runs:
         echo "${{ toJSON(runner) }}"
 
         echo "TMPDIR=/data/_temp" >> $GITHUB_ENV;
-        echo "HOME=/data/_work/devcontainers" >> $GITHUB_ENV;
+        echo "HOME=/data/devcontainers" >> $GITHUB_ENV;
 
         data="${{ runner.workspace }}/../";
         data="$(realpath -m "$data")";
