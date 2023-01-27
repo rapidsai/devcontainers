@@ -60,7 +60,7 @@ runs:
         nvhpc=${NVHPC:+"-${NVHPC}"}
         mamba=${MAMBA:+"-mambaforge"}
         rapids=${RAPIDS:-"$(git describe --abbrev=0 --tags | sed 's/[a-zA-Z]//g' | cut -d '.' -f -2)"};
-        tag="${rapids:-dev}-cpp${llvm}${rust}${cuda}${nvhpc}${mamba}-jammy"
+        tag="${rapids:-dev}-jammy-cpp${llvm}${rust}${cuda}${nvhpc}${mamba}"
 
         echo "dir=$dir" >> $GITHUB_OUTPUT;
         echo "tag=$tag" >> $GITHUB_OUTPUT;
