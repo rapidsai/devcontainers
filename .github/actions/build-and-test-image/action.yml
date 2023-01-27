@@ -24,10 +24,17 @@ runs:
   using: composite
   steps:
     - name: Free up disk space
+      if: ${{ !contains(runner.name, 'rapidsai') }}
       uses: ./.github/actions/free-disk-space
       with:
         home: "${{ inputs.home }}"
         tool_cache: "${{ runner.tool_cache }}"
+
+    - name: Setup Node.js
+      if: ${{ contains(runner.name, 'rapidsai') }}
+      uses: actions/setup-node@v3
+      with:
+        node-version: '16'
 
     - name: Cache devcontainer user data folder
       uses: actions/cache@v3

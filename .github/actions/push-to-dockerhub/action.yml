@@ -27,6 +27,7 @@ runs:
   steps:
 
     - name: Free up disk space
+      if: ${{ !contains(runner.name, 'rapidsai') }}
       uses: ./.github/actions/free-disk-space
       with:
         home: "${{ inputs.home }}"

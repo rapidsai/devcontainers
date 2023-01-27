@@ -5,10 +5,18 @@ description: Install devcontainers CLI
 runs:
   using: composite
   steps:
+    - name: Setup Node.js
+      if: ${{ contains(runner.name, 'rapidsai') }}
+      uses: actions/setup-node@v3
+      with:
+        node-version: '16'
     - name: Install devcontainers CLI
-      # run: npm install -g @devcontainers/cli
       shell: bash
       run: |
-        sudo wget --no-hsts -q -O /usr/bin/devcontainer \
-          "https://github.com/trxcllnt/devcontainers-cli/releases/download/v0.29.0-trxcllnt/devcontainer-linux-x64";
-        sudo chmod +x /usr/bin/devcontainer;
+        if [[ "${{ contains(runner.arch, 'ARM') }}" == true ]]; then
+          npm install -g @devcontainers/cli;
+        else
+          sudo wget --no-hsts -q -O /usr/bin/devcontainer \
+            "https://github.com/trxcllnt/devcontainers-cli/releases/download/v0.29.0-trxcllnt/devcontainer-linux-x64";
+          sudo chmod +x /usr/bin/devcontainer;
+        fi
