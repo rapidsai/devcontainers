@@ -34,6 +34,8 @@ runs:
       if: ${{ contains(runner.name, 'rapidsai') }}
       shell: bash
       run: |
+        uname -a;
+        lsb_release -a;
         sudo apt update -y;
         DEBIAN_FRONTEND=noninteractive \
         sudo apt install -y --no-install-recommends skopeo;
