@@ -64,6 +64,7 @@ runs:
         nvhpc=${NVHPC:+"-${NVHPC}"}
         mamba=${MAMBA:+"-mambaforge"}
         tag="${{ inputs.RAPIDS }}${llvm}${rust}${cuda}${nvhpc}${mamba}"
+        tag="${tag:-base}"
 
         echo "dir=$dir" >> $GITHUB_OUTPUT;
         echo "tag=$tag" >> $GITHUB_OUTPUT;
