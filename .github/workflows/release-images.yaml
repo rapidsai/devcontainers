@@ -1,0 +1,46 @@
+name: Release images
+
+concurrency:
+  group: release-images-on-${{ github.event_name }}-from-${{ github.ref_name }}
+  cancel-in-progress: true
+
+on:
+  workflow_dispatch:
+    inputs:
+      RAPIDS:
+        type: string
+        required: true
+        description: RAPIDS release version
+
+jobs:
+
+  matrix:
+    name: Determine matrix
+    runs-on: ubuntu-latest
+    outputs:
+      matrix: ${{ steps.matrix.outputs.matrix }}
+    steps:
+      - name: Checkout ${{ github.repository }}
+        uses: actions/checkout@v3
+        with:
+          persist-credentials: false
+      - id: matrix
+        name: Determine matrix
+        uses: ./.github/actions/image-matrix
+
+  push-images:
+    name: Push
+    needs: matrix
+    uses: ./.github/workflows/build-and-push-images.yml
+    secrets: inherit
+    strategy:
+      max-parallel: 2
+      fail-fast: true
+      matrix: ${{ fromJSON(needs.matrix.outputs.matrix) }}
+    with:
+      CUDA: "${{ matrix.CUDA }}"
+      LLVM: "${{ matrix.LLVM }}"
+      RUST: "${{ matrix.RUST }}"
+      NVHPC: "${{ matrix.NVHPC }}"
+      MAMBA: "${{ matrix.MAMBA }}"
+      RAPIDS: "${{ inputs.RAPIDS }}"

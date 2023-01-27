@@ -1,0 +1,3 @@
+SHELL=/bin/bash
+BASH_ENV=/etc/bash.bash_env
+*/55 * * * * source $BASH_ENV && /opt/devcontainer/bin/vault/s3/init.sh &> /var/log/vault-s3-init.log

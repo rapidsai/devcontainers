@@ -1,0 +1,57 @@
+{
+  "name": "NVHPC SDK",
+  "id": "nvhpc",
+  "version": "1.0.0",
+  "description": "A feature to install the NVHPC SDK",
+  "options": {
+    "version": {
+      "type": "string",
+      "proposals": [
+        "22.11",
+        "22.9",
+        "22.7"
+      ],
+      "default": "22.11",
+      "description": "Version of NVHPC SDK to install."
+    }
+  },
+  "containerEnv": {
+    "BASH_ENV": "/etc/bash.bash_env"
+  },
+  "capAdd": [
+    "SYS_PTRACE"
+  ],
+  "securityOpt": [
+    "seccomp=unconfined"
+  ],
+  "installsAfter": [
+    "ghcr.io/devcontainers/features/common-utils",
+    "ghcr.io/trxcllnt/devcontainer-features/cuda"
+  ],
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "ms-vscode.cpptools",
+        "nvidia.nsight-vscode-edition"
+      ],
+      "settings": {
+        "files.associations": {
+          "*.cu": "cuda-cpp",
+          "*.cuh": "cuda-cpp",
+          "**/libcudacxx/include/**/*": "cpp",
+          "**/libcudacxx-src/include/**/*": "cpp"
+        },
+        "terminal.integrated.profiles.linux": {
+          "bash": {
+            "path": "bash",
+            "icon": "terminal-bash",
+            "args": [
+              "-li"
+            ]
+          }
+        },
+        "terminal.integrated.defaultProfile.linux": "bash"
+      }
+    }
+  }
+}

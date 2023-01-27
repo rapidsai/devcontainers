@@ -1,0 +1,32 @@
+name: image-matrix
+
+description: Determine the image matrix
+
+outputs:
+  matrix:
+    value: ${{ steps.matrix.outputs.matrix }}
+
+runs:
+  using: composite
+  steps:
+    - name: Determine the image matrix
+      id: matrix
+      shell: bash
+      run: |
+        echo "matrix=$(
+        cat <<EOF | yq -o json --no-colors | jq -c -r -M '.matrix'
+        matrix:
+          LLVM: ["", "llvm15", "llvmdev"]
+          RUST: ["", "rust"]
+          CUDA: ["", "cuda11.8", "cuda12.0"]
+          NVHPC: ["", "nvhpc22.11"]
+          MAMBA: ["", "mambaforge"]
+          exclude:
+            - { RUST: "rust", NVHPC: "nvhpc22.11" }
+            - { RUST: "rust", CUDA: "", LLVM: "", NVHPC: "" }
+            - { NVHPC: "nvhpc22.11",        MAMBA: "mambaforge" }
+            - { CUDA: "",         LLVM: "", MAMBA: "mambaforge" }
+            - { CUDA: "cuda11.8", LLVM: "", NVHPC: "nvhpc22.11" }
+            - { CUDA: "cuda12.0", LLVM: "", NVHPC: "nvhpc22.11" }
+        EOF
+        )" | tee -a $GITHUB_OUTPUT;

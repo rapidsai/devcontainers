@@ -1,0 +1,96 @@
+name: push-to-dockerhub
+
+description: Push multiarch manifest to Docker Hub
+
+inputs:
+  tag:
+    type: string
+    required: true
+    description: Image tag
+  home:
+    type: string
+    required: true
+    description: Runner HOME dir
+  archs:
+    type: string
+    required: true
+    description: Image architectures
+  username:
+    required: true
+    description: Docker Hub username
+  password:
+    required: true
+    description: Docker Hub password
+
+runs:
+  using: composite
+  steps:
+
+    - name: Free up disk space
+      uses: ./.github/actions/free-disk-space
+      with:
+        home: "${{ inputs.home }}"
+        tool_cache: "${{ runner.tool_cache }}"
+
+    - name: Login to Docker Hub
+      uses: docker/login-action@v2
+      with:
+        username: ${{ inputs.username }}
+        password: ${{ inputs.password }}
+
+    - name: Push image to Docker Hub
+      env:
+        tag: "${{ inputs.tag }}"
+        DOCKER_CLI_EXPERIMENTAL: enabled
+        registry_username: "${{ inputs.username }}"
+        registry_password: "${{ inputs.password }}"
+        docker_repository: "rapidsai/devcontainers"
+      shell: bash
+      run: |
+        from=ghcr.io/${{github.repository}}:${tag};
+        name=docker.io/${docker_repository}:${tag};
+
+        # Remove all images to conserve disk space
+        docker rmi $(docker image ls -aq) || true;
+        docker system prune -f;
+
+        docker manifest rm ${name} || true;
+
+        for arch in "${{ inputs.archs }}"; do
+          # Pull each image locally
+          docker pull --platform linux/${arch} ${from}-${arch};
+
+          # Retag from ghcr.io to docker.io and add -${arch} suffix
+          docker image tag ${from}-${arch} ${name}-${arch};
+
+          # Push platform-specific docker.io image
+          docker push ${name}-${arch};
+
+          # Create multiarch manifest and add the retagged image
+          docker manifest create ${name} --amend ${name}-${arch};
+
+          # Annotate that this image is the ${arch} version
+          docker manifest annotate ${name} ${name}-${arch} --arch ${arch};
+
+          # Remove all images to conserve disk space
+          docker rmi $(docker image ls -aq) || true;
+          docker system prune -f;
+        done;
+
+        # Push the multiarch manifest
+        docker manifest push ${name};
+
+        # Remove the arch-specific tags and just leave the multiarch manifest
+        DOCKERHUB_TOKEN="$(
+          curl -s -X POST \
+            -H "Content-Type: application/json" \
+            -d "{\"username\": \"${registry_username}\", \"password\": \"${registry_password}\"}" \
+            https://hub.docker.com/v2/users/login/ \
+        | jq -r .token)";
+
+        for arch in "${{ inputs.archs }}"; do
+          curl -i -X DELETE \
+            -H "Accept: application/json" \
+            -H "Authorization: JWT $DOCKERHUB_TOKEN" \
+            "https://hub.docker.com/v2/repositories/${docker_repository}/tags/${tag}-${arch}/";
+        done

@@ -1,0 +1,22 @@
+{
+  "id": "gitlab-cli",
+  "version": "1.0.0",
+  "name": "GitLab CLI",
+  "documentationURL": "https://github.com/trxcllnt/devcontainer-features/tree/main/src/gitlab-cli",
+  "description": "Installs the GitLab CLI. Auto-detects latest version and installs needed dependencies.",
+  "options": {
+    "version": {
+      "type": "string",
+      "proposals": [
+        "latest",
+        "none"
+      ],
+      "default": "latest",
+      "description": "Select version of the GitLab CLI, if not latest."
+    }
+  },
+  "installsAfter": [
+    "ghcr.io/devcontainers/features/common-utils",
+    "ghcr.io/devcontainers/features/git"
+  ]
+}

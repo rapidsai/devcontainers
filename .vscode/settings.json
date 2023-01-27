@@ -1,0 +1,16 @@
+{
+  "[json]": {
+    "editor.tabSize": 2,
+    "editor.formatOnSave": true,
+    "editor.formatOnSaveMode": "file",
+  },
+  "[jsonc]": {
+    "editor.tabSize": 2,
+    "editor.formatOnSave": true,
+    "editor.formatOnSaveMode": "file"
+  },
+  "files.associations": {
+    "**/features/**/*.json": "jsonc",
+    "**/images/**/*.json": "jsonc"
+  }
+}

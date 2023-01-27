@@ -1,0 +1,57 @@
+name: test-image
+
+description: Test image
+
+inputs:
+  dir:
+    type: string
+    required: true
+    description: Image dir
+  tag:
+    type: string
+    required: true
+    description: Image tag
+  arch:
+    type: string
+    required: true
+    description: Image arch
+  home:
+    type: string
+    required: true
+    description: Runner HOME dir
+
+runs:
+  using: composite
+  steps:
+    - name: Free up disk space
+      uses: ./.github/actions/free-disk-space
+      with:
+        home: "${{ inputs.home }}"
+        tool_cache: "${{ runner.tool_cache }}"
+
+    - name: Set up QEMU
+      if: contains(inputs.arch, 'arm64')
+      uses: docker/setup-qemu-action@v2
+
+    - name: Setup Docker buildx
+      uses: docker/setup-buildx-action@v2
+      with:
+        use: true
+
+    - name: Cache devcontainer user data folder
+      uses: actions/cache@v3
+      with:
+        key: ${{ inputs.tag }}-${{ inputs.arch }}-userdata
+        path: ${{ runner.temp }}/${{ inputs.tag }}-${{ inputs.arch }}-userdata
+
+    - name: Build ghcr.io/${{ github.repository }}:${{ inputs.tag }}-${{ inputs.arch }}
+      uses: devcontainers/ci@v0.2
+      with:
+        push: never
+        skipContainerUserIdUpdate: true
+        platform: linux/${{ inputs.arch }}
+        subFolder: images/${{ inputs.dir }}
+        imageName: ghcr.io/${{ github.repository }}
+        imageTag: ${{ inputs.tag }}-${{ inputs.arch }}
+        userDataFolder: ${{ runner.temp }}/${{ inputs.tag }}-${{ inputs.arch }}-userdata
+        cacheFrom: ghcr.io/${{ github.repository }}:${{ inputs.tag }}-${{ inputs.arch }}
