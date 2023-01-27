@@ -46,12 +46,14 @@ for_each_user_bashrc 'sed -i -re "s/^(HIST(FILE)?SIZE=).*$/\1/g" "$0"';
 # Append history lines as soon as they're entered
 for_each_user_bashrc 'echo "PROMPT_COMMAND=\"history -a; \$PROMPT_COMMAND\"" >> "$0"';
 
+github_ssh_keys="$(curl -s https://api.github.com/meta || echo "")";
+github_ssh_keys="${github_ssh_keys:-'{ "ssh_keys" : [] }'}";
+
 # Add GitHub's public keys to known_hosts
 for_each_user_bashrc "$(cat <<"EOF"
     home="$(dirname "$0")"                                \
  && mkdir -p -m 0700 "$home/.ssh"                         \
- && json="$(curl https://api.github.com/meta || echo "")" \
- && echo "${json:-'{ "ssh_keys": [] }'}"                  \
+ && echo "$github_ssh_keys"                               \
   | jq -r '.ssh_keys | map("github.com \(.)") | .[]'      \
   > "$home/.ssh/known_hosts"                              \
  && chmod 644 "$home/.ssh/known_hosts"                    ;
