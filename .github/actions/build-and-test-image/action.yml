@@ -29,15 +29,6 @@ runs:
         home: "${{ inputs.home }}"
         tool_cache: "${{ runner.tool_cache }}"
 
-    - name: Set up QEMU
-      if: contains(inputs.arch, 'arm64')
-      uses: docker/setup-qemu-action@v2
-
-    - name: Setup Docker buildx
-      uses: docker/setup-buildx-action@v2
-      with:
-        use: true
-
     - name: Cache devcontainer user data folder
       uses: actions/cache@v3
       with:
