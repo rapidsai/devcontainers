@@ -1,0 +1,31 @@
+name: install-skopeo
+
+description: Build and install skopeo for Ubuntu 20.04
+
+outputs:
+  features:
+    value: ${{ steps.matrix.outputs.features }}
+
+runs:
+  using: composite
+  steps:
+    - name: Build and install skopeo for Ubuntu 20.04
+      shell: bash
+      run: |
+        DOCKER_BUILDKIT=1 sudo docker build --output=/ < <(cat <<"EOF"
+        FROM golang:1.18 AS skopeo-build
+
+        WORKDIR /usr/src/skopeo
+
+        ARG SKOPEO_VERSION="1.8.0"
+        RUN curl -fsSL "https://github.com/containers/skopeo/archive/v${SKOPEO_VERSION}.tar.gz" \
+          | tar -xzf - --strip-components=1 \
+         && CGO_ENABLED=0 DISABLE_DOCS=1 make -j BUILDTAGS=containers_image_openpgp GO_DYN_FLAGS= \
+         && ./bin/skopeo --version
+
+        FROM scratch
+
+        COPY --from=skopeo-build /usr/src/skopeo/bin/skopeo /usr/bin/
+        COPY --from=skopeo-build /usr/src/skopeo/default-policy.json /etc/containers/policy.json
+        EOF
+        )

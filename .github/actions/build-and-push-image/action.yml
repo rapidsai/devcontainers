@@ -32,13 +32,7 @@ runs:
 
     - name: Setup skopeo
       if: ${{ contains(runner.name, 'rapidsai') }}
-      shell: bash
-      run: |
-        uname -a;
-        lsb_release -a;
-        sudo apt update -y;
-        DEBIAN_FRONTEND=noninteractive \
-        sudo apt install -y --no-install-recommends skopeo;
+      uses: ./.github/actions/install-skopeo
 
     - name: Setup Node.js
       if: ${{ contains(runner.name, 'rapidsai') }}
