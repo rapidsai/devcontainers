@@ -61,7 +61,6 @@ jobs:
       - name: Build and push ${{ steps.info.outputs.tag }}-${{ matrix.arch }}
         uses: ./.github/actions/build-and-push-image
         with:
-          home: "${{ env.HOME }}"
           arch: "${{ matrix.arch }}"
           dir: "${{ steps.info.outputs.dir }}"
           tag: "${{ steps.info.outputs.tag }}"
@@ -92,7 +91,6 @@ jobs:
         uses: ./.github/actions/push-to-dockerhub
         with:
           archs: "amd64 arm64"
-          home: "${{ env.HOME }}"
           tag: "${{ steps.info.outputs.tag }}"
           username: "${{ secrets.GPUCIBOT_DOCKERHUB_USER }}"
           password: "${{ secrets.GPUCIBOT_DOCKERHUB_TOKEN }}"

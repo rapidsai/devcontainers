@@ -15,10 +15,6 @@ inputs:
     type: string
     required: true
     description: Image arch
-  home:
-    type: string
-    required: true
-    description: Runner HOME dir
 
 runs:
   using: composite
@@ -28,13 +24,13 @@ runs:
       name: Setup self-hosted runner environment
       uses: ./.github/actions/setup-runner-env
       with:
-        home: "${{ inputs.home }}"
+        home: "${{ env.home }}"
 
     - if: contains(runner.name, 'rapidsai') != true
       name: Free up disk space
       uses: ./.github/actions/free-disk-space
       with:
-        home: "${{ inputs.home }}"
+        home: "${{ env.home }}"
         tool_cache: "${{ runner.tool_cache }}"
 
     - if: contains(runner.name, 'rapidsai') == true

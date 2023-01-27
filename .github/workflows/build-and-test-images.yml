@@ -56,7 +56,6 @@ jobs:
       - name: Build and test ${{ steps.info.outputs.tag }}-${{ matrix.arch }}
         uses: ./.github/actions/build-and-test-image
         with:
-          home: "${{ env.HOME }}"
           arch: "${{ matrix.arch }}"
           dir: "${{ steps.info.outputs.dir }}"
           tag: "${{ steps.info.outputs.tag }}"
