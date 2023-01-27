@@ -48,12 +48,13 @@ for_each_user_bashrc 'echo "PROMPT_COMMAND=\"history -a; \$PROMPT_COMMAND\"" >> 
 
 # Add GitHub's public keys to known_hosts
 for_each_user_bashrc "$(cat <<"EOF"
-    home="$(dirname "$0")"                           \
- && mkdir -p -m 0700 "$home/.ssh"                    \
- && curl -s https://api.github.com/meta              \
-  | jq -r '.ssh_keys | map("github.com \(.)") | .[]' \
-  > "$home/.ssh/known_hosts"                         \
- && chmod 644 "$home/.ssh/known_hosts"               ;
+    home="$(dirname "$0")"                                \
+ && mkdir -p -m 0700 "$home/.ssh"                         \
+ && json="$(curl https://api.github.com/meta || echo "")" \
+ && echo "${json:-'{ "ssh_keys": [] }'}"                  \
+  | jq -r '.ssh_keys | map("github.com \(.)") | .[]'      \
+  > "$home/.ssh/known_hosts"                              \
+ && chmod 644 "$home/.ssh/known_hosts"                    ;
 EOF
 )"
 
