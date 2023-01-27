@@ -45,7 +45,6 @@ runs:
       uses: docker/setup-buildx-action@v2
       with:
         use: true
-        install: true
         buildkitd-flags: --debug
         endpoint: ${{ inputs.tag }}-${{ inputs.arch }}-builder
 
