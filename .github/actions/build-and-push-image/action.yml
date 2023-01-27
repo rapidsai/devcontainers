@@ -64,7 +64,6 @@ runs:
         # Skip setting this so skopeo isn't required
         # platform: linux/${{ inputs.arch }}
         subFolder: images/${{ inputs.dir }}
-        # checkoutPath: ${{ env.HOME }}/devcontainers
         imageName: ghcr.io/${{ github.repository }}
         imageTag: ${{ inputs.tag }}-${{ inputs.arch }}
         cacheFrom: ghcr.io/${{ github.repository }}:${{ inputs.tag }}-${{ inputs.arch }}
