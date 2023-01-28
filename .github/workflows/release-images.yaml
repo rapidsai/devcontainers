@@ -31,7 +31,7 @@ jobs:
   push-images:
     name: Push
     needs: matrix
-    uses: ./.github/workflows/build-and-push-images.yml
+    uses: ./.github/workflows/build-and-push-image.yml
     secrets: inherit
     strategy:
       fail-fast: true
