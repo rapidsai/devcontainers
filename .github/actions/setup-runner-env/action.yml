@@ -2,6 +2,11 @@ name: image-info
 
 description: Setup self-hosted runner environment
 
+inputs:
+  arch:
+    type: string
+    required: true
+
 runs:
   using: composite
   steps:
@@ -18,3 +23,9 @@ runs:
         echo "${{ toJSON(runner) }}";
         echo "TMPDIR=${{ runner.temp }}" >> $GITHUB_ENV;
         echo "HOME=${{ runner.workspace }}" >> $GITHUB_ENV;
+
+        sudo curl -s \
+            -L "https://github.com/docker/buildx/releases/download/v0.10.1/buildx-v0.10.1-linux-${{ inputs.arch }}" \
+            -o /usr/local/lib/docker/cli-plugins/buildx;
+
+        sudo chmod +x /usr/local/lib/docker/cli-plugins/buildx;
