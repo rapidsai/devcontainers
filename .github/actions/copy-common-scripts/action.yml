@@ -1,4 +1,4 @@
-name: push-to-dockerhub
+name: copy-common-scripts
 
 description: Copy common scripts into features
 

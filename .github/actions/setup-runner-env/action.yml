@@ -1,11 +1,6 @@
-name: image-info
+name: setup-runner-env
 
 description: Setup self-hosted runner environment
-
-inputs:
-  arch:
-    type: string
-    required: true
 
 runs:
   using: composite
@@ -16,8 +11,8 @@ runs:
       with:
         node-version: '16'
 
-    - name: Setup self-hosted runner environment
-      if: contains(runner.name, 'rapidsai') == true
+    - if: contains(runner.name, 'rapidsai') == true
+      name: Setup self-hosted runner environment
       shell: bash -xeo pipefail {0}
       run: |
         echo "${{ toJSON(runner) }}";
@@ -25,13 +20,32 @@ runs:
         echo "HOME=${{ runner.workspace }}" >> $GITHUB_ENV;
         echo "TMPDIR=${{ runner.temp }}" >> $GITHUB_ENV;
 
-        sudo mkdir -p /usr/local/lib/docker/cli-plugins;
-        sudo curl -s \
-            -L "https://github.com/docker/buildx/releases/download/v0.10.1/buildx-v0.10.1.linux-${{ inputs.arch }}" \
-            -o "/usr/local/lib/docker/cli-plugins/docker-buildx";
-        sudo chmod +x /usr/local/lib/docker/cli-plugins/docker-buildx;
-        stat /usr/local/lib/docker/cli-plugins/docker-buildx;
+        arch="$(dpkg --print-architecture | awk -F'-' '{print $NF}')";
 
-        which -a docker;
-        docker --version;
-        docker buildx version;
+        # Install docker buildx
+        docker buildx &>/dev/null \
+         || sudo mkdir -p /usr/local/lib/docker/cli-plugins \
+         && sudo curl -s \
+            -L "https://github.com/docker/buildx/releases/download/v0.10.1/buildx-v0.10.1.linux-${arch}" \
+            -o "/usr/local/lib/docker/cli-plugins/docker-buildx" \
+         && sudo chmod +x /usr/local/lib/docker/cli-plugins/docker-buildx;
+
+    - if: contains(runner.name, 'rapidsai') == true
+      name: Setup Node.js
+      uses: actions/setup-node@v3
+      with:
+        node-version: '16'
+
+    - if: contains(runner.name, 'rapidsai') != true
+      name: Set up QEMU
+      uses: docker/setup-qemu-action@v2
+
+    - name: Create docker context
+      shell: bash
+      run: docker context create builder
+
+    - name: Setup docker buildx
+      uses: docker/setup-buildx-action@v2
+      with:
+        buildkitd-flags: --debug
+        endpoint: builder

@@ -1,4 +1,4 @@
-name: push-to-dockerhub
+name: install-devcontainers-cli
 
 description: Install devcontainers CLI
 

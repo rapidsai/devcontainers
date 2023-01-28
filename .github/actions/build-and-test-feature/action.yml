@@ -1,0 +1,26 @@
+name: test-feature
+
+description: Test feature
+
+inputs:
+  args:
+    type: string
+    required: false
+
+runs:
+  using: composite
+  steps:
+      - name: Setup runner environment
+        uses: ./.github/actions/setup-runner-env
+
+      - name: Copy common scripts into features
+        uses: ./.github/actions/copy-common-scripts
+
+      - name: Install devcontainers CLI
+        uses: ./.github/actions/install-devcontainers-cli
+
+      - name: Test feature
+        shell: bash
+        run: |
+          args="$(echo "${{ inputs.args }}")";
+          devcontainer features test ${args};
