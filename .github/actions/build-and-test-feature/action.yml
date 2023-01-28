@@ -10,17 +10,17 @@ inputs:
 runs:
   using: composite
   steps:
-      - name: Setup runner environment
-        uses: ./.github/actions/setup-runner-env
+    - name: Setup runner environment
+      uses: ./.github/actions/setup-runner-env
 
-      - name: Copy common scripts into features
-        uses: ./.github/actions/copy-common-scripts
+    - name: Copy common scripts into features
+      uses: ./.github/actions/copy-common-scripts
 
-      - name: Install devcontainers CLI
-        uses: ./.github/actions/install-devcontainers-cli
+    - name: Install devcontainers CLI
+      uses: ./.github/actions/install-devcontainers-cli
 
-      - name: Test feature
-        shell: bash
-        env:
-          NODE_NO_WARNINGS: 1
-        run: devcontainer features test ${{ inputs.args }} ./features;
+    - name: Test feature
+      shell: bash
+      env:
+        NODE_NO_WARNINGS: 1
+      run: devcontainer features test ${{ inputs.args }} ./features;

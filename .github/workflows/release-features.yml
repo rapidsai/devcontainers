@@ -9,7 +9,6 @@ on:
 
 jobs:
   deploy:
-    if: ${{ github.ref == 'refs/heads/main' }}
     runs-on: ubuntu-latest
     permissions:
       contents: write
@@ -21,6 +20,7 @@ jobs:
 
       - name: Copy common scripts into features
         uses: ./.github/actions/copy-common-scripts
+
       - name: Install devcontainers CLI
         uses: ./.github/actions/install-devcontainers-cli
 
@@ -40,10 +40,11 @@ jobs:
         run: |
           set -e
           echo "Start."
-          # Configure git and Push updates
+          # Configure git and push updates
           git config --global user.email github-actions@github.com
           git config --global user.name github-actions
           git config pull.rebase false
+          base="$(git branch --show-current)"
           branch=automated-documentation-update-$GITHUB_RUN_ID
           git checkout -b $branch
           message='Automated documentation update'
@@ -53,5 +54,5 @@ jobs:
           # Push
           if [ "$NO_UPDATES" != "true" ] ; then
               git push origin "$branch"
-              gh pr create --title "$message" --body "$message"
+              gh pr create --base "$base" --title "$message" --body "$message"
           fi

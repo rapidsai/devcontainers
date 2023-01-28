@@ -30,6 +30,9 @@ runs:
     - name: Setup runner environment
       uses: ./.github/actions/setup-runner-env
 
+    - name: Copy common scripts into features
+      uses: ./.github/actions/copy-common-scripts
+
     - name: Build ghcr.io/${{ github.repository }}:${{ inputs.tag }}-${{ inputs.arch }}
       uses: devcontainers/ci@v0.2
       env:
