@@ -18,10 +18,6 @@ on:
       MAMBA:
         type: string
         required: true
-      RAPIDS:
-        type: string
-        required: true
-        description: RAPIDS release version
 
 jobs:
 
@@ -57,7 +53,6 @@ jobs:
           RUST: "${{ inputs.RUST }}"
           NVHPC: "${{ inputs.NVHPC }}"
           MAMBA: "${{ inputs.MAMBA }}"
-          RAPIDS: "${{ inputs.RAPIDS }}"
 
       - name: Build and push ${{ steps.info.outputs.tag }}-${{ matrix.arch }}
         uses: ./.github/actions/build-and-push-image
@@ -86,7 +81,6 @@ jobs:
           RUST: "${{ inputs.RUST }}"
           NVHPC: "${{ inputs.NVHPC }}"
           MAMBA: "${{ inputs.MAMBA }}"
-          RAPIDS: "${{ inputs.RAPIDS }}"
 
       - name: Push multiarch manifest to Docker Hub
         uses: ./.github/actions/push-to-dockerhub

@@ -6,11 +6,6 @@ concurrency:
 
 on:
   workflow_dispatch:
-    inputs:
-      RAPIDS:
-        type: string
-        required: true
-        description: RAPIDS release version
 
 jobs:
 
@@ -42,4 +37,3 @@ jobs:
       RUST: "${{ matrix.RUST }}"
       NVHPC: "${{ matrix.NVHPC }}"
       MAMBA: "${{ matrix.MAMBA }}"
-      RAPIDS: "${{ inputs.RAPIDS }}"

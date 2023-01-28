@@ -18,9 +18,6 @@ inputs:
   MAMBA:
     type: string
     required: true
-  RAPIDS:
-    type: string
-    required: false
 
 outputs:
   dir:
@@ -40,7 +37,6 @@ runs:
         RUST: "${{ inputs.RUST }}"
         NVHPC: "${{ inputs.NVHPC }}"
         MAMBA: "${{ inputs.MAMBA }}"
-        RAPIDS: "${{ inputs.RAPIDS }}"
       run: |
         cuda=${CUDA:+"-cuda"};
         llvm=${LLVM:+"-llvm"};
@@ -54,13 +50,13 @@ runs:
           exit 1;
         fi
 
-        cuda=${CUDA:+"-${CUDA}"}
-        llvm=${LLVM:+"-${LLVM}"}
-        rust=${RUST:+"-${RUST}"}
-        nvhpc=${NVHPC:+"-${NVHPC}"}
-        mamba=${MAMBA:+"-mambaforge"}
-        rapids=${RAPIDS:-"$(git describe --abbrev=0 --tags | sed 's/[a-zA-Z]//g' | cut -d '.' -f -2)"};
-        tag="${rapids:-dev}-jammy-cpp${llvm}${rust}${cuda}${nvhpc}${mamba}"
+        cuda=${CUDA:+"-${CUDA}"};
+        llvm=${LLVM:+"-${LLVM}"};
+        rust=${RUST:+"-${RUST}"};
+        nvhpc=${NVHPC:+"-${NVHPC}"};
+        mamba=${MAMBA:+"-mambaforge"};
+        rapids="$(git describe --abbrev=0 --tags | sed 's/[a-zA-Z]//g' | cut -d '.' -f -2)";
+        tag="${rapids:-dev}-jammy-cpp${llvm}${rust}${cuda}${nvhpc}${mamba}";
 
         echo "dir=$dir" >> $GITHUB_OUTPUT;
         echo "tag=$tag" >> $GITHUB_OUTPUT;
