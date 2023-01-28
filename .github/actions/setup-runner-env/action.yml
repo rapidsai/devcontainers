@@ -24,6 +24,7 @@ runs:
         echo "TMPDIR=${{ runner.temp }}" >> $GITHUB_ENV;
         echo "HOME=${{ runner.workspace }}" >> $GITHUB_ENV;
 
+        sudo mkdir -p /usr/local/lib/docker/cli-plugins
         sudo curl -s \
             -L "https://github.com/docker/buildx/releases/download/v0.10.1/buildx-v0.10.1-linux-${{ inputs.arch }}" \
             -o /usr/local/lib/docker/cli-plugins/buildx;
