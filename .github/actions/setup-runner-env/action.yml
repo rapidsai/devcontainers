@@ -15,20 +15,8 @@ runs:
       name: Setup self-hosted runner environment
       shell: bash -eo pipefail {0}
       run: |
-        echo "${{ toJSON(runner) }}";
-
         echo "HOME=${{ runner.workspace }}" >> $GITHUB_ENV;
         echo "TMPDIR=${{ runner.temp }}" >> $GITHUB_ENV;
-
-        arch="$(dpkg --print-architecture | awk -F'-' '{print $NF}')";
-
-        # Install docker buildx
-        docker buildx &>/dev/null \
-         || sudo mkdir -p /usr/local/lib/docker/cli-plugins \
-         && sudo curl -s \
-            -L "https://github.com/docker/buildx/releases/download/v0.10.1/buildx-v0.10.1.linux-${arch}" \
-            -o "/usr/local/lib/docker/cli-plugins/docker-buildx" \
-         && sudo chmod +x /usr/local/lib/docker/cli-plugins/docker-buildx;
 
     - if: contains(runner.name, 'rapidsai') == true
       name: Setup Node.js
