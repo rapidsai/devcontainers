@@ -25,19 +25,12 @@ runs:
         echo "HOME=${{ runner.workspace }}" >> $GITHUB_ENV;
         echo "TMPDIR=${{ runner.temp }}" >> $GITHUB_ENV;
 
-        HOME="$(bash -c "echo ~$(whoami)")";
-        mkdir -p "$HOME/.docker/cli-plugins";
-        chmod 0775 "$HOME/.docker/cli-plugins";
-        chmod 0700 "$HOME/.docker";
-        curl -s \
+        sudo mkdir -p /usr/local/lib/docker/cli-plugins;
+        sudo curl -s \
             -L "https://github.com/docker/buildx/releases/download/v0.10.1/buildx-v0.10.1.linux-${{ inputs.arch }}" \
-            -o "$HOME/.docker/cli-plugins/buildx";
-
-        chmod 0755 "$HOME/.docker/cli-plugins/buildx";
-
-        stat "$HOME/.docker";
-        stat "$HOME/.docker/cli-plugins";
-        stat "$HOME/.docker/cli-plugins/buildx";
+            -o "/usr/local/lib/docker/cli-plugins/buildx";
+        sudo chmod +x /usr/local/lib/docker/cli-plugins/buildx;
+        stat /usr/local/lib/docker/cli-plugins/buildx;
 
         which -a docker;
         docker --version;
