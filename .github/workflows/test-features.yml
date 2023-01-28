@@ -34,7 +34,7 @@ jobs:
 
   test-scenario:
     needs: matrix
-    name: Scenario
+    name: Scenarios
     uses: ./.github/workflows/build-and-test-feature.yml
     secrets: inherit
     strategy:

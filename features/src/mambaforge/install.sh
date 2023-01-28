@@ -1,5 +1,5 @@
 #! /usr/bin/env bash
-set -ex
+set -e
 
 MAMBAFORGE_VERSION="${VERSION:-latest}";
 

@@ -13,7 +13,7 @@ runs:
 
     - if: contains(runner.name, 'rapidsai') == true
       name: Setup self-hosted runner environment
-      shell: bash -xeo pipefail {0}
+      shell: bash -eo pipefail {0}
       run: |
         echo "${{ toJSON(runner) }}";
 
