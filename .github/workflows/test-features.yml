@@ -50,6 +50,9 @@ jobs:
 
       - name: Setup runner environment
         uses: ./.github/actions/setup-runner-env
+        with:
+          arch: ${{ matrix.arch }}
+
       - name: Copy common scripts into features
         uses: ./.github/actions/copy-common-scripts
       - name: Install devcontainers CLI
@@ -81,6 +84,9 @@ jobs:
 
       - name: Setup runner environment
         uses: ./.github/actions/setup-runner-env
+        with:
+          arch: ${{ matrix.arch }}
+
       - name: Copy common scripts into features
         uses: ./.github/actions/copy-common-scripts
       - name: Install devcontainers CLI
@@ -110,6 +116,9 @@ jobs:
 
       - name: Setup runner environment
         uses: ./.github/actions/setup-runner-env
+        with:
+          arch: ${{ matrix.arch }}
+
       - name: Copy common scripts into features
         uses: ./.github/actions/copy-common-scripts
       - name: Install devcontainers CLI

@@ -27,11 +27,14 @@ runs:
 
         HOME="$(bash -c "echo ~$(whoami)")";
         mkdir -p "$HOME/.docker/cli-plugins";
+        chmod 0775 "$HOME/.docker/cli-plugins";
+        chmod 0700 "$HOME/.docker";
         curl -s \
             -L "https://github.com/docker/buildx/releases/download/v0.10.1/buildx-v0.10.1-linux-${{ inputs.arch }}" \
             -o "$HOME/.docker/cli-plugins/buildx";
 
-        chmod +x "$HOME/.docker/cli-plugins/buildx";
+        chmod 0755 "$HOME/.docker/cli-plugins/buildx";
+
         stat "$HOME/.docker";
         stat "$HOME/.docker/cli-plugins";
         stat "$HOME/.docker/cli-plugins/buildx";
