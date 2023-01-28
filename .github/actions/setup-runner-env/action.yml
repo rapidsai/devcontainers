@@ -22,24 +22,20 @@ runs:
       run: |
         echo "${{ toJSON(runner) }}";
 
-        USER="$(whoami)";
-        TMPDIR="${{ runner.temp }}";
-        NEW_HOME="${{ runner.workspace }}";
-        OLD_HOME="$(bash -c "echo ~${USER}")";
-        sudo sed -ri "s@$OLD_HOME@$NEW_HOME@g" /etc/passwd
+        echo "HOME=${{ runner.workspace }}" >> $GITHUB_ENV;
+        echo "TMPDIR=${{ runner.temp }}" >> $GITHUB_ENV;
 
-        echo "HOME=$NEW_HOME" >> $GITHUB_ENV;
-        echo "TMPDIR=$TMPDIR" >> $GITHUB_ENV;
-
-        mkdir -p "$NEW_HOME/.docker/cli-plugins";
+        HOME="$(bash -c "echo ~$(whoami)")";
+        mkdir -p "$HOME/.docker/cli-plugins";
         curl -s \
             -L "https://github.com/docker/buildx/releases/download/v0.10.1/buildx-v0.10.1-linux-${{ inputs.arch }}" \
-            -o "$NEW_HOME/.docker/cli-plugins/buildx";
+            -o "$HOME/.docker/cli-plugins/buildx";
 
-        chmod +x "$NEW_HOME/.docker/cli-plugins/buildx";
-        stat "$NEW_HOME/.docker/cli-plugins/buildx";
+        chmod +x "$HOME/.docker/cli-plugins/buildx";
+        stat "$HOME/.docker";
+        stat "$HOME/.docker/cli-plugins";
+        stat "$HOME/.docker/cli-plugins/buildx";
 
         which -a docker;
         docker --version;
         docker buildx version;
-        docker buildx && echo $?;
