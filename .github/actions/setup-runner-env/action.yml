@@ -21,12 +21,25 @@ runs:
       shell: bash -xeo pipefail {0}
       run: |
         echo "${{ toJSON(runner) }}";
-        echo "TMPDIR=${{ runner.temp }}" >> $GITHUB_ENV;
-        echo "HOME=${{ runner.workspace }}" >> $GITHUB_ENV;
 
-        sudo mkdir -p /usr/local/lib/docker/cli-plugins
-        sudo curl -s \
+        USER="$(whoami)";
+        TMPDIR="${{ runner.temp }}";
+        NEW_HOME="${{ runner.workspace }}";
+        OLD_HOME="$(bash -c "echo ~${USER}")";
+        sudo sed -ri "s@$OLD_HOME@$NEW_HOME@g" /etc/passwd
+
+        echo "HOME=$NEW_HOME" >> $GITHUB_ENV;
+        echo "TMPDIR=$TMPDIR" >> $GITHUB_ENV;
+
+        mkdir -p "$NEW_HOME/.docker/cli-plugins";
+        curl -s \
             -L "https://github.com/docker/buildx/releases/download/v0.10.1/buildx-v0.10.1-linux-${{ inputs.arch }}" \
-            -o /usr/local/lib/docker/cli-plugins/buildx;
+            -o "$NEW_HOME/.docker/cli-plugins/buildx";
 
-        sudo chmod +x /usr/local/lib/docker/cli-plugins/buildx;
+        chmod +x "$NEW_HOME/.docker/cli-plugins/buildx";
+        stat "$NEW_HOME/.docker/cli-plugins/buildx";
+
+        which -a docker;
+        docker --version;
+        docker buildx version;
+        docker buildx && echo $?;
