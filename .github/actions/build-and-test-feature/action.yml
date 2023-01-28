@@ -5,7 +5,7 @@ description: Test feature
 inputs:
   args:
     type: string
-    required: false
+    required: true
 
 runs:
   using: composite
@@ -21,6 +21,6 @@ runs:
 
       - name: Test feature
         shell: bash
-        run: |
-          args="$(echo "${{ inputs.args }}")";
-          devcontainer features test ${args};
+        env:
+          NODE_NO_WARNINGS: 1
+        run: devcontainer features test ${{ inputs.args }} ./features;

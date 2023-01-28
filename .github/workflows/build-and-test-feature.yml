@@ -32,4 +32,4 @@ jobs:
       - name: ${{ inputs.name }}
         uses: ./.github/actions/build-and-test-feature
         with:
-          args: ${{ inputs.args }}
+          args: "${{ inputs.args }}"

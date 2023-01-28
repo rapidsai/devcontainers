@@ -39,6 +39,8 @@ runs:
 
     - name: Build and push ghcr.io/${{ github.repository }}:${{ inputs.tag }}-${{ inputs.arch }}
       uses: devcontainers/ci@v0.2
+      env:
+        NODE_NO_WARNINGS: 1
       with:
         push: always
         skipContainerUserIdUpdate: true
