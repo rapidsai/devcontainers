@@ -9,7 +9,7 @@ cd "$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )";
 # install global/common scripts
 . ./common/install.sh;
 
-check_packages jq wget unzip ca-certificates bash-completion;
+check_packages jq git gcc g++ make wget file unzip ca-certificates bash-completion;
 
 echo "Installing ninja-build...";
 
@@ -17,11 +17,24 @@ if [ $NINJA_VERSION == latest ]; then
     find_version_from_git_tags NINJA_VERSION https://github.com/ninja-build/ninja;
 fi
 
+# Clone Ninja
+git clone \
+    -j$(nproc) \
+    --single-branch \
+    --shallow-submodules \
+    --recurse-submodules \
+    --branch "v$NINJA_VERSION" \
+    https://github.com/ninja-build/ninja \
+    /tmp/ninja
+
+# Configure Ninja
+cmake -S /tmp/ninja -B /tmp/ninja/build -DCMAKE_BUILD_TYPE=Release;
+# Build Ninja
+cmake --build /tmp/ninja/build --parallel --config Release;
 # Install Ninja
-wget --no-hsts -q -O /tmp/ninja-linux.zip \
-    https://github.com/ninja-build/ninja/releases/download/v${NINJA_VERSION}/ninja-linux.zip;
-unzip -d /usr/bin /tmp/ninja-linux.zip;
-chmod +x /usr/bin/ninja;
+strip /tmp/ninja/build/ninja;
+file /tmp/ninja/build/ninja;
+cmake --install /tmp/ninja/build;
 
 # Clean up
 rm -rf "/tmp/*";
