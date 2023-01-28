@@ -28,9 +28,9 @@ runs:
         sudo mkdir -p /usr/local/lib/docker/cli-plugins;
         sudo curl -s \
             -L "https://github.com/docker/buildx/releases/download/v0.10.1/buildx-v0.10.1.linux-${{ inputs.arch }}" \
-            -o "/usr/local/lib/docker/cli-plugins/buildx";
-        sudo chmod +x /usr/local/lib/docker/cli-plugins/buildx;
-        stat /usr/local/lib/docker/cli-plugins/buildx;
+            -o "/usr/local/lib/docker/cli-plugins/docker-buildx";
+        sudo chmod +x /usr/local/lib/docker/cli-plugins/docker-buildx;
+        stat /usr/local/lib/docker/cli-plugins/docker-buildx;
 
         which -a docker;
         docker --version;
