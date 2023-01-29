@@ -13,7 +13,7 @@ on:
 jobs:
 
   test:
-    name: ${{ inputs.name }}
+    name: ${{ inputs.name }} (${{ matrix.arch }})
     runs-on:
       - self-hosted
       - linux
