@@ -1,11 +1,7 @@
 name: Validate features
 
-concurrency:
-  group: validate-features-on-${{ github.event_name }}-from-${{ github.ref_name }}
-  cancel-in-progress: true
-
 on:
-  pull_request:
+  workflow_call:
 
 jobs:
   validate:
