@@ -30,7 +30,7 @@ jobs:
         uses: ./.github/actions/image-matrix
 
   test-images:
-    name: Test
+    name: Image
     needs: image-matrix
     secrets: inherit
     uses: ./.github/workflows/build-and-test-image.yml
