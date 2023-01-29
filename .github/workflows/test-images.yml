@@ -26,8 +26,8 @@ jobs:
   test-images:
     name: Test
     needs: matrix
-    uses: ./.github/workflows/build-and-test-image.yml
     secrets: inherit
+    uses: ./.github/workflows/build-and-test-image.yml
     strategy:
       fail-fast: true
       matrix: ${{ fromJSON(needs.matrix.outputs.matrix) }}
