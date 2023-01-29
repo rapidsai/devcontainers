@@ -22,7 +22,7 @@ on:
 jobs:
 
   build-and-test:
-    name: Test
+    name: Build and test
     runs-on:
       - self-hosted
       - linux

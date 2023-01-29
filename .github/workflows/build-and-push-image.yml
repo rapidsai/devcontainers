@@ -22,7 +22,7 @@ on:
 jobs:
 
   build-and-push:
-    name: Push
+    name: Build and push to ghcr.io
     runs-on:
       - self-hosted
       - linux

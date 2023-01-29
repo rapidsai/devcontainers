@@ -13,7 +13,7 @@ on:
 jobs:
 
   test:
-    name: Test
+    name: ${{ inputs.name }}
     runs-on:
       - self-hosted
       - linux

@@ -5,6 +5,7 @@ on:
 
 jobs:
   validate:
+    name: Validate features
     runs-on: ubuntu-latest
     steps:
       - name: Checkout ${{ github.repository }}
