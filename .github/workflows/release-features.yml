@@ -1,19 +1,15 @@
 name: Release features
 
-concurrency:
-  group: release-features-on-${{ github.event_name }}-from-${{ github.ref_name }}
-  cancel-in-progress: true
-
 on:
-  workflow_dispatch:
+  workflow_call:
 
 jobs:
+
   release-features:
+    name: Release features
     runs-on: ubuntu-latest
     permissions:
-      contents: write
       packages: write
-      pull-requests: write
     steps:
       - name: Checkout ${{ github.repository }}
         uses: actions/checkout@v3
