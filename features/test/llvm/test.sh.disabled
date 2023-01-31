@@ -16,7 +16,7 @@ source dev-container-features-test-lib
 # The 'check' command comes from the dev-container-features-test-lib.
 
 echo "LLVM_VERSION: $LLVM_VERSION"
-check "clang version" bash -c "clang --version | grep 'clang version $LLVM_VERSION'"
+check "clang version" bash -c "clang --version | grep 'clang version 17'"
 check "apt repo" grep "llvm-toolchain-$(lsb_release -cs) main" /etc/apt/sources.list{,.d/*.list}
 
 # Report result

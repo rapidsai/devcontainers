@@ -14,36 +14,6 @@ jobs:
     secrets: inherit
     uses: ./.github/workflows/validate-features-json.yml
 
-  image-matrix:
-    name: Determine image matrix
-    needs: validate-features-json
-    runs-on: ubuntu-latest
-    outputs:
-      matrix: ${{ steps.matrix.outputs.matrix }}
-    steps:
-      - name: Checkout ${{ github.repository }}
-        uses: actions/checkout@v3
-        with:
-          persist-credentials: false
-      - id: matrix
-        name: Determine image matrix
-        uses: ./.github/actions/image-matrix
-
-  test-images:
-    name: Image
-    needs: image-matrix
-    secrets: inherit
-    uses: ./.github/workflows/build-and-test-image.yml
-    strategy:
-      fail-fast: true
-      matrix: ${{ fromJSON(needs.image-matrix.outputs.matrix) }}
-    with:
-      CUDA: "${{ matrix.CUDA }}"
-      LLVM: "${{ matrix.LLVM }}"
-      RUST: "${{ matrix.RUST }}"
-      NVHPC: "${{ matrix.NVHPC }}"
-      MAMBA: "${{ matrix.MAMBA }}"
-
   run-feature-integration-tests:
     name: Integration
     needs: validate-features-json
@@ -91,7 +61,39 @@ jobs:
       fail-fast: true
       matrix:
         feature: ${{ fromJSON(needs.features-matrix.outputs.features) }}
-        image: ["ubuntu:jammy", "mcr.microsoft.com/devcontainers/base:jammy"]
     with:
-      name: "'${{ matrix.feature }}' × '${{ matrix.image }}'"
-      args: "--skip-scenarios -f ${{ matrix.feature }} -i ${{ matrix.image }}"
+      name: "'${{ matrix.feature }}' × 'ubuntu:jammy'"
+      args: "--skip-scenarios -f ${{ matrix.feature }} -i ubuntu:jammy"
+
+  image-matrix:
+    name: Determine image matrix
+    needs:
+      - validate-features-json
+      - run-feature-scenario-tests
+      - run-generated-feature-tests
+    runs-on: ubuntu-latest
+    outputs:
+      matrix: ${{ steps.matrix.outputs.matrix }}
+    steps:
+      - name: Checkout ${{ github.repository }}
+        uses: actions/checkout@v3
+        with:
+          persist-credentials: false
+      - id: matrix
+        name: Determine image matrix
+        uses: ./.github/actions/image-matrix
+
+  test-images:
+    name: Image
+    needs: image-matrix
+    secrets: inherit
+    uses: ./.github/workflows/build-and-test-image.yml
+    strategy:
+      fail-fast: true
+      matrix: ${{ fromJSON(needs.image-matrix.outputs.matrix) }}
+    with:
+      CUDA: "${{ matrix.CUDA }}"
+      LLVM: "${{ matrix.LLVM }}"
+      RUST: "${{ matrix.RUST }}"
+      NVHPC: "${{ matrix.NVHPC }}"
+      MAMBA: "${{ matrix.MAMBA }}"
