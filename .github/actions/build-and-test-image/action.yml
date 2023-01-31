@@ -1,4 +1,4 @@
-name: test-image
+name: build-and-test-image
 
 description: Test image
 
@@ -15,43 +15,34 @@ inputs:
     type: string
     required: true
     description: Image arch
-  home:
-    type: string
-    required: true
-    description: Runner HOME dir
 
 runs:
   using: composite
   steps:
-    - name: Free up disk space
+
+    - if: contains(runner.name, 'rapidsai') != true
+      name: Free up disk space
       uses: ./.github/actions/free-disk-space
       with:
-        home: "${{ inputs.home }}"
+        home: "${{ env.HOME }}"
         tool_cache: "${{ runner.tool_cache }}"
 
-    - name: Set up QEMU
-      if: contains(inputs.arch, 'arm64')
-      uses: docker/setup-qemu-action@v2
+    - name: Setup runner environment
+      uses: ./.github/actions/setup-runner-env
 
-    - name: Setup Docker buildx
-      uses: docker/setup-buildx-action@v2
-      with:
-        use: true
-
-    - name: Cache devcontainer user data folder
-      uses: actions/cache@v3
-      with:
-        key: ${{ inputs.tag }}-${{ inputs.arch }}-userdata
-        path: ${{ runner.temp }}/${{ inputs.tag }}-${{ inputs.arch }}-userdata
+    - name: Copy common scripts into features
+      uses: ./.github/actions/copy-common-scripts
 
     - name: Build ghcr.io/${{ github.repository }}:${{ inputs.tag }}-${{ inputs.arch }}
       uses: devcontainers/ci@v0.2
+      env:
+        NODE_NO_WARNINGS: 1
       with:
         push: never
         skipContainerUserIdUpdate: true
-        platform: linux/${{ inputs.arch }}
+        # Skip setting this so skopeo isn't required
+        # platform: linux/${{ inputs.arch }}
         subFolder: images/${{ inputs.dir }}
         imageName: ghcr.io/${{ github.repository }}
         imageTag: ${{ inputs.tag }}-${{ inputs.arch }}
-        userDataFolder: ${{ runner.temp }}/${{ inputs.tag }}-${{ inputs.arch }}-userdata
         cacheFrom: ghcr.io/${{ github.repository }}:${{ inputs.tag }}-${{ inputs.arch }}

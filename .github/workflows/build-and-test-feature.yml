@@ -1,0 +1,35 @@
+name: Build and test devcontainer features
+
+on:
+  workflow_call:
+    inputs:
+      name:
+        type: string
+        required: true
+      args:
+        type: string
+        required: true
+
+jobs:
+
+  test:
+    name: ${{ inputs.name }} (${{ matrix.arch }})
+    runs-on:
+      - self-hosted
+      - linux
+      - ${{ matrix.arch }}
+      - cpu4
+    strategy:
+      fail-fast: true
+      matrix:
+        arch: [amd64, arm64]
+    steps:
+      - name: Checkout ${{ github.repository }}
+        uses: actions/checkout@v3
+        with:
+          persist-credentials: false
+
+      - name: ${{ inputs.name }}
+        uses: ./.github/actions/build-and-test-feature
+        with:
+          args: "${{ inputs.args }}"

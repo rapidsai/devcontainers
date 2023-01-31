@@ -1,14 +1,11 @@
 name: Validate features
 
-concurrency:
-  group: validate-features-on-${{ github.event_name }}-from-${{ github.ref_name }}
-  cancel-in-progress: true
-
 on:
-  pull_request:
+  workflow_call:
 
 jobs:
   validate:
+    name: Validate features
     runs-on: ubuntu-latest
     steps:
       - name: Checkout ${{ github.repository }}
@@ -16,7 +13,8 @@ jobs:
         with:
           persist-credentials: false
 
-      - uses: ./.github/actions/install-devcontainers-cli
+      - name: Install devcontainers CLI
+        uses: ./.github/actions/install-devcontainers-cli
 
       - name: Validate devcontainer-feature.json files
         uses: devcontainers/action@v1

@@ -39,36 +39,27 @@ fi
 
 echo "Successfully authenticated with vault!";
 
+ttl="${VAULT_S3_TTL:-"43200s"}";
+uri="${VAULT_S3_URI:-"v1/aws/creds/devs"}";
+
 # Generate temporary AWS creds
-# todo: This should work but isn't
-# -d "{\"ttl\": \"43200s\"}"          \
 aws_creds="$(                               \
     curl -s                                 \
-        -X POST                             \
+        -X GET                              \
         -H "X-Vault-Token: $vault_token"    \
         -H "Content-Type: application/json" \
-        "$VAULT_HOST/v1/aws/sts/devs"       \
+        "$VAULT_HOST/$uri?ttl=$ttl"         \
   | jq -r '.data'                           \
 )";
 
 unset vault_token;
 
-aws_role_arn="$(echo "$aws_creds" | jq -r '.arn')";
 aws_access_key_id="$(echo "$aws_creds" | jq -r '.access_key')";
-aws_session_token="$(echo "$aws_creds" | jq -r '.security_token')";
 aws_secret_access_key="$(echo "$aws_creds" | jq -r '.secret_key')";
 
 unset aws_creds;
 
-if [[ "${aws_role_arn:-null}" == null ]]; then
-    echo "Failed to generate temporary AWS S3 credentials. Exiting." >&2;
-    exit 1;
-fi;
 if [[ "${aws_access_key_id:-null}" == null ]]; then
-    echo "Failed to generate temporary AWS S3 credentials. Exiting." >&2;
-    exit 1;
-fi;
-if [[ "${aws_session_token:-null}" == null ]]; then
     echo "Failed to generate temporary AWS S3 credentials. Exiting." >&2;
     exit 1;
 fi;
@@ -83,18 +74,14 @@ cat <<EOF > ~/.aws/config
 [default]
 region=${SCCACHE_REGION:-us-east-2}
 bucket=${SCCACHE_BUCKET:-rapids-sccache-devs}
-role_arn=$aws_role_arn
 EOF
 cat <<EOF > ~/.aws/credentials
 [default]
 aws_access_key_id=$aws_access_key_id
 aws_secret_access_key=$aws_secret_access_key
-aws_session_token=$aws_session_token
 EOF
 
-unset aws_role_arn;
 unset aws_access_key_id;
-unset aws_session_token;
 unset aws_secret_access_key;
 
 chmod 0600 ~/.aws/{config,credentials};
@@ -112,7 +99,7 @@ if [ -z "${SCCACHE_BUCKET:-}" ] || \
     echo "export SCCACHE_BUCKET=${SCCACHE_BUCKET:-rapids-sccache-devs}" >> ~/.bashrc;
 fi
 
-# If we succeeded at least once, install user crontab and refresh creds every 55 minutes
+# If we succeeded at least once, install user crontab and refresh creds every 8hrs
 if ! crontab -l &> /dev/null; then
     crontab /opt/devcontainer/cron/vault-s3-init            \
  && sudo touch /var/log/vault-s3-init.log                   \

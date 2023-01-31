@@ -1,21 +1,21 @@
-name: Release images
+name: Release
 
 concurrency:
-  group: release-images-on-${{ github.event_name }}-from-${{ github.ref_name }}
+  group: release-on-${{ github.event_name }}-from-${{ github.ref_name }}
   cancel-in-progress: true
 
 on:
   workflow_dispatch:
-    inputs:
-      RAPIDS:
-        type: string
-        required: true
-        description: RAPIDS release version
 
 jobs:
 
-  matrix:
-    name: Determine matrix
+  release-features:
+    name: Features
+    secrets: inherit
+    uses: ./.github/workflows/release-features.yml
+
+  image-matrix:
+    name: Determine image matrix
     runs-on: ubuntu-latest
     outputs:
       matrix: ${{ steps.matrix.outputs.matrix }}
@@ -25,22 +25,20 @@ jobs:
         with:
           persist-credentials: false
       - id: matrix
-        name: Determine matrix
+        name: Determine image matrix
         uses: ./.github/actions/image-matrix
 
   push-images:
-    name: Push
-    needs: matrix
-    uses: ./.github/workflows/build-and-push-images.yml
+    name: Image
+    needs: image-matrix
     secrets: inherit
+    uses: ./.github/workflows/build-and-push-image.yml
     strategy:
-      max-parallel: 2
       fail-fast: true
-      matrix: ${{ fromJSON(needs.matrix.outputs.matrix) }}
+      matrix: ${{ fromJSON(needs.image-matrix.outputs.matrix) }}
     with:
       CUDA: "${{ matrix.CUDA }}"
       LLVM: "${{ matrix.LLVM }}"
       RUST: "${{ matrix.RUST }}"
       NVHPC: "${{ matrix.NVHPC }}"
       MAMBA: "${{ matrix.MAMBA }}"
-      RAPIDS: "${{ inputs.RAPIDS }}"

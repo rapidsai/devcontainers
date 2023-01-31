@@ -18,17 +18,12 @@ inputs:
   MAMBA:
     type: string
     required: true
-  RAPIDS:
-    type: string
-    required: false
 
 outputs:
   dir:
     value: ${{ steps.image-info.outputs.dir }}
   tag:
     value: ${{ steps.image-info.outputs.tag }}
-  build_image:
-    value: ${{ steps.image-info.outputs.build_image }}
 
 runs:
   using: composite
@@ -48,22 +43,20 @@ runs:
         rust=${RUST:+"-rust"};
         nvhpc=${NVHPC:+"-nvhpc"};
         mamba=${MAMBA:+"-mambaforge"};
-        dir="cmake-ninja-sccache${llvm}${rust}${cuda}${mamba}${nvhpc}";
+        dir="cpp${llvm}${rust}${cuda}${mamba}${nvhpc}";
 
         if [[ ! -d "./images/${dir}" ]]; then
           echo "skipping because ! -d ./images/${dir}";
-          echo "build_image=0" >> $GITHUB_OUTPUT;
           exit 1;
         fi
 
-        echo "build_image=1" >> $GITHUB_OUTPUT;
-
-        cuda=${CUDA:+"-${CUDA}"}
-        llvm=${LLVM:+"-${LLVM}"}
-        rust=${RUST:+"-${RUST}"}
-        nvhpc=${NVHPC:+"-${NVHPC}"}
-        mamba=${MAMBA:+"-mambaforge"}
-        tag="${{ inputs.RAPIDS }}${llvm}${rust}${cuda}${nvhpc}${mamba}"
+        cuda=${CUDA:+"-${CUDA}"};
+        llvm=${LLVM:+"-${LLVM}"};
+        rust=${RUST:+"-${RUST}"};
+        nvhpc=${NVHPC:+"-${NVHPC}"};
+        mamba=${MAMBA:+"-mambaforge"};
+        rapids="$(git describe --abbrev=0 --tags | sed 's/[a-zA-Z]//g' | cut -d '.' -f -2)";
+        tag="${rapids:-dev}-jammy-cpp${llvm}${rust}${cuda}${nvhpc}${mamba}";
 
         echo "dir=$dir" >> $GITHUB_OUTPUT;
         echo "tag=$tag" >> $GITHUB_OUTPUT;

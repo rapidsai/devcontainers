@@ -22,12 +22,13 @@ on:
 jobs:
 
   build-and-test:
-    name: Test
-    runs-on: ubuntu-latest
-    permissions:
-      packages: write
+    name: Build and test
+    runs-on:
+      - self-hosted
+      - linux
+      - ${{ matrix.arch }}
+      - cpu4
     strategy:
-      max-parallel: 2
       fail-fast: true
       matrix:
         arch: [amd64, arm64]
@@ -35,19 +36,22 @@ jobs:
       - name: Checkout ${{ github.repository }}
         uses: actions/checkout@v3
         with:
+          fetch-depth: 0
           persist-credentials: false
 
-      - uses: ./.github/actions/copy-common-scripts
-
-      - name: Determine devcontainer image info
+      - id: info
+        name: Determine devcontainer image info
         uses: ./.github/actions/image-info
-        with: ${{ fromJSON(inputs) }}
-        id: info
+        with:
+          CUDA: "${{ inputs.CUDA }}"
+          LLVM: "${{ inputs.LLVM }}"
+          RUST: "${{ inputs.RUST }}"
+          NVHPC: "${{ inputs.NVHPC }}"
+          MAMBA: "${{ inputs.MAMBA }}"
 
       - name: Build and test ${{ steps.info.outputs.tag }}-${{ matrix.arch }}
         uses: ./.github/actions/build-and-test-image
         with:
-          home: "${{ env.HOME }}"
           arch: "${{ matrix.arch }}"
           dir: "${{ steps.info.outputs.dir }}"
           tag: "${{ steps.info.outputs.tag }}"

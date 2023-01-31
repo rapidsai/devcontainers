@@ -1,5 +1,5 @@
 #! /usr/bin/env bash
-set -ex
+set -e
 
 # Ensure we're in this feature's directory during build
 cd "$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )";
@@ -47,18 +47,21 @@ for_each_user_bashrc 'sed -i -re "s/^(HIST(FILE)?SIZE=).*$/\1/g" "$0"';
 for_each_user_bashrc 'echo "PROMPT_COMMAND=\"history -a; \$PROMPT_COMMAND\"" >> "$0"';
 
 # Add GitHub's public keys to known_hosts
-for_each_user_bashrc "$(cat <<"EOF"
-    home="$(dirname "$0")"                           \
- && mkdir -p -m 0700 "$home/.ssh"                    \
- && curl -s https://api.github.com/meta              \
-  | jq -r '.ssh_keys | map("github.com \(.)") | .[]' \
-  > "$home/.ssh/known_hosts"                         \
- && chmod 644 "$home/.ssh/known_hosts"               ;
-EOF
-)"
+known_hosts="$(curl -s https://api.github.com/meta | jq -r '.ssh_keys | map("github.com \(.)") | .[]' || echo "")";
 
-find_non_root_user;
-chown -R ${USERNAME}:${USERNAME} "$(bash -c "echo ~${USERNAME}")";
+if [[ -n "$known_hosts" ]]; then
+    # for_each_user_bashrc "echo \$0";
+    for_each_user_bashrc "$(cat <<EOF
+    home="\$(dirname "\$(realpath -m "\$0")")"       \
+ && mkdir -p -m 0700 "\$home/.ssh"                   \
+ && echo "$known_hosts" >> "\$home/.ssh/known_hosts" \
+ && chmod 644 "\$home/.ssh/known_hosts"              ;
+EOF
+)";
+
+    find_non_root_user;
+    chown -R ${USERNAME}:${USERNAME} "$(bash -c "echo ~${USERNAME}")";
+fi
 
 # Generate bash completions
 if dpkg -s bash-completion >/dev/null 2>&1; then
