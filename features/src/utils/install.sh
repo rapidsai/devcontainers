@@ -50,7 +50,6 @@ for_each_user_bashrc 'echo "PROMPT_COMMAND=\"history -a; \$PROMPT_COMMAND\"" >> 
 known_hosts="$(curl -s https://api.github.com/meta | jq -r '.ssh_keys | map("github.com \(.)") | .[]' || echo "")";
 
 if [[ -n "$known_hosts" ]]; then
-    # for_each_user_bashrc "echo \$0";
     for_each_user_bashrc "$(cat <<EOF
     home="\$(dirname "\$(realpath -m "\$0")")"       \
  && mkdir -p -m 0700 "\$home/.ssh"                   \
