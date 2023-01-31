@@ -7,7 +7,7 @@ A feature to install the NVHPC SDK
 
 ```json
 "features": {
-    "ghcr.io/trxcllnt/devcontainer-features/nvhpc:2": {}
+    "ghcr.io/rapidsai/devcontainers/features/nvhpc:1": {}
 }
 ```
 
@@ -21,4 +21,4 @@ A feature to install the NVHPC SDK
 
 ---
 
-_Note: This file was auto-generated from the [devcontainer-feature.json](https://github.com/trxcllnt/devcontainer-features/blob/main/src/nvhpc/devcontainer-feature.json).  Add additional notes to a `NOTES.md`._
+_Note: This file was auto-generated from the [devcontainer-feature.json](https://github.com/rapidsai/devcontainers/blob/main/features/src/nvhpc/devcontainer-feature.json).  Add additional notes to a `NOTES.md`._

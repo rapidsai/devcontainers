@@ -7,7 +7,7 @@ A feature to install sccache
 
 ```json
 "features": {
-    "ghcr.io/trxcllnt/devcontainer-features/sccache:2": {}
+    "ghcr.io/rapidsai/devcontainers/features/sccache:1": {}
 }
 ```
 
@@ -21,4 +21,4 @@ A feature to install sccache
 
 ---
 
-_Note: This file was auto-generated from the [devcontainer-feature.json](https://github.com/trxcllnt/devcontainer-features/blob/main/src/sccache/devcontainer-feature.json).  Add additional notes to a `NOTES.md`._
+_Note: This file was auto-generated from the [devcontainer-feature.json](https://github.com/rapidsai/devcontainers/blob/main/features/src/sccache/devcontainer-feature.json).  Add additional notes to a `NOTES.md`._

@@ -7,7 +7,7 @@ A feature to install ninja-build
 
 ```json
 "features": {
-    "ghcr.io/trxcllnt/devcontainer-features/ninja:2": {}
+    "ghcr.io/rapidsai/devcontainers/features/ninja:1": {}
 }
 ```
 
@@ -21,4 +21,4 @@ A feature to install ninja-build
 
 ---
 
-_Note: This file was auto-generated from the [devcontainer-feature.json](https://github.com/trxcllnt/devcontainer-features/blob/main/src/ninja/devcontainer-feature.json).  Add additional notes to a `NOTES.md`._
+_Note: This file was auto-generated from the [devcontainer-feature.json](https://github.com/rapidsai/devcontainers/blob/main/features/src/ninja/devcontainer-feature.json).  Add additional notes to a `NOTES.md`._

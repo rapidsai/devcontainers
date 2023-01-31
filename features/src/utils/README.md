@@ -7,7 +7,7 @@ A feature to install my devcontainer utilities
 
 ```json
 "features": {
-    "ghcr.io/trxcllnt/devcontainer-features/utils:2": {}
+    "ghcr.io/rapidsai/devcontainers/features/utils:1": {}
 }
 ```
 
@@ -17,4 +17,4 @@ A feature to install my devcontainer utilities
 
 ---
 
-_Note: This file was auto-generated from the [devcontainer-feature.json](https://github.com/trxcllnt/devcontainer-features/blob/main/src/utils/devcontainer-feature.json).  Add additional notes to a `NOTES.md`._
+_Note: This file was auto-generated from the [devcontainer-feature.json](https://github.com/rapidsai/devcontainers/blob/main/features/src/utils/devcontainer-feature.json).  Add additional notes to a `NOTES.md`._

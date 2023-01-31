@@ -7,7 +7,7 @@ Installs the GitLab CLI. Auto-detects latest version and installs needed depende
 
 ```json
 "features": {
-    "ghcr.io/trxcllnt/devcontainer-features/gitlab-cli:2": {}
+    "ghcr.io/rapidsai/devcontainers/features/gitlab-cli:1": {}
 }
 ```
 
@@ -28,4 +28,4 @@ This Feature should work on recent versions of Debian/Ubuntu-based distributions
 
 ---
 
-_Note: This file was auto-generated from the [devcontainer-feature.json](https://github.com/trxcllnt/devcontainer-features/blob/main/src/gitlab-cli/devcontainer-feature.json).  Add additional notes to a `NOTES.md`._
+_Note: This file was auto-generated from the [devcontainer-feature.json](https://github.com/rapidsai/devcontainers/blob/main/features/src/gitlab-cli/devcontainer-feature.json).  Add additional notes to a `NOTES.md`._
