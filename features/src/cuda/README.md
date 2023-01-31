@@ -7,7 +7,7 @@ A feature to install the NVIDIA CUDA Toolkit
 
 ```json
 "features": {
-    "ghcr.io/trxcllnt/devcontainer-features/cuda:2": {}
+    "ghcr.io/rapidsai/devcontainers/features/cuda:1": {}
 }
 ```
 
@@ -21,4 +21,4 @@ A feature to install the NVIDIA CUDA Toolkit
 
 ---
 
-_Note: This file was auto-generated from the [devcontainer-feature.json](https://github.com/trxcllnt/devcontainer-features/blob/main/src/cuda/devcontainer-feature.json).  Add additional notes to a `NOTES.md`._
+_Note: This file was auto-generated from the [devcontainer-feature.json](https://github.com/rapidsai/devcontainers/blob/main/features/src/cuda/devcontainer-feature.json).  Add additional notes to a `NOTES.md`._

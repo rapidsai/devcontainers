@@ -7,7 +7,7 @@ A feature to install mambaforge
 
 ```json
 "features": {
-    "ghcr.io/trxcllnt/devcontainer-features/mambaforge:2": {}
+    "ghcr.io/rapidsai/devcontainers/features/mambaforge:1": {}
 }
 ```
 
@@ -21,4 +21,4 @@ A feature to install mambaforge
 
 ---
 
-_Note: This file was auto-generated from the [devcontainer-feature.json](https://github.com/trxcllnt/devcontainer-features/blob/main/src/mambaforge/devcontainer-feature.json).  Add additional notes to a `NOTES.md`._
+_Note: This file was auto-generated from the [devcontainer-feature.json](https://github.com/rapidsai/devcontainers/blob/main/features/src/mambaforge/devcontainer-feature.json).  Add additional notes to a `NOTES.md`._
