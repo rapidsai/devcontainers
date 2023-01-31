@@ -61,10 +61,9 @@ jobs:
       fail-fast: true
       matrix:
         feature: ${{ fromJSON(needs.features-matrix.outputs.features) }}
-        image: ["ubuntu:jammy", "mcr.microsoft.com/devcontainers/base:jammy"]
     with:
-      name: "'${{ matrix.feature }}' × '${{ matrix.image }}'"
-      args: "--skip-scenarios -f ${{ matrix.feature }} -i ${{ matrix.image }}"
+      name: "'${{ matrix.feature }}' × 'ubuntu:jammy'"
+      args: "--skip-scenarios -f ${{ matrix.feature }} -i ubuntu:jammy"
 
   image-matrix:
     name: Determine image matrix
