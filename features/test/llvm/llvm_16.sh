@@ -18,7 +18,7 @@ source dev-container-features-test-lib
 echo "LLVM_VERSION: $LLVM_VERSION"
 check "version" bash -c "echo '$LLVM_VERSION' | grep '16'"
 check "clang version" bash -c "clang --version | grep 'clang version $LLVM_VERSION'"
-check "apt repo" grep "llvm-toolchain-$(lsb_release -cs) main" /etc/apt/sources.list{,.d/*.list}
+check "apt repo" grep "llvm-toolchain-$(lsb_release -cs)-16 main" /etc/apt/sources.list{,.d/*.list}
 
 # Report result
 # If any of the checks above exited with a non-zero exit code, the test will fail.
