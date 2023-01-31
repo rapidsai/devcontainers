@@ -2,6 +2,11 @@ name: feature-matrix
 
 description: Determine the feature matrix
 
+inputs:
+  full_matrix:
+    type: boolean
+    default: false
+
 outputs:
   features:
     value: ${{ steps.matrix.outputs.features }}
@@ -11,31 +16,68 @@ outputs:
 runs:
   using: composite
   steps:
+    - name: Check if files changed
+      if: inputs.full_matrix == false
+      id: changes
+      uses: tj-actions/changed-files@v35.4.4
+      with:
+        files: |
+          features/src/**
+          features/test/**
+# .github/workflows/test.yml
+# .github/workflows/build-and-test-feature.yml
+# .github/actions/feature-matrix/action.yml
+# .github/actions/build-and-test-feature/action.yml
+
+    - name: Report changes
+      if: inputs.full_matrix == false
+      shell: bash
+      run: echo '${{ toJSON(steps.changes.outputs) }}'
+
     - name: Determine the feature matrix
       id: matrix
       shell: bash
       run: |
+        set -x;
+
         join_with_delimiter() {
           local IFS='' delim=$1; shift; echo -n "$1"; shift; echo -n "${*/#/$delim}";
         }
 
-        features="$(                                                       \
-          find ./features/test -mindepth 1 -type f -name test.sh -exec     \
+        find_features_with_tests() {
+          find ${@:2} -mindepth 1 -type f -name "$1" -exec                 \
             bash -c 'echo {} | sed -r s@./features/test/\(.*\)/.*@\\1@' \; \
-        | grep -v _global                                                  \
-        )";
+          | grep -v _global                                                ;
+        }
+
+        features="";
+        scenarios="";
+        files="${{ steps.changes.outputs.all_modified_files }}";
+
+        if [[ echo "$files" | grep -q "features/" ]]; then
+          changed=();
+          for x in ${files}; do
+            x="${x##features/src/}";
+            x="${x##features/test/}";
+            x="features/test/${x%/*}";
+            changed+=("${x}");
+          done;
+          changed="${changed[@]}";
+          features="$(find_features_with_tests 'test.sh' ${changed})";
+          scenarios="$(find_features_with_tests 'scenarios.json' ${changed})";
+        elif [[ echo "$files" | grep -q ".github/" ]]; then
+          features="$(find_features_with_tests 'test.sh' 'features/test')";
+          scenarios="$(find_features_with_tests 'scenarios.json' 'features/test')";
+        elif [[ "${{ inputs.full_matrix }}" == true ]]; then
+          features="$(find_features_with_tests 'test.sh' 'features/test')";
+          scenarios="$(find_features_with_tests 'scenarios.json' 'features/test')";
+        fi
 
         if [[ -n "$(echo "$features")" ]]; then
           features="[\"$(join_with_delimiter '","' $features)\"]";
         fi
 
         echo "features=${features:-'[]'}" | tee -a $GITHUB_OUTPUT;
-
-        scenarios="$(                                                         \
-          find ./features/test -mindepth 1 -type f -name scenarios.json -exec \
-            bash -c 'echo {} | sed -r s@./features/test/\(.*\)/.*@\\1@' \;    \
-        | grep -v _global                                                     \
-        )";
 
         if [[ -n "$(echo "$scenarios")" ]]; then
           scenarios="[\"$(join_with_delimiter '","' $scenarios)\"]";
