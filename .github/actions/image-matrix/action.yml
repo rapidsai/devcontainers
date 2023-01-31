@@ -19,14 +19,14 @@ runs:
           LLVM: ["", "llvm15", "llvm16"]
           RUST: ["", "rust"]
           CUDA: ["", "cuda11.8", "cuda12.0"]
-          NVHPC: ["", "nvhpc23.01"]
+          NVHPC: ["", "nvhpc23.1"]
           MAMBA: ["", "mambaforge"]
           exclude:
-            - { RUST: "rust", NVHPC: "nvhpc23.01" }
+            - { RUST: "rust", NVHPC: "nvhpc23.1" }
             - { RUST: "rust", CUDA: "", LLVM: "", NVHPC: "" }
-            - { NVHPC: "nvhpc23.01",        MAMBA: "mambaforge" }
+            - { NVHPC: "nvhpc23.1",        MAMBA: "mambaforge" }
             - { CUDA: "",         LLVM: "", MAMBA: "mambaforge" }
-            - { CUDA: "cuda11.8", LLVM: "", NVHPC: "nvhpc23.01" }
-            - { CUDA: "cuda12.0", LLVM: "", NVHPC: "nvhpc23.01" }
+            - { CUDA: "cuda11.8", LLVM: "", NVHPC: "nvhpc23.1" }
+            - { CUDA: "cuda12.0", LLVM: "", NVHPC: "nvhpc23.1" }
         EOF
         )" | tee -a $GITHUB_OUTPUT;

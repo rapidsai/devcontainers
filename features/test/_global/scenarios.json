@@ -39,7 +39,7 @@
         "version": "12.0"
       },
       "nvhpc": {
-        "version": "23.01"
+        "version": "23.1"
       },
       "mambaforge": {
         "version": "22.9.0-2"
