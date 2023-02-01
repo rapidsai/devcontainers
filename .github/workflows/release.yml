@@ -6,11 +6,12 @@ concurrency:
 
 on:
   workflow_dispatch:
-    repository:
-      type: string
-      required: false
-      default: rapidsai/devcontainers
-      description: Docker Hub repository
+    inputs:
+      repository:
+        type: string
+        required: false
+        default: rapidsai/devcontainers
+        description: Docker Hub repository
 
 jobs:
 
