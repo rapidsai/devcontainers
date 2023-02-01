@@ -59,7 +59,7 @@ runs:
           for x in ${files}; do
             x="${x##features/src/}";
             x="${x##features/test/}";
-            x="features/test/${x%/*}";
+            x="features/test/${x%%/*}";
             changed+=("${x}");
           done;
           changed="${changed[@]}";
