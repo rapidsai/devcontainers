@@ -23,7 +23,7 @@ jobs:
 
   build-and-test:
     name: Build and test
-    runs-on: ${{ fromJSON(github.repository != 'rapidsai/devcontainers' && '"ubuntu-latest"' || format('{"labels":["self-hosted", "linux", "{0}", "cpu4"]}', matrix.arch)) }}
+    runs-on: ${{ fromJSON(github.repository != 'rapidsai/devcontainers' && '"ubuntu-latest"' || format('{{"labels":["self-hosted", "linux", "{0}", "cpu4"]}}', matrix.arch)) }}
     strategy:
       fail-fast: true
       matrix:
