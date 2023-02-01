@@ -5,6 +5,14 @@ description: Setup self-hosted runner environment
 runs:
   using: composite
   steps:
+
+    - if: contains(runner.name, 'rapidsai') != true
+      name: Free up disk space
+      uses: ./.github/actions/free-disk-space
+      with:
+        home: "${{ env.HOME }}"
+        tool_cache: "${{ runner.tool_cache }}"
+
     - if: contains(runner.name, 'rapidsai') == true
       name: Setup Node.js
       uses: actions/setup-node@v3

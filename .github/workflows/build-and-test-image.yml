@@ -23,11 +23,7 @@ jobs:
 
   build-and-test:
     name: Build and test
-    runs-on:
-      - self-hosted
-      - linux
-      - ${{ matrix.arch }}
-      - cpu4
+    runs-on: ${{ fromJSON(github.repository != 'rapidsai/devcontainers' && '"ubuntu-latest"' || '{"labels":["self-hosted", "linux", "${{ matrix.arch }}", "cpu4"]}') }}
     strategy:
       fail-fast: true
       matrix:

@@ -16,15 +16,24 @@ inputs:
     required: true
     description: Image architectures
   username:
+    type: string
     required: true
     description: Docker Hub username
   password:
+    type: string
     required: true
     description: Docker Hub password
+  repository:
+    type: string
+    required: true
+    description: Docker Hub repository
 
 runs:
   using: composite
   steps:
+
+    - name: Setup runner environment
+      uses: ./.github/actions/setup-runner-env
 
     - name: Free up disk space
       if: ${{ !contains(runner.name, 'rapidsai') }}
@@ -45,7 +54,7 @@ runs:
         DOCKER_CLI_EXPERIMENTAL: enabled
         registry_username: "${{ inputs.username }}"
         registry_password: "${{ inputs.password }}"
-        docker_repository: "rapidsai/devcontainers"
+        docker_repository: "${{ inputs.repository }}"
       shell: bash
       run: |
         from=ghcr.io/${{github.repository}}:${tag};

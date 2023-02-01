@@ -6,6 +6,11 @@ concurrency:
 
 on:
   workflow_dispatch:
+    repository:
+      type: string
+      required: false
+      default: rapidsai/devcontainers
+      description: Docker Hub repository
 
 jobs:
 
@@ -43,3 +48,4 @@ jobs:
       RUST: "${{ matrix.RUST }}"
       NVHPC: "${{ matrix.NVHPC }}"
       MAMBA: "${{ matrix.MAMBA }}"
+      repository: "${{ inputs.repository }}"

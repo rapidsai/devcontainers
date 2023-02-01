@@ -20,13 +20,6 @@ runs:
   using: composite
   steps:
 
-    - if: contains(runner.name, 'rapidsai') != true
-      name: Free up disk space
-      uses: ./.github/actions/free-disk-space
-      with:
-        home: "${{ env.HOME }}"
-        tool_cache: "${{ runner.tool_cache }}"
-
     - name: Setup runner environment
       uses: ./.github/actions/setup-runner-env
 
