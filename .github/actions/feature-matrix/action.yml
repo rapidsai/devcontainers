@@ -24,10 +24,10 @@ runs:
         files: |
           features/src/**
           features/test/**
-# .github/workflows/test.yml
-# .github/workflows/build-and-test-feature.yml
-# .github/actions/feature-matrix/action.yml
-# .github/actions/build-and-test-feature/action.yml
+          .github/workflows/test.yml
+          .github/workflows/build-and-test-feature.yml
+          .github/actions/feature-matrix/action.yml
+          .github/actions/build-and-test-feature/action.yml
 
     - name: Report changes
       if: inputs.full_matrix != true
@@ -54,7 +54,10 @@ runs:
         scenarios="";
         files="${{ steps.changes.outputs.all_modified_files }}";
 
-        if echo "$files" | grep -q "features/"; then
+        if echo "$files" | grep -q ".github/"; then
+          features="$(find_features_with_tests 'test.sh' 'features/test')";
+          scenarios="$(find_features_with_tests 'scenarios.json' 'features/test')";
+        elif echo "$files" | grep -q "features/"; then
           changed=();
           for x in ${files}; do
             x="${x##features/src/}";
@@ -65,9 +68,6 @@ runs:
           changed="${changed[@]}";
           features="$(find_features_with_tests 'test.sh' ${changed})";
           scenarios="$(find_features_with_tests 'scenarios.json' ${changed})";
-        elif echo "$files" | grep -q ".github/"; then
-          features="$(find_features_with_tests 'test.sh' 'features/test')";
-          scenarios="$(find_features_with_tests 'scenarios.json' 'features/test')";
         elif [[ "${{ inputs.full_matrix }}" == true ]]; then
           features="$(find_features_with_tests 'test.sh' 'features/test')";
           scenarios="$(find_features_with_tests 'scenarios.json' 'features/test')";
