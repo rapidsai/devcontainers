@@ -82,7 +82,9 @@ jobs:
       - name: Push multiarch manifest to Docker Hub
         uses: ./.github/actions/push-to-dockerhub
         with:
-          archs: "amd64 arm64"
+          archs: |
+            amd64
+            arm64
           tag: "${{ steps.info.outputs.tag }}"
           repository: "${{ inputs.repository }}"
           username: "${{ secrets.GPUCIBOT_DOCKERHUB_USER }}"
