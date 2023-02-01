@@ -19,6 +19,8 @@ find /opt/devcontainer \
     \( -type d -exec chmod 0775 {} \; \
     -o -type f -exec chmod 0755 {} \; \);
 
+touch /var/log/vault-s3-init.log;
+chmod 0777 /var/log/vault-s3-init.log;
 chmod 0644 /opt/devcontainer/cron/vault-s3-init;
 
 update-alternatives --install /usr/bin/on-create-command       on-create-command      /opt/devcontainer/bin/on-create-command.sh       0

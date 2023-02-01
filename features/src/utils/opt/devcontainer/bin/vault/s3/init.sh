@@ -101,10 +101,8 @@ fi
 
 # If we succeeded at least once, install user crontab and refresh creds every 8hrs
 if ! crontab -l &> /dev/null; then
-    crontab /opt/devcontainer/cron/vault-s3-init            \
- && sudo touch /var/log/vault-s3-init.log                   \
- && sudo chown $(id -u):$(id -g) /var/log/vault-s3-init.log \
- && sudo cron;
+    crontab /opt/devcontainer/cron/vault-s3-init;
+    sudo cron;
 fi
 
 echo "Successfully generated temporary AWS S3 credentials!";
