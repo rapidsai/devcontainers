@@ -74,7 +74,7 @@ jobs:
       args: "--skip-scenarios -f ${{ matrix.feature }} -i ubuntu:jammy"
 
   image-matrix:
-    if: false
+    if: needs.features-matrix.outputs.features  != '[]' && needs.features-matrix.outputs.scenarios != '[]'
     name: Determine image matrix
     needs: validate-features-json
     runs-on: ubuntu-latest
