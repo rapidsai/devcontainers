@@ -14,15 +14,6 @@ jobs:
     secrets: inherit
     uses: ./.github/workflows/validate-features-json.yml
 
-  run-feature-integration-tests:
-    name: Integration
-    needs: validate-features-json
-    secrets: inherit
-    uses: ./.github/workflows/build-and-test-feature.yml
-    with:
-      name: "Test global scenarios"
-      args: "--global-scenarios-only"
-
   features-matrix:
     name: Determine features matrix
     needs: validate-features-json
@@ -43,6 +34,18 @@ jobs:
       - id: matrix
         name: Determine features matrix
         uses: ./.github/actions/feature-matrix
+
+  run-feature-integration-tests:
+    if: |
+      fromJSON(needs.features-matrix.outputs.features ).length > 0 &&
+      fromJSON(needs.features-matrix.outputs.scenarios).length > 0
+    name: Integration
+    needs: features-matrix
+    secrets: inherit
+    uses: ./.github/workflows/build-and-test-feature.yml
+    with:
+      name: "Test global scenarios"
+      args: "--global-scenarios-only"
 
   run-feature-scenario-tests:
     if: fromJSON(needs.features-matrix.outputs.scenarios).length > 0
