@@ -27,7 +27,7 @@ jobs:
 
   build-and-push:
     name: Build and push to ghcr.io
-    runs-on: ${{ fromJSON(github.repository != 'rapidsai/devcontainers' && '"ubuntu-latest"' || '{"labels":["self-hosted", "linux", "matrix.arch", "cpu4"]}') }}
+    runs-on: ${{ fromJSON(github.repository != 'rapidsai/devcontainers' && '"ubuntu-latest"' || '{"labels":["self-hosted", "linux", \"matrix.arch\", "cpu4"]}') }}
     permissions:
       packages: write
     strategy:
