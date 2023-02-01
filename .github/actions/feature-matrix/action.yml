@@ -46,7 +46,7 @@ runs:
 
         find_features_with_tests() {
           find ${@:2} -mindepth 1 -type f -name "$1" ! -wholename '*/test/_global/*' \
-            -exec bash -c 'echo {} | sed -r s@./features/test/\(.*\)/.*@\\1@' \;     \
+            -exec bash -c 'echo {} | sed -r s@features/test/\(.*\)/.*@\\1@' \;       \
           | sort | uniq                                                              ;
         }
 
