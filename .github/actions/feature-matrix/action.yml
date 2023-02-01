@@ -17,7 +17,7 @@ runs:
   using: composite
   steps:
     - name: Check if files changed
-      if: inputs.full_matrix == false
+      if: inputs.full_matrix != true
       id: changes
       uses: tj-actions/changed-files@v35.4.4
       with:
@@ -30,7 +30,7 @@ runs:
 # .github/actions/build-and-test-feature/action.yml
 
     - name: Report changes
-      if: inputs.full_matrix == false
+      if: inputs.full_matrix != true
       shell: bash
       run: echo '${{ toJSON(steps.changes.outputs) }}'
 
