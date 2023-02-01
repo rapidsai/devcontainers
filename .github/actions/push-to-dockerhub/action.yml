@@ -46,6 +46,7 @@ runs:
         docker_repository: "${{ inputs.repository }}"
       shell: bash
       run: |
+        set -x;
         from=ghcr.io/${{github.repository}}:${tag};
         name=docker.io/${docker_repository}:${tag};
 
