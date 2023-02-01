@@ -10,7 +10,8 @@ on:
       - branch-*
 
 jobs:
-  deploy:
+  docs:
+    if: github.repository == 'rapidsai/devcontainers'
     runs-on: ubuntu-latest
     permissions:
       contents: write

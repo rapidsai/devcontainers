@@ -3,10 +3,6 @@ name: free-disk-space
 description: Free up disk space on the GitHub-hosted runners
 
 inputs:
-  home:
-    type: string
-    required: true
-    description: Runner HOME dir
   tool_cache:
     type: string
     required: true
@@ -21,12 +17,6 @@ runs:
           set -x;
           df -h;
           docker images;
-          # sudo du -h -d2 /opt | sort -rh | head -n 30 || true;
-          # sudo du -h -d2 /mnt | sort -rh | head -n 30 || true;
-          # sudo du -h -d2 /usr | sort -rh | head -n 30 || true;
-          # sudo du -h -d2 /home | sort -rh | head -n 30 || true;
-          # sudo du -h -d2 "${{ inputs.home }}" | sort -rh | head -n 30 || true;
-          # sudo du -h -d2 ${{ inputs.tool_cache }} | sort -rh | head -n 30 || true;
           sudo swapoff -a;
           sudo rm -f /swapfile /mnt/swapfile;
           sudo apt clean;
@@ -56,9 +46,3 @@ runs:
           docker rmi $(docker image ls -aq) || true;
           docker images;
           df -h;
-          # sudo du -h -d2 /opt | sort -rh | head -n 30 || true;
-          # sudo du -h -d2 /mnt | sort -rh | head -n 30 || true;
-          # sudo du -h -d2 /usr | sort -rh | head -n 30 || true;
-          # sudo du -h -d2 /home | sort -rh | head -n 30 || true;
-          # sudo du -h -d2 "${{ inputs.home }}" | sort -rh | head -n 30 || true;
-          # sudo du -h -d2 ${{ inputs.tool_cache }} | sort -rh | head -n 30 || true;

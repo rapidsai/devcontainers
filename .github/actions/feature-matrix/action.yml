@@ -75,10 +75,10 @@ runs:
           features="[\"$(join_with_delimiter '","' $features)\"]";
         fi
 
-        echo "features=${features:-'[]'}" | tee -a $GITHUB_OUTPUT;
+        echo "features=${features:-[]}" | tee -a $GITHUB_OUTPUT;
 
         if [[ -n "$(echo "$scenarios")" ]]; then
           scenarios="[\"$(join_with_delimiter '","' $scenarios)\"]";
         fi
 
-        echo "scenarios=${scenarios:-'[]'}" | tee -a $GITHUB_OUTPUT;
+        echo "scenarios=${scenarios:-[]}" | tee -a $GITHUB_OUTPUT;

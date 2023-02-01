@@ -18,16 +18,16 @@ on:
       MAMBA:
         type: string
         required: true
+      repository:
+        type: string
+        required: true
+        description: Docker Hub repository
 
 jobs:
 
   build-and-push:
     name: Build and push to ghcr.io
-    runs-on:
-      - self-hosted
-      - linux
-      - ${{ matrix.arch }}
-      - cpu4
+    runs-on: ${{ fromJSON(github.repository != 'rapidsai/devcontainers' && '"ubuntu-latest"' || format('{{"labels":["self-hosted", "linux", "{0}", "cpu4"]}}', matrix.arch)) }}
     permissions:
       packages: write
     strategy:
@@ -84,5 +84,6 @@ jobs:
         with:
           archs: "amd64 arm64"
           tag: "${{ steps.info.outputs.tag }}"
+          repository: "${{ inputs.repository }}"
           username: "${{ secrets.GPUCIBOT_DOCKERHUB_USER }}"
           password: "${{ secrets.GPUCIBOT_DOCKERHUB_TOKEN }}"

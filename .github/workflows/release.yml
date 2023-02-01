@@ -6,10 +6,16 @@ concurrency:
 
 on:
   workflow_dispatch:
+    repository:
+      type: string
+      required: false
+      default: rapidsai/devcontainers
+      description: Docker Hub repository
 
 jobs:
 
   release-features:
+    if: github.repository == 'rapidsai/devcontainers'
     name: Features
     secrets: inherit
     uses: ./.github/workflows/release-features.yml
@@ -42,3 +48,4 @@ jobs:
       RUST: "${{ matrix.RUST }}"
       NVHPC: "${{ matrix.NVHPC }}"
       MAMBA: "${{ matrix.MAMBA }}"
+      repository: "${{ inputs.repository }}"
