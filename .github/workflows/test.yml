@@ -75,10 +75,7 @@ jobs:
 
   image-matrix:
     name: Determine image matrix
-    needs:
-      - validate-features-json
-      - run-feature-scenario-tests
-      - run-generated-feature-tests
+    needs: validate-features-json
     runs-on: ubuntu-latest
     outputs:
       matrix: ${{ steps.matrix.outputs.matrix }}
