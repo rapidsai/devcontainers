@@ -56,7 +56,9 @@ runs:
 
         docker manifest rm ${name} || true;
 
-        for arch in "${{ inputs.archs }}"; do
+        archs="$(echo -n "${{ inputs.archs }}")";
+
+        for arch in ${archs}; do
           # Pull each image locally
           docker pull --platform linux/${arch} ${from}-${arch};
 
