@@ -36,7 +36,7 @@ jobs:
         uses: ./.github/actions/feature-matrix
 
   run-feature-integration-tests:
-    if: needs.features-matrix.outputs.features  != '[]' && needs.features-matrix.outputs.scenarios != '[]'
+    if: needs.features-matrix.outputs.features != '[]' && needs.features-matrix.outputs.scenarios != '[]'
     name: Integration
     needs: features-matrix
     secrets: inherit
@@ -74,7 +74,7 @@ jobs:
       args: "--skip-scenarios -f ${{ matrix.feature }} -i ubuntu:jammy"
 
   image-matrix:
-    if: needs.features-matrix.outputs.features  != '[]' && needs.features-matrix.outputs.scenarios != '[]'
+    if: needs.features-matrix.outputs.features != '[]' && needs.features-matrix.outputs.scenarios != '[]'
     name: Determine image matrix
     needs:
       - features-matrix
