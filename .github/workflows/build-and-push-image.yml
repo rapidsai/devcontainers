@@ -56,7 +56,7 @@ jobs:
           arch: "${{ matrix.arch }}"
           dir: "${{ steps.info.outputs.dir }}"
           tag: "${{ steps.info.outputs.tag }}"
-          repository: "${{ vars.DOCKERHUB_REPOSITORY }}"
+          repository: "${{ vars.DOCKERHUB_REPOSITORY || github.repository }}"
 
   push-to-dockerhub:
     name: Push to Docker Hub
@@ -74,7 +74,7 @@ jobs:
         uses: ./.github/actions/push-to-dockerhub
         with:
           archs: amd64 arm64
-          repository: "${{ vars.DOCKERHUB_REPOSITORY }}"
           tag: "${{ needs.build-and-push.outputs.tag }}"
           username: "${{ secrets.GPUCIBOT_DOCKERHUB_USER }}"
           password: "${{ secrets.GPUCIBOT_DOCKERHUB_TOKEN }}"
+          repository: "${{ vars.DOCKERHUB_REPOSITORY || github.repository }}"
