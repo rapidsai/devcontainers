@@ -62,6 +62,8 @@ jobs:
     name: Push to Docker Hub
     needs: build-and-push
     runs-on: ubuntu-latest
+    permissions:
+      packages: write
     steps:
       - name: Checkout ${{ github.repository }}
         uses: actions/checkout@v3
@@ -77,13 +79,6 @@ jobs:
           username: "${{ secrets.GPUCIBOT_DOCKERHUB_USER }}"
           password: "${{ secrets.GPUCIBOT_DOCKERHUB_TOKEN }}"
 
-  cleanup-ghcr-images:
-    name: Remove ghcr.io images
-    needs: push-to-dockerhub
-    runs-on: ubuntu-latest
-    permissions:
-      packages: write
-    steps:
       - continue-on-error: true
         name: Remove ghcr.io images
         uses: snok/container-retention-policy@v1
