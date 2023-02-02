@@ -18,10 +18,6 @@ on:
       MAMBA:
         type: string
         required: true
-      repository:
-        type: string
-        required: true
-        description: Docker Hub repository
 
 jobs:
 
@@ -60,7 +56,7 @@ jobs:
           arch: "${{ matrix.arch }}"
           dir: "${{ steps.info.outputs.dir }}"
           tag: "${{ steps.info.outputs.tag }}"
-          repository: "${{ inputs.repository }}"
+          repository: "${{ vars.DOCKERHUB_REPOSITORY }}"
 
   push-to-dockerhub:
     name: Push to Docker Hub
@@ -71,7 +67,7 @@ jobs:
         uses: ./.github/actions/push-to-dockerhub
         with:
           archs: amd64 arm64
-          repository: "${{ inputs.repository }}"
+          repository: "${{ vars.DOCKERHUB_REPOSITORY }}"
           tag: "${{ needs.build-and-push.outputs.tag }}"
           username: "${{ secrets.GPUCIBOT_DOCKERHUB_USER }}"
           password: "${{ secrets.GPUCIBOT_DOCKERHUB_TOKEN }}"
@@ -90,7 +86,7 @@ jobs:
         arch: [amd64, arm64]
     steps:
       - name: Remove ghcr.io image
-        uses: bots-house/ghcr-delete-image-action@v1.0.0
+        uses: bots-house/ghcr-delete-image-action@v1
         with:
           token: "${{ github.token }}"
           name: "${{ github.repository }}"
