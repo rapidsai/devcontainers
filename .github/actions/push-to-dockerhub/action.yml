@@ -90,7 +90,7 @@ runs:
             https://hub.docker.com/v2/users/login/ \
         | jq -r .token)";
 
-        for arch in "${{ inputs.archs }}"; do
+        for arch in ${archs}; do
           curl -i -X DELETE \
             -H "Accept: application/json" \
             -H "Authorization: JWT $DOCKERHUB_TOKEN" \

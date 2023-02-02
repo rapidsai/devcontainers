@@ -47,7 +47,7 @@ runs:
         subFolder: images/${{ inputs.dir }}
         imageName: ghcr.io/${{ github.repository }}
         imageTag: ${{ inputs.tag }}-${{ inputs.arch }}
-        cacheFrom: ${{ inputs.repository }}:${{ inputs.tag }}
+        cacheFrom: docker.io/${{ inputs.repository }}:${{ inputs.tag }}
         # Set platform to an empty string when using self-hosted runners so
         # devcontainers/ci doesn't try to use skopeo (ubuntu 20.10+ only)
         platform: ${{ contains(runner.name, 'rapidsai') != true && format('linux/{0}', inputs.arch) || '' }}
