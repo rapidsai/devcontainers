@@ -85,7 +85,7 @@ jobs:
         with:
           image-names: devcontainers
           cut-off: "1 second ago UTC"
-          token: "${{ github.token }}"
+          token: "${{ secrets.GITHUB_TOKEN }}"
           org-name: "${{ github.repository_owner }}"
           filter-tags: "${{ needs.build-and-push.outputs.tag }}-*"
           account-type: ${{ github.repository == 'rapidsai/devcontainers' && 'org' || 'personal' }}
