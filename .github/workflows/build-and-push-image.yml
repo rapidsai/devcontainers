@@ -78,28 +78,19 @@ jobs:
           password: "${{ secrets.GPUCIBOT_DOCKERHUB_TOKEN }}"
 
   cleanup-ghcr-images:
-    name: Remove images from ghcr.io
-    needs:
-      - build-and-push
-      - push-to-dockerhub
+    name: Remove ghcr.io images
+    needs: push-to-dockerhub
     runs-on: ubuntu-latest
     permissions:
       packages: write
-    strategy:
-      fail-fast: false
-      matrix:
-        arch: [amd64, arm64]
     steps:
-      - name: Checkout ${{ github.repository }}
-        uses: actions/checkout@v3
-        with:
-          persist-credentials: false
-
       - continue-on-error: true
-        name: Remove ghcr.io image
-        uses: bots-house/ghcr-delete-image-action@v1.0.1
+        name: Remove ghcr.io images
+        uses: snok/container-retention-policy@v1
         with:
-          name: devcontainers
+          image-names: devcontainers
+          cut-off: "1 second ago UTC"
           token: "${{ github.token }}"
-          owner: "${{ github.repository_owner }}"
-          tag: "${{ needs.build-and-push.outputs.tag }}-${{ matrix.arch }}"
+          org-name: "${{ github.repository_owner }}"
+          filter-tags: "${{ needs.build-and-push.outputs.tag }}-*"
+          account-type: ${{ github.repository == 'rapidsai/devcontainers' && 'org' || 'personal' }}
