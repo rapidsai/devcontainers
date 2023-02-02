@@ -82,13 +82,19 @@ runs:
         # Push the multiarch manifest
         docker manifest push ${name};
 
+        cat <<EOF > "${{ runner.temp }}/dockerhub.json"
+        {"username": "$registry_username", "password": "$registry_password"}
+        EOF
+
         # Remove the arch-specific tags and just leave the multiarch manifest
         DOCKERHUB_TOKEN="$(
           curl -s -X POST \
             -H "Content-Type: application/json" \
-            -d "{\"username\": \"${registry_username}\", \"password\": \"${registry_password}\"}" \
+            -d "@${{ runner.temp }}/dockerhub.json" \
             https://hub.docker.com/v2/users/login/ \
         | jq -r .token)";
+
+        rm "${{ runner.temp }}/dockerhub.json";
 
         for arch in ${archs}; do
           curl -i -X DELETE \
