@@ -30,6 +30,9 @@ runs:
     - name: Copy common scripts into features
       uses: ./.github/actions/copy-common-scripts
 
+    - name: Install devcontainers CLI
+      uses: ./.github/actions/install-devcontainers-cli
+
     - name: Login to ghcr.io
       uses: docker/login-action@v2
       with:
