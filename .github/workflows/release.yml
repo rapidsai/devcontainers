@@ -10,8 +10,7 @@ on:
 jobs:
 
   release-features:
-    if: github.repository == 'rapidsai/devcontainers'
-    name: Features
+    name: Release Features
     secrets: inherit
     uses: ./.github/workflows/release-features.yml
 
