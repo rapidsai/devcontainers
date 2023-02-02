@@ -96,7 +96,7 @@ jobs:
           persist-credentials: false
 
       - name: Remove ghcr.io image
-        uses: bots-house/ghcr-delete-image-action@v1
+        uses: bots-house/ghcr-delete-image-action@v1.0.1
         with:
           token: "${{ github.token }}"
           name: "${{ github.repository }}"
