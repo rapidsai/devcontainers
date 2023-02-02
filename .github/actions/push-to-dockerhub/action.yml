@@ -28,9 +28,6 @@ runs:
   using: composite
   steps:
 
-    - name: Setup runner environment
-      uses: ./.github/actions/setup-runner-env
-
     - name: Login to Docker Hub
       uses: docker/login-action@v2
       with:
@@ -46,13 +43,8 @@ runs:
         docker_repository: "${{ inputs.repository }}"
       shell: bash
       run: |
-        set -x;
         from=ghcr.io/${{github.repository}}:${tag};
         name=docker.io/${docker_repository}:${tag};
-
-        # Remove all images to conserve disk space
-        docker rmi $(docker image ls -aq) || true;
-        docker system prune -f;
 
         docker manifest rm ${name} || true;
 
@@ -74,9 +66,9 @@ runs:
           # Annotate that this image is the ${arch} version
           docker manifest annotate ${name} ${name}-${arch} --arch ${arch};
 
-          # Remove all images to conserve disk space
-          docker rmi $(docker image ls -aq) || true;
-          docker system prune -f;
+          # Remove images to conserve disk space
+          docker rmi -f ${from}-${arch} || true;
+          docker rmi -f ${name}-${arch} || true;
         done;
 
         # Push the multiarch manifest
