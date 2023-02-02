@@ -15,6 +15,10 @@ inputs:
     type: string
     required: true
     description: Image arch
+  repository:
+    type: string
+    required: true
+    description: Docker Hub repository
 
 runs:
   using: composite
@@ -26,16 +30,17 @@ runs:
     - name: Copy common scripts into features
       uses: ./.github/actions/copy-common-scripts
 
-    - name: Build ghcr.io/${{ github.repository }}:${{ inputs.tag }}-${{ inputs.arch }}
+    - name: Build ghcr.io/${{ github.repository_owner }}/devcontainers:${{ inputs.tag }}-${{ inputs.arch }}
       uses: devcontainers/ci@v0.2
       env:
         NODE_NO_WARNINGS: 1
       with:
         push: never
         skipContainerUserIdUpdate: true
-        # Skip setting this so skopeo isn't required
-        # platform: linux/${{ inputs.arch }}
         subFolder: images/${{ inputs.dir }}
-        imageName: ghcr.io/${{ github.repository }}
+        imageName: ghcr.io/${{ github.repository_owner }}/devcontainers
         imageTag: ${{ inputs.tag }}-${{ inputs.arch }}
-        cacheFrom: ghcr.io/${{ github.repository }}:${{ inputs.tag }}-${{ inputs.arch }}
+        cacheFrom: docker.io/${{ inputs.repository }}:${{ inputs.tag }}
+        # Set platform to an empty string when using self-hosted runners so
+        # devcontainers/ci doesn't try to use skopeo (ubuntu 20.10+ only)
+        platform: ${{ contains(runner.name, 'rapidsai') != true && format('linux/{0}', inputs.arch) || '' }}

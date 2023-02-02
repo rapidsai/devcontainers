@@ -25,7 +25,7 @@ jobs:
     name: Build and test
     runs-on: ${{ fromJSON(github.repository != 'rapidsai/devcontainers' && '"ubuntu-latest"' || format('{{"labels":["self-hosted", "linux", "{0}", "cpu4"]}}', matrix.arch)) }}
     strategy:
-      fail-fast: true
+      fail-fast: false
       matrix:
         arch: [amd64, arm64]
     steps:
@@ -51,3 +51,4 @@ jobs:
           arch: "${{ matrix.arch }}"
           dir: "${{ steps.info.outputs.dir }}"
           tag: "${{ steps.info.outputs.tag }}"
+          repository: "${{ vars.DOCKERHUB_REPOSITORY || github.repository }}"

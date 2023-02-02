@@ -18,10 +18,6 @@ on:
       MAMBA:
         type: string
         required: true
-      repository:
-        type: string
-        required: true
-        description: Docker Hub repository
 
 jobs:
 
@@ -30,8 +26,11 @@ jobs:
     runs-on: ${{ fromJSON(github.repository != 'rapidsai/devcontainers' && '"ubuntu-latest"' || format('{{"labels":["self-hosted", "linux", "{0}", "cpu4"]}}', matrix.arch)) }}
     permissions:
       packages: write
+    outputs:
+      dir: ${{ steps.info.outputs.dir }}
+      tag: ${{ steps.info.outputs.tag }}
     strategy:
-      fail-fast: true
+      fail-fast: false
       matrix:
         arch: [amd64, arm64]
     steps:
@@ -57,33 +56,25 @@ jobs:
           arch: "${{ matrix.arch }}"
           dir: "${{ steps.info.outputs.dir }}"
           tag: "${{ steps.info.outputs.tag }}"
+          repository: "${{ vars.DOCKERHUB_REPOSITORY || github.repository }}"
 
   push-to-dockerhub:
     name: Push to Docker Hub
     needs: build-and-push
     runs-on: ubuntu-latest
+    permissions:
+      packages: write
     steps:
       - name: Checkout ${{ github.repository }}
         uses: actions/checkout@v3
         with:
-          fetch-depth: 0
           persist-credentials: false
-
-      - id: info
-        name: Determine devcontainer image info
-        uses: ./.github/actions/image-info
-        with:
-          CUDA: "${{ inputs.CUDA }}"
-          LLVM: "${{ inputs.LLVM }}"
-          RUST: "${{ inputs.RUST }}"
-          NVHPC: "${{ inputs.NVHPC }}"
-          MAMBA: "${{ inputs.MAMBA }}"
 
       - name: Push multiarch manifest to Docker Hub
         uses: ./.github/actions/push-to-dockerhub
         with:
-          archs: "amd64 arm64"
-          tag: "${{ steps.info.outputs.tag }}"
-          repository: "${{ inputs.repository }}"
+          archs: amd64 arm64
+          tag: "${{ needs.build-and-push.outputs.tag }}"
           username: "${{ secrets.GPUCIBOT_DOCKERHUB_USER }}"
           password: "${{ secrets.GPUCIBOT_DOCKERHUB_TOKEN }}"
+          repository: "${{ vars.DOCKERHUB_REPOSITORY || github.repository }}"

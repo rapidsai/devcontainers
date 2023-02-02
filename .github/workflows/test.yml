@@ -52,7 +52,7 @@ jobs:
     secrets: inherit
     uses: ./.github/workflows/build-and-test-feature.yml
     strategy:
-      fail-fast: true
+      fail-fast: false
       matrix:
         feature: ${{ fromJSON(needs.features-matrix.outputs.scenarios) }}
     with:
@@ -66,7 +66,7 @@ jobs:
     secrets: inherit
     uses: ./.github/workflows/build-and-test-feature.yml
     strategy:
-      fail-fast: true
+      fail-fast: false
       matrix:
         feature: ${{ fromJSON(needs.features-matrix.outputs.features) }}
     with:
@@ -76,9 +76,7 @@ jobs:
   image-matrix:
     if: needs.features-matrix.outputs.features != '[]' && needs.features-matrix.outputs.scenarios != '[]'
     name: Determine image matrix
-    needs:
-      - features-matrix
-      - validate-features-json
+    needs: features-matrix
     runs-on: ubuntu-latest
     outputs:
       matrix: ${{ steps.matrix.outputs.matrix }}
@@ -97,7 +95,7 @@ jobs:
     secrets: inherit
     uses: ./.github/workflows/build-and-test-image.yml
     strategy:
-      fail-fast: true
+      fail-fast: false
       matrix: ${{ fromJSON(needs.image-matrix.outputs.matrix) }}
     with:
       CUDA: "${{ matrix.CUDA }}"

@@ -6,12 +6,6 @@ concurrency:
 
 on:
   workflow_dispatch:
-    inputs:
-      repository:
-        type: string
-        required: false
-        default: rapidsai/devcontainers
-        description: Docker Hub repository
 
 jobs:
 
@@ -41,7 +35,7 @@ jobs:
     secrets: inherit
     uses: ./.github/workflows/build-and-push-image.yml
     strategy:
-      fail-fast: true
+      fail-fast: false
       matrix: ${{ fromJSON(needs.image-matrix.outputs.matrix) }}
     with:
       CUDA: "${{ matrix.CUDA }}"
@@ -49,4 +43,12 @@ jobs:
       RUST: "${{ matrix.RUST }}"
       NVHPC: "${{ matrix.NVHPC }}"
       MAMBA: "${{ matrix.MAMBA }}"
-      repository: "${{ inputs.repository }}"
+
+  cleanup-ghcr:
+    name: Clean up ghcr.io packages
+    needs: push-images
+    secrets: inherit
+    uses: ./.github/workflows/cleanup-ghcr.yml
+    with:
+      cut-off: "1 second ago UTC"
+      untagged-only: true
