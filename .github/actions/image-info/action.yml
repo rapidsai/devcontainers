@@ -71,6 +71,6 @@ runs:
           "s@features/nvhpc(:[0-9]+)?\": \{\}@features/nvhpc\1\": \{\"version\": \"${NVHPC#nvhpc}\"\}@" \
           "./images/${dir}/.devcontainer/devcontainer.json";
 
-        echo "image name: ghcr.io/${{ github.repository }}:${tag}";
+        echo "image name: ghcr.io/${{ github.repository_owner }}/devcontainers:${tag}";
         echo "devcontainer.json:";
         cat "./images/${dir}/.devcontainer/devcontainer.json";

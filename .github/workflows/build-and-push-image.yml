@@ -95,10 +95,11 @@ jobs:
         with:
           persist-credentials: false
 
-      - name: Remove ghcr.io image
+      - continue-on-error: true
+        name: Remove ghcr.io image
         uses: bots-house/ghcr-delete-image-action@v1.0.1
         with:
+          name: devcontainers
           token: "${{ github.token }}"
-          name: "${{ github.repository }}"
           owner: "${{ github.repository_owner }}"
           tag: "${{ needs.build-and-push.outputs.tag }}-${{ matrix.arch }}"
