@@ -35,7 +35,7 @@ jobs:
     secrets: inherit
     uses: ./.github/workflows/build-and-push-image.yml
     strategy:
-      # fail-fast: true
+      fail-fast: false
       matrix: ${{ fromJSON(needs.image-matrix.outputs.matrix) }}
     with:
       CUDA: "${{ matrix.CUDA }}"

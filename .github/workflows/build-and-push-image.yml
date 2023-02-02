@@ -30,7 +30,7 @@ jobs:
       dir: ${{ steps.info.outputs.dir }}
       tag: ${{ steps.info.outputs.tag }}
     strategy:
-      # fail-fast: true
+      fail-fast: false
       matrix:
         arch: [amd64, arm64]
     steps:
@@ -81,7 +81,7 @@ jobs:
     permissions:
       packages: write
     strategy:
-      # fail-fast: true
+      fail-fast: false
       matrix:
         arch: [amd64, arm64]
     steps:
