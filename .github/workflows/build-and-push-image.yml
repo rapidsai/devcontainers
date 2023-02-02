@@ -63,6 +63,11 @@ jobs:
     needs: build-and-push
     runs-on: ubuntu-latest
     steps:
+      - name: Checkout ${{ github.repository }}
+        uses: actions/checkout@v3
+        with:
+          persist-credentials: false
+
       - name: Push multiarch manifest to Docker Hub
         uses: ./.github/actions/push-to-dockerhub
         with:
@@ -85,6 +90,11 @@ jobs:
       matrix:
         arch: [amd64, arm64]
     steps:
+      - name: Checkout ${{ github.repository }}
+        uses: actions/checkout@v3
+        with:
+          persist-credentials: false
+
       - name: Remove ghcr.io image
         uses: bots-house/ghcr-delete-image-action@v1
         with:
