@@ -43,3 +43,12 @@ jobs:
       RUST: "${{ matrix.RUST }}"
       NVHPC: "${{ matrix.NVHPC }}"
       MAMBA: "${{ matrix.MAMBA }}"
+
+  cleanup-ghcr:
+    name: Clean up ghcr.io packages
+    needs: push-images
+    secrets: inherit
+    uses: ./.github/workflows/cleanup-ghcr.yml
+    with:
+      cut-off: "1 second ago UTC"
+      untagged-only: true

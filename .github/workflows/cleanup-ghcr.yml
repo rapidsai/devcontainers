@@ -1,13 +1,30 @@
 name: Clean up ghcr.io packages
 
 on:
-  workflow_dispatch:
+  workflow_call:
     inputs:
       cut-off:
+        type: string
         default: "1 second ago UTC"
         description: >
           Delete images older than this datetime (must include timezone).
-          Accepted formats: dateparser.readthedocs.io
+          Formats: https://dateparser.readthedocs.io
+      untagged-only:
+        type: boolean
+        default: true
+        description: Restricts image deletion to images without any tags, if enabled.
+  workflow_dispatch:
+    inputs:
+      cut-off:
+        type: string
+        default: "1 second ago UTC"
+        description: >
+          Delete images older than this datetime (must include timezone).
+          Formats: https://dateparser.readthedocs.io
+      untagged-only:
+        type: boolean
+        default: true
+        description: Restricts image deletion to images without any tags, if enabled.
 
 jobs:
   cleanup-ghcr:
@@ -22,4 +39,5 @@ jobs:
           cut-off: "${{ inputs.cut-off }}"
           token: "${{ secrets.WORKFLOW_TOKEN }}"
           org-name: "${{ github.repository_owner }}"
+          untagged-only: ${{ inputs.untagged-only }}
           account-type: ${{ github.repository == 'rapidsai/devcontainers' && 'org' || 'personal' }}
