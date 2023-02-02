@@ -76,9 +76,7 @@ jobs:
   image-matrix:
     if: needs.features-matrix.outputs.features != '[]' && needs.features-matrix.outputs.scenarios != '[]'
     name: Determine image matrix
-    needs:
-      - features-matrix
-      - validate-features-json
+    needs: features-matrix
     runs-on: ubuntu-latest
     outputs:
       matrix: ${{ steps.matrix.outputs.matrix }}
