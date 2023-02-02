@@ -82,6 +82,8 @@ jobs:
       - build-and-push
       - push-to-dockerhub
     runs-on: ubuntu-latest
+    permissions:
+      packages: write
     strategy:
       fail-fast: true
       matrix:
