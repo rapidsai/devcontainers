@@ -93,7 +93,7 @@ runs:
         rm "${{ runner.temp }}/dockerhub.json";
 
         for arch in ${archs}; do
-          curl -i -X DELETE -H "@${{ runner.temp }}/dockerhub.headers" \
+          curl -s -X DELETE -H "@${{ runner.temp }}/dockerhub.headers" \
             "https://hub.docker.com/v2/repositories/${docker_repository}/tags/${tag}-${arch}/";
         done
 
