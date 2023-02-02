@@ -123,13 +123,21 @@ find_version_from_git_tags() {
     local last_part_optional=${6:-"false"}
     if [ "$(echo "${requested_version}" | grep -o "." | wc -l)" != "2" ]; then
         local escaped_separator=${separator//./\\.}
-        local last_part
+        local last_part=
         if [ "${last_part_optional}" = "true" ]; then
-            last_part="(${escaped_separator}[0-9]+${suffix})?"
+            last_part+="(${escaped_separator}[0-9]+)?"
+            last_part+="(${escaped_separator}[0-9]+)?"
+            if [ -n "${suffix}" ]; then
+                last_part+="(${suffix})?"
+            fi
         else
-            last_part="${escaped_separator}[0-9]+${suffix}"
+            last_part+="${escaped_separator}[0-9]+"
+            last_part+="${escaped_separator}[0-9]+"
+            if [ -n "${suffix}" ]; then
+                last_part+="(${suffix})"
+            fi
         fi
-        local regex="${prefix}\\K[0-9]+${escaped_separator}[0-9]+${last_part}$"
+        local regex="${prefix}\\K[0-9]+${last_part}$"
         local version_list="$(git ls-remote --tags ${repository} | grep -oP "${regex}" | tr -d ' ' | tr "${separator}" "." | sort -rV)"
         if [ "${requested_version}" = "latest" ] || [ "${requested_version}" = "current" ] || [ "${requested_version}" = "lts" ]; then
             declare -g ${variable_name}="$(echo "${version_list}" | head -n 1)"
