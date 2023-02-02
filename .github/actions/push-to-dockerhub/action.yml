@@ -74,23 +74,27 @@ runs:
         # Push the multiarch manifest
         docker manifest push ${name};
 
+        # Remove the arch-specific tags and just leave the multiarch manifest
+
         cat <<EOF > "${{ runner.temp }}/dockerhub.json"
         {"username": "$registry_username", "password": "$registry_password"}
         EOF
 
-        # Remove the arch-specific tags and just leave the multiarch manifest
-        DOCKERHUB_TOKEN="$(
-          curl -s -X POST \
-            -H "Content-Type: application/json" \
-            -d "@${{ runner.temp }}/dockerhub.json" \
-            https://hub.docker.com/v2/users/login/ \
-        | jq -r .token)";
+        cat <<EOF > "${{ runner.temp }}/dockerhub.headers"
+        Accept: application/json
+        Authorization: JWT $(
+            curl -s -X POST \
+              -H "Content-Type: application/json" \
+              -d "@${{ runner.temp }}/dockerhub.json" \
+              https://hub.docker.com/v2/users/login/ \
+          | jq -r .token)
+        EOF
 
         rm "${{ runner.temp }}/dockerhub.json";
 
         for arch in ${archs}; do
-          curl -i -X DELETE \
-            -H "Accept: application/json" \
-            -H "Authorization: JWT $DOCKERHUB_TOKEN" \
+          curl -i -X DELETE -H "@${{ runner.temp }}/dockerhub.headers" \
             "https://hub.docker.com/v2/repositories/${docker_repository}/tags/${tag}-${arch}/";
         done
+
+        rm "${{ runner.temp }}/dockerhub.headers";
