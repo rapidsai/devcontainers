@@ -21,19 +21,7 @@
     "vscode": {
       "extensions": [
         "twxs.cmake"
-      ],
-      "settings": {
-        "terminal.integrated.profiles.linux": {
-          "bash": {
-            "path": "bash",
-            "icon": "terminal-bash",
-            "args": [
-              "-li"
-            ]
-          }
-        },
-        "terminal.integrated.defaultProfile.linux": "bash"
-      }
+      ]
     }
   }
 }

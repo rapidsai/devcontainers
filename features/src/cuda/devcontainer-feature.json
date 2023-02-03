@@ -47,17 +47,7 @@
           "*.cuh": "cuda-cpp",
           "**/libcudacxx/include/**/*": "cpp",
           "**/libcudacxx-src/include/**/*": "cpp"
-        },
-        "terminal.integrated.profiles.linux": {
-          "bash": {
-            "path": "bash",
-            "icon": "terminal-bash",
-            "args": [
-              "-li"
-            ]
-          }
-        },
-        "terminal.integrated.defaultProfile.linux": "bash"
+        }
       }
     }
   }

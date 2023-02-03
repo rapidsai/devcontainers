@@ -8,6 +8,7 @@
       "type": "string",
       "proposals": [
         "latest",
+        "22.11.1-2",
         "22.9.0-2"
       ],
       "default": "latest",
@@ -36,17 +37,7 @@
         "python.linting.mypyPath": "/tmp/.current-conda-env/bin/mypy",
         "python.linting.pycodestylePath": "/tmp/.current-conda-env/bin/pycodestyle",
         "python.linting.pydocstylePath": "/tmp/.current-conda-env/bin/pydocstyle",
-        "python.linting.pylintPath": "/tmp/.current-conda-env/bin/pylint",
-        "terminal.integrated.profiles.linux": {
-          "bash": {
-            "path": "bash",
-            "icon": "terminal-bash",
-            "args": [
-              "-li"
-            ]
-          }
-        },
-        "terminal.integrated.defaultProfile.linux": "bash"
+        "python.linting.pylintPath": "/tmp/.current-conda-env/bin/pylint"
       }
     }
   }
