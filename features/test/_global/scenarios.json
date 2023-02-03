@@ -12,9 +12,16 @@
       "./cuda"
     ]
   },
-  "cmake_cuda_gitlabcli_llvm_ninja_nvhpc_sccache": {
+  "cpp_llvm_cuda_nvhpc": {
     "image": "ubuntu:22.04",
     "features": {
+      "ghcr.io/devcontainers/features/common-utils:2": {
+        "uid": "1000",
+        "gid": "1000",
+        "username": "coder",
+        "installZsh": "true",
+        "upgradePackages": "true"
+      },
       "ghcr.io/devcontainers/features/git:1": {
         "ppa": "true"
       },
@@ -30,7 +37,7 @@
         "version": "1.11.1"
       },
       "sccache": {
-        "version": "0.3.1"
+        "version": "0.4.0-pre.6"
       },
       "llvm": {
         "version": "15"
@@ -40,16 +47,22 @@
       },
       "nvhpc": {
         "version": "23.1"
-      }
+      },
+      "utils": {}
     },
     "overrideFeatureInstallOrder": [
+      "ghcr.io/devcontainers/features/common-utils",
+      "ghcr.io/devcontainers/features/git",
+      "ghcr.io/devcontainers/features/git-lfs",
+      "ghcr.io/devcontainers/features/github-cli",
       "./gitlab-cli",
       "./cmake",
       "./ninja",
       "./sccache",
       "./llvm",
       "./cuda",
-      "./nvhpc"
+      "./nvhpc",
+      "./utils"
     ]
   }
 }
