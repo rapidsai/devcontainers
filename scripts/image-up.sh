@@ -13,7 +13,7 @@ image_up() {
         --remove-existing-container \
         --remote-env 'VAULT_HOST=https://vault.ops.k8s.rapids.ai' \
         --workspace-folder $cwd/images/$img \
-        --cache-from docker.io/rapidsai/devcontainers:23.04-$img-ubuntu20.04;
+        --cache-from docker.io/rapidsai/devcontainers:23.04-$img-ubuntu22.04;
 }
 
 image_up "$@";

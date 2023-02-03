@@ -43,7 +43,8 @@ cuda_ver="${cuda_ver/./-}";
 
 check_packages                          \
     libnccl-dev                         \
-    libcutensor-dev                     \
+    `# cutensor isn't 22.04 repo yet?`  \
+    `# libcutensor-dev`                 \
     cuda-compiler-${cuda_ver}           \
     cuda-nvml-dev-${cuda_ver}           \
     cuda-libraries-dev-${cuda_ver}      \

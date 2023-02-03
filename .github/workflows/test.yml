@@ -71,7 +71,7 @@ jobs:
         feature: ${{ fromJSON(needs.features-matrix.outputs.features) }}
     with:
       name: "Run generated tests"
-      args: "--skip-scenarios -f ${{ matrix.feature }} -i ubuntu:20.04"
+      args: "--skip-scenarios -f ${{ matrix.feature }} -i ubuntu:22.04"
 
   image-matrix:
     if: needs.features-matrix.outputs.features != '[]' && needs.features-matrix.outputs.scenarios != '[]'

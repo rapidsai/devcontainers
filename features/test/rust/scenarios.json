@@ -1,6 +1,6 @@
 {
   "rust_at_pinned_version": {
-    "image": "ubuntu:20.04",
+    "image": "ubuntu:22.04",
     "features": {
       "llvm": {
         "version": "15"
