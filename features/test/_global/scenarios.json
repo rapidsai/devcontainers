@@ -12,7 +12,7 @@
       "./cuda"
     ]
   },
-  "cmake_cuda_gitlabcli_llvm_ninja_nvhpc_sccache_mambaforge": {
+  "cmake_cuda_gitlabcli_llvm_ninja_nvhpc_sccache": {
     "image": "ubuntu:22.04",
     "features": {
       "ghcr.io/devcontainers/features/git:1": {
@@ -40,9 +40,6 @@
       },
       "nvhpc": {
         "version": "23.1"
-      },
-      "mambaforge": {
-        "version": "22.9.0-2"
       }
     },
     "overrideFeatureInstallOrder": [
@@ -52,8 +49,7 @@
       "./sccache",
       "./llvm",
       "./cuda",
-      "./nvhpc",
-      "./mambaforge"
+      "./nvhpc"
     ]
   }
 }

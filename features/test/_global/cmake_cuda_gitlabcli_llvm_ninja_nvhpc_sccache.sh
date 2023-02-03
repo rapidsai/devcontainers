@@ -79,14 +79,6 @@ SCCACHE_VERSION="0.3.1";
 check "sccache exists and is on path" which sccache;
 check "version" bash -c "sccache --version | grep '$SCCACHE_VERSION'";
 
-# Check Mambaforge
-check "conda exists and is on path" which conda;
-check "mamba exists and is on path" which mamba;
-check "mamba no banner" bash -c "echo '$MAMBA_NO_BANNER' | grep '1'";
-
-conda --version;
-mamba --version;
-
 # Report result
 # If any of the checks above exited with a non-zero exit code, the test will fail.
 reportResults;
