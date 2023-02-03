@@ -16,7 +16,7 @@ runs:
         echo "matrix=$(
         cat <<EOF | yq -o json --no-colors | jq -c -r -M '.matrix'
         matrix:
-          LLVM: ["", "llvm15", "llvm16"]
+          LLVM: ["", "llvm15"]
           RUST: ["", "rust"]
           CUDA: ["", "cuda11.8", "cuda12.0"]
           NVHPC: ["", "nvhpc23.1"]
