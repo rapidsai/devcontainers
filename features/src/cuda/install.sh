@@ -25,8 +25,8 @@ fi
 
 get_cuda_deb() {
     local deb="$(                                 \
-        cat wget --no-hsts -q -O- "${1}/Packages" \
-    | grep -P "^Filename: \./$2(.*)\.deb$"        \
+        wget --no-hsts -q -O- "${1}/Packages"     \
+    | grep -P "^Filename: \./${2}(.*)\.deb$"      \
     | sort -Vr | head -n1 | cut -d' ' -f2         \
     )";
     wget --no-hsts -q -O "/tmp/${deb#./}" "${1}/${deb#./}";
