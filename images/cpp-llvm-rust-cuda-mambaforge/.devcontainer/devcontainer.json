@@ -5,7 +5,7 @@
   },
   "remoteUser": "coder",
   "features": {
-    "ghcr.io/devcontainers/features/common-utils:1": {
+    "ghcr.io/devcontainers/features/common-utils:2": {
       "uid": "1000",
       "gid": "1000",
       "username": "coder",
