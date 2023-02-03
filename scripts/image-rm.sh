@@ -9,7 +9,7 @@ rm_image() {
     img="$(realpath -m "$img")";
     img="${img#"$cwd/images/"}";
 
-    exec docker rm -f "$(docker ps | grep vsc-$img | cut -d' ' -f1)";
+    exec docker rm -f "$(docker ps | grep -P "vsc-$img-[0-9a-z]{32}-uid" | cut -d' ' -f1)";
 }
 
 rm_image "$@";
