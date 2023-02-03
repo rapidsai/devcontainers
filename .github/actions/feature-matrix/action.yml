@@ -24,6 +24,7 @@ runs:
         files: |
           features/src/**
           features/test/**
+          images/matrix.yml
           .github/workflows/test.yml
           .github/workflows/build-and-test-feature.yml
           .github/actions/feature-matrix/action.yml
