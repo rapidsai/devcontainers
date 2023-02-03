@@ -7,7 +7,13 @@ cd "$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )";
 # install global/common scripts
 . ./common/install.sh;
 
-check_packages jq wget ca-certificates bash-completion gettext-base
+check_packages \
+    jq \
+    wget \
+    gettext-base \
+    ca-certificates \
+    bash-completion \
+    ;
 
 echo "Downloading CUDA keyring...";
 
@@ -17,46 +23,38 @@ if [[ "$NVARCH" == aarch64 ]]; then
     NVARCH="sbsa";
 fi
 
-pushd "$(mktemp -d)";
-
 # Add NVIDIA's keyring and apt repository
-wget --no-hsts -q "\
+wget --no-hsts -q -O /tmp/cuda-keyring_1.0-1_all.deb "\
 https://developer.download.nvidia.com/compute/cuda/repos/\
 $(. /etc/os-release; echo "$ID${VERSION_ID/./}")/\
 ${NVARCH}/cuda-keyring_1.0-1_all.deb";
 
-dpkg -i cuda-keyring_1.0-1_all.deb;
-
-popd
+dpkg -i /tmp/cuda-keyring_1.0-1_all.deb;
 
 apt-get update;
 
-echo "Installing minimal CUDA toolkit..."
+echo "Installing dev CUDA toolkit..."
 
 cuda_ver="${VERSION:-12.0.0}";
-cuda_ver=$(echo ${cuda_ver/./-} | cut -d'-' -f3 --complement);
-gds_tools=
-if [[ $(uname -p) == x86_64 ]]; then
-    gds_tools="gds-tools-${cuda_ver}";
-fi
+cuda_ver=$(echo "${cuda_ver}" | cut -d'.' -f3 --complement);
 
-DEBIAN_FRONTEND=noninteractive              \
-apt-get install -y --no-install-recommends  \
-    libnccl-dev                             \
-    ${gds_tools}                            \
-    cuda-compat-${cuda_ver}                 \
-    cuda-nvml-dev-${cuda_ver}               \
-    cuda-compiler-${cuda_ver}               \
-    cuda-libraries-${cuda_ver}              \
-    cuda-driver-dev-${cuda_ver}             \
-    cuda-libraries-dev-${cuda_ver}          \
-    cuda-minimal-build-${cuda_ver}          \
-    cuda-command-line-tools-${cuda_ver}     \
+cudapath="${CUDA_HOME}-${cuda_ver}";
+cuda_ver="${cuda_ver/./-}";
+
+check_packages                          \
+    libnccl-dev                         \
+    libcutensor-dev                     \
+    cuda-compiler-${cuda_ver}           \
+    cuda-nvml-dev-${cuda_ver}           \
+    cuda-libraries-dev-${cuda_ver}      \
+    cuda-command-line-tools-${cuda_ver} \
+    $([ "$NVARCH" == x86_64 ] && echo   \
+        gds-tools-${cuda_ver} || echo ) \
     ;
 
 if [[ ! -L "${CUDA_HOME}" ]]; then
     # Create /usr/local/cuda symlink
-    ln -s "${CUDA_HOME}-${CUDAVERSION}" "${CUDA_HOME}";
+    ln -s "${cudapath}" "${CUDA_HOME}";
 fi
 
 cuda_ver=$(grep "#define CUDA_VERSION" ${CUDA_HOME}/include/cuda.h | cut -d' ' -f3);
