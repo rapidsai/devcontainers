@@ -1,3 +1,3 @@
-FROM ubuntu:jammy
+FROM ubuntu:focal
 
 COPY .clangd /etc/skel/.config/clangd/config.yaml

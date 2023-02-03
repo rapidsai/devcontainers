@@ -1,1 +1,1 @@
-FROM ubuntu:jammy
+FROM ubuntu:focal
