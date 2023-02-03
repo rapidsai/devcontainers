@@ -1,6 +1,6 @@
 {
   "cuda_rust": {
-    "image": "ubuntu:focal",
+    "image": "ubuntu:20.04",
     "features": {
       "rust": {},
       "cuda": {
@@ -13,7 +13,7 @@
     ]
   },
   "cmake_cuda_gitlabcli_llvm_ninja_nvhpc_sccache_mambaforge": {
-    "image": "ubuntu:focal",
+    "image": "ubuntu:20.04",
     "features": {
       "ghcr.io/devcontainers/features/git:1": {
         "ppa": "true"

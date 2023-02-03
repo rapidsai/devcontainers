@@ -4,7 +4,7 @@
 # ```
 # npx --package=@devcontainers/cli -c 'devcontainer features test \
 #     --features llvm \
-#     --base-image ubuntu:focal .'
+#     --base-image ubuntu:20.04 .'
 # ```
 
 set -e

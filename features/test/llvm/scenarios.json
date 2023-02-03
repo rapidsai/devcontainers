@@ -1,6 +1,6 @@
 {
   "llvm_15": {
-    "image": "ubuntu:focal",
+    "image": "ubuntu:20.04",
     "features": {
       "llvm": {
         "version": "15"
@@ -8,7 +8,7 @@
     }
   },
   "llvm_16": {
-    "image": "ubuntu:focal",
+    "image": "ubuntu:20.04",
     "features": {
       "llvm": {
         "version": "16"

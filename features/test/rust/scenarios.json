@@ -1,6 +1,6 @@
 {
   "rust_at_pinned_version": {
-    "image": "ubuntu:focal",
+    "image": "ubuntu:20.04",
     "features": {
       "llvm": {
         "version": "15"
