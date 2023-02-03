@@ -23,21 +23,24 @@ if [[ "$NVARCH" == aarch64 ]]; then
     NVARCH="sbsa";
 fi
 
+get_cuda_deb() {
+    local deb="$(                                 \
+        cat wget --no-hsts -q -O- "${1}/Packages" \
+    | grep -P "^Filename: \./$2(.*)\.deb$"        \
+    | sort -Vr | head -n1 | cut -d' ' -f2         \
+    )";
+    wget --no-hsts -q -O "/tmp/${deb#./}" "${1}/${deb#./}";
+    echo -n "/tmp/${deb#./}";
+}
+
 # Add NVIDIA's keyring and apt repository
 cuda_repo_base="https://developer.download.nvidia.com/compute/cuda/repos";
 cuda_repo="${cuda_repo_base}/$(. /etc/os-release; echo "$ID${VERSION_ID/./}")/${NVARCH}";
 
-cuda_keyring_deb="$(
-    curl -s -X GET ${cuda_repo}/Packages \
-  | grep -P '^Filename: \./cuda-keyring(.*)\.deb$' \
-  | sort -Vr | head -n1 | cut -d' ' -f2 \
-)";
-
-cuda_keyring_deb="${cuda_keyring_deb#./}";
-
-wget --no-hsts -q -O /tmp/${cuda_keyring_deb} "${cuda_repo}/${cuda_keyring_deb}";
-
-dpkg -i /tmp/${cuda_keyring_deb};
+DEBIAN_FRONTEND=noninteractive                    \
+apt install -y --no-install-recommends            \
+    "$(get_cuda_deb "${cuda_repo}" cuda-keyring)" \
+    ;
 
 apt-get update;
 
@@ -70,20 +73,10 @@ if ! dpkg -s libcutensor-dev > /dev/null 2>&1; then
         focal_cuda_repo="${cuda_repo_base}/ubuntu2004/${NVARCH}";
         wget --no-hsts -q -O /tmp/focal-cuda-packages "${focal_cuda_repo}/Packages";
 
-        get_focal_cuda_deb() {
-            local deb="$(                          \
-                cat /tmp/focal-cuda-packages       \
-            | grep -P "^Filename: \./$1(.*)\.deb$" \
-            | sort -Vr | head -n1 | cut -d' ' -f2  \
-            )";
-            wget --no-hsts -q -O "/tmp/${deb#./}" "${focal_cuda_repo}/${deb#./}";
-            echo -n "/tmp/${deb#./}";
-        }
-
-        DEBIAN_FRONTEND=noninteractive \
-        apt install -y --no-install-recommends      \
-            "$(get_focal_cuda_deb libcutensor1)"    \
-            "$(get_focal_cuda_deb libcutensor-dev)" \
+        DEBIAN_FRONTEND=noninteractive                             \
+        apt install -y --no-install-recommends                     \
+            "$(get_cuda_deb "${focal_cuda_repo}" libcutensor1)"    \
+            "$(get_cuda_deb "${focal_cuda_repo}" libcutensor-dev)" \
             ;
     fi
 fi
