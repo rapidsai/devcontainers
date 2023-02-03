@@ -62,7 +62,7 @@ check "nvc++ exists and is on path" which nvc++;
 # Check LLVM
 echo "LLVM_VERSION: $LLVM_VERSION";
 check "clang version" bash -c "clang --version | grep 'clang version 16'";
-check "apt repo" grep "llvm-toolchain-$(lsb_release -cs)-16 main" /etc/apt/sources.list{,.d/*.list};
+check "apt repo" grep "llvm-toolchain-$(lsb_release -cs)-16 main" $(find /etc/apt -type f -name '*.list');
 
 # Check CMake
 CMAKE_VERSION="3.25.2";
