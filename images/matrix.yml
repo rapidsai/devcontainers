@@ -47,5 +47,9 @@ matrix:
     - { CPP: "cpp", RUST: "rust", CUDA: "cuda11.8" }
     - { CPP: "cpp", RUST: "rust", CUDA: "cuda12.0" }
 
+    # images/cuda-mambaforge
+    # Only need 11.8, because full 12.0+ CTKs are available via conda
+    - { CUDA: "cuda11.8", MAMBA: "mambaforge" }
+
     # images/mambaforge
     - { MAMBA: "mambaforge" }
