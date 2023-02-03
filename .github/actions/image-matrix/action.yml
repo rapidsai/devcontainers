@@ -13,24 +13,8 @@ runs:
       id: matrix
       shell: bash
       run: |
-        echo "matrix=$(
-        cat <<EOF | yq -o json --no-colors | jq -c -r -M '.matrix'
-        matrix:
-          CPP: ["", "cpp"]
-          LLVM: ["", "llvm15"]
-          RUST: ["", "rust"]
-          CUDA: ["", "cuda11.8", "cuda12.0"]
-          NVHPC: ["", "nvhpc23.1"]
-          MAMBA: ["", "mambaforge"]
-          include:
-            - { CPP: "", MAMBA: "mambaforge" }
-          exclude:
-            - { CPP: "" }
-            - { RUST: "rust", NVHPC: "nvhpc23.1" }
-            - { RUST: "rust", CUDA: "", LLVM: "", NVHPC: "" }
-            - { NVHPC: "nvhpc23.1",        MAMBA: "mambaforge" }
-            - { CUDA: "",         LLVM: "", MAMBA: "mambaforge" }
-            - { CUDA: "cuda11.8", LLVM: "", NVHPC: "nvhpc23.1" }
-            - { CUDA: "cuda12.0", LLVM: "", NVHPC: "nvhpc23.1" }
-        EOF
+        echo "matrix=$(\
+          cat ./images/matrix.yml \
+        | yq -o json --no-colors  \
+        | jq -c -r -M '.matrix'   \
         )" | tee -a $GITHUB_OUTPUT;
