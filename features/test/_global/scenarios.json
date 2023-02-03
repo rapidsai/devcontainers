@@ -33,7 +33,7 @@
         "version": "0.3.1"
       },
       "llvm": {
-        "version": "16"
+        "version": "15"
       },
       "cuda": {
         "version": "12.0"
