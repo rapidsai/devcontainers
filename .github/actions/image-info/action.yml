@@ -3,6 +3,9 @@ name: image-info
 description: Determine devcontainer image info
 
 inputs:
+  CPP:
+    type: string
+    required: true
   CUDA:
     type: string
     required: true
@@ -32,31 +35,42 @@ runs:
       name: Determine devcontainer image info
       shell: bash
       env:
+        CPP: "${{ inputs.CPP }}"
         CUDA: "${{ inputs.CUDA }}"
         LLVM: "${{ inputs.LLVM }}"
         RUST: "${{ inputs.RUST }}"
         NVHPC: "${{ inputs.NVHPC }}"
         MAMBA: "${{ inputs.MAMBA }}"
       run: |
-        cuda=${CUDA:+"-cuda"};
-        llvm=${LLVM:+"-llvm"};
-        rust=${RUST:+"-rust"};
-        nvhpc=${NVHPC:+"-nvhpc"};
-        mamba=${MAMBA:+"-mambaforge"};
-        dir="cpp${llvm}${rust}${cuda}${mamba}${nvhpc}";
+        join_with_delimiter() {
+          local IFS='' delim=$1; shift; echo -n "$1"; shift; echo -n "${*/#/$delim}";
+        }
+
+        dir="$(join_with_delimiter "-" \
+          ${CPP:+"cpp"} \
+          ${LLVM:+"llvm"} \
+          ${RUST:+"rust"} \
+          ${CUDA:+"cuda"} \
+          ${MAMBA:+"mambaforge"} \
+          ${NVHPC:+"nvhpc"} \
+        )";
 
         if [[ ! -d "./images/${dir}" ]]; then
           echo "skipping because ! -d ./images/${dir}";
           exit 1;
         fi
 
-        cuda=${CUDA:+"-${CUDA}"};
-        llvm=${LLVM:+"-${LLVM}"};
-        rust=${RUST:+"-${RUST}"};
-        nvhpc=${NVHPC:+"-${NVHPC}"};
-        mamba=${MAMBA:+"-mambaforge"};
-        rapids="$(git describe --abbrev=0 --tags | sed 's/[a-zA-Z]//g' | cut -d '.' -f -2)";
-        tag="${rapids:-dev}-cpp${llvm}${rust}${cuda}${nvhpc}${mamba}-ubuntu22.04";
+        RAPIDS="$(git describe --abbrev=0 --tags | sed 's/[a-zA-Z]//g' | cut -d '.' -f -2)";
+
+        tag="$(join_with_delimiter "-" \
+          ${RAPIDS:-dev} \
+          ${CPP:-} \
+          ${LLVM:-} \
+          ${RUST:-} \
+          ${CUDA:-} \
+          ${MAMBA:-} \
+          ${NVHPC:-} \
+        )";
 
         echo "dir=$dir" >> $GITHUB_OUTPUT;
         echo "tag=$tag" >> $GITHUB_OUTPUT;

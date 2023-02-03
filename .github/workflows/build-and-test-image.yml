@@ -3,6 +3,9 @@ name: Build and test devcontainer images
 on:
   workflow_call:
     inputs:
+      CPP:
+        type: string
+        required: true
       CUDA:
         type: string
         required: true
@@ -39,6 +42,7 @@ jobs:
         name: Determine devcontainer image info
         uses: ./.github/actions/image-info
         with:
+          CPP: "${{ inputs.CPP }}"
           CUDA: "${{ inputs.CUDA }}"
           LLVM: "${{ inputs.LLVM }}"
           RUST: "${{ inputs.RUST }}"

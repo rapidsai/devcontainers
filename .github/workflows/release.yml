@@ -37,6 +37,7 @@ jobs:
       fail-fast: false
       matrix: ${{ fromJSON(needs.image-matrix.outputs.matrix) }}
     with:
+      CPP: "${{ matrix.CPP }}"
       CUDA: "${{ matrix.CUDA }}"
       LLVM: "${{ matrix.LLVM }}"
       RUST: "${{ matrix.RUST }}"

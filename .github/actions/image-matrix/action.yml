@@ -16,12 +16,16 @@ runs:
         echo "matrix=$(
         cat <<EOF | yq -o json --no-colors | jq -c -r -M '.matrix'
         matrix:
+          CPP: ["", "cpp"]
           LLVM: ["", "llvm15"]
           RUST: ["", "rust"]
           CUDA: ["", "cuda11.8", "cuda12.0"]
           NVHPC: ["", "nvhpc23.1"]
           MAMBA: ["", "mambaforge"]
+          include:
+            - { CPP: "", MAMBA: "mambaforge" }
           exclude:
+            - { CPP: "" }
             - { RUST: "rust", NVHPC: "nvhpc23.1" }
             - { RUST: "rust", CUDA: "", LLVM: "", NVHPC: "" }
             - { NVHPC: "nvhpc23.1",        MAMBA: "mambaforge" }
