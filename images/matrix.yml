@@ -47,5 +47,9 @@ matrix:
     - { CPP: "cpp", RUST: "rust", CUDA: "cuda11.8" }
     - { CPP: "cpp", RUST: "rust", CUDA: "cuda12.0" }
 
+    # images/cuda-mambaforge
+    - { CUDA: "cuda11.8", MAMBA: "mambaforge" }
+    - { CUDA: "cuda12.0", MAMBA: "mambaforge" }
+
     # images/mambaforge
     - { MAMBA: "mambaforge" }

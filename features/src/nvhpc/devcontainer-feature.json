@@ -27,7 +27,7 @@
   ],
   "installsAfter": [
     "ghcr.io/devcontainers/features/common-utils",
-    "ghcr.io/trxcllnt/devcontainer-features/cuda"
+    "ghcr.io/rapidsai/devcontainers/features/cuda"
   ],
   "customizations": {
     "vscode": {

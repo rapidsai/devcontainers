@@ -70,6 +70,7 @@ runs:
           ${CUDA:-} \
           ${MAMBA:-} \
           ${NVHPC:-} \
+          ubuntu22.04
         )";
 
         echo "dir=$dir" >> $GITHUB_OUTPUT;
