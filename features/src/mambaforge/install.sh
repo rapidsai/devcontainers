@@ -40,7 +40,7 @@ append_to_all_bashrcs "$(cat .bashrc)";
 # Update the devcontainers/features/common-utils __bash_prompt fn
 # to insert ${CONDA_PROMPT_MODIFIER} into the dev container's PS1
 for_each_user_bashrc '
-if [[ "$(grep -q "# Codespaces bash prompt theme" "$0"; echo $?)" == 0 ]]; then
+if [[ "$(grep -qE "^__bash_prompt\(\) \{$" "$0"; echo $?)" == 0 ]]; then
     sed -i -re "s@PS1=\"(\\\$\{userpart\} )@PS1=\"\${CONDA_PROMPT_MODIFIER:-}\1@g" "$0";
 fi
 ';

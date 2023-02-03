@@ -1,6 +1,6 @@
 {
   "sccache_pub": {
-    "image": "mcr.microsoft.com/devcontainers/base:jammy",
+    "image": "ubuntu:22.04",
     "features": {
       "sccache": {
         "version": "0.3.1"
@@ -8,7 +8,7 @@
     }
   },
   "sccache_pre": {
-    "image": "mcr.microsoft.com/devcontainers/base:jammy",
+    "image": "ubuntu:22.04",
     "features": {
       "sccache": {
         "version": "0.4.0-pre.6"

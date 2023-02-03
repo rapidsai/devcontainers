@@ -4,7 +4,7 @@
 # ```
 # npx --package=@devcontainers/cli -c 'devcontainer features test \
 #     --features cuda \
-#     --base-image mcr.microsoft.com/devcontainers/base:jammy .'
+#     --base-image ubuntu:22.04 .'
 # ```
 
 set -e

@@ -1,1 +1,1 @@
-FROM ubuntu:jammy
+FROM ubuntu:22.04

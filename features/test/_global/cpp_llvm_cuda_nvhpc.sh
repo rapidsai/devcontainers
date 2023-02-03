@@ -61,8 +61,8 @@ check "nvc++ exists and is on path" which nvc++;
 
 # Check LLVM
 echo "LLVM_VERSION: $LLVM_VERSION";
-check "clang version" bash -c "clang --version | grep 'clang version 16'";
-check "apt repo" grep "llvm-toolchain-$(lsb_release -cs)-16 main" /etc/apt/sources.list{,.d/*.list};
+check "clang version" bash -c "clang --version | grep 'clang version 15'";
+check "apt repo" grep "llvm-toolchain-$(lsb_release -cs)-15 main" $(find /etc/apt -type f -name '*.list');
 
 # Check CMake
 CMAKE_VERSION="3.25.2";
@@ -75,17 +75,9 @@ check "ninja exists and is on path" which ninja;
 check "version" bash -c "ninja --version | grep '$NINJA_VERSION'";
 
 # Check sccache
-SCCACHE_VERSION="0.3.1";
+SCCACHE_VERSION="0.4.0-pre.6";
 check "sccache exists and is on path" which sccache;
 check "version" bash -c "sccache --version | grep '$SCCACHE_VERSION'";
-
-# Check Mambaforge
-check "conda exists and is on path" which conda;
-check "mamba exists and is on path" which mamba;
-check "mamba no banner" bash -c "echo '$MAMBA_NO_BANNER' | grep '1'";
-
-conda --version;
-mamba --version;
 
 # Report result
 # If any of the checks above exited with a non-zero exit code, the test will fail.

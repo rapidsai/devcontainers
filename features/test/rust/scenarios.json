@@ -1,6 +1,6 @@
 {
   "rust_at_pinned_version": {
-    "image": "mcr.microsoft.com/devcontainers/base:jammy",
+    "image": "ubuntu:22.04",
     "features": {
       "llvm": {
         "version": "15"

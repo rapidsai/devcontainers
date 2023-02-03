@@ -8,6 +8,7 @@
       "type": "string",
       "proposals": [
         "dev",
+        "17",
         "16",
         "15",
         "14",
@@ -24,6 +25,12 @@
   "containerEnv": {
     "BASH_ENV": "/etc/bash.bash_env"
   },
+  "capAdd": [
+    "SYS_PTRACE"
+  ],
+  "securityOpt": [
+    "seccomp=unconfined"
+  ],
   "customizations": {
     "vscode": {
       "extensions": [
@@ -56,15 +63,6 @@
           "--completion-style=detailed",
           "--header-insertion-decorators"
         ],
-        "terminal.integrated.profiles.linux": {
-          "bash": {
-            "path": "bash",
-            "icon": "terminal-bash",
-            "args": [
-              "-li"
-            ]
-          }
-        },
         "terminal.integrated.defaultProfile.linux": "bash",
         "[c]": {
           "editor.defaultFormatter": "xaver.clang-format"

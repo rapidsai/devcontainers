@@ -1,6 +1,6 @@
 {
   "cuda_rust": {
-    "image": "mcr.microsoft.com/devcontainers/base:jammy",
+    "image": "ubuntu:22.04",
     "features": {
       "rust": {},
       "cuda": {
@@ -12,9 +12,16 @@
       "./cuda"
     ]
   },
-  "cmake_cuda_gitlabcli_llvm_ninja_nvhpc_sccache_mambaforge": {
-    "image": "mcr.microsoft.com/devcontainers/base:jammy",
+  "cpp_llvm_cuda_nvhpc": {
+    "image": "ubuntu:22.04",
     "features": {
+      "ghcr.io/devcontainers/features/common-utils:2": {
+        "uid": "1000",
+        "gid": "1000",
+        "username": "coder",
+        "installZsh": "true",
+        "upgradePackages": "true"
+      },
       "ghcr.io/devcontainers/features/git:1": {
         "ppa": "true"
       },
@@ -30,10 +37,10 @@
         "version": "1.11.1"
       },
       "sccache": {
-        "version": "0.3.1"
+        "version": "0.4.0-pre.6"
       },
       "llvm": {
-        "version": "16"
+        "version": "15"
       },
       "cuda": {
         "version": "12.0"
@@ -41,11 +48,13 @@
       "nvhpc": {
         "version": "23.1"
       },
-      "mambaforge": {
-        "version": "22.9.0-2"
-      }
+      "utils": {}
     },
     "overrideFeatureInstallOrder": [
+      "ghcr.io/devcontainers/features/common-utils",
+      "ghcr.io/devcontainers/features/git",
+      "ghcr.io/devcontainers/features/git-lfs",
+      "ghcr.io/devcontainers/features/github-cli",
       "./gitlab-cli",
       "./cmake",
       "./ninja",
@@ -53,7 +62,7 @@
       "./llvm",
       "./cuda",
       "./nvhpc",
-      "./mambaforge"
+      "./utils"
     ]
   }
 }
