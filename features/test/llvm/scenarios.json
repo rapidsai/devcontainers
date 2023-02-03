@@ -1,6 +1,6 @@
 {
   "llvm_15": {
-    "image": "mcr.microsoft.com/devcontainers/base:focal",
+    "image": "ubuntu:focal",
     "features": {
       "llvm": {
         "version": "15"
@@ -8,7 +8,7 @@
     }
   },
   "llvm_16": {
-    "image": "mcr.microsoft.com/devcontainers/base:focal",
+    "image": "ubuntu:focal",
     "features": {
       "llvm": {
         "version": "16"

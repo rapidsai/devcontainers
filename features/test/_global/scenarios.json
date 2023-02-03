@@ -1,6 +1,6 @@
 {
   "cuda_rust": {
-    "image": "mcr.microsoft.com/devcontainers/base:focal",
+    "image": "ubuntu:focal",
     "features": {
       "rust": {},
       "cuda": {
@@ -13,7 +13,7 @@
     ]
   },
   "cmake_cuda_gitlabcli_llvm_ninja_nvhpc_sccache_mambaforge": {
-    "image": "mcr.microsoft.com/devcontainers/base:focal",
+    "image": "ubuntu:focal",
     "features": {
       "ghcr.io/devcontainers/features/git:1": {
         "ppa": "true"

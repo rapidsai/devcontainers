@@ -4,7 +4,7 @@
 # ```
 # npx --package=@devcontainers/cli -c 'devcontainer features test \
 #     --features nvhpc \
-#     --base-image mcr.microsoft.com/devcontainers/base:focal .'
+#     --base-image ubuntu:focal .'
 # ```
 
 set -e

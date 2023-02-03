@@ -1,6 +1,6 @@
 {
   "rust_at_pinned_version": {
-    "image": "mcr.microsoft.com/devcontainers/base:focal",
+    "image": "ubuntu:focal",
     "features": {
       "llvm": {
         "version": "15"
