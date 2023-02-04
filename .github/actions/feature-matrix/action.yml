@@ -24,11 +24,10 @@ runs:
         files: |
           features/src/**
           features/test/**
-          images/matrix.yml
+          .github/workflows/test.yml
+          .github/actions/feature-matrix/action.yml
           .github/workflows/build-and-test-feature.yml
           .github/actions/build-and-test-feature/action.yml
-#          .github/workflows/test.yml
-#          .github/actions/feature-matrix/action.yml
 
     - name: Report changes
       if: inputs.full_matrix != true
@@ -51,7 +50,7 @@ runs:
 
         features="";
         scenarios="";
-        files="${{ steps.changes.outputs.all_modified_files }}";
+        files="${{ steps.changes.outputs.all_changed_and_modified_files }}";
 
         if echo "$files" | grep -q ".github/"; then
           features="$(find_features_with_tests 'test.sh' 'features/test')";
