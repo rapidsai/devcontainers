@@ -20,25 +20,18 @@ runs:
     - name: Determine the image matrix
       id: matrix
       shell: bash
-      env:
-        features: "${{ join(fromJSON(inputs.features || '[]'), '|') }}"
-        scenarios: "${{ join(fromJSON(inputs.scenarios || '[]'), '|') }}"
       run: |
         set -x;
 
-        filter="";
+        filter="$(echo                                             \
+          '"${{ join(fromJSON(inputs.features  || '[]'), '|') }}"' \
+          '"${{ join(fromJSON(inputs.scenarios || '[]'), '|') }}"' \
+        | jq -sr 'map(select(. != "")) | join("|")'                \
+        )";
 
-        if [[ -n "$features" && -n "$scenarios" ]]; then
-          filter="(${{ join([env.features, env.scenarios], '|') }})";
-        elif [[ -n "$features" ]]; then
-          filter="($features)";
-        elif [[ -n "$scenarios" ]]; then
-          filter="($scenarios)";
-        fi
-
-        cmd="$([ -x "$filter" ]     \
-        && echo "cat"               \
-        || echo "grep -E '$filter'" \
+        cmd="$([ -x "$filter" ]       \
+        && echo "cat"                 \
+        || echo "grep -E '($filter)'" \
         )";
 
         echo "matrix=$(            \
