@@ -85,21 +85,21 @@ runs:
         | jq -r 'map(select(. != "")) | unique | join("|")' \
         )";
 
-        # If the filter is empty, produce an empty matrix
-        # If the filter is not empty, test the images that match
-        cmd="$([ -z "$filter" ]     \
-        && echo grep -E -q "."      \
-        || echo grep -E "($filter)" \
-        )";
-
         # Write the matrix output
-        cat <<EOF | yq -o json --no-colors   \
-                  | jq -c -r -M '.matrix'    \
-                  | cat <(echo -n matrix=) - \
-                  | tee -a $GITHUB_OUTPUT
-        matrix:
-          include:
-        $($cmd ./images/matrix.yml         \
-        | xargs -r -d'\n' -I{} echo '  {}' \
-        )
-        EOF
+
+        if [[ -z "$filter" ]]; then
+          # If the filter is empty, produce an empty matrix
+          echo "matrix={}" >> $GITHUB_OUTPUT;
+        else
+          # If the filter is not empty, include images that match
+          cat <<EOF | yq -o json --no-colors   \
+                    | jq -c -r -M '.matrix'    \
+                    | cat <(echo -n matrix=) - \
+                    | tee -a $GITHUB_OUTPUT
+          matrix:
+            include:
+          $(echo grep -E "($filter)" ./images/matrix.yml \
+          | xargs -r -d'\n' -I{} echo '  {}'             \
+          )
+          EOF
+        fi
