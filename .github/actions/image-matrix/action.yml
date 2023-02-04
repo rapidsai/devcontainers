@@ -29,13 +29,18 @@ runs:
         | jq -sr 'map(select(. != "")) | join("|")'                \
         )";
 
-        cmd="$([ -x "$filter" ]     \
+        cmd="$([ -z "$filter" ]     \
         && echo cat                 \
         || echo grep -E "($filter)" \
         )";
 
-        echo "matrix=$(            \
-          $cmd ./images/matrix.yml \
-        | yq -o json --no-colors   \
-        | jq -c -r -M '.matrix'    \
-        )" | tee -a $GITHUB_OUTPUT ;
+        cat <<EOF | yq -o json --no-colors   \
+                  | jq -c -r -M '.matrix'    \
+                  | cat <(echo -n matrix=) - \
+                  | tee -a $GITHUB_OUTPUT
+        matrix:
+          include:
+        $($cmd ./images/matrix.yml         \
+        | xargs -r -d'\n' -I{} echo '  {}' \
+        )
+        EOF
