@@ -88,6 +88,9 @@ jobs:
       - id: matrix
         name: Determine image matrix
         uses: ./.github/actions/image-matrix
+        with:
+          features: "${{ needs.features-matrix.outputs.features }}"
+          scenarios: "${{ needs.features-matrix.outputs.scenarios }}"
 
   test-images:
     name: Image
