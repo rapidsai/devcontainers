@@ -29,9 +29,9 @@ runs:
         | jq -sr 'map(select(. != "")) | join("|")'                \
         )";
 
-        cmd="$([ -x "$filter" ]       \
-        && echo "cat"                 \
-        || echo "grep -E '($filter)'" \
+        cmd="$([ -x "$filter" ]     \
+        && echo cat                 \
+        || echo grep -E "($filter)" \
         )";
 
         echo "matrix=$(            \
