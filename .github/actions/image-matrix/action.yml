@@ -96,10 +96,10 @@ runs:
                     | jq -c -r -M '.matrix'    \
                     | cat <(echo -n matrix=) - \
                     | tee -a $GITHUB_OUTPUT
-          matrix:
-            include:
-          $(echo grep -E "($filter)" ./images/matrix.yml \
-          | xargs -r -d'\n' -I{} echo '  {}'             \
-          )
-          EOF
+        matrix:
+          include:
+        $(echo grep -E "($filter)" ./images/matrix.yml \
+        | xargs -r -d'\n' -I{} echo '  {}'             \
+        )
+        EOF
         fi
