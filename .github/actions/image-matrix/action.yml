@@ -2,6 +2,17 @@ name: image-matrix
 
 description: Determine the image matrix
 
+inputs:
+  features:
+    type: string
+    required: false
+  scenarios:
+    type: string
+    required: false
+  full_matrix:
+    type: boolean
+    default: true
+
 outputs:
   matrix:
     value: ${{ steps.matrix.outputs.matrix }}
@@ -9,12 +20,93 @@ outputs:
 runs:
   using: composite
   steps:
+    - name: Check if files changed
+      if: inputs.full_matrix != true
+      id: changes
+      uses: tj-actions/changed-files@v35.4.4
+      with:
+        files: |
+          images/**
+          .github/workflows/test.yml
+          .github/actions/image-matrix/action.yml
+          .github/workflows/build-and-test-image.yml
+          .github/actions/build-and-test-image/action.yml
+
+    - name: Report changes
+      if: inputs.full_matrix != true
+      shell: bash
+      run: echo '${{ toJSON(steps.changes.outputs) }}'
+
     - name: Determine the image matrix
       id: matrix
       shell: bash
       run: |
-        echo "matrix=$(\
-          cat ./images/matrix.yml \
-        | yq -o json --no-colors  \
-        | jq -c -r -M '.matrix'   \
-        )" | tee -a $GITHUB_OUTPUT;
+        files='${{ steps.changes.outputs.all_changed_and_modified_files }}';
+
+        if `# Include all images if utils feature changed`              \
+           echo "${{ inputs.features }}"  | grep -q 'utils'             \
+        || echo "${{ inputs.scenarios }}" | grep -q 'utils'             \
+           `# Include all images if full_matrix is true`                \
+        || [ "${{ inputs.full_matrix }}" == "true" ]                    \
+           `# Include all images if matrix or workflows changed`        \
+        || echo "$files" | grep -q -E '^(\.github/|images/matrix\.yml)' \
+        ; then
+          files="$(find images -mindepth 1 -maxdepth 1 -type d)";
+        fi
+
+        # Select the matrix of images whose source files changed
+        if echo "$files" | grep -q '^images/'; then
+
+          images=();
+          for x in ${files}; do
+            x="${x##images/}";
+            images+=("\"${x%%/*}\"");
+          done;
+
+          changed_images="$(           \
+            echo ${images[@]}          \
+          | tr '[:lower:]' '[:upper:]' \
+          | jq -cs 'map(split("-"))'   \
+          )";
+
+          changed_images="$(                    \
+            cat ./images/matrix.yml             \
+          | yq -o json --no-colors              \
+          | jq -cM                              \
+               --argjson xs "$changed_images"   \
+               'map(select(keys == $xs[]))'     \
+          )";
+
+        fi
+
+        # Select all images that use a changed feature
+        changed_features="$(echo                                   \
+          '"${{ join(fromJSON(inputs.features  || '[]'), '|') }}"' \
+          '"${{ join(fromJSON(inputs.scenarios || '[]'), '|') }}"' \
+        | jq -s                                                    \
+        | jq 'map(split("|")) | flatten'                           \
+        | jq 'map(select(. != ""))'                                \
+        | jq 'map(sub("utils";   "cpp"))'                          \
+        | jq 'map(sub("cmake";   "cpp"))'                          \
+        | jq 'map(sub("ninja";   "cpp"))'                          \
+        | jq 'map(sub("sccache"; "cpp"))'                          \
+        | jq -r 'unique | join("|")'                               \
+        )";
+
+        if [[ -n "$changed_features" ]]; then
+          changed_features="$(            \
+            cat  ./images/matrix.yml      \
+          | grep -E "($changed_features)" \
+          | yq -o json --no-colors        \
+          | jq -cM                        \
+          )";
+        fi
+
+        # Concatenate changed feature/image lists and write the matrix
+        cat <<EOF | tee -a $GITHUB_OUTPUT
+        matrix={"include":$(echo        \
+          "$changed_images"             \
+          "$changed_features"           \
+        | jq -scM 'flatten(1) | unique' \
+        )}
+        EOF

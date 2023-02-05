@@ -9,7 +9,12 @@ cd "$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )";
 
 LLVM_VERSION="${VERSION:-}";
 
-if [[ "$LLVM_VERSION" == "latest" || "$LLVM_VERSION" == "dev" || "$LLVM_VERSION" == "pre" || "$LLVM_VERSION" == "prerelease" ]]; then
+if [[ -z "$LLVM_VERSION" \
+      || "$LLVM_VERSION" == "latest" \
+      || "$LLVM_VERSION" == "dev" \
+      || "$LLVM_VERSION" == "pre" \
+      || "$LLVM_VERSION" == "prerelease" \
+]]; then
     LLVM_VERSION="latest";
     find_version_from_git_tags \
         LLVM_VERSION \
@@ -30,7 +35,7 @@ check_packages                  \
     software-properties-common  \
     ;
 
-echo "Installing LLVM ${LLVM_VERSION} compilers and tools";
+echo "Installing llmv-${LLVM_VERSION} compilers and tools";
 
 wget --no-hsts -q -O /tmp/llvm.sh https://apt.llvm.org/llvm.sh;
 chmod +x /tmp/llvm.sh;
@@ -79,6 +84,15 @@ export LLVM_VERSION="${LLVM_VERSION}";
 # export envvars in bashrc files
 append_to_etc_bashrc "$(cat .bashrc | envsubst)";
 append_to_all_bashrcs "$(cat .bashrc | envsubst)";
+
+# Copy clangd config into etc/skel + user home dirs
+for_each_user_bashrc "$(cat <<EOF
+    home="\$(dirname "\$(realpath -m "\$0")")"     \
+ && mkdir -p -m 0755 "\$home/.config/clangd"       \
+ && cp .clangd "\$home/.config/clangd/config.yaml" \
+ && chmod 0644 "\$home/.config/clangd/config.yaml" ;
+EOF
+)";
 
 # Clean up
 rm -rf "/tmp/*";

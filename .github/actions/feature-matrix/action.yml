@@ -24,10 +24,9 @@ runs:
         files: |
           features/src/**
           features/test/**
-          images/matrix.yml
           .github/workflows/test.yml
-          .github/workflows/build-and-test-feature.yml
           .github/actions/feature-matrix/action.yml
+          .github/workflows/build-and-test-feature.yml
           .github/actions/build-and-test-feature/action.yml
 
     - name: Report changes
@@ -51,13 +50,13 @@ runs:
 
         features="";
         scenarios="";
-        files="${{ steps.changes.outputs.all_modified_files }}";
+        files="${{ steps.changes.outputs.all_changed_and_modified_files }}";
 
         if echo "$files" | grep -q ".github/"; then
           features="$(find_features_with_tests 'test.sh' 'features/test')";
           scenarios="$(find_features_with_tests 'scenarios.json' 'features/test')";
         elif echo "$files" | grep -q "features/"; then
-          files="$(echo "$files" | grep "features/")";
+          files="$(join_with_delimiter "\n" $files | grep "features/")";
           changed=();
           for x in ${files}; do
             x="${x##features/src/}";
