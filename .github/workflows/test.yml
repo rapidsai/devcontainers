@@ -93,7 +93,7 @@ jobs:
           scenarios: "${{ needs.features-matrix.outputs.scenarios }}"
 
   test-images:
-    if: needs.image-matrix.outputs.matrix != '{}'
+    if: needs.image-matrix.outputs.matrix != '{"include":null}'
     name: Image
     needs: image-matrix
     secrets: inherit
