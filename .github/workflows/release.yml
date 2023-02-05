@@ -27,6 +27,8 @@ jobs:
       - id: matrix
         name: Determine image matrix
         uses: ./.github/actions/image-matrix
+        with:
+          full_matrix: true
 
   push-images:
     name: Image
@@ -42,7 +44,7 @@ jobs:
       LLVM: "${{ matrix.LLVM }}"
       RUST: "${{ matrix.RUST }}"
       NVHPC: "${{ matrix.NVHPC }}"
-      MAMBA: "${{ matrix.MAMBA }}"
+      MAMBAFORGE: "${{ matrix.MAMBAFORGE }}"
 
   cleanup-ghcr:
     name: Clean up ghcr.io packages

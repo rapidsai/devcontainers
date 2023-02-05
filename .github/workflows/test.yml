@@ -107,4 +107,4 @@ jobs:
       LLVM: "${{ matrix.LLVM }}"
       RUST: "${{ matrix.RUST }}"
       NVHPC: "${{ matrix.NVHPC }}"
-      MAMBA: "${{ matrix.MAMBA }}"
+      MAMBAFORGE: "${{ matrix.MAMBAFORGE }}"

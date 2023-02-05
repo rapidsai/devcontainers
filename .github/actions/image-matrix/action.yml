@@ -57,24 +57,24 @@ runs:
         # Select the matrix of images whose source files changed
         if echo "$files" | grep -q '^images/'; then
 
-          images=();
-          for x in ${files}; do
-            x="${x##images/}";
-            images+=("\"${x%%/*}\"");
-          done;
-
-          changed_images="$(           \
-            echo ${images[@]}          \
-          | tr '[:lower:]' '[:upper:]' \
-          | jq -cs 'map(split("-"))'   \
+          imgs="$(                 \
+            for x in ${files}; do  \
+              x=${x##images/};     \
+              echo "\"${x%%/*}\""; \
+            done                   \
           )";
 
-          changed_images="$(                    \
-            cat ./images/matrix.yml             \
-          | yq -o json --no-colors              \
-          | jq -cM                              \
-               --argjson xs "$changed_images"   \
-               'map(select(keys == $xs[]))'     \
+          keys="$(                          \
+            echo ${imgs}                    \
+          | tr '[:lower:]' '[:upper:]'      \
+          | jq -cs 'map(split("-") | sort)' \
+          )";
+
+          changed_images="$(              \
+            cat images/matrix.yml         \
+          | yq -o json --no-colors        \
+          | jq -cM --argjson xs "$keys"   \
+            'map(select(keys == $xs[]))'  \
           )";
 
         fi
