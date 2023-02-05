@@ -41,9 +41,45 @@ runs:
       id: matrix
       shell: bash
       run: |
-        features_from_changed_images="";
+        files='${{ steps.changes.outputs.all_changed_and_modified_files }}';
 
-        # Build a filter for any changed features
+        if `# Include all images if utils feature changed`              \
+           echo "${{ inputs.features }}"  | grep -q 'utils'             \
+        || echo "${{ inputs.scenarios }}" | grep -q 'utils'             \
+           `# Include all images if full_matrix is true`                \
+        || [ "${{ inputs.full_matrix }}" == "true" ]                    \
+           `# Include all images if matrix or workflows changed`        \
+        || echo "$files" | grep -q -E '^(\.github/|images/matrix\.yml)' \
+        ; then
+          files="$(find images -mindepth 1 -maxdepth 1 -type d)";
+        fi
+
+        # Select the matrix of images whose source files changed
+        if echo "$files" | grep -q '^images/'; then
+
+          images=();
+          for x in ${files}; do
+            x="${x##images/}";
+            images+=("\"${x%%/*}\"");
+          done;
+
+          changed_images="$(           \
+            echo ${images[@]}          \
+          | tr '[:lower:]' '[:upper:]' \
+          | jq -cs 'map(split("-"))'   \
+          )";
+
+          changed_images="$(                    \
+            cat ./images/matrix.yml             \
+          | yq -o json --no-colors              \
+          | jq -cM                              \
+               --argjson xs "$changed_images"   \
+               'map(select(keys == $xs[]))'     \
+          )";
+
+        fi
+
+        # Select all images that use a changed feature
         changed_features="$(echo                                   \
           '"${{ join(fromJSON(inputs.features  || '[]'), '|') }}"' \
           '"${{ join(fromJSON(inputs.scenarios || '[]'), '|') }}"' \
@@ -54,63 +90,23 @@ runs:
         | jq 'map(sub("cmake";   "cpp"))'                          \
         | jq 'map(sub("ninja";   "cpp"))'                          \
         | jq 'map(sub("sccache"; "cpp"))'                          \
-        | jq 'unique | join("|")'                                  \
+        | jq -r 'unique | join("|")'                               \
         )";
 
-        files='${{ steps.changes.outputs.all_changed_and_modified_files }}';
-
-        if `# Include all images if utils feature changed`              \
-           echo "${{ inputs.features }}"  | grep -q 'utils'             \
-        || echo "${{ inputs.scenarios }}" | grep -q 'utils'             \
-        || `# Include all images if full_matrix is true`                \
-           [ "${{ inputs.full_matrix }}" == "true" ]                    \
-        || `# Include all images if matrix or workflows changed`        \
-           echo "$files" | grep -q -E '^(\.github/|images/matrix\.yml)' \
-        ; then
-          files="$(find images -mindepth 1 -maxdepth 1 -type d)";
-        fi
-
-        # Build a filter for any images whose source files changed
-        if echo "$files" | grep -q '^images/'; then
-
-          images=();
-          for x in ${files}; do
-            x="${x##images/}";
-            images+=("\"${x%%/*}\"");
-          done;
-
-          features_from_changed_images="$(                 \
-            echo ${images[@]}                              \
-          | jq -s                                          \
-          | jq 'map(split("-")) | flatten'                 \
-          | jq 'map(select(. != "")) | unique | join("|")' \
+        if [[ -n "$changed_features" ]]; then
+          changed_features="$(            \
+            cat  ./images/matrix.yml      \
+          | grep -E "($changed_features)" \
+          | yq -o json --no-colors        \
+          | jq -cM                        \
           )";
-
         fi
 
-        # Combine the filters of changed features and images
-        filter="$(echo "$changed_features"                  \
-                       "$features_from_changed_images"      \
-        | jq -s 'map(split("|")) | flatten'                 \
-        | jq -r 'map(select(. != "")) | unique | join("|")' \
-        )";
-
-        # Write the matrix output
-        # - If the filter is empty, produce an empty matrix
-        # - If the filter is not empty, include images that match
-
-        cmd="$([ -z "$filter" ]     \
-        && echo grep -E -q "."      \
-        || echo grep -E "($filter)" \
-        )";
-
-        cat <<EOF | yq -o json --no-colors   \
-                  | jq -c -r -M '.matrix'    \
-                  | cat <(echo -n matrix=) - \
-                  | tee -a $GITHUB_OUTPUT
-        matrix:
-          include:
-        $($cmd ./images/matrix.yml         \
-        | xargs -r -d'\n' -I{} echo '  {}' \
-        )
+        # Concatenate changed feature/image lists and write the matrix
+        cat <<EOF | tee -a $GITHUB_OUTPUT
+        matrix={"include":$(echo        \
+          "$changed_images"             \
+          "$changed_features"           \
+        | jq -scM 'flatten(1) | unique' \
+        )}
         EOF
