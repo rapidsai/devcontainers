@@ -3,7 +3,7 @@
     "dockerfile": "./Dockerfile",
     "context": ".",
     "args": {
-      "BUILDKIT_INLINE_CACHE": "0"
+      "BUILDKIT_INLINE_CACHE": "{localEnv:BUILDKIT_INLINE_CACHE:1}"
     }
   },
   "remoteUser": "coder",
