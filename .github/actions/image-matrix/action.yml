@@ -43,20 +43,30 @@ runs:
       run: |
         features_from_changed_images="";
 
-        # build a filter for any changed features
+        # Build a filter for any changed features
         changed_features="$(echo                                   \
           '"${{ join(fromJSON(inputs.features  || '[]'), '|') }}"' \
           '"${{ join(fromJSON(inputs.scenarios || '[]'), '|') }}"' \
-        | jq -s 'map(select(. != "")) | unique | join("|")'        \
+        | jq -s                                                    \
+        | jq 'map(split("|")) | flatten'                           \
+        | jq 'map(select(. != ""))'                                \
+        | jq 'map(sub("utils";   "cpp"))'                          \
+        | jq 'map(sub("cmake";   "cpp"))'                          \
+        | jq 'map(sub("ninja";   "cpp"))'                          \
+        | jq 'map(sub("sccache"; "cpp"))'                          \
+        | jq 'unique | join("|")'                                  \
         )";
 
         files='${{ steps.changes.outputs.all_changed_and_modified_files }}';
 
-        if [[ "${{ inputs.full_matrix }}" == "true" ]]; then
-          # Include all images if full_matrix is true
-          files="$(find images -mindepth 1 -maxdepth 1 -type d)";
-        elif echo "$files" | grep -q -E '^(\.github/|images/matrix\.yml)'; then
-          # Include all images if workflow or matrix files changed
+        if `# Include all images if utils feature changed`              \
+           echo "${{ inputs.features }}"  | grep -q 'utils'             \
+        || echo "${{ inputs.scenarios }}" | grep -q 'utils'             \
+        || `# Include all images if full_matrix is true`                \
+           [ "${{ inputs.full_matrix }}" == "true" ]                    \
+        || `# Include all images if matrix or workflows changed`        \
+           echo "$files" | grep -q -E '^(\.github/|images/matrix\.yml)' \
+        ; then
           files="$(find images -mindepth 1 -maxdepth 1 -type d)";
         fi
 
