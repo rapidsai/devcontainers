@@ -18,7 +18,7 @@ on:
       NVHPC:
         type: string
         required: true
-      MAMBA:
+      MAMBAFORGE:
         type: string
         required: true
 
@@ -52,7 +52,7 @@ jobs:
           LLVM: "${{ inputs.LLVM }}"
           RUST: "${{ inputs.RUST }}"
           NVHPC: "${{ inputs.NVHPC }}"
-          MAMBA: "${{ inputs.MAMBA }}"
+          MAMBAFORGE: "${{ inputs.MAMBAFORGE }}"
 
       - name: Build and push ${{ steps.info.outputs.tag }}-${{ matrix.arch }}
         uses: ./.github/actions/build-and-push-image

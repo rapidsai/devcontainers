@@ -18,7 +18,7 @@ inputs:
   NVHPC:
     type: string
     required: true
-  MAMBA:
+  MAMBAFORGE:
     type: string
     required: true
 
@@ -40,7 +40,7 @@ runs:
         LLVM: "${{ inputs.LLVM }}"
         RUST: "${{ inputs.RUST }}"
         NVHPC: "${{ inputs.NVHPC }}"
-        MAMBA: "${{ inputs.MAMBA }}"
+        MAMBAFORGE: "${{ inputs.MAMBAFORGE }}"
       run: |
         join_with_delimiter() {
           local IFS='' delim=$1; shift; echo -n "$1"; shift; echo -n "${*/#/$delim}";
@@ -51,7 +51,7 @@ runs:
           ${LLVM:+"llvm"} \
           ${RUST:+"rust"} \
           ${CUDA:+"cuda"} \
-          ${MAMBA:+"mambaforge"} \
+          ${MAMBAFORGE:+"mambaforge"} \
           ${NVHPC:+"nvhpc"} \
         )";
 
@@ -68,7 +68,7 @@ runs:
           ${LLVM:-} \
           ${RUST:-} \
           ${CUDA:-} \
-          ${MAMBA:-} \
+          ${MAMBAFORGE:-} \
           ${NVHPC:-} \
           ubuntu22.04
         )";
