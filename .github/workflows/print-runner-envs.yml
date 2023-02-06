@@ -1,0 +1,49 @@
+name: Print runner envs
+
+concurrency:
+  group: print-runner-envs-${{ github.event_name }}-from-${{ github.ref_name }}
+  cancel-in-progress: true
+
+on:
+  pull_request:
+
+jobs:
+  ghub-hosted:
+    name: GHub runner
+    runs-on: ubuntu-latest
+    steps:
+      - name: Print runner env
+        shell: bash
+        run: |
+          echo "runner env:";
+          env;
+
+          echo "env context:";
+          echo "${{ toJSON(env) }}";
+
+          echo "runner context:";
+          echo "${{ toJSON(runner) }}";
+
+  self-hosted:
+    name: Self hosted
+    runs-on:
+      - self-hosted
+      - linux
+      - ${{ matrix.arch }}
+      - cpu4
+    strategy:
+      fail-fast: false
+      matrix:
+        arch: [amd64, arm64]
+    steps:
+      - name: Print runner env
+        shell: bash
+        run: |
+          echo "runner env:";
+          env;
+
+          echo "env context:";
+          echo "${{ toJSON(env) }}";
+
+          echo "runner context:";
+          echo "${{ toJSON(runner) }}";
