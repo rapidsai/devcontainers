@@ -1,7 +1,7 @@
 {
   "name": "LLVM compilers and tools",
   "id": "llvm",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "A feature to install LLVM compilers and tools",
   "options": {
     "version": {
@@ -63,7 +63,6 @@
           "--completion-style=detailed",
           "--header-insertion-decorators"
         ],
-        "terminal.integrated.defaultProfile.linux": "bash",
         "[c]": {
           "editor.defaultFormatter": "xaver.clang-format"
         },
