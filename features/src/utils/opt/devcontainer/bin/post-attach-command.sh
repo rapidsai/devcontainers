@@ -15,5 +15,5 @@ for cmd in $(find /opt -type f -name post-attach-command.sh ! -wholename $(realp
 done
 
 if [[ "${CODESPACES:-false}" == true ]]; then
-    touch ~/.devcontainer/.postAttachCommandMarker;
+    mkdir -p ~/.devcontainer && touch ~/.devcontainer/.postAttachCommandMarker;
 fi
