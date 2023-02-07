@@ -5,7 +5,7 @@ set -euo pipefail;
 get_user_orgs() {
 
     local VAULT_HOST="$1";
-    local allowed_orgs="${VAULT_GITHUB_ORGS:-nvidia nv-legate rapids}";
+    local allowed_orgs="${VAULT_GITHUB_ORGS:-nvidia nv-morpheus nv-legate rapids}";
     local allowed_orgs="${allowed_orgs// /|}";
 
     local user_orgs="$(                              \
