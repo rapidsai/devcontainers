@@ -18,7 +18,7 @@ elif [[ ! $(ps -o args= -p $$) =~ (--norc|--rcfile|--init-file) ]]; then
     if [ -f /etc/bash.bashrc ]; then
         . /etc/bash.bashrc
     fi
-    for x in "$HOME"/.{bashrc}; do
+    for x in "$HOME"/.bashrc; do
         if [ -f "$x" ]; then
             . "$x"
             break
