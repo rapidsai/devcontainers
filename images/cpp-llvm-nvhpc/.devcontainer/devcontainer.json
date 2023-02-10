@@ -42,5 +42,30 @@
     "./features/llvm",
     "./features/nvhpc",
     "./features/utils"
+  ],
+  "updateContentCommand": [
+    "bash",
+    "-li",
+    "/opt/devcontainer/bin/update-content-command.sh"
+  ],
+  "onCreateCommand": [
+    "bash",
+    "-li",
+    "/opt/devcontainer/bin/on-create-command.sh"
+  ],
+  "postCreateCommand": [
+    "bash",
+    "-li",
+    "/opt/devcontainer/bin/post-create-command.sh"
+  ],
+  "postStartCommand": [
+    "bash",
+    "-li",
+    "/opt/devcontainer/bin/post-start-command.sh"
+  ],
+  "postAttachCommand": [
+    "bash",
+    "-li",
+    "/opt/devcontainer/bin/post-attach-command.sh"
   ]
 }
