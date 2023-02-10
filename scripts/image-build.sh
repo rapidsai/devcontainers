@@ -9,7 +9,6 @@ build_image() {
     img="$(realpath -m "$img")";
     img="${img#"$cwd/images/"}";
 
-    export BUILDKIT_INLINE_CACHE=0
     exec devcontainer build \
         --workspace-folder $cwd/images/$img \
         --image-name docker.io/rapidsai/devcontainers:23.04-$img-ubuntu22.04;

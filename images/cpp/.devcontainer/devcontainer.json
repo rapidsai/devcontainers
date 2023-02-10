@@ -1,10 +1,7 @@
 {
   "build": {
     "dockerfile": "./Dockerfile",
-    "context": ".",
-    "args": {
-      "BUILDKIT_INLINE_CACHE": "{localEnv:BUILDKIT_INLINE_CACHE:1}"
-    }
+    "context": "."
   },
   "remoteUser": "coder",
   "features": {
