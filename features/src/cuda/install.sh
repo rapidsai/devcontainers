@@ -101,7 +101,7 @@ echo "/usr/local/nvidia/lib" >> /etc/ld.so.conf.d/nvidia.conf;
 echo "/usr/local/nvidia/lib64" >> /etc/ld.so.conf.d/nvidia.conf;
 
 # Clean up
-rm -rf "/tmp/*";
-rm -rf "/var/tmp/*";
-rm -rf "/var/cache/apt/*";
-rm -rf "/var/lib/apt/lists/*";
+rm -rf /tmp/*;
+rm -rf /var/tmp/*;
+rm -rf /var/cache/apt/*;
+rm -rf /var/lib/apt/lists/*;

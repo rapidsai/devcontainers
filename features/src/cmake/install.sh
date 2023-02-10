@@ -26,8 +26,7 @@ echo "Installing CMake...";
 bash /tmp/cmake_${CMAKE_VERSION}.sh --skip-license --exclude-subdir --prefix=/usr;
 
 # Clean up
-rm -rf "/tmp/*";
-rm -rf "/var/tmp/*";
-rm -rf "/var/cache/apt/*";
-rm -rf "/var/lib/apt/lists/*";
-rm -rf "/tmp/cmake_${CMAKE_VERSION}.sh";
+rm -rf /tmp/*;
+rm -rf /var/tmp/*;
+rm -rf /var/cache/apt/*;
+rm -rf /var/lib/apt/lists/*;
