@@ -23,7 +23,7 @@ wget --no-hsts -q -O- "https://github.com/mozilla/sccache/releases/download/v$SC
  && chmod +x /usr/bin/sccache;
 
 # Clean up
-rm -rf "/tmp/*";
-rm -rf "/var/tmp/*";
-rm -rf "/var/cache/apt/*";
-rm -rf "/var/lib/apt/lists/*";
+# rm -rf /tmp/*;
+rm -rf /var/tmp/*;
+rm -rf /var/cache/apt/*;
+rm -rf /var/lib/apt/lists/*;
