@@ -71,8 +71,6 @@ if ! dpkg -s libcutensor-dev > /dev/null 2>&1; then
     else
         # If it's not in the apt repo for the current OS version, install it from the 20.04 repo
         focal_cuda_repo="${cuda_repo_base}/ubuntu2004/${NVARCH}";
-        wget --no-hsts -q -O /tmp/focal-cuda-packages "${focal_cuda_repo}/Packages";
-
         DEBIAN_FRONTEND=noninteractive                             \
         apt install -y --no-install-recommends                     \
             "$(get_cuda_deb "${focal_cuda_repo}" libcutensor1)"    \
@@ -101,7 +99,9 @@ echo "/usr/local/nvidia/lib" >> /etc/ld.so.conf.d/nvidia.conf;
 echo "/usr/local/nvidia/lib64" >> /etc/ld.so.conf.d/nvidia.conf;
 
 # Clean up
-rm -rf /tmp/*;
+# rm -rf /tmp/*;
 rm -rf /var/tmp/*;
 rm -rf /var/cache/apt/*;
 rm -rf /var/lib/apt/lists/*;
+
+rm -rf /tmp/*.deb;
