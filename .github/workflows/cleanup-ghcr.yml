@@ -37,7 +37,7 @@ jobs:
         with:
           image-names: devcontainers
           cut-off: "${{ inputs.cut-off }}"
-          token: "${{ secrets.WORKFLOW_TOKEN }}"
+          token: "${{ secrets.GPUTESTER_PACKAGES_TOKEN }}"
           org-name: "${{ github.repository_owner }}"
           untagged-only: ${{ inputs.untagged-only }}
           account-type: ${{ github.repository == 'rapidsai/devcontainers' && 'org' || 'personal' }}

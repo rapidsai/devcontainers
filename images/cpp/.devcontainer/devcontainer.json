@@ -1,10 +1,7 @@
 {
   "build": {
     "dockerfile": "./Dockerfile",
-    "context": ".",
-    "args": {
-      "BUILDKIT_INLINE_CACHE": "{localEnv:BUILDKIT_INLINE_CACHE:1}"
-    }
+    "context": "."
   },
   "remoteUser": "coder",
   "features": {
@@ -38,5 +35,30 @@
     "./features/ninja",
     "./features/sccache",
     "./features/utils"
+  ],
+  "updateContentCommand": [
+    "bash",
+    "-li",
+    "/opt/devcontainer/bin/update-content-command.sh"
+  ],
+  "onCreateCommand": [
+    "bash",
+    "-li",
+    "/opt/devcontainer/bin/on-create-command.sh"
+  ],
+  "postCreateCommand": [
+    "bash",
+    "-li",
+    "/opt/devcontainer/bin/post-create-command.sh"
+  ],
+  "postStartCommand": [
+    "bash",
+    "-li",
+    "/opt/devcontainer/bin/post-start-command.sh"
+  ],
+  "postAttachCommand": [
+    "bash",
+    "-li",
+    "/opt/devcontainer/bin/post-attach-command.sh"
   ]
 }

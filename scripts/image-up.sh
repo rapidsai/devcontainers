@@ -9,8 +9,8 @@ image_up() {
     img="$(realpath -m "$img")";
     img="${img#"$cwd/images/"}";
 
-    export BUILDKIT_INLINE_CACHE=0
     exec devcontainer up \
+        --skip-post-attach \
         --remove-existing-container \
         --remote-env 'VAULT_HOST=https://vault.ops.k8s.rapids.ai' \
         --workspace-folder $cwd/images/$img \
