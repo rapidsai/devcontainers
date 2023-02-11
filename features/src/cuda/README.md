@@ -16,6 +16,7 @@ A feature to install the NVIDIA CUDA Toolkit
 | Options Id | Description | Type | Default Value |
 |-----|-----|-----|-----|
 | version | Version of the CUDA Toolkit to install. | string | 12.0 |
+| pruneStaticLibs | Whether to remove static libs from the CUDA Toolkit to save image size | boolean | false |
 
 
 
