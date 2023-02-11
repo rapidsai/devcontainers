@@ -90,6 +90,16 @@ export CUDA_VERSION_MINOR=$((cuda_ver / 10 % 100));
 export CUDA_VERSION_PATCH=$((cuda_ver % 10));
 export CUDA_VERSION="$CUDA_VERSION_MAJOR.$CUDA_VERSION_MINOR.$CUDA_VERSION_PATCH";
 
+# Remove extra libcutensor versions
+libcutensor_ver="$(dpkg -s libcutensor1 | grep '^Version:' | cut -d' ' -f2 | cut -d'-' -f1 | cut -d'.' -f4 --complement)";
+
+update-alternatives --set libcutensorMg.so.${libcutensor_ver} "$(find /usr/lib -type f -regex "^.*/libcutensor/${CUDA_VERSION_MAJOR}/libcutensorMg.so.${libcutensor_ver}$")";
+update-alternatives --set libcutensorMg_static.a              "$(find /usr/lib -type f -regex "^.*/libcutensor/${CUDA_VERSION_MAJOR}/libcutensorMg_static.a$")";
+update-alternatives --set libcutensor.so.${libcutensor_ver}   "$(find /usr/lib -type f -regex "^.*/libcutensor/${CUDA_VERSION_MAJOR}/libcutensor.so.${libcutensor_ver}$")";
+update-alternatives --set libcutensor_static.a                "$(find /usr/lib -type f -regex "^.*/libcutensor/${CUDA_VERSION_MAJOR}/libcutensor_static.a$")";
+
+rm -rf $(find /usr/lib -mindepth 1 -type d -regex "^.*/libcutensor/.*$" | grep -Ev "^.*/libcutensor/${CUDA_VERSION_MAJOR}$");
+
 # export envvars in bashrc files
 append_to_etc_bashrc "$(cat .bashrc | envsubst)";
 append_to_all_bashrcs "$(cat .bashrc | envsubst)";
