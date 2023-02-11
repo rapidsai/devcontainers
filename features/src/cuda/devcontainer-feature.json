@@ -18,6 +18,11 @@
       ],
       "default": "12.0",
       "description": "Version of the CUDA Toolkit to install."
+    },
+    "pruneStaticLibs": {
+      "type": "boolean",
+      "default": false,
+      "description": "Whether to remove static libs from the CUDA Toolkit to save image size"
     }
   },
   "containerEnv": {

@@ -25,7 +25,9 @@
     },
     "./features/llvm": {},
     "./features/rust": {},
-    "./features/cuda": {},
+    "./features/cuda": {
+      "pruneStaticLibs": true
+    },
     "./features/mambaforge": {},
     "./features/utils": {}
   },
