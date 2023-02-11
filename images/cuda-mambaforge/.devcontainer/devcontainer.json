@@ -18,7 +18,9 @@
     "ghcr.io/devcontainers/features/git-lfs:1": {},
     "ghcr.io/devcontainers/features/github-cli:1": {},
     "./features/gitlab-cli": {},
-    "./features/cuda": {},
+    "./features/cuda": {
+      "pruneStaticLibs": true
+    },
     "./features/mambaforge": {},
     "./features/utils": {}
   },

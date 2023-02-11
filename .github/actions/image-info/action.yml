@@ -77,13 +77,13 @@ runs:
         echo "tag=$tag" >> $GITHUB_OUTPUT;
 
         sed -i -re \
-          "s@features/cuda(:[0-9]+)?\": \{\}@features/cuda\1\": \{\"version\": \"${CUDA#cuda}\"\}@" \
+          "s@features/cuda(:[0-9]+)?\": \{@features/cuda\1\": \{\"version\": \"${CUDA#cuda}\",@" \
           "./images/${dir}/.devcontainer/devcontainer.json";
         sed -i -re \
-          "s@features/llvm(:[0-9]+)?\": \{\}@features/llvm\1\": \{\"version\": \"${LLVM#llvm}\"\}@" \
+          "s@features/llvm(:[0-9]+)?\": \{@features/llvm\1\": \{\"version\": \"${LLVM#llvm}\",@" \
           "./images/${dir}/.devcontainer/devcontainer.json";
         sed -i -re \
-          "s@features/nvhpc(:[0-9]+)?\": \{\}@features/nvhpc\1\": \{\"version\": \"${NVHPC#nvhpc}\"\}@" \
+          "s@features/nvhpc(:[0-9]+)?\": \{@features/nvhpc\1\": \{\"version\": \"${NVHPC#nvhpc}\",@" \
           "./images/${dir}/.devcontainer/devcontainer.json";
 
         echo "image name: ghcr.io/${{ github.repository_owner }}/devcontainers:${tag}";
