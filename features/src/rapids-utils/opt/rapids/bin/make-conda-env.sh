@@ -25,7 +25,7 @@ make_conda_env() {
     local conda_noinstall=();
     local conda_env_yamls=();
 
-    for lib in $(find ~ -maxdepth 1 -mindepth 1 -type d ! -name '.*'); do
+    for lib in $(find ~ -maxdepth 1 -mindepth 1 -type d ! -name '.*' -exec basename {} \;); do
         if [ -f ~/"${lib}/dependencies.yaml" ]; then
             conda_env_yamls+=("/tmp/${lib}.yaml");
             conda_noinstall+=($(rapids-python-pkg-names "${lib}"));
@@ -77,7 +77,9 @@ make_conda_env() {
     cp -a "${new_env_path}" "${old_env_path}";
 }
 
+. /opt/conda/etc/profile.d/conda.sh;
+. /opt/conda/etc/profile.d/mamba.sh;
+
 make_conda_env "${DEFAULT_CONDA_ENV:-rapids}" "$@";
 
-. /opt/conda/etc/profile.d/conda.sh;
 conda activate "${DEFAULT_CONDA_ENV:-rapids}" 2>/dev/null;

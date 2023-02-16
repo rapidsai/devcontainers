@@ -25,8 +25,8 @@ build_${PY_LIB}_python() {
     cmake_args+=(-D FIND_${cpp_lib_upper}_CPP=TRUE);
     cmake_args+=(-D ${cpp_lib_upper}_ROOT=${cpp_bin});
 
-    cmake_args+=(${CPP_ARGS});
     cmake_args+=(${CPP_DEPS});
+    cmake_args+=(${CPP_ARGS});
     cmake_args+=(${@});
 
     local ninja_args=();

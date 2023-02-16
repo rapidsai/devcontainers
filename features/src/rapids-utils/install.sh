@@ -20,6 +20,7 @@ update-alternatives --install /usr/bin/rapids-generate-scripts           rapids-
 update-alternatives --install /usr/bin/rapids-join-strings               rapids-join-strings               /opt/rapids/bin/join-strings.sh               0;
 update-alternatives --install /usr/bin/rapids-make-conda-env             rapids-make-conda-env             /opt/rapids/bin/make-conda-env.sh             0;
 update-alternatives --install /usr/bin/rapids-make-pip-env               rapids-make-pip-env               /opt/rapids/bin/make-pip-env.sh               0;
+update-alternatives --install /usr/bin/rapids-make-vscode-workspace      rapids-make-vscode-workspace      /opt/rapids/bin/make-vscode-workspace.sh      0;
 update-alternatives --install /usr/bin/rapids-parse-cmake-args           rapids-parse-cmake-args           /opt/rapids/bin/parse-cmake-args.sh           0;
 update-alternatives --install /usr/bin/rapids-parse-cmake-build-type     rapids-parse-cmake-build-type     /opt/rapids/bin/parse-cmake-build-type.sh     0;
 update-alternatives --install /usr/bin/rapids-parse-cmake-var-from-args  rapids-parse-cmake-var-from-args  /opt/rapids/bin/parse-cmake-var-from-args.sh  0;
@@ -38,6 +39,7 @@ if [[ ! -d ~/'${lib}/.git' ]]; then
     echo 'Cloning ${lib}' 1>&2;
     github-repo-clone 'rapidsai' '${lib}' '${lib}';
     rapids-generate-scripts '${lib}' '${src}' '${deps}' '${args}';
+    rapids-make-vscode-workspace > ~/workspace.code-workspace;
 fi
 EOF
 
@@ -45,13 +47,14 @@ EOF
         "/usr/bin/clone-${lib}" "clone-${lib}" "/opt/rapids/bin/clone-${lib}.sh" 0;
 }
 
-gen_rmm_args='          rmm                                     ';
-gen_cudf_args='         cudf         cpp "rmm"                  ';
-gen_raft_args='         raft         cpp "rmm"                  ';
-gen_cumlprims_mg_args=' cumlprims_mg cpp "rmm raft"             ';
-gen_cuml_args='         cuml         cpp "rmm raft cumlprims_mg"';
-gen_cugraph_ops_args='  cugraph-ops  cpp "rmm raft"             ';
-gen_cugraph_args='      cugraph      cpp "rmm raft cugraph-ops" ';
+gen_rmm_args='          rmm                                              ';
+gen_cudf_args='         cudf         cpp "rmm"                           ';
+gen_raft_args='         raft         cpp "rmm"                           ';
+gen_cumlprims_mg_args=' cumlprims_mg cpp "rmm raft/cpp"                  ';
+gen_cuml_args='         cuml         cpp "rmm raft/cpp cumlprims_mg/cpp" ';
+gen_cugraph_ops_args='  cugraph-ops  cpp "rmm raft/cpp"                  ';
+gen_cugraph_args='      cugraph      cpp "rmm raft/cpp cugraph-ops/cpp"  ';
+gen_cuspatial_args='    cuspatial    cpp "rmm cudf/cpp"                  ';
 
 generate_clone_script ${gen_rmm_args};
 generate_clone_script ${gen_cudf_args};
@@ -60,6 +63,7 @@ generate_clone_script ${gen_cumlprims_mg_args};
 generate_clone_script ${gen_cuml_args};
 generate_clone_script ${gen_cugraph_ops_args};
 generate_clone_script ${gen_cugraph_args};
+generate_clone_script ${gen_cuspatial_args};
 
 cat<<EOF >> /opt/rapids/bin/update-content-command.sh
 rapids-generate-scripts ${gen_rmm_args};
@@ -69,6 +73,7 @@ rapids-generate-scripts ${gen_cumlprims_mg_args};
 rapids-generate-scripts ${gen_cuml_args};
 rapids-generate-scripts ${gen_cugraph_ops_args};
 rapids-generate-scripts ${gen_cugraph_args};
+rapids-generate-scripts ${gen_cuspatial_args};
 EOF
 
 find /opt/rapids \

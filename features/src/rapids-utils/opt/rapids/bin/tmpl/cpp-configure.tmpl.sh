@@ -21,8 +21,8 @@ configure_${CPP_LIB}_cpp() {
     local cmake_args=();
     cmake_args+=(-S ${source_dir});
     cmake_args+=(-B ${binary_dir});
-    cmake_args+=(${CPP_ARGS});
     cmake_args+=(${CPP_DEPS});
+    cmake_args+=(${CPP_ARGS});
     cmake_args+=(${@});
 
     cmake $(rapids-parse-cmake-args ${cmake_args[@]});

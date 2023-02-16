@@ -18,28 +18,35 @@ generate_scripts() {
     cd "$( cd "$( dirname "$(realpath -m "${BASH_SOURCE[0]}")" )" && pwd )";
 
     local lib="${1:-}";
-    local src="${2:-}";
-    local deps="${3:-}";
-    local args="${4:-}";
 
     if [[ ! -d ~/"${lib}/.git" ]]; then
         exit 0;
     fi
 
+    local src="${lib}${2:+/$2}";
+
+    local deps="$(echo -n "${3:-}"                                  \
+      | xargs -r -d' ' -I{} bash -c '                               \
+        echo -n "-D${0%%/*}_ROOT=$(realpath -m ~/$0/build/latest) " \
+        ' {}                                                        \
+    )";
+
+    local args="${4:-}";
+
     cat ./tmpl/cpp-build.tmpl.sh        \
       | NAME="${lib}"                   \
         CPP_LIB="${lib}"                \
-        CPP_SRC="${lib}${src:+/$src}"   \
-        CPP_ARGS="${args}"              \
+        CPP_SRC="${src}"                \
         CPP_DEPS="${deps}"              \
+        CPP_ARGS="${args}"              \
       generate_script "build-${lib}-cpp";
 
     cat ./tmpl/cpp-configure.tmpl.sh        \
       | NAME="${lib}"                       \
         CPP_LIB="${lib}"                    \
-        CPP_SRC="${lib}${src:+/$src}"       \
-        CPP_ARGS="${args}"                  \
+        CPP_SRC="${src}"                    \
         CPP_DEPS="${deps}"                  \
+        CPP_ARGS="${args}"                  \
       generate_script "configure-${lib}-cpp";
 
     local py_libs=($(rapids-python-pkg-names $lib));
@@ -51,9 +58,9 @@ generate_scripts() {
         cat ./tmpl/python-build.tmpl.sh           \
           | NAME="${lib}"                         \
             CPP_LIB="${lib}"                      \
-            CPP_SRC="${lib}${src:+/$src}"         \
-            CPP_ARGS="${args}"                    \
+            CPP_SRC="${src}"                      \
             CPP_DEPS="${deps}"                    \
+            CPP_ARGS="${args}"                    \
             PY_SRC="${py_dir}"                    \
             PY_LIB="${py_lib}"                    \
           generate_script "build-${py_lib}-python";
