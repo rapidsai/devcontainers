@@ -77,6 +77,7 @@ bucket=${SCCACHE_BUCKET:-rapids-sccache-devs}
 EOF
 cat <<EOF > ~/.aws/credentials
 [default]
+region=${SCCACHE_REGION:-us-east-2}
 aws_access_key_id=$aws_access_key_id
 aws_secret_access_key=$aws_secret_access_key
 EOF
@@ -86,18 +87,7 @@ unset aws_secret_access_key;
 
 chmod 0600 ~/.aws/{config,credentials};
 
-if [ -z "${SCCACHE_S3_USE_SSL:-}" ] || \
-   [ ! grep -q -E "^SCCACHE_S3_USE_SSL=${SCCACHE_S3_USE_SSL:-true}$" ~/.bashrc ]; then
-    echo "export SCCACHE_S3_USE_SSL=${SCCACHE_S3_USE_SSL:-true}" >> ~/.bashrc;
-fi
-if [ -z "${SCCACHE_REGION:-}" ] || \
-   [ ! grep -q -E "^SCCACHE_REGION=${SCCACHE_REGION:-us-east-2}$" ~/.bashrc ]; then
-    echo "export SCCACHE_REGION=${SCCACHE_REGION:-us-east-2}" >> ~/.bashrc;
-fi
-if [ -z "${SCCACHE_BUCKET:-}" ] || \
-   [ ! grep -q -E "^SCCACHE_BUCKET=${SCCACHE_BUCKET:-rapids-sccache-devs}$" ~/.bashrc ]; then
-    echo "export SCCACHE_BUCKET=${SCCACHE_BUCKET:-rapids-sccache-devs}" >> ~/.bashrc;
-fi
+. /opt/devcontainer/bin/vault/s3/export.sh
 
 # If we succeeded at least once, install user crontab and refresh creds every 8hrs
 if ! crontab -l &> /dev/null; then

@@ -26,14 +26,14 @@ test_aws_creds() {
     AWS_SESSION_TOKEN="$aws_session_token" \
     AWS_ACCESS_KEY_ID="$aws_access_key_id" \
     AWS_SECRET_ACCESS_KEY="$aws_secret_access_key" \
-    aws-curl -s -X GET --region "${region}" -o /tmp/.sccache_check \
+    aws-curl -f -s -X GET --region "${region}" -o /tmp/.sccache_check \
         "https://${bucket}.s3.amazonaws.com/.sccache_check";
 
     # Test PUT
     AWS_SESSION_TOKEN="$aws_session_token" \
     AWS_ACCESS_KEY_ID="$aws_access_key_id" \
     AWS_SECRET_ACCESS_KEY="$aws_secret_access_key" \
-    aws-curl -s -X PUT --region "${region}" -d @/tmp/.sccache_check \
+    aws-curl -f -s -X PUT --region "${region}" -d @/tmp/.sccache_check \
         "https://${bucket}.s3.amazonaws.com/.sccache_check";
 }
 

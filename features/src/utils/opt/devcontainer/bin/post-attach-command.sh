@@ -10,6 +10,8 @@ if ! /opt/devcontainer/bin/vault/s3/test.sh 2>&1 >/dev/null; then
     /opt/devcontainer/bin/vault/s3/init.sh;
 fi
 
+. /opt/devcontainer/bin/vault/s3/export.sh;
+
 for cmd in $(find /opt -type f -name post-attach-command.sh ! -wholename $(realpath -m $0)); do
     . $cmd;
 done
