@@ -1,0 +1,10 @@
+{
+  "name": "NVIDIA RAPIDS devcontainer utilities",
+  "id": "rapids-utils",
+  "version": "1.0.0",
+  "description": "A feature to install the RAPIDS devcontainer utilities",
+  "containerEnv": {
+    "DEFAULT_CONDA_ENV": "rapids",
+    "BASH_ENV": "/etc/bash.bash_env"
+  }
+}
