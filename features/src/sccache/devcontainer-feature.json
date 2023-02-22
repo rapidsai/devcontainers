@@ -17,7 +17,7 @@
     }
   },
   "containerEnv": {
-    "SCCACHE_IDLE_TIMEOUT": 32768,
+    "SCCACHE_IDLE_TIMEOUT": "32768",
     "RUSTC_WRAPPER": "/usr/bin/sccache",
     "CMAKE_C_COMPILER_LAUNCHER": "/usr/bin/sccache",
     "CMAKE_CXX_COMPILER_LAUNCHER": "/usr/bin/sccache",
