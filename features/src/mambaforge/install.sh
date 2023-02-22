@@ -25,7 +25,7 @@ echo "Installing Mambaforge...";
 # Install miniconda
 /bin/bash /tmp/miniforge.sh -b -p /opt/conda;
 
-export PATH="/opt/conda/bin:${PATH}";
+export PATH="${PATH}:/opt/conda/bin";
 
 conda clean --tarballs --index-cache --packages --yes;
 find /opt/conda -follow -type f -name '*.a' -delete;

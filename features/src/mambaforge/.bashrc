@@ -1,3 +1,5 @@
+export PATH="${PATH}:/opt/conda/bin";
+
 . /opt/conda/etc/profile.d/conda.sh;
 . /opt/conda/etc/profile.d/mamba.sh;
 
