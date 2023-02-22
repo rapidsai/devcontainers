@@ -28,7 +28,7 @@ make_conda_env() {
     for lib in $(find ~ -maxdepth 1 -mindepth 1 -type d ! -name '.*' -exec basename {} \;); do
         if [ -f ~/"${lib}/dependencies.yaml" ]; then
             conda_env_yamls+=("/tmp/${lib}.yaml");
-            conda_noinstall+=($(rapids-python-pkg-names "${lib}"));
+            conda_noinstall+=($(rapids-python-conda-pkg-names "${lib}"));
             /opt/conda/bin/rapids-dependency-file-generator \
                 --file_key all \
                 --output conda \

@@ -2,16 +2,10 @@
 
 get_repos_ordered() {
     local cmd="${@}";
-    cat<<EOF | ${cmd:-cat -}
-01 rmm
-02 cudf
-03 raft
-04 cumlprims_mg
-05 cuml
-06 cugraph-ops
-07 cugraph
-08 cuspatial
-EOF
+    local names=($(yq '.repos[].name' /opt/rapids-build-utils/manifest.yaml));
+    for i in "${!names[@]}"; do
+        echo "$i ${names[$i]}";
+    done
 }
 
 get_repos() {
@@ -21,7 +15,7 @@ get_repos() {
     join \
       <(get_repos_ordered)                                       \
       <(find ~ -maxdepth 1 -mindepth 1 -type d ! -name '.*'      \
-        -exec bash -c 'get_repos_ordered grep $(basename {})' \; \
+        -exec bash -c 'get_repos_ordered | grep $(basename {})' \; \
       | sort -h) \
   | cut -d' ' -f3;
 
@@ -72,9 +66,6 @@ make_vscode_workspace() {
     cat<<EOF
 {
   "folders": [
-    { "name": ".conda", "path": ".conda" },
-    { "name": ".config", "path": ".config" },
-    { "name": ".cache", "path": ".cache" },
 $(get_repos | with_git_dirs \
     | lib_entries \
     | xargs -r -d'\n' -I% echo -e '    %,'
