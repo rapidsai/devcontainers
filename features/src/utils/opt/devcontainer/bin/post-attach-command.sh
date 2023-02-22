@@ -6,6 +6,7 @@ fi
 
 /opt/devcontainer/bin/git/init.sh;
 
+# Refresh the S3 creds if they've expired
 if ! /opt/devcontainer/bin/vault/s3/test.sh 2>&1 >/dev/null; then
     /opt/devcontainer/bin/vault/s3/init.sh;
 fi

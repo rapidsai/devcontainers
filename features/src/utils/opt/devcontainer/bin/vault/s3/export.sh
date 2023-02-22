@@ -2,29 +2,11 @@
 
 export_sccache_vars() {
 
-    local bucket="${SCCACHE_BUCKET:-}";
-    local region="${SCCACHE_REGION:-}";
-    local usessl="${SCCACHE_S3_USE_SSL:-}";
+    local bucket="${SCCACHE_BUCKET:-$(grep 'bucket=' ~/.aws/config | sed 's/bucket=//')}";
+    local region="${SCCACHE_REGION:-$(grep 'region=' ~/.aws/config | sed 's/region=//')}";
 
-    if [ -f  ~/.aws/config ]; then
-        bucket="${bucket:-$(grep "bucket=" ~/.aws/config | sed 's/bucket=//')}";
-        region="${region:-$(grep "region=" ~/.aws/config | sed 's/region=//')}";
-    fi
-
-    if [ -f  ~/.aws/credentials ]; then
-        region="${region:-$(grep "region=" ~/.aws/credentials | sed 's/region=//')}";
-    fi
-
-    if [[ -z "${bucket:-}" || -z "${region:-}" ]]; then
-        exit 0;
-    fi
-
-    export SCCACHE_S3_USE_SSL="${usessl:-true}";
-    export SCCACHE_BUCKET="${bucket:-rapids-sccache-devs}";
-    export SCCACHE_REGION="${region:-us-east-2}";
-
-    if ! grep -q -E "^export SCCACHE_S3_USE_SSL=${SCCACHE_S3_USE_SSL}$" ~/.bashrc; then
-        echo "export SCCACHE_S3_USE_SSL=${SCCACHE_S3_USE_SSL}" >> ~/.bashrc;
+    if grep -q -E "^export SCCACHE_S3_NO_CREDENTIALS=true$" ~/.bashrc; then
+        sed -i 's@export SCCACHE_S3_NO_CREDENTIALS=true@@g' ~/.bashrc;
     fi
 
     if ! grep -q -E "^export SCCACHE_BUCKET=${SCCACHE_BUCKET}$" ~/.bashrc; then
@@ -34,6 +16,18 @@ export_sccache_vars() {
     if ! grep -q -E "^export SCCACHE_REGION=${SCCACHE_REGION}$" ~/.bashrc; then
         echo "export SCCACHE_REGION=${SCCACHE_REGION}" >> ~/.bashrc;
     fi
+
+    # If we succeeded at least once, install user crontab and refresh creds every 8hrs
+    if ! crontab -l &> /dev/null; then
+        crontab /opt/devcontainer/cron/vault-s3-init;
+        sudo cron;
+    fi
 }
 
-export_sccache_vars "$@";
+if [[ -f ~/.aws/stamp && -f ~/.aws/config && -f ~/.aws/credentials ]]; then
+    export_sccache_vars;
+elif ! grep -q -E "^export SCCACHE_S3_NO_CREDENTIALS=true$" ~/.bashrc; then
+    echo "export SCCACHE_S3_NO_CREDENTIALS=true" >> ~/.bashrc;
+fi
+
+source ~/.bashrc;

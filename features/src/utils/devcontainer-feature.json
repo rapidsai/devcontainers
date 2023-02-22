@@ -1,7 +1,7 @@
 {
   "name": "devcontainer utils",
   "id": "utils",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "description": "A feature to install my devcontainer utilities",
   "containerEnv": {
     "BASH_ENV": "/etc/bash.bash_env"
