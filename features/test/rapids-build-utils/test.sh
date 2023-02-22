@@ -6,7 +6,7 @@ set -e
 source dev-container-features-test-lib
 
 # Definition specific tests
-# TODO
+check "TODO" echo "success"
 
 # Report result
 reportResults
