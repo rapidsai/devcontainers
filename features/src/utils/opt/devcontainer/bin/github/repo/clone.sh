@@ -5,14 +5,14 @@ set -euo pipefail;
 clone_github_repo() {
 
     . /opt/devcontainer/bin/github/cli/init.sh;
-
     if [[ -z "$GITHUB_USER" ]]; then exit 1; fi
 
     local user="$GITHUB_USER";
     local orig="${1:?orig is required}"; shift;
     local repo="${1:?repo is required}"; shift;
     local dest="${1:-$repo}";
-    local args="${@:1}";
+    if test -n "${1:-}"; then shift; fi;
+    local args="${@}";
     local fork="$(gh repo list $user --fork --json name             \
         --jq ". | map(select(.name == \"${repo}\")) | map(.name)[]")";
 

@@ -11,7 +11,8 @@ clone_gitlab_repo() {
     local orig="${1:?orig is required}"; shift;
     local repo="${1:?repo is required}"; shift;
     local dest="${1:-$repo}";
-    local args="${@:1}";
+    if test -n "${1:-}"; then shift; fi;
+    local args="${@}";
 
     local src="${orig}/${repo}";
     local dst="${user}/${repo}";
