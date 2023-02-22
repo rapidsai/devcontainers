@@ -37,7 +37,7 @@
         "version": "1.11.1"
       },
       "sccache": {
-        "version": "0.4.0-pre.6"
+        "version": "0.4.0-pre.7"
       },
       "llvm": {
         "version": "15"
