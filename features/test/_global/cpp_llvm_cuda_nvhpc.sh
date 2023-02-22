@@ -75,7 +75,7 @@ check "ninja exists and is on path" which ninja;
 check "version" bash -c "ninja --version | grep '$NINJA_VERSION'";
 
 # Check sccache
-SCCACHE_VERSION="0.4.0-pre.6";
+SCCACHE_VERSION="0.4.0-pre.7";
 check "sccache exists and is on path" which sccache;
 check "version" bash -c "sccache --version | grep '$SCCACHE_VERSION'";
 
