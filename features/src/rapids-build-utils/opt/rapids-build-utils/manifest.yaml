@@ -1,0 +1,77 @@
+x-git-defaults: &git_defaults
+    host: github
+    tag: branch-23.04
+    upstream: rapidsai
+
+repos:
+- name: rmm
+  path: rmm
+  cpp:
+    sub_dir: ""
+    depends: []
+  git:
+    repo: rmm
+    <<: *git_defaults
+
+- name: cudf
+  path: cudf
+  cpp:
+    sub_dir: cpp
+    depends: [rmm]
+  git:
+    repo: cudf
+    <<: *git_defaults
+
+- name: raft
+  path: raft
+  cpp:
+    sub_dir: cpp
+    depends: [rmm]
+  git:
+    repo: raft
+    <<: *git_defaults
+
+- name: cumlprims_mg
+  path: cumlprims_mg
+  cpp:
+    sub_dir: cpp
+    depends: [rmm, raft]
+  git:
+    repo: cumlprims_mg
+    <<: *git_defaults
+
+- name: cuml
+  path: cuml
+  cpp:
+    sub_dir: cpp
+    depends: [rmm, raft, cumlprims_mg]
+  git:
+    repo: cuml
+    <<: *git_defaults
+
+- name: cugraph-ops
+  path: cugraph-ops
+  cpp:
+    sub_dir: cpp
+    depends: [rmm, raft]
+  git:
+    repo: cugraph-ops
+    <<: *git_defaults
+
+- name: cugraph
+  path: cugraph
+  cpp:
+    sub_dir: cpp
+    depends: [rmm, raft, cugraph-ops]
+  git:
+    repo: cugraph
+    <<: *git_defaults
+
+- name: cuspatial
+  path: cuspatial
+  cpp:
+    sub_dir: cpp
+    depends: [rmm, cudf]
+  git:
+    repo: cuspatial
+    <<: *git_defaults

@@ -1,3 +1,7 @@
+if [[ "$PATH" != *"/opt/conda/bin"* ]]; then
+    export PATH="$PATH:/opt/conda/bin";
+fi
+
 . /opt/conda/etc/profile.d/conda.sh;
 . /opt/conda/etc/profile.d/mamba.sh;
 

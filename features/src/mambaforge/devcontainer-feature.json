@@ -1,7 +1,7 @@
 {
   "name": "Mambaforge",
   "id": "mambaforge",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "A feature to install mambaforge",
   "options": {
     "version": {
@@ -17,7 +17,8 @@
   },
   "containerEnv": {
     "MAMBA_NO_BANNER": "1",
-    "BASH_ENV": "/etc/bash.bash_env"
+    "BASH_ENV": "/etc/bash.bash_env",
+    "PATH": "${PATH}:/opt/conda/bin"
   },
   "customizations": {
     "vscode": {
