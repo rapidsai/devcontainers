@@ -5,9 +5,8 @@ set -euo pipefail;
 # Attempt to retrieve temporary AWS credentials from a vault
 # instance using GitHub OAuth.
 
-if [[ -z "${VAULT_HOST:-}" ]]; then
-    exit 0;
-fi
+if [[ -z "${VAULT_HOST:-}" ]]; then exit 0; fi
+if [[ -z "${SCCACHE_BUCKET:-}" ]]; then exit 0; fi
 
 # Initialize the GitHub CLI with the appropriate user scopes
 . /opt/devcontainer/bin/github/cli/init.sh;
@@ -70,14 +69,16 @@ fi;
 
 # Generate AWS config files
 mkdir -p ~/.aws;
+
+echo "$(date '+%s')" > ~/.aws/stamp;
+
 cat <<EOF > ~/.aws/config
 [default]
-region=${SCCACHE_REGION:-us-east-2}
-bucket=${SCCACHE_BUCKET:-rapids-sccache-devs}
+${SCCACHE_REGION:+region=$SCCACHE_REGION}
+${SCCACHE_BUCKET:+bucket=$SCCACHE_BUCKET}
 EOF
 cat <<EOF > ~/.aws/credentials
 [default]
-region=${SCCACHE_REGION:-us-east-2}
 aws_access_key_id=$aws_access_key_id
 aws_secret_access_key=$aws_secret_access_key
 EOF
@@ -88,11 +89,5 @@ unset aws_secret_access_key;
 chmod 0600 ~/.aws/{config,credentials};
 
 . /opt/devcontainer/bin/vault/s3/export.sh
-
-# If we succeeded at least once, install user crontab and refresh creds every 8hrs
-if ! crontab -l &> /dev/null; then
-    crontab /opt/devcontainer/cron/vault-s3-init;
-    sudo cron;
-fi
 
 echo "Successfully generated temporary AWS S3 credentials!";

@@ -2,39 +2,42 @@
 
 set -euo pipefail;
 
-. /opt/devcontainer/bin/github/cli/init.sh;
-if [[ -z "$GITHUB_USER" ]]; then exit 1; fi
+clone_github_repo() {
 
-NAME="$2";
-UPSTREAM="$1/$NAME";
-REPO="$GITHUB_USER/$NAME";
-FORK="$(gh repo list $GITHUB_USER --fork --json name --jq ". | map(select(.name == \"$NAME\")) | map(.name)[]")";
+    . /opt/devcontainer/bin/github/cli/init.sh;
+    if [[ -z "$GITHUB_USER" ]]; then exit 1; fi
 
-if [[ ! "$FORK" ]]; then
-    ORIGIN_URL="github.com/$REPO";
-    UPSTREAM_URL="github.com/$UPSTREAM";
+    local user="$GITHUB_USER";
+    local orig="${1:?orig is required}"; shift;
+    local repo="${1:?repo is required}"; shift;
+    local dest="${1:-$repo}";
+    if test -n "${1:-}"; then shift; fi;
+    local args="${@}";
+    local fork="$(gh repo list $user --fork --json name             \
+        --jq ". | map(select(.name == \"${repo}\")) | map(.name)[]")";
 
-    while true; do
+    if [[ -z "$fork" ]]; then
 
-        read -p "\`$UPSTREAM_URL\` not found.
-Fork \`$UPSTREAM_URL\` into \`$ORIGIN_URL\` now (y/n)? " CHOICE </dev/tty
+        local src="${orig}/${repo}";
+        local dst="${user}/${repo}";
 
-        case $CHOICE in
-            [Nn]* ) REPO="$UPSTREAM"; break;;
-            [Yy]* ) gh repo fork "$UPSTREAM" --clone=false; break;;
-            * ) echo "Please answer 'y' or 'n'";;
-        esac
-        unset CHOICE;
-    done;
-fi
+        while true; do
+            read -p "'github.com/${dst}.git' not found.
+    Fork '${src}' into '${dst}' now (y/n)? " CHOICE </dev/tty
+            case $CHOICE in
+                [Nn]* ) fork="${src}"; break;;
+                [Yy]* ) fork="${dst}";
+                        gh repo fork "${src}" --clone=false --default-branch-only;
+                        break;;
+                * ) echo "Please answer 'y' or 'n'";;
+            esac
+            unset CHOICE;
+        done;
+    fi
 
-if [[ ! -d ~/${3:-$NAME}/.git ]]; then
-    gh repo clone "$REPO" ~/${3:-$NAME};
-fi
+    if [[ ! -d ~/${dest}/.git ]]; then
+        gh repo clone ${fork} ~/${dest} ${args:+-- $args};
+    fi
+}
 
-unset NAME;
-unset UPSTREAM;
-unset REPO;
-unset FORK;
-unset ORIGIN_URL;
-unset UPSTREAM_URL;
+clone_github_repo "$@";
