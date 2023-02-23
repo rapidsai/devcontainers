@@ -86,19 +86,20 @@ runs:
         changed_features="$(echo                                   \
           '"${{ join(fromJSON(inputs.features  || '[]'), '|') }}"' \
           '"${{ join(fromJSON(inputs.scenarios || '[]'), '|') }}"' \
-        | jq -s                                                    \
-        | jq 'map(split("|")) | flatten'                           \
-        | jq 'map(select(. != ""))'                                \
-        | jq 'map(sub("utils";   "cpp"))'                          \
-        | jq 'map(sub("cmake";   "cpp"))'                          \
-        | jq 'map(sub("ninja";   "cpp"))'                          \
-        | jq 'map(sub("sccache"; "cpp"))'                          \
-        | jq -r 'unique | join("|")'                               \
+        | jq -e -s                                                 \
+        | jq -e 'map(split("|")) | flatten'                        \
+        | jq -e 'map(select(. != ""))'                             \
+        | jq -e 'map(sub("utils";   "cpp"))'                       \
+        | jq -e 'map(sub("cmake";   "cpp"))'                       \
+        | jq -e 'map(sub("ninja";   "cpp"))'                       \
+        | jq -e 'map(sub("sccache"; "cpp"))'                       \
+        | jq -e -r 'unique | join("|")'                            \
+        || echo ''                                                 \
         )";
 
         if [[ -n "$changed_features" ]]; then
           changed_features="$(            \
-            cat  ./images/matrix.yml      \
+            cat images/matrix.yml         \
           | grep -E "($changed_features)" \
           | yq -e -o json --no-colors     \
           | jq -ceM                       \
