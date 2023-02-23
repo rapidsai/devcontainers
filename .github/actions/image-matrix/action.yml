@@ -28,10 +28,9 @@ runs:
         files: |
           images/**
           .github/workflows/test.yml
+          .github/actions/image-matrix/action.yml
           .github/workflows/build-and-test-image.yml
           .github/actions/build-and-test-image/action.yml
-
-#          .github/actions/image-matrix/action.yml
 
     - name: Report changes
       if: inputs.full_matrix != true
@@ -40,7 +39,7 @@ runs:
 
     - name: Determine the image matrix
       id: matrix
-      shell: bash --noprofile --norc -x -eo pipefail {0}
+      shell: bash
       run: |
         files='${{ steps.changes.outputs.all_changed_and_modified_files }}';
 
