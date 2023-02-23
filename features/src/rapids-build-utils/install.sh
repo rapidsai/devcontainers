@@ -1,5 +1,5 @@
 #! /usr/bin/env bash
-set -e
+set -ex
 
 # Ensure we're in this feature's directory during build
 cd "$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )";
@@ -12,7 +12,7 @@ check_packages jq wget gettext-base bash-completion;
 # Install yq
 arch=$(dpkg --print-architecture | awk -F'-' '{print $NF}');
 wget --no-hsts -q -O- \
-    https://github.com/mikefarah/yq/releases/download/v4.30.8/yq_linux_${arch}.tar.gz -O- \
+    https://github.com/mikefarah/yq/releases/download/v4.31.1/yq_linux_${arch}.tar.gz \
   | tar -C /usr/bin -xzf - \
  && mv /usr/bin/yq_linux_${arch} /usr/bin/yq;
 
