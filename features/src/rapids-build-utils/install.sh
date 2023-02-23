@@ -42,6 +42,7 @@ find /opt/rapids-build-utils \
     -o -type f -exec chmod 0755 {} \; \);
 
 # Copy in bash completions
+mkdir -p /etc/bash_completion.d/;
 cp -ar ./etc/bash_completion.d/* /etc/bash_completion.d/;
 
 yq shell-completion bash | tee /etc/bash_completion.d/yq >/dev/null;
