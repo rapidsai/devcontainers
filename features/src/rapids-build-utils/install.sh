@@ -7,7 +7,7 @@ cd "$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )";
 # install global/common scripts
 . ./common/install.sh;
 
-check_packages jq curl gettext-base bash-completion;
+check_packages jq wget gettext-base bash-completion;
 
 # Install yq
 arch=$(dpkg --print-architecture | awk -F'-' '{print $NF}');
