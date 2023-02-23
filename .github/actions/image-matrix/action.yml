@@ -74,9 +74,10 @@ runs:
 
           changed_images="$(              \
             cat images/matrix.yml         \
-          | yq -o json --no-colors        \
-          | jq -cM --argjson xs "$keys"   \
+          | yq -e -o json --no-colors     \
+          | jq -ceM --argjson xs "$keys"  \
             'map(select(keys == $xs[]))'  \
+         || echo ''
           )";
 
         fi
