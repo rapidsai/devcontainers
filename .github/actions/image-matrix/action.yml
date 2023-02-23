@@ -107,6 +107,9 @@ runs:
           )";
         fi
 
+        if [[ "$changed_images" == "null" ]]; then changed_images=""; fi
+        if [[ "$changed_features" == "null" ]]; then changed_features=""; fi
+
         # Concatenate changed feature/image lists and write the matrix
         cat <<EOF | tee -a $GITHUB_OUTPUT
         matrix={"include":$(echo        \
