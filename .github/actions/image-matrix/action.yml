@@ -45,8 +45,8 @@ runs:
         files='${{ steps.changes.outputs.all_changed_and_modified_files }}';
 
         if `# Include all images if utils feature changed`              \
-           echo "${{ inputs.features }}"  | grep -q 'utils'             \
-        || echo "${{ inputs.scenarios }}" | grep -q 'utils'             \
+           echo "${{ inputs.features }}"  | grep -q '^utils$'           \
+        || echo "${{ inputs.scenarios }}" | grep -q '^utils$'           \
            `# Include all images if full_matrix is true`                \
         || [ "${{ inputs.full_matrix }}" == "true" ]                    \
            `# Include all images if matrix or workflows changed`        \
@@ -54,6 +54,8 @@ runs:
         ; then
           files="$(find images -mindepth 1 -maxdepth 1 -type d)";
         fi
+
+        changed_images="";
 
         # Select the matrix of images whose source files changed
         if echo "$files" | grep -q '^images/'; then
