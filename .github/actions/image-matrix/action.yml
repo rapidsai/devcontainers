@@ -99,8 +99,8 @@ runs:
           changed_features="$(            \
             cat  ./images/matrix.yml      \
           | grep -E "($changed_features)" \
-          | yq -o json --no-colors        \
-          | jq -cM                        \
+          | yq -e -o json --no-colors     \
+          | jq -ceM                       \
          || echo ''
           )";
         fi
