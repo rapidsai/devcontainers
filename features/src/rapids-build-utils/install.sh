@@ -10,11 +10,10 @@ cd "$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )";
 check_packages jq wget gettext-base bash-completion;
 
 # Install yq
-arch=$(dpkg --print-architecture | awk -F'-' '{print $NF}');
-wget --no-hsts -q -O- \
-    https://github.com/mikefarah/yq/releases/download/v4.31.1/yq_linux_${arch}.tar.gz \
-  | tar -C /usr/bin -xzf - \
- && mv /usr/bin/yq_linux_${arch} /usr/bin/yq;
+wget --no-hsts -q \
+    https://github.com/mikefarah/yq/releases/download/v4.31.1/yq_linux_$(dpkg --print-architecture | awk -F'-' '{print $NF}') \
+    -O /usr/bin/yq \
+ && chmod 0755 /usr/bin/yq;
 
 # Install the rapids dependency file generator and conda-merge
 if type python >/dev/null 2>&1; then
