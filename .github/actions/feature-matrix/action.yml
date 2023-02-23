@@ -36,7 +36,7 @@ runs:
 
     - name: Determine the feature matrix
       id: matrix
-      shell: bash --noprofile --norc -x -eo pipefail {0}
+      shell: bash
       run: |
         join_with_delimiter() {
           local IFS='' delim=$1; shift; echo -n "$1"; shift; echo -n "${*/#/$delim}";
