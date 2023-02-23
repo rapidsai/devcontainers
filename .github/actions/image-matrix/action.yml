@@ -89,10 +89,10 @@ runs:
         | jq -e -s                                                 \
         | jq -e 'map(split("|")) | flatten'                        \
         | jq -e 'map(select(. != ""))'                             \
-        | jq -e 'map(sub("utils";   "cpp"))'                       \
-        | jq -e 'map(sub("cmake";   "cpp"))'                       \
-        | jq -e 'map(sub("ninja";   "cpp"))'                       \
-        | jq -e 'map(sub("sccache"; "cpp"))'                       \
+        | jq -e 'map(gsub("^utils$";   "cpp"))'                    \
+        | jq -e 'map(gsub("^cmake$";   "cpp"))'                    \
+        | jq -e 'map(gsub("^ninja$";   "cpp"))'                    \
+        | jq -e 'map(gsub("^sccache$"; "cpp"))'                    \
         | jq -e -r 'unique | join("|")'                            \
         || echo ''                                                 \
         )";
