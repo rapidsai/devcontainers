@@ -39,7 +39,7 @@ runs:
 
     - name: Determine the image matrix
       id: matrix
-      shell: bash
+      shell: bash --noprofile --norc -x -eo pipefail {0}
       run: |
         files='${{ steps.changes.outputs.all_changed_and_modified_files }}';
 
