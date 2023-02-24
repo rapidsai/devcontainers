@@ -3,10 +3,12 @@
 make_conda_env() {
 
     local env_name="${1}";
+    local env_file_name="${env_name}.yml";
 
     # Remove the current conda env if called with `-f|--force`
     if echo "${@:2}" | grep -qE '(\-f|\-\-force)'; then
-        rm -rf "$HOME/.conda/envs/${env_name}";
+        rm -rf "$HOME/.conda/envs/${env_name}" \
+               "$HOME/.conda/envs/${env_file_name}";
     fi
 
     local cuda_version="${CUDA_VERSION:-${CUDA_VERSION_MAJOR}.${CUDA_VERSION_MINOR}}";
@@ -18,9 +20,8 @@ make_conda_env() {
         python_version="$(python3 --version 2>&1 | cut -d' ' -f2 | cut -d'.' -f3 --complement)";
     fi
 
-    local env_file_name="${env_name}.yml";
     local new_env_path="$(realpath -m /tmp/${env_file_name})";
-    local old_env_path="$(realpath -m ~/.cache/${env_file_name})";
+    local old_env_path="$(realpath -m ~/.conda/envs/${env_file_name})";
 
     local conda_noinstall=();
     local conda_env_yamls=();
