@@ -7,8 +7,6 @@ build_${CPP_LIB}_cpp() {
     cmake --build ~/${CPP_SRC}/build/latest      \
         -j${PARALLEL_LEVEL:-$(nproc --ignore=2)} \
     ;
-
-    sudo ldconfig;
 }
 
 build_${CPP_LIB}_cpp "$@";
