@@ -7,7 +7,7 @@ Installs the GitLab CLI. Auto-detects latest version and installs needed depende
 
 ```json
 "features": {
-    "ghcr.io/rapidsai/devcontainers/features/gitlab-cli:1": {}
+    "ghcr.io/rapidsai/devcontainers/features/gitlab-cli:23": {}
 }
 ```
 
