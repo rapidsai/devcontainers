@@ -39,6 +39,7 @@ build_${PY_LIB}_python() {
     pip_args+=("--no-deps");
     pip_args+=("--editable");
     pip_args+=(~/${PY_SRC});
+    cmake_args+=("-DCMAKE_INSTALL_RPATH_USE_LINK_PATH=ON");
 
     trap "rm -rf ~/${PY_SRC}/$(echo "${PY_LIB}" | tr '-' '_').egg-info" EXIT;
 

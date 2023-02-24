@@ -6,13 +6,26 @@
 python_pkg_names() {
     cd ~;
     # the regex will continue until morale improves
-    rapids-python-pkg-roots "$@"             \
-      | xargs -I{} echo '{}/setup.py'        \
-      | xargs -I{} grep -E 'name=f?' {}      \
-      | sed -r "s/^.*?name=f?('|\")//"       \
-      | sed -r "s/('|\").*$//"               \
-      | sed -r 's/\{.*$//'                   \
-      ;
+    for dir in $(rapids-python-pkg-roots "$@"); do
+        local name="";
+        if [[ -z "${name}" && -f "${dir}/setup.py" ]]; then
+            name="$(                              \
+                grep -E 'name=f?' ${dir}/setup.py \
+              | sed -r "s/^.*?name=f?('|\")//"    \
+              | sed -r "s/('|\").*$//"            \
+              | sed -r 's/\{.*$//'                \
+             || echo ''                           \
+            )";
+        fi
+        if [[ -z "${name}" && -f "${dir}/pyproject.toml" ]]; then
+            name="$(python -c "\
+import toml;\
+print(toml.load('${dir}/pyproject.toml')['project']['name'])")";
+        fi
+        if [[ -n "${name}" ]]; then
+            echo "${name}";
+        fi
+    done
 }
 
 python_pkg_names "$@";

@@ -144,12 +144,6 @@ generate_clone_scripts() {
             generate_scripts;
     done
 
-    cat <<EOF | sudo tee /etc/ld.so.conf.d/dev-libs.conf >/dev/null
-$(for dir in ${cpp_build_dirs[@]}; do echo -e "$dir\n$dir/lib\n$dir/lib64"; done)
-EOF
-
-    sudo ldconfig;
-
     unset name_to_path;
     unset name_to_cpp_sub_dir;
 }

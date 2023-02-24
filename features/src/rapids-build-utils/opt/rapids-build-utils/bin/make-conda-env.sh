@@ -49,7 +49,7 @@ make_conda_env() {
     rm ${conda_env_yamls[@]};
 
     # If the conda env doesn't exist, make one
-    if ! conda info -e | grep -q "${env_name}"; then
+    if ! conda info -e | grep -qE "^${env_name} "; then
         echo -e "Creating '${env_name}' conda environment\n" 1>&2;
         echo -e "Environment (${env_file_name}):\n" 1>&2;
         cat "${new_env_path}";
