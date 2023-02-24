@@ -1,7 +1,6 @@
 #! /usr/bin/env -S bash -euo pipefail
 
 get_repos_ordered() {
-    local cmd="${@}";
     local names=($(yq '.repos[].name' /opt/rapids-build-utils/manifest.yaml));
     for i in "${!names[@]}"; do
         echo "$i ${names[$i]}";
@@ -9,17 +8,14 @@ get_repos_ordered() {
 }
 
 get_repos() {
-
-    export -f get_repos_ordered;
+    local repos="$(get_repos_ordered)";
 
     join \
-      <(get_repos_ordered)                                       \
-      <(find ~ -maxdepth 1 -mindepth 1 -type d ! -name '.*'      \
-        -exec bash -c 'get_repos_ordered | grep $(basename {})' \; \
-      | sort -h) \
+      <(echo "${repos}")                                          \
+      <(find ~ -maxdepth 1 -mindepth 1 -type d ! -name '.*' -exec \
+        bash -c "echo '${repos}' | grep \$(basename {})" \; \
+      | sort -h | uniq) \
   | cut -d' ' -f3;
-
-    export -n get_repos_ordered;
 }
 
 with_git_dirs() {
