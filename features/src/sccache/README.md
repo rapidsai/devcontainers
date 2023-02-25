@@ -7,7 +7,7 @@ A feature to install sccache
 
 ```json
 "features": {
-    "ghcr.io/rapidsai/devcontainers/features/sccache:1": {}
+    "ghcr.io/rapidsai/devcontainers/features/sccache:23": {}
 }
 ```
 
