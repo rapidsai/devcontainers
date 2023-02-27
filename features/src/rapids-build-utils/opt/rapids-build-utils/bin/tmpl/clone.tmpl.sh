@@ -20,7 +20,7 @@ clone_${NAME}() {
 
         rapids-generate-scripts;
 
-        rapids-make-vscode-workspace > ~/workspace.code-workspace;
+        rapids-make-vscode-workspace --update;
     fi
 }
 

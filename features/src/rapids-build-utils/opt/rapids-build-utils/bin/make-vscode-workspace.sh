@@ -74,4 +74,12 @@ $(get_repos | with_git_dirs \
 EOF
 }
 
-make_vscode_workspace "$@";
+if echo "$@" | grep -qE '(\-u|\-\-update)'; then
+    make_vscode_workspace > /tmp/workspace.code-workspace;
+    if ! diff -BNqw ~/workspace.code-workspace /tmp/workspace.code-workspace >/dev/null 2>&1; then
+        cp /tmp/workspace.code-workspace ~/workspace.code-workspace;
+    fi
+    rm /tmp/workspace.code-workspace;
+else
+    make_vscode_workspace;
+fi
