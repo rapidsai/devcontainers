@@ -7,13 +7,22 @@ cd "$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )";
 # install global/common scripts
 . ./common/install.sh;
 
-check_packages jq wget gettext-base bash-completion;
+check_packages                  \
+    jq                          \
+    wget                        \
+    gettext-base                \
+    bash-completion             \
+    ;
 
-# Install yq
-wget --no-hsts -q \
-    https://github.com/mikefarah/yq/releases/download/v4.31.1/yq_linux_$(dpkg --print-architecture | awk -F'-' '{print $NF}') \
-    -O /usr/bin/yq \
- && chmod 0755 /usr/bin/yq;
+# Install yq if not installed
+if ! dpkg -s "yq" > /dev/null 2>&1; then
+    check_packages                  \
+        apt-transport-https         \
+        software-properties-common  \
+        ;
+    apt-add-repository -y ppa:rmescandon/yq;
+    check_packages yq;
+fi
 
 # Install the rapids dependency file generator and conda-merge
 if type python >/dev/null 2>&1; then

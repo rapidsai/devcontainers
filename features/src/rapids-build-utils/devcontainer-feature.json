@@ -1,7 +1,7 @@
 {
   "name": "NVIDIA RAPIDS devcontainer build utilities",
   "id": "rapids-build-utils",
-  "version": "23.4.1",
+  "version": "23.4.2",
   "description": "A feature to install the RAPIDS devcontainer build utilities",
   "containerEnv": {
     "CONDA_ALWAYS_YES": "true",
