@@ -1,7 +1,7 @@
 #! /usr/bin/env -S bash -euo pipefail
 
 get_repos_ordered() {
-    local names=($(yq '.repos[].name' /opt/rapids-build-utils/manifest.yaml));
+    local names=($(yq eval '.repos[].name' /opt/rapids-build-utils/manifest.yaml));
     for i in "${!names[@]}"; do
         echo "$i ${names[$i]}";
     done

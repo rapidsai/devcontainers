@@ -102,7 +102,7 @@ generate_clone_scripts() {
 
     # Generate and install the "clone-<repo>" scripts
     local manifest="$(cat /opt/rapids-build-utils/manifest.yaml)";
-    local names=($(echo -e "$manifest" | yq '.repos[].name'));
+    local names=($(echo -e "$manifest" | yq eval '.repos[].name' -));
 
     local cpp_build_dirs=();
 
@@ -111,14 +111,14 @@ generate_clone_scripts() {
 
     for i in "${!names[@]}"; do
         local name="${names[$i]}";
-        local path="$(         echo -e "$manifest" | yq ".repos | map(select(.name == \"${name}\") | .path)         | flatten | join(\" \")")";
-        local cpp_args="$(     echo -e "$manifest" | yq ".repos | map(select(.name == \"${name}\") | .cpp.args)     | flatten | join(\" \")")";
-        local cpp_sub_dir="$(  echo -e "$manifest" | yq ".repos | map(select(.name == \"${name}\") | .cpp.sub_dir)  | flatten | join(\" \")")";
-        local cpp_depends="$(  echo -e "$manifest" | yq ".repos | map(select(.name == \"${name}\") | .cpp.depends)  | flatten | join(\" \")")";
-        local git_tag="$(      echo -e "$manifest" | yq ".repos | map(select(.name == \"${name}\") | .git.tag)      | flatten | join(\" \")")";
-        local git_repo="$(     echo -e "$manifest" | yq ".repos | map(select(.name == \"${name}\") | .git.repo)     | flatten | join(\" \")")";
-        local git_host="$(     echo -e "$manifest" | yq ".repos | map(select(.name == \"${name}\") | .git.host)     | flatten | join(\" \")")";
-        local git_upstream="$( echo -e "$manifest" | yq ".repos | map(select(.name == \"${name}\") | .git.upstream) | flatten | join(\" \")")";
+        local path="$(         echo -e "$manifest" | yq eval ".repos | map(select(.name == \"${name}\") | .path)         | flatten | join(\" \")" -)";
+        local cpp_args="$(     echo -e "$manifest" | yq eval ".repos | map(select(.name == \"${name}\") | .cpp.args)     | flatten | join(\" \")" -)";
+        local cpp_sub_dir="$(  echo -e "$manifest" | yq eval ".repos | map(select(.name == \"${name}\") | .cpp.sub_dir)  | flatten | join(\" \")" -)";
+        local cpp_depends="$(  echo -e "$manifest" | yq eval ".repos | map(select(.name == \"${name}\") | .cpp.depends)  | flatten | join(\" \")" -)";
+        local git_tag="$(      echo -e "$manifest" | yq eval ".repos | map(select(.name == \"${name}\") | .git.tag)      | flatten | join(\" \")" -)";
+        local git_repo="$(     echo -e "$manifest" | yq eval ".repos | map(select(.name == \"${name}\") | .git.repo)     | flatten | join(\" \")" -)";
+        local git_host="$(     echo -e "$manifest" | yq eval ".repos | map(select(.name == \"${name}\") | .git.host)     | flatten | join(\" \")" -)";
+        local git_upstream="$( echo -e "$manifest" | yq eval ".repos | map(select(.name == \"${name}\") | .git.upstream) | flatten | join(\" \")" -)";
 
         name_to_path[$name]="$path";
         name_to_cpp_sub_dir[$name]="$cpp_sub_dir";
