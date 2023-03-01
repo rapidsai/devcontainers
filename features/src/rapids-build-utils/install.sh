@@ -20,6 +20,7 @@ if ! dpkg -s "yq" > /dev/null 2>&1; then
         apt-transport-https         \
         software-properties-common  \
         ;
+    apt-key adv --keyserver keyserver.ubuntu.com --recv-keys CC86BB64;
     apt-add-repository -y ppa:rmescandon/yq;
     check_packages yq;
 fi
