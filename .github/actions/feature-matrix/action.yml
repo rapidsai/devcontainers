@@ -57,6 +57,7 @@ runs:
           scenarios="$(find_features_with_tests 'scenarios.json' 'features/test')";
         elif echo "$files" | grep -q "features/"; then
           files="$(join_with_delimiter "\n" $files | grep "features/")";
+          files="$(echo -e "$files")";
           changed=();
           for x in ${files}; do
             x="${x##features/src/}";
