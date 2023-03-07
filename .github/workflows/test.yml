@@ -6,11 +6,30 @@ concurrency:
 
 on:
   pull_request:
+  push:
+    branches:
+      - "pull-request/[0-9]+"
 
 jobs:
+  check-event:
+    name: Check PR Event
+    runs-on: ubuntu-latest
+    outputs:
+      ok: ${{ steps.check_pr_event.outputs.ok }}
+    steps:
+      - id: check_pr_event
+        name: Check PR Event
+        shell: bash
+        run: |
+          [[ '${{ github.event_name }}' == 'push' && '${{ github.repository }}' == 'rapidsai/devcontainers' ]] || \
+          [[ '${{ github.event_name }}' == 'pull_request' && '${{ github.repository }}' != 'rapidsai/devcontainers' ]] \
+          && echo "ok=true"  | tee -a $GITHUB_OUTPUT \
+          || echo "ok=false" | tee -a $GITHUB_OUTPUT;
 
   validate-features-json:
+    if: needs.check-event.outputs.ok == 'true'
     name: Validate features
+    needs: check-event
     secrets: inherit
     uses: ./.github/workflows/validate-features-json.yml
 
