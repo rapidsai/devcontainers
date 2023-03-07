@@ -9,7 +9,6 @@ cd "$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )";
 
 check_packages                  \
     jq                          \
-    wget                        \
     gettext-base                \
     bash-completion             \
     ;
@@ -19,6 +18,7 @@ if ! dpkg -s "yq" > /dev/null 2>&1; then
     check_packages                  \
         gpg                         \
         dirmngr                     \
+        gpg-agent                   \
         apt-transport-https         \
         software-properties-common  \
         ;
