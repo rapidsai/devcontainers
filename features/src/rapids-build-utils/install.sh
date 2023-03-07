@@ -18,6 +18,7 @@ check_packages                  \
 if ! dpkg -s "yq" > /dev/null 2>&1; then
     check_packages                  \
         gpg                         \
+        dirmngr                     \
         apt-transport-https         \
         software-properties-common  \
         ;
