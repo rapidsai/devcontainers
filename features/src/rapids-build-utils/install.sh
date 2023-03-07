@@ -17,6 +17,7 @@ check_packages                  \
 # Install yq if not installed
 if ! dpkg -s "yq" > /dev/null 2>&1; then
     check_packages                  \
+        gpg                         \
         apt-transport-https         \
         software-properties-common  \
         ;
