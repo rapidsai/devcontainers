@@ -1,0 +1,1 @@
+export GCC_VERSION="${GCC_VERSION}";
