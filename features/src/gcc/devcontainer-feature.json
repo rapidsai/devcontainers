@@ -1,0 +1,22 @@
+{
+  "name": "GCC",
+  "id": "gcc",
+  "version": "23.4.0",
+  "description": "A feature to install gcc",
+  "options": {
+    "version": {
+      "type": "string",
+      "proposals": [
+        "",
+        "12",
+        "11",
+        "10",
+        "9",
+        "8",
+        "7"
+      ],
+      "default": "",
+      "description": "gcc version to install (or empty string to install OS default)."
+    }
+  }
+}
