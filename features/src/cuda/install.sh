@@ -7,17 +7,19 @@ cd "$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )";
 # install global/common scripts
 . ./common/install.sh;
 
-check_packages      \
-    jq              \
-    wget            \
-    gettext-base    \
-    ca-certificates \
-    bash-completion \
+check_packages                 \
+    jq                         \
+    wget                       \
+    gettext-base               \
+    ca-certificates            \
+    bash-completion            \
+    software-properties-common \
     ;
 
 echo "Downloading CUDA keyring...";
 
 export NVARCH="$(uname -p)";
+export OSNAME="$(. /etc/os-release; echo "$ID${VERSION_ID/./}")";
 
 if [[ "$NVARCH" == aarch64 ]]; then
     NVARCH="sbsa";
@@ -35,12 +37,18 @@ get_cuda_deb() {
 
 # Add NVIDIA's keyring and apt repository
 cuda_repo_base="https://developer.download.nvidia.com/compute/cuda/repos";
-cuda_repo="${cuda_repo_base}/$(. /etc/os-release; echo "$ID${VERSION_ID/./}")/${NVARCH}";
+cuda_repo="${cuda_repo_base}/${OSNAME}/${NVARCH}";
 
 DEBIAN_FRONTEND=noninteractive                    \
 apt install -y --no-install-recommends            \
     "$(get_cuda_deb "${cuda_repo}" cuda-keyring)" \
     ;
+
+if [[ "${OSNAME}" == "ubuntu18.04" && "${NVARCH}" == "sbsa" ]]; then
+    ml_repo_base="https://developer.download.nvidia.com/compute/machine-learning/repos";
+    ml_repo="${ml_repo_base}/${OSNAME}/${NVARCH}";
+    add-apt-repository -yn "deb ${ml_repo}/ /"
+fi
 
 apt-get update;
 
@@ -52,11 +60,11 @@ cuda_ver=$(echo "${cuda_ver}" | cut -d'.' -f3 --complement);
 cudapath="${CUDA_HOME}-${cuda_ver}";
 cuda_ver="${cuda_ver/./-}";
 
-check_packages                          \
-    libnccl-dev                         \
-    cuda-toolkit-${cuda_ver}            \
-    $([ "$NVARCH" == x86_64 ]           \
-     && echo nvidia-fs || echo)         \
+check_packages                  \
+    libnccl-dev                 \
+    cuda-toolkit-${cuda_ver}    \
+    $([ "$NVARCH" == x86_64 ]   \
+     && echo nvidia-fs || echo) \
     ;
 
 # HACK: libcutensor-dev isn't currently in the ubuntu22.04 repo,
