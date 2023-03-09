@@ -54,12 +54,9 @@ cuda_ver="${cuda_ver/./-}";
 
 check_packages                          \
     libnccl-dev                         \
-    cuda-compiler-${cuda_ver}           \
-    cuda-nvml-dev-${cuda_ver}           \
-    cuda-libraries-dev-${cuda_ver}      \
-    cuda-command-line-tools-${cuda_ver} \
-    $([ "$NVARCH" == x86_64 ] && echo   \
-        gds-tools-${cuda_ver} || echo ) \
+    cuda-toolkit-${cuda_ver}            \
+    $([ "$NVARCH" == x86_64 ]           \
+     && echo nvidia-fs || echo)         \
     ;
 
 # HACK: libcutensor-dev isn't currently in the ubuntu22.04 repo,
