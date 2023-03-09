@@ -44,7 +44,7 @@ apt install -y --no-install-recommends            \
     "$(get_cuda_deb "${cuda_repo}" cuda-keyring)" \
     ;
 
-if [[ "${OSNAME}" == "ubuntu18.04" && "${NVARCH}" == "sbsa" ]]; then
+if [[ "${OSNAME}" == "ubuntu1804" && "${NVARCH}" == "sbsa" ]]; then
     ml_repo_base="https://developer.download.nvidia.com/compute/machine-learning/repos";
     ml_repo="${ml_repo_base}/${OSNAME}/${NVARCH}";
     add-apt-repository -yn "deb ${ml_repo}/ /"
