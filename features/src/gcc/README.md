@@ -1,13 +1,13 @@
 
-# CUDA Toolkit (cuda)
+# GCC (gcc)
 
-A feature to install the NVIDIA CUDA Toolkit
+A feature to install gcc
 
 ## Example Usage
 
 ```json
 "features": {
-    "ghcr.io/rapidsai/devcontainers/features/cuda:23": {}
+    "ghcr.io/rapidsai/devcontainers/features/gcc:23": {}
 }
 ```
 
@@ -15,11 +15,10 @@ A feature to install the NVIDIA CUDA Toolkit
 
 | Options Id | Description | Type | Default Value |
 |-----|-----|-----|-----|
-| version | Version of the CUDA Toolkit to install. | string | 12.0 |
-| pruneStaticLibs | Whether to remove static libs from the CUDA Toolkit to save image size | boolean | false |
+| version | gcc version to install (or empty string to install OS default). | string | - |
 
 
 
 ---
 
-_Note: This file was auto-generated from the [devcontainer-feature.json](https://github.com/rapidsai/devcontainers/blob/main/features/src/cuda/devcontainer-feature.json).  Add additional notes to a `NOTES.md`._
+_Note: This file was auto-generated from the [devcontainer-feature.json](https://github.com/rapidsai/devcontainers/blob/main/features/src/gcc/devcontainer-feature.json).  Add additional notes to a `NOTES.md`._
