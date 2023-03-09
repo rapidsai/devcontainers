@@ -47,6 +47,7 @@ apt install -y --no-install-recommends            \
 if [[ "${OSNAME}" == "ubuntu1804" && "${NVARCH}" == "sbsa" ]]; then
     ml_repo_base="https://developer.download.nvidia.com/compute/machine-learning/repos";
     ml_repo="${ml_repo_base}/${OSNAME}/${NVARCH}";
+    apt-key adv --fetch-keys "${ml_repo}/7fa2af80.pub";
     add-apt-repository -yn "deb ${ml_repo}/ /"
 fi
 
