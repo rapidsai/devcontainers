@@ -14,13 +14,5 @@
         "version": "11.0"
       }
     }
-  },
-  "cuda_11-ubuntu22.04": {
-    "image": "ubuntu:22.04",
-    "features": {
-      "cuda": {
-        "version": "11.0"
-      }
-    }
   }
 }

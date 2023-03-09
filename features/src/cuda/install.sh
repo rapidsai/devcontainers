@@ -7,10 +7,10 @@ cd "$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )";
 # install global/common scripts
 . ./common/install.sh;
 
-check_packages \
-    jq \
-    wget \
-    gettext-base \
+check_packages      \
+    jq              \
+    wget            \
+    gettext-base    \
     ca-certificates \
     bash-completion \
     ;
