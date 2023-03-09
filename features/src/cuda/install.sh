@@ -9,7 +9,11 @@ cd "$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )";
 
 check_packages                 \
     jq                         \
+    gpg                        \
     wget                       \
+    dirmngr                    \
+    gpg-agent                  \
+    apt-utils                  \
     gettext-base               \
     ca-certificates            \
     bash-completion            \
