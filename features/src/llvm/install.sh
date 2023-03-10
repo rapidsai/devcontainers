@@ -37,9 +37,7 @@ check_packages                  \
 
 echo "Installing llmv-${LLVM_VERSION} compilers and tools";
 
-wget --no-hsts -q -O /tmp/llvm.sh https://apt.llvm.org/llvm.sh;
-chmod +x /tmp/llvm.sh;
-/tmp/llvm.sh $LLVM_VERSION all;
+./llvm.sh $LLVM_VERSION all;
 
 # # Remove existing cc/c++ alternatives
 # (update-alternatives --remove-all cc           >/dev/null 2>&1 || true);
@@ -99,4 +97,3 @@ EOF
 rm -rf /var/tmp/*;
 rm -rf /var/cache/apt/*;
 rm -rf /var/lib/apt/lists/*;
-rm -rf /tmp/llvm.sh;

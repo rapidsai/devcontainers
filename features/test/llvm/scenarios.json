@@ -1,4 +1,28 @@
 {
+  "llvm_9": {
+    "image": "ubuntu:20.04",
+    "features": {
+      "llvm": {
+        "version": "9"
+      }
+    }
+  },
+  "llvm_10": {
+    "image": "ubuntu:20.04",
+    "features": {
+      "llvm": {
+        "version": "10"
+      }
+    }
+  },
+  "llvm_12": {
+    "image": "ubuntu:20.04",
+    "features": {
+      "llvm": {
+        "version": "12"
+      }
+    }
+  },
   "llvm_15": {
     "image": "ubuntu:22.04",
     "features": {
