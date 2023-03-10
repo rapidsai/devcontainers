@@ -44,8 +44,8 @@ jobs:
       - name: Checkout ${{ github.repository }}
         uses: actions/checkout@v3
         with:
-          fetch-depth: 2
-          persist-credentials: true
+          fetch-depth: 0
+          persist-credentials: false
 
       - name: Copy common scripts into features
         uses: ./.github/actions/copy-common-scripts
@@ -102,8 +102,8 @@ jobs:
       - name: Checkout ${{ github.repository }}
         uses: actions/checkout@v3
         with:
-          fetch-depth: 2
-          persist-credentials: true
+          fetch-depth: 0
+          persist-credentials: false
 
       - id: matrix
         name: Determine image matrix
