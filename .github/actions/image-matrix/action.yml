@@ -21,21 +21,12 @@ runs:
   using: composite
   steps:
 
-    - name: Get last successful main commit sha
-      if: inputs.full_matrix != true
-      uses: nrwl/last-successful-commit-action@v1
-      id: last_main_commit
-      with:
-        branch: main
-        workflow_id: "release.yml"
-        github_token: "${{ github.token }}"
-
     - name: Check if files changed
       if: inputs.full_matrix != true
       id: changes
       uses: tj-actions/changed-files@v35.4.4
       with:
-        base_sha: ${{ steps.last_main_commit.outputs.commit_hash }}
+        since_last_remote_commit: true
         files: |
           images/**
           .github/workflows/test.yml
