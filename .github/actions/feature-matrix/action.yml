@@ -23,6 +23,8 @@ runs:
       with:
         main-branch-name: branch-23.04
         workflow-id: release-features.yml
+        set-environment-variables-for-job: false
+        last-successful-event: workflow_dispatch
 
     - name: Check if files changed
       if: inputs.full_matrix != true
