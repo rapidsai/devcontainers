@@ -20,13 +20,20 @@ outputs:
 runs:
   using: composite
   steps:
+    - name: Get last successful main commit sha
+      if: inputs.full_matrix != true
+      uses: nrwl/nx-set-shas@v3
+      id: last_main_commit
+      with:
+        workflow-id: "release.yml"
+        github_token: "${{ github.token }}"
 
     - name: Check if files changed
       if: inputs.full_matrix != true
       id: changes
       uses: tj-actions/changed-files@v35.4.4
       with:
-        since_last_remote_commit: true
+        base_sha: ${{ steps.last_main_commit.outputs.base }}
         files: |
           images/**
           .github/workflows/test.yml
