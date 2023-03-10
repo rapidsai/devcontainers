@@ -1,0 +1,10 @@
+{
+  "cuda_11-ubuntu18.04": {
+    "image": "ubuntu:18.04",
+    "features": {
+      "cuda": {
+        "version": "11.0"
+      }
+    }
+  }
+}

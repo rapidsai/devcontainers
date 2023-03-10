@@ -7,17 +7,23 @@ cd "$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )";
 # install global/common scripts
 . ./common/install.sh;
 
-check_packages \
-    jq \
-    wget \
-    gettext-base \
-    ca-certificates \
-    bash-completion \
+check_packages                 \
+    jq                         \
+    gpg                        \
+    wget                       \
+    dirmngr                    \
+    gpg-agent                  \
+    apt-utils                  \
+    gettext-base               \
+    ca-certificates            \
+    bash-completion            \
+    software-properties-common \
     ;
 
 echo "Downloading CUDA keyring...";
 
 export NVARCH="$(uname -p)";
+export OSNAME="$(. /etc/os-release; echo "$ID${VERSION_ID/./}")";
 
 if [[ "$NVARCH" == aarch64 ]]; then
     NVARCH="sbsa";
@@ -35,12 +41,19 @@ get_cuda_deb() {
 
 # Add NVIDIA's keyring and apt repository
 cuda_repo_base="https://developer.download.nvidia.com/compute/cuda/repos";
-cuda_repo="${cuda_repo_base}/$(. /etc/os-release; echo "$ID${VERSION_ID/./}")/${NVARCH}";
+cuda_repo="${cuda_repo_base}/${OSNAME}/${NVARCH}";
 
 DEBIAN_FRONTEND=noninteractive                    \
 apt install -y --no-install-recommends            \
     "$(get_cuda_deb "${cuda_repo}" cuda-keyring)" \
     ;
+
+if [[ "${OSNAME}" == "ubuntu1804" && "${NVARCH}" == "sbsa" ]]; then
+    ml_repo_base="https://developer.download.nvidia.com/compute/machine-learning/repos";
+    ml_repo="${ml_repo_base}/${OSNAME}/${NVARCH}";
+    apt-key adv --fetch-keys "${ml_repo}/7fa2af80.pub";
+    add-apt-repository -yn "deb ${ml_repo}/ /"
+fi
 
 apt-get update;
 
@@ -58,8 +71,7 @@ check_packages                          \
     cuda-nvml-dev-${cuda_ver}           \
     cuda-libraries-dev-${cuda_ver}      \
     cuda-command-line-tools-${cuda_ver} \
-    $([ "$NVARCH" == x86_64 ] && echo   \
-        gds-tools-${cuda_ver} || echo ) \
+    $([ "$NVARCH" == x86_64 ] && echo nvidia-fs || echo) \
     ;
 
 # HACK: libcutensor-dev isn't currently in the ubuntu22.04 repo,
