@@ -30,6 +30,9 @@ runs:
     - name: Copy common scripts into features
       uses: ./.github/actions/copy-common-scripts
 
+    - name: Install devcontainers CLI
+      uses: ./.github/actions/install-devcontainers-cli
+
     - name: Build ghcr.io/${{ github.repository_owner }}/devcontainers:${{ inputs.tag }}-${{ inputs.arch }}
       uses: devcontainers/ci@v0.2
       env:
