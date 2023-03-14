@@ -3,11 +3,11 @@
 
 # images/cpp-cuda
 - { CPP: "cpp", CUDA: "cuda11.8" }
-- { CPP: "cpp", CUDA: "cuda12.0" }
+- { CPP: "cpp", CUDA: "cuda12.1" }
 
 # images/cpp-cuda-mambaforge
 - { CPP: "cpp", CUDA: "cuda11.8", MAMBAFORGE: "mambaforge" }
-- { CPP: "cpp", CUDA: "cuda12.0", MAMBAFORGE: "mambaforge" }
+- { CPP: "cpp", CUDA: "cuda12.1", MAMBAFORGE: "mambaforge" }
 
 # images/cpp-llvm
 - { CPP: "cpp", LLVM: "llvm15" }
@@ -15,21 +15,21 @@
 
 # images/cpp-llvm-cuda
 - { CPP: "cpp", LLVM: "llvm15", CUDA: "cuda11.8" }
-- { CPP: "cpp", LLVM: "llvm15", CUDA: "cuda12.0" }
+- { CPP: "cpp", LLVM: "llvm15", CUDA: "cuda12.1" }
 - { CPP: "cpp", LLVM: "llvm16", CUDA: "cuda11.8" }
-- { CPP: "cpp", LLVM: "llvm16", CUDA: "cuda12.0" }
+- { CPP: "cpp", LLVM: "llvm16", CUDA: "cuda12.1" }
 
 # images/cpp-llvm-cuda-mambaforge
 - { CPP: "cpp", LLVM: "llvm15", CUDA: "cuda11.8", MAMBAFORGE: "mambaforge" }
-- { CPP: "cpp", LLVM: "llvm15", CUDA: "cuda12.0", MAMBAFORGE: "mambaforge" }
+- { CPP: "cpp", LLVM: "llvm15", CUDA: "cuda12.1", MAMBAFORGE: "mambaforge" }
 - { CPP: "cpp", LLVM: "llvm16", CUDA: "cuda11.8", MAMBAFORGE: "mambaforge" }
-- { CPP: "cpp", LLVM: "llvm16", CUDA: "cuda12.0", MAMBAFORGE: "mambaforge" }
+- { CPP: "cpp", LLVM: "llvm16", CUDA: "cuda12.1", MAMBAFORGE: "mambaforge" }
 
 # images/cpp-llvm-cuda-nvhpc
 - { CPP: "cpp", LLVM: "llvm15", CUDA: "cuda11.8", NVHPC: "nvhpc22.11" }
-- { CPP: "cpp", LLVM: "llvm15", CUDA: "cuda12.0", NVHPC: "nvhpc23.1" }
+- { CPP: "cpp", LLVM: "llvm15", CUDA: "cuda12.1", NVHPC: "nvhpc23.1" }
 - { CPP: "cpp", LLVM: "llvm16", CUDA: "cuda11.8", NVHPC: "nvhpc22.11" }
-- { CPP: "cpp", LLVM: "llvm16", CUDA: "cuda12.0", NVHPC: "nvhpc23.1" }
+- { CPP: "cpp", LLVM: "llvm16", CUDA: "cuda12.1", NVHPC: "nvhpc23.1" }
 
 # images/cpp-llvm-mambaforge
 - { CPP: "cpp", LLVM: "llvm15", MAMBAFORGE: "mambaforge" }
@@ -47,15 +47,15 @@
 
 # images/cpp-llvm-rust-cuda
 - { CPP: "cpp", LLVM: "llvm15", RUST: "rust", CUDA: "cuda11.8" }
-- { CPP: "cpp", LLVM: "llvm15", RUST: "rust", CUDA: "cuda12.0" }
+- { CPP: "cpp", LLVM: "llvm15", RUST: "rust", CUDA: "cuda12.1" }
 - { CPP: "cpp", LLVM: "llvm16", RUST: "rust", CUDA: "cuda11.8" }
-- { CPP: "cpp", LLVM: "llvm16", RUST: "rust", CUDA: "cuda12.0" }
+- { CPP: "cpp", LLVM: "llvm16", RUST: "rust", CUDA: "cuda12.1" }
 
 # images/cpp-llvm-rust-cuda-mambaforge
 - { CPP: "cpp", LLVM: "llvm15", RUST: "rust", CUDA: "cuda11.8", MAMBAFORGE: "mambaforge" }
-- { CPP: "cpp", LLVM: "llvm15", RUST: "rust", CUDA: "cuda12.0", MAMBAFORGE: "mambaforge" }
+- { CPP: "cpp", LLVM: "llvm15", RUST: "rust", CUDA: "cuda12.1", MAMBAFORGE: "mambaforge" }
 - { CPP: "cpp", LLVM: "llvm16", RUST: "rust", CUDA: "cuda11.8", MAMBAFORGE: "mambaforge" }
-- { CPP: "cpp", LLVM: "llvm16", RUST: "rust", CUDA: "cuda12.0", MAMBAFORGE: "mambaforge" }
+- { CPP: "cpp", LLVM: "llvm16", RUST: "rust", CUDA: "cuda12.1", MAMBAFORGE: "mambaforge" }
 
 # images/cpp-nvhpc
 - { CPP: "cpp", NVHPC: "nvhpc22.11" }
@@ -63,15 +63,15 @@
 
 # images/cpp-rust-cuda
 - { CPP: "cpp", RUST: "rust", CUDA: "cuda11.8" }
-- { CPP: "cpp", RUST: "rust", CUDA: "cuda12.0" }
+- { CPP: "cpp", RUST: "rust", CUDA: "cuda12.1" }
 
 # images/cpp-rust-cuda-mambaforge
 - { CPP: "cpp", RUST: "rust", CUDA: "cuda11.8", MAMBAFORGE: "mambaforge" }
-- { CPP: "cpp", RUST: "rust", CUDA: "cuda12.0", MAMBAFORGE: "mambaforge" }
+- { CPP: "cpp", RUST: "rust", CUDA: "cuda12.1", MAMBAFORGE: "mambaforge" }
 
 # images/cuda-mambaforge
 - { CUDA: "cuda11.8", MAMBAFORGE: "mambaforge" }
-- { CUDA: "cuda12.0", MAMBAFORGE: "mambaforge" }
+- { CUDA: "cuda12.1", MAMBAFORGE: "mambaforge" }
 
 # images/mambaforge
 - { MAMBAFORGE: "mambaforge" }

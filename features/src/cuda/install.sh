@@ -59,7 +59,7 @@ apt-get update;
 
 echo "Installing dev CUDA toolkit..."
 
-cuda_ver="${VERSION:-12.0.0}";
+cuda_ver="${VERSION:-12.1.0}";
 cuda_ver=$(echo "${cuda_ver}" | cut -d'.' -f3 --complement);
 
 cudapath="${CUDA_HOME}-${cuda_ver}";
@@ -71,7 +71,6 @@ check_packages                          \
     cuda-nvml-dev-${cuda_ver}           \
     cuda-libraries-dev-${cuda_ver}      \
     cuda-command-line-tools-${cuda_ver} \
-    $([ "$NVARCH" == x86_64 ] && echo nvidia-fs || echo) \
     ;
 
 # HACK: libcutensor-dev isn't currently in the ubuntu22.04 repo,

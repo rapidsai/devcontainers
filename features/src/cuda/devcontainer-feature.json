@@ -1,7 +1,7 @@
 {
   "name": "CUDA Toolkit",
   "id": "cuda",
-  "version": "23.4.1",
+  "version": "23.4.2",
   "description": "A feature to install the NVIDIA CUDA Toolkit",
   "options": {
     "version": {
@@ -17,7 +17,7 @@
         "11.3",
         "11.2"
       ],
-      "default": "12.0",
+      "default": "12.1",
       "description": "Version of the CUDA Toolkit to install."
     },
     "pruneStaticLibs": {
