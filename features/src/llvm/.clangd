@@ -48,6 +48,7 @@ CompileFlags:
     - -fcoroutines
     # strip CUDA flags unknown to clang
     - "-ccbin*"
+    - "-Xcudafe=*"
     - "--compiler-options*"
     - "--expt-extended-lambda"
     - "--expt-relaxed-constexpr"
