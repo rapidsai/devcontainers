@@ -1,7 +1,7 @@
 {
   "name": "LLVM compilers and tools",
   "id": "llvm",
-  "version": "23.4.2",
+  "version": "23.4.3",
   "description": "A feature to install LLVM compilers and tools",
   "options": {
     "version": {
@@ -38,7 +38,7 @@
         "llvm-vs-code-extensions.vscode-clangd",
         "ms-vscode.cpptools",
         "vadimcn.vscode-lldb",
-        "xaver.clang-format"
+        "seaube.clangformat"
       ],
       "settings": {
         "C_Cpp.vcpkg.enabled": false,
@@ -64,13 +64,13 @@
           "--header-insertion-decorators"
         ],
         "[c]": {
-          "editor.defaultFormatter": "xaver.clang-format"
+          "editor.defaultFormatter": "seaube.clangformat"
         },
         "[cpp]": {
-          "editor.defaultFormatter": "xaver.clang-format"
+          "editor.defaultFormatter": "seaube.clangformat"
         },
         "[cuda-cpp]": {
-          "editor.defaultFormatter": "xaver.clang-format"
+          "editor.defaultFormatter": "seaube.clangformat"
         }
       }
     }
