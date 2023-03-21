@@ -9,22 +9,17 @@ cd "$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )";
 
 check_packages                  \
     jq                          \
+    wget                        \
     gettext-base                \
     bash-completion             \
     ;
 
 # Install yq if not installed
 if ! dpkg -s "yq" > /dev/null 2>&1; then
-    check_packages                 \
-        wget                       \
-        gpg-agent                  \
-        software-properties-common \
-        ;
-    wget --no-hsts -q -O- "https://keyserver.ubuntu.com/pks/lookup?op=get&search=0x9a2d61f6bb03ced7522b8e7d6657dbe0cc86bb64" \
-        | gpg --dearmor -o /etc/apt/trusted.gpg.d/rmescandon-yq-archive-keyring.gpg;
-    chmod 0644 /etc/apt/trusted.gpg.d/*.gpg;
-    apt-add-repository -y ppa:rmescandon/yq;
-    check_packages yq;
+    arch="${TARGETARCH:-$(dpkg --print-architecture | awk -F'-' '{print $NF}')}";
+    wget --no-hsts -q -O /tmp/yq.deb "http://ppa.launchpad.net/rmescandon/yq/ubuntu/pool/main/y/yq/yq_4.16.2_${arch}.deb";
+    DEBIAN_FRONTEND=noninteractive apt install -y --no-install-recommends /tmp/yq.deb;
+    rm /tmp/yq.deb;
 fi
 
 # Install the rapids dependency file generator and conda-merge
