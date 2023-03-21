@@ -10,16 +10,20 @@ cd "$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )";
 check_packages                  \
     jq                          \
     wget                        \
+    unzip                       \
     gettext-base                \
     bash-completion             \
     ;
 
 # Install yq if not installed
 if ! dpkg -s "yq" > /dev/null 2>&1; then
+(
+    mkdir -p /tmp/yq && cd /tmp/yq;
     arch="${TARGETARCH:-$(dpkg --print-architecture | awk -F'-' '{print $NF}')}";
-    wget --no-hsts -q -O /tmp/yq.deb "http://ppa.launchpad.net/rmescandon/yq/ubuntu/pool/main/y/yq/yq_4.16.2_${arch}.deb";
-    DEBIAN_FRONTEND=noninteractive apt install -y --no-install-recommends /tmp/yq.deb;
-    rm /tmp/yq.deb;
+    wget --no-hsts -q -O /tmp/yq/yq.deb "http://ppa.launchpad.net/rmescandon/yq/ubuntu/pool/main/y/yq/yq_4.16.2_${arch}.deb";
+    ar x /tmp/yq/yq.deb && rm /tmp/yq/yq.deb && tar -C /usr/bin -f /tmp/yq/data.tar.xz --strip-components=3 -x ./usr/bin/yq;
+    cd / && rm -rf /tmp/yq;
+)
 fi
 
 # Install the rapids dependency file generator and conda-merge
