@@ -21,7 +21,7 @@
     "./features/cmake": {},
     "./features/ninja": {},
     "./features/sccache": {
-      "version": "0.4.0-pre.7"
+      "version": "0.4.0"
     },
     "./features/cuda": {
       "pruneStaticLibs": true
