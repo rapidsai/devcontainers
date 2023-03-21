@@ -13,7 +13,7 @@ fi
 
 . /opt/devcontainer/bin/vault/s3/export.sh;
 
-for cmd in $(find /opt -type f -name post-attach-command.sh ! -wholename $(realpath -m $0)); do
+for cmd in $(find /opt -type f -name post-attach-command.sh ! -wholename $(realpath -m "${BASH_SOURCE[0]}")); do
     . $cmd;
 done
 
