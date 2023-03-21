@@ -15,14 +15,14 @@ check_packages                  \
 
 # Install yq if not installed
 if ! dpkg -s "yq" > /dev/null 2>&1; then
-    check_packages                  \
-        gpg                         \
-        dirmngr                     \
-        gpg-agent                   \
-        apt-transport-https         \
-        software-properties-common  \
+    check_packages                 \
+        wget                       \
+        gpg-agent                  \
+        software-properties-common \
         ;
-    apt-key adv --keyserver keyserver.ubuntu.com --recv-keys CC86BB64;
+    wget --no-hsts -q -O- "https://keyserver.ubuntu.com/pks/lookup?op=get&search=0x9a2d61f6bb03ced7522b8e7d6657dbe0cc86bb64" \
+        | gpg --dearmor -o /etc/apt/trusted.gpg.d/rmescandon-yq-archive-keyring.gpg;
+    chmod 0644 /etc/apt/trusted.gpg.d/*.gpg;
     apt-add-repository -y ppa:rmescandon/yq;
     check_packages yq;
 fi
