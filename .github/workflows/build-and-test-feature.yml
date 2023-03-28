@@ -14,7 +14,7 @@ jobs:
 
   test:
     name: ${{ inputs.name }} (${{ matrix.arch }})
-    runs-on: ${{ fromJSON(github.repository != 'rapidsai/devcontainers' && '"ubuntu-latest"' || format('{{"labels":["self-hosted", "linux", "{0}", "cpu4"]}}', matrix.arch)) }}
+    runs-on: ${{ fromJSON(github.repository != 'rapidsai/devcontainers' && '"ubuntu-latest"' || format('"linux-{0}-cpu4"', matrix.arch)) }}
     strategy:
       fail-fast: false
       matrix:
