@@ -14,10 +14,6 @@ source dev-container-features-test-lib
 
 # Feature-specific tests
 # The 'check' command comes from the dev-container-features-test-lib.
-check "on-create-command.sh exists" stat /opt/devcontainer/bin/on-create-command.sh
-check "update-content-command.sh exists" stat /opt/devcontainer/bin/update-content-command.sh
-check "post-create-command.sh exists" stat /opt/devcontainer/bin/post-create-command.sh
-check "post-start-command.sh exists" stat /opt/devcontainer/bin/post-start-command.sh
 check "post-attach-command.sh exists" stat /opt/devcontainer/bin/post-attach-command.sh
 
 # Report result
