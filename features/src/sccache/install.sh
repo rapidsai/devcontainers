@@ -1,5 +1,5 @@
 #! /usr/bin/env bash
-set -e
+set -ex
 
 SCCACHE_VERSION="${VERSION:-latest}";
 
