@@ -161,7 +161,7 @@ if [[ "${PRUNESTATICLIBS:-false}" == true ]]; then
 
     for dir in "lib" "lib64"; do
         find "$(realpath -m "${CUDA_HOME}/${dir}")/" -type f \
-            \( -name '*.a' ! -name 'libcudart_static.a' ! -name 'libcudadevrt.a' ! -name 'libculibos.a' \) \
+            \( -name '*.a' ! -name 'libnvptxcompiler_static.a' ! -name 'libcudart_static.a' ! -name 'libcudadevrt.a' ! -name 'libculibos.a' \) \
             -delete || true;
     done
 fi
