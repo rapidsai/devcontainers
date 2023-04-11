@@ -7,7 +7,7 @@ cd "$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )";
 # install global/common scripts
 . ./common/install.sh;
 
-check_packages jq cron curl gettext-base bash-completion;
+check_packages jq cron curl gettext-base bash-completion ca-certificates;
 
 # Install yq if not installed
 if ! type yq &>/dev/null; then
