@@ -1,50 +1,55 @@
 #! /usr/bin/env bash
 
-set -euo pipefail;
-
 _add_warning_to_bashrc() {
-    if [[ "$(grep -q print-missing-gitlab-token-warning ~/.bashrc; echo $?)" == 1 ]]; then
-        echo '/bin/bash /opt/devcontainer/bin/gitlab/print-missing-token-warning.sh' >> ~/.bashrc;
+    if [[ "$(grep -q devcontainer-utils-print-missing-gitlab-token-warning ~/.bashrc; echo $?)" == 1 ]]; then
+        echo 'devcontainer-utils-print-missing-gitlab-token-warning;' >> ~/.bashrc;
     fi
 }
 
 _remove_warning_from_bashrc() {
-    if [[ "$(grep -q print-missing-gitlab-token-warning ~/.bashrc; echo $?)" == 0 ]]; then
-        sed -i 's@/bin/bash /opt/devcontainer/bin/gitlab/print-missing-token-warning.sh@@g' ~/.bashrc;
+    if [[ "$(grep -q devcontainer-utils-print-missing-gitlab-token-warning ~/.bashrc; echo $?)" == 0 ]]; then
+        sed -i 's@devcontainer-utils-print-missing-gitlab-token-warning;@@g' ~/.bashrc;
     fi
 }
 
-if [[ "${CODESPACES:-false}" == true ]]; then
-    if [[ -z "${GITLAB_TOKEN:-}" ]]; then
-        /opt/devcontainer/bin/gitlab/print-missing-token-warning.sh;
-        _add_warning_to_bashrc;
-        exit 0;
+init_gitlab_cli() {
+
+    set -euo pipefail;
+
+    if [[ "${CODESPACES:-false}" == true ]]; then
+        if [[ -z "${GITLAB_TOKEN:-}" ]]; then
+            devcontainer-utils-print-missing-gitlab-token-warning;
+            _add_warning_to_bashrc;
+            return;
+        fi
+        glab config set --global git_protocol https;
     fi
-    glab config set --global git_protocol https;
-fi
 
-if [[ $(glab auth status 2>&1 | grep "No token provided" &>/dev/null; echo $?) == 0 ]]; then
-    if [[ -z "${GITLAB_TOKEN:-}" ]]; then
-        glab auth login --hostname gitlab.com;
-    else
-        glab auth login  --hostname gitlab.com --stdin < <(echo $GITLAB_TOKEN);
+    if [[ $(glab auth status 2>&1 | grep "No token provided" &>/dev/null; echo $?) == 0 ]]; then
+        if [[ -z "${GITLAB_TOKEN:-}" ]]; then
+            glab auth login --hostname gitlab.com;
+        else
+            glab auth login  --hostname gitlab.com --stdin < <(echo "${GITLAB_TOKEN}");
+        fi
     fi
-fi
 
-if [[ -z "${GITLAB_USER:-}" ]]; then
-    if [[ -f ~/.config/glab-cli/config.yml ]]; then
-        GITLAB_USER="$(grep --color=never 'user:' ~/.config/glab-cli/config.yml | cut -d ':' -f2 | tr -d '[:space:]' || echo '')";
+    local gitlab_user="${GITLAB_USER:-}";
+
+    if [[ -z "${gitlab_user:-}" ]]; then
+        if [[ -f ~/.config/glab-cli/config.yml ]]; then
+            gitlab_user="$(grep --color=never 'user:' ~/.config/glab-cli/config.yml | cut -d ':' -f2 | tr -d '[:space:]' || echo '')";
+        fi
     fi
-fi
 
-if [[ -z "${GITLAB_USER:-}" ]]; then
-    GITLAB_USER="$(glab api user | jq -r '.username')";
-fi
+    if [[ -z "${gitlab_user:-}" ]]; then
+        gitlab_user="$(glab api user | jq -r '.username')";
+    fi
 
-if [[ -z "${GITLAB_USER:-}" ]]; then
-    exit 1;
-fi
+    if [[ -n "${gitlab_user:-}" ]]; then
+        _remove_warning_from_bashrc;
+    fi
 
-_remove_warning_from_bashrc;
+    echo "GITLAB_USER=${gitlab_user}";
+}
 
-export GITLAB_USER;
+(init_gitlab_cli "$@");

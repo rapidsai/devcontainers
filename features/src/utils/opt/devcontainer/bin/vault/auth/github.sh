@@ -1,8 +1,9 @@
 #! /usr/bin/env bash
 
-set -euo pipefail;
 
 get_vault_token() {
+
+    set -euo pipefail;
 
     local VAULT_HOST="$1";
     local user_orgs="${@:2}";
@@ -28,4 +29,4 @@ get_vault_token() {
     echo "vault_token='$vault_token'";
 }
 
-get_vault_token "$@";
+(get_vault_token "$@");

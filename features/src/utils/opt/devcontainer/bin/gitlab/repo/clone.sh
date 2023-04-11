@@ -1,10 +1,12 @@
 #! /usr/bin/env bash
 
-set -euo pipefail;
 
 clone_gitlab_repo() {
 
-    . /opt/devcontainer/bin/gitlab/cli/init.sh;
+    set -euo pipefail;
+
+    eval "export $(devcontainer-utils-init-gitlab-cli)";
+
     if [[ -z "$GITLAB_USER" ]]; then exit 1; fi
 
     local user="$GITLAB_USER";
@@ -39,13 +41,6 @@ Fork '${src}' into '${dst}' now (y/n)? " CHOICE </dev/tty
     if [ ! -d ~/${dest}/.git ]; then
         glab repo clone ${fork} ~/${dest} ${args:+-- $args};
     fi
-
-    unset NAME;
-    unset UPSTREAM;
-    unset REPO;
-    unset FORK;
-    unset ORIGIN_URL;
-    unset UPSTREAM_URL;
 }
 
-clone_gitlab_repo "$@";
+(clone_gitlab_repo "$@");

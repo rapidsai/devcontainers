@@ -5,5 +5,12 @@
   "description": "A feature to install my devcontainer utilities",
   "containerEnv": {
     "BASH_ENV": "/etc/bash.bash_env"
-  }
+  },
+  "postAttachCommand": [
+    "/bin/bash",
+    "-li",
+    "+o",
+    "history",
+    "devcontainer-utils-post-attach-command"
+  ]
 }

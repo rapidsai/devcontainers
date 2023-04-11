@@ -1,10 +1,12 @@
 #! /usr/bin/env bash
 
-set -euo pipefail;
 
 clone_github_repo() {
 
-    . /opt/devcontainer/bin/github/cli/init.sh;
+    set -euo pipefail;
+
+    eval "export $(devcontainer-utils-init-github-cli)";
+
     if [[ -z "$GITHUB_USER" ]]; then exit 1; fi
 
     local user="$GITHUB_USER";
@@ -40,4 +42,4 @@ clone_github_repo() {
     fi
 }
 
-clone_github_repo "$@";
+(clone_github_repo "$@");

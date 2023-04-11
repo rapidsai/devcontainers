@@ -1,33 +1,53 @@
 #! /usr/bin/env bash
 
-export_sccache_vars() {
-
-    local bucket="${SCCACHE_BUCKET:-$(grep 'bucket=' ~/.aws/config | sed 's/bucket=//')}";
-    local region="${SCCACHE_REGION:-$(grep 'region=' ~/.aws/config | sed 's/region=//')}";
-
-    if grep -q -E "^export SCCACHE_S3_NO_CREDENTIALS=true$" ~/.bashrc; then
-        sed -i 's@export SCCACHE_S3_NO_CREDENTIALS=true@@g' ~/.bashrc;
-    fi
-
-    if ! grep -q -E "^export SCCACHE_BUCKET=${SCCACHE_BUCKET}$" ~/.bashrc; then
-        echo "export SCCACHE_BUCKET=${SCCACHE_BUCKET}" >> ~/.bashrc;
-    fi
-
-    if ! grep -q -E "^export SCCACHE_REGION=${SCCACHE_REGION}$" ~/.bashrc; then
-        echo "export SCCACHE_REGION=${SCCACHE_REGION}" >> ~/.bashrc;
-    fi
-
-    # If we succeeded at least once, install user crontab and refresh creds every 8hrs
-    if ! crontab -l &> /dev/null; then
-        crontab /opt/devcontainer/cron/vault-s3-init;
-        sudo cron;
+append_envvar() {
+    if [ -n "${1:-}" ]; then
+        echo "export ${1}=\"${2:-}\";" >> ~/.bashrc;
     fi
 }
 
-if [[ -f ~/.aws/stamp && -f ~/.aws/config && -f ~/.aws/credentials ]]; then
-    export_sccache_vars;
-elif ! grep -q -E "^export SCCACHE_S3_NO_CREDENTIALS=true$" ~/.bashrc; then
-    echo "export SCCACHE_S3_NO_CREDENTIALS=true" >> ~/.bashrc;
-fi
+remove_envvar() {
+    if [ -n "${1:-}" ]; then
+        if grep -q -E "^export ${1}=.*$" ~/.bashrc; then
+            sed -Ei "/^export ${1}=.*\$/d" ~/.bashrc;
+        fi
+    fi
+}
 
-source ~/.bashrc;
+test_s3_creds_and_update_envvars() {
+
+    set -euo pipefail;
+
+    remove_envvar "SCCACHE_BUCKET";
+    remove_envvar "SCCACHE_REGION";
+    remove_envvar "SCCACHE_S3_NO_CREDENTIALS";
+    sed -Ei '/^unset SCCACHE_BUCKET;$/d' ~/.bashrc;
+    sed -Ei '/^unset SCCACHE_REGION;$/d' ~/.bashrc;
+
+    local s3_status="${1:-$(devcontainer-utils-vault-s3-test &> /dev/null; echo $?)}";
+
+    case $s3_status in
+        [0] ) # bucket is read + write
+            append_envvar "SCCACHE_BUCKET" "$(grep 'bucket=' ~/.aws/config | sed 's/bucket=//')";
+            append_envvar "SCCACHE_REGION" "$(grep 'region=' ~/.aws/config | sed 's/region=//')";
+            # install a crontab to refresh creds
+            if ! crontab -l &> /dev/null; then
+                crontab -u $(whoami) /opt/devcontainer/cron/vault-s3-init;
+                sudo cron;
+            fi
+            ;;
+        [2] ) # bucket is read-only
+            append_envvar "SCCACHE_S3_NO_CREDENTIALS" "1";
+            append_envvar "SCCACHE_BUCKET" "$(grep 'bucket=' ~/.aws/config | sed 's/bucket=//')";
+            append_envvar "SCCACHE_REGION" "$(grep 'region=' ~/.aws/config | sed 's/region=//')";
+            ;;
+          * ) # bucket is inaccessible
+            echo "unset SCCACHE_BUCKET;" >> ~/.bashrc;
+            echo "unset SCCACHE_REGION;" >> ~/.bashrc;
+            ;;
+    esac
+}
+
+(test_s3_creds_and_update_envvars "$@");
+
+. ~/.bashrc;

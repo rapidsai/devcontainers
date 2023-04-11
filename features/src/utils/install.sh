@@ -7,7 +7,20 @@ cd "$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )";
 # install global/common scripts
 . ./common/install.sh;
 
-check_packages jq cron curl gettext-base bash-completion
+check_packages jq cron curl gettext-base bash-completion;
+
+# Install yq if not installed
+if ! type yq &>/dev/null; then
+    YQ_VERSION=latest;
+    find_version_from_git_tags YQ_VERSION https://github.com/mikefarah/yq;
+
+    YQ_BINARY="yq";
+    YQ_BINARY+="_$(uname -s | tr '[:upper:]' '[:lower:]')";
+    YQ_BINARY+="_${TARGETARCH:-$(dpkg --print-architecture | awk -F'-' '{print $NF}')}";
+
+    wget --no-hsts -q -O- "https://github.com/mikefarah/yq/releases/download/v${YQ_VERSION}/${YQ_BINARY}.tar.gz" \
+        | tar -C /usr/bin -zf - -x ./${YQ_BINARY} --transform="s/${YQ_BINARY}/yq/";
+fi
 
 # Remove built-in anacron configs
 rm -rf /etc/crontab /etc/cron.*;
@@ -23,16 +36,24 @@ touch /var/log/vault-s3-init.log;
 chmod 0777 /var/log/vault-s3-init.log;
 chmod 0644 /opt/devcontainer/cron/vault-s3-init;
 
-update-alternatives --install /usr/bin/on-create-command       on-create-command      /opt/devcontainer/bin/on-create-command.sh       0
-update-alternatives --install /usr/bin/post-attach-command     post-attach-command    /opt/devcontainer/bin/post-attach-command.sh     0
-update-alternatives --install /usr/bin/post-start-command      post-start-command     /opt/devcontainer/bin/post-start-command.sh      0
-update-alternatives --install /usr/bin/update-content-command  update-content-command /opt/devcontainer/bin/update-content-command.sh  0
-update-alternatives --install /usr/bin/github-cli-init         github-cli-init        /opt/devcontainer/bin/github/cli/init.sh         0
-update-alternatives --install /usr/bin/gitlab-cli-init         gitlab-cli-init        /opt/devcontainer/bin/gitlab/cli/init.sh         0
-update-alternatives --install /usr/bin/gitlab-repo-clone       gitlab-repo-clone      /opt/devcontainer/bin/gitlab/repo/clone.sh       0
-update-alternatives --install /usr/bin/github-repo-clone       github-repo-clone      /opt/devcontainer/bin/github/repo/clone.sh       0
-update-alternatives --install /usr/bin/vault-s3-init           vault-s3-init          /opt/devcontainer/bin/vault/s3/init.sh           0
-update-alternatives --install /usr/bin/vault-s3-test           vault-s3-test          /opt/devcontainer/bin/vault/s3/test.sh           0
+install_utility() {
+    update-alternatives --install "/usr/bin/$1" "$1" "/opt/devcontainer/bin/$2" 0;
+}
+
+install_utility devcontainer-utils-post-attach-command post-attach-command.sh;
+install_utility devcontainer-utils-init-git git/init.sh;
+
+install_utility devcontainer-utils-init-github-cli   github/cli/init.sh;
+install_utility devcontainer-utils-clone-github-repo github/repo/clone.sh;
+
+install_utility devcontainer-utils-init-gitlab-cli                    gitlab/cli/init.sh;
+install_utility devcontainer-utils-clone-gitlab-repo                  gitlab/repo/clone.sh;
+install_utility devcontainer-utils-print-missing-gitlab-token-warning gitlab/print-missing-token-warning.sh;
+
+install_utility devcontainer-utils-vault-s3-init     vault/s3/init.sh;
+install_utility devcontainer-utils-vault-s3-test     vault/s3/test.sh;
+install_utility devcontainer-utils-vault-s3-export   vault/s3/export.sh;
+install_utility devcontainer-utils-vault-auth-github vault/auth/github.sh;
 
 # Install aws-curl helper (https://github.com/sormy/aws-curl)
 curl -s -o /usr/bin/aws-curl \
@@ -46,7 +67,7 @@ for_each_user_bashrc 'sed -i -re "s/^#(export GCC_COLORS)/\1/g" "$0"';
 for_each_user_bashrc 'sed -i -re "s/^(HIST(FILE)?SIZE=).*$/\1/g" "$0"';
 
 # Append history lines as soon as they're entered
-for_each_user_bashrc 'echo "PROMPT_COMMAND=\"history -a; \$PROMPT_COMMAND\"" >> "$0"';
+append_to_all_bashrcs 'PROMPT_COMMAND="history -a; $PROMPT_COMMAND"';
 
 # Add GitHub's public keys to known_hosts
 known_hosts="$(curl -s https://api.github.com/meta | jq -r '.ssh_keys | map("github.com \(.)") | .[]' || echo "")";
@@ -61,7 +82,7 @@ EOF
 )";
 
     find_non_root_user;
-    chown -R ${USERNAME}:${USERNAME} "$(bash -c "echo ~${USERNAME}")";
+    chown -R ${USERNAME}:${USERNAME} "$(bash -c "echo ~${USERNAME}/.ssh")";
 fi
 
 # Generate bash completions
