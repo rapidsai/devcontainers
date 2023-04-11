@@ -6,7 +6,6 @@ runs:
   using: composite
   steps:
     - name: Setup Node.js
-      if: ${{ contains(runner.name, 'rapidsai') }}
       uses: actions/setup-node@v3
       with:
         node-version: '16'
@@ -16,10 +15,5 @@ runs:
         if [[ "${{ contains(runner.arch, 'ARM') }}" == true ]]; then
           sudo apt update;
           sudo apt install -y --no-install-recommends build-essential;
-          npm install -g @devcontainers/cli;
-        else
-          sudo curl -s \
-            -o /usr/bin/devcontainer \
-            -L "https://github.com/trxcllnt/devcontainers-cli/releases/download/v0.29.0-trxcllnt/devcontainer-linux-x64";
-          sudo chmod +x /usr/bin/devcontainer;
         fi
+        npm install -g @devcontainers/cli;
