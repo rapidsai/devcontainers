@@ -178,4 +178,4 @@ if [[ $ALL -eq 1 ]]; then
         PKG="$PKG libclang-rt-$LLVM_VERSION-dev libpolly-$LLVM_VERSION-dev"
     fi
 fi
-apt-get install -y $PKG
+apt-get install -y -o Dpkg::Options::="--force-overwrite" $PKG
