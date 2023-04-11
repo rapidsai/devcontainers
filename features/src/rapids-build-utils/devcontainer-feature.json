@@ -5,7 +5,6 @@
   "description": "A feature to install the RAPIDS devcontainer build utilities",
   "containerEnv": {
     "CONDA_ALWAYS_YES": "true",
-    "DEFAULT_CONDA_ENV": "rapids",
     "BASH_ENV": "/etc/bash.bash_env"
   }
 }

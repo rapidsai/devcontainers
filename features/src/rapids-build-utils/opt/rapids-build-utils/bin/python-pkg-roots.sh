@@ -11,6 +11,7 @@ python_pkg_roots() {
         -exec sh -c "                                  \
             grep -HP 'name(\s+)?=(\s+)?f?' {}          \
           | head -n1" \;                               \
+      2>/dev/null                                      \
       | sed -r 's@/(setup.py|pyproject.toml):.*$@@g'   \
     ;
 }

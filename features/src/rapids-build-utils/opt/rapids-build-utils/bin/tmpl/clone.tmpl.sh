@@ -5,7 +5,7 @@ clone_${NAME}() {
 
         local git_tag='${GIT_TAG}';
         local git_args="${@}";
-        if echo "${git_args}" | grep -qE '(\-b |\-b=|\-\-branch |\-\-branch=)'; then
+        if ! echo "${git_args}" | grep -qE '(\-b |\-b=|\-\-branch |\-\-branch=)'; then
             git_args="${git_args:+"$git_args "}${git_tag:+"--branch $git_tag"}";
         fi
 

@@ -14,22 +14,21 @@ check_packages                  \
     ;
 
 # Install yq if not installed
-if ! dpkg -s "yq" > /dev/null 2>&1; then
-    check_packages                 \
-        wget                       \
-        gpg-agent                  \
-        software-properties-common \
-        ;
-    wget --no-hsts -q -O- "https://keyserver.ubuntu.com/pks/lookup?op=get&search=0x9a2d61f6bb03ced7522b8e7d6657dbe0cc86bb64" \
-        | gpg --dearmor -o /etc/apt/trusted.gpg.d/rmescandon-yq-archive-keyring.gpg;
-    chmod 0644 /etc/apt/trusted.gpg.d/*.gpg;
-    apt-add-repository -y ppa:rmescandon/yq;
-    check_packages yq;
+if ! type yq &>/dev/null; then
+    YQ_VERSION=latest;
+    find_version_from_git_tags YQ_VERSION https://github.com/mikefarah/yq;
+
+    YQ_BINARY="yq";
+    YQ_BINARY+="_$(uname -s | tr '[:upper:]' '[:lower:]')";
+    YQ_BINARY+="_${TARGETARCH:-$(dpkg --print-architecture | awk -F'-' '{print $NF}')}";
+
+    wget --no-hsts -q -O- "https://github.com/mikefarah/yq/releases/download/v${YQ_VERSION}/${YQ_BINARY}.tar.gz" \
+        | tar -C /usr/bin -zf - -x ./${YQ_BINARY} --transform="s/${YQ_BINARY}/yq/";
 fi
 
 # Install the rapids dependency file generator and conda-merge
 if type python >/dev/null 2>&1; then
-    python -m pip install rapids-dependency-file-generator conda-merge;
+    python -m pip install rapids-dependency-file-generator conda-merge toml;
 fi
 
 # Install RAPIDS build utility scripts to /opt/
@@ -58,6 +57,11 @@ mkdir -p /etc/bash_completion.d/;
 cp -ar ./etc/bash_completion.d/* /etc/bash_completion.d/;
 
 yq shell-completion bash | tee /etc/bash_completion.d/yq >/dev/null;
+
+# Activate venv in /etc/bash.bashrc
+append_to_etc_bashrc "$(cat .bashrc)";
+# Activate venv in ~/.bashrc
+append_to_all_bashrcs "$(cat .bashrc)";
 
 # Clean up
 # rm -rf /tmp/*;

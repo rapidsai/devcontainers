@@ -12,6 +12,7 @@ python_conda_pkg_names() {
       ! -path '*/build/*'             \
       ! -path '*/_skbuild/*'          \
         -exec grep -E 'name: ?' {} \; \
+      2>/dev/null                     \
       | tr -d '[:blank:]'             \
       | cut -d':' -f2                 \
     ;
