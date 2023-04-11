@@ -1,6 +1,8 @@
-#! /usr/bin/env -S bash -euo pipefail
+#! /usr/bin/env bash
 
 build_${CPP_LIB}_cpp() {
+
+    set -euo pipefail;
 
     configure-${CPP_LIB}-cpp "$@";
 
@@ -9,4 +11,4 @@ build_${CPP_LIB}_cpp() {
     ;
 }
 
-build_${CPP_LIB}_cpp "$@";
+(build_${CPP_LIB}_cpp "$@");

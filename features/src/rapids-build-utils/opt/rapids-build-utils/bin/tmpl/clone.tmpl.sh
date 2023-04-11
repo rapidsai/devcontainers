@@ -1,6 +1,8 @@
-#! /usr/bin/env -S bash -euo pipefail
+#! /usr/bin/env bash
 
 clone_${NAME}() {
+    set -euo pipefail;
+
     if [[ ! -d ~/'${SRC_PATH}/.git' ]]; then
 
         local git_tag='${GIT_TAG}';
@@ -24,4 +26,4 @@ clone_${NAME}() {
     fi
 }
 
-clone_${NAME} "$@";
+(clone_${NAME} "$@");

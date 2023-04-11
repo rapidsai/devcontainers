@@ -1,6 +1,8 @@
-#! /usr/bin/env -S bash -euo pipefail
+#! /usr/bin/env bash
 
 remove_script_for_pattern() {
+    set -euo pipefail;
+
     local pattern="${1}";
     for x in $(update-alternatives --get-selections | grep -oP "$pattern"); do
         if [[ -f "$(which "$x")" ]]; then
@@ -97,6 +99,9 @@ generate_scripts() {
 }
 
 generate_clone_scripts() {
+
+    set -euo pipefail;
+
     # Ensure we're in this script's directory
     cd "$( cd "$( dirname "$(realpath -m "${BASH_SOURCE[0]}")" )" && pwd )";
 
@@ -148,9 +153,9 @@ generate_clone_scripts() {
     unset name_to_cpp_sub_dir;
 }
 
-remove_script_for_pattern '^clone-[\w-]+'         ;
-remove_script_for_pattern '^build-[\w-]+-cpp'     ;
-remove_script_for_pattern '^configure-[\w-]+-cpp' ;
-remove_script_for_pattern '^build-[\w-]+-python'  ;
+(remove_script_for_pattern '^clone-[\w-]+' );
+(remove_script_for_pattern '^build-[\w-]+-cpp');
+(remove_script_for_pattern '^configure-[\w-]+-cpp');
+(remove_script_for_pattern '^build-[\w-]+-python');
 
-generate_clone_scripts;
+(generate_clone_scripts "$@");

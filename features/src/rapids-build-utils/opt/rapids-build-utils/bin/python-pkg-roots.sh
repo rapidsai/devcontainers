@@ -1,7 +1,9 @@
-#! /usr/bin/env -S bash -euo pipefail
+#! /usr/bin/env bash
 
 # Find the parent dir of the `setup.py` files in a RAPIDS library source tree.
 python_pkg_roots() {
+    set -euo pipefail;
+
     cd ~;
     find "$@"                                          \
         -type f                                        \
@@ -16,4 +18,4 @@ python_pkg_roots() {
     ;
 }
 
-python_pkg_roots "$@";
+(python_pkg_roots "$@");

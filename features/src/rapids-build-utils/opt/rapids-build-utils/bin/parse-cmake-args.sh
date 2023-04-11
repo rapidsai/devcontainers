@@ -1,6 +1,8 @@
-#! /usr/bin/env -S bash -euo pipefail
+#! /usr/bin/env bash
 
 parse_cmake_args() {
+
+    set -euo pipefail;
 
     local ARG="";
     local args=(${CMAKE_ARGS:-});
@@ -30,4 +32,4 @@ parse_cmake_args() {
     echo ${args[@]};
 }
 
-parse_cmake_args "$@";
+(parse_cmake_args "$@");

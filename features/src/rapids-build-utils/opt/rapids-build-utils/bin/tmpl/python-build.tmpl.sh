@@ -1,6 +1,8 @@
-#! /usr/bin/env -S bash -euo pipefail
+#! /usr/bin/env bash
 
 build_${PY_LIB}_python() {
+
+    set -euo pipefail;
 
     if [[ ! -d ~/${CPP_LIB}/.git ]]; then
         exit 1;
@@ -51,4 +53,4 @@ build_${PY_LIB}_python() {
     ;
 }
 
-build_${PY_LIB}_python "$@";
+(build_${PY_LIB}_python "$@");

@@ -1,6 +1,8 @@
-#! /usr/bin/env -S bash -euo pipefail
+#! /usr/bin/env bash
 
 make_conda_env() {
+
+    set -euo pipefail;
 
     local env_name="${1}";
     local env_file_name="${env_name}.yml";
@@ -80,6 +82,7 @@ make_conda_env() {
 . /opt/conda/etc/profile.d/conda.sh;
 . /opt/conda/etc/profile.d/mamba.sh;
 
-make_conda_env "${DEFAULT_CONDA_ENV:-rapids}" "$@";
+(make_conda_env "${DEFAULT_CONDA_ENV:-rapids}" "$@");
 
-conda activate "${DEFAULT_CONDA_ENV:-rapids}" 2>/dev/null;
+conda activate "${DEFAULT_CONDA_ENV:-rapids}";
+# conda activate "${DEFAULT_CONDA_ENV:-rapids}" 2>/dev/null;

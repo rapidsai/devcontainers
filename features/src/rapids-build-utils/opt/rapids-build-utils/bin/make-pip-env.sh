@@ -1,6 +1,8 @@
-#! /usr/bin/env -S bash -euo pipefail
+#! /usr/bin/env bash
 
 make_pip_env() {
+
+    set -euo pipefail;
 
     local env_name="${1}";
     local env_file_name="${env_name}.requirements.txt";
@@ -89,6 +91,6 @@ make_pip_env() {
     cp -a "${new_env_path}" "${old_env_path}";
 }
 
-make_pip_env "${DEFAULT_VIRTUAL_ENV:-rapids}" "$@";
+(make_pip_env "${DEFAULT_VIRTUAL_ENV:-rapids}" "$@");
 
 . ~/.local/share/venvs/${DEFAULT_VIRTUAL_ENV:-rapids}/bin/activate;

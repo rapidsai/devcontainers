@@ -1,9 +1,11 @@
-#! /usr/bin/env -S bash -euo pipefail
+#! /usr/bin/env bash
 
 # Read the `name="<pkg>"` fields from any `setup.py` files in a RAPIDS library
 # source tree. This seems to be the most reliable way to determine the actual
 # list of possible package names we should exclude from the combined conda env
 python_pkg_names() {
+    set -euo pipefail;
+
     cd ~;
     # the regex will continue until morale improves
     for dir in $(rapids-python-pkg-roots "$@"); do
@@ -28,4 +30,4 @@ print(toml.load('${dir}/pyproject.toml')['project']['name'])")";
     done
 }
 
-python_pkg_names "$@";
+(python_pkg_names "$@");

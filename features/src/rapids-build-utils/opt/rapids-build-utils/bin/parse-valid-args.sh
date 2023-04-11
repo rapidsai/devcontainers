@@ -1,6 +1,8 @@
-#! /usr/bin/env -S bash -euo pipefail
+#! /usr/bin/env bash
 
 parse_valid_args() {
+
+    set -euo pipefail;
 
     local cmd="$@";
     local hash="$(echo "$cmd" | tr -d'[:space:]')";
@@ -17,4 +19,4 @@ parse_valid_args() {
     cat ${file};
 }
 
-parse_valid_args "$@";
+(parse_valid_args "$@");

@@ -6,5 +6,12 @@
   "containerEnv": {
     "CONDA_ALWAYS_YES": "true",
     "BASH_ENV": "/etc/bash.bash_env"
-  }
+  },
+  "updateContentCommand": [
+    "/bin/bash",
+    "-li",
+    "+o",
+    "history",
+    "/opt/rapids-build-utils/bin/update-content-command.sh"
+  ]
 }

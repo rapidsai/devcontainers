@@ -1,4 +1,4 @@
-#! /usr/bin/env -S bash -euo pipefail
+#! /usr/bin/env bash
 
 get_repos_ordered() {
     local names=($(yq eval '.repos[].name' /opt/rapids-build-utils/manifest.yaml));
@@ -59,6 +59,8 @@ EOF
 }
 
 make_vscode_workspace() {
+    set -euo pipefail;
+
     cat<<EOF
 {
   "folders": [
@@ -75,11 +77,11 @@ EOF
 }
 
 if echo "$@" | grep -qE '(\-u|\-\-update)'; then
-    make_vscode_workspace > /tmp/workspace.code-workspace;
+    (make_vscode_workspace "$@" > /tmp/workspace.code-workspace);
     if ! diff -BNqw ~/workspace.code-workspace /tmp/workspace.code-workspace >/dev/null 2>&1; then
         cp /tmp/workspace.code-workspace ~/workspace.code-workspace;
     fi
     rm /tmp/workspace.code-workspace;
 else
-    make_vscode_workspace;
+    (make_vscode_workspace "$@");
 fi

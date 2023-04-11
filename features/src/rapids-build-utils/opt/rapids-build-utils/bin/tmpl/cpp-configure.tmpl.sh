@@ -1,6 +1,8 @@
-#! /usr/bin/env -S bash -euo pipefail
+#! /usr/bin/env bash
 
 configure_${CPP_LIB}_cpp() {
+
+    set -euo pipefail;
 
     if [[ ! -d ~/${CPP_LIB}/.git ]]; then
         exit 1;
@@ -37,4 +39,4 @@ configure_${CPP_LIB}_cpp() {
     fi
 }
 
-configure_${CPP_LIB}_cpp "$@";
+(configure_${CPP_LIB}_cpp "$@");
