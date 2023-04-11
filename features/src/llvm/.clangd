@@ -34,21 +34,22 @@ CompileFlags:
     - "-fmacro-backtrace-limit=0"
     - "-ftemplate-backtrace-limit=0"
   Remove:
-    - "-stdpar*"
-    # strip CUDA fatbin args
-    - "-Xfatbin*"
-    - "-Xcompiler*"
-    - "-gpu=*"
-    - "--diag_suppress*"
-    # strip CUDA arch flags
+    # strip unknown arch flags
     - "-arch*"
     - "-gencode*"
     - "--generate-code*"
+    # strip unknown nvc++ flags
+    - "-gpu=*"
+    - "-stdpar*"
+    - "--diag_suppress*"
     # strip gcc's -fcoroutines
     - -fcoroutines
-    # strip CUDA flags unknown to clang
+    # strip unknown nvcc flags
     - "-ccbin*"
-    - "-Xcudafe=*"
+    - "-Xptxas*"
+    - "-Xcudafe*"
+    - "-Xfatbin*"
+    - "-Xcompiler*"
     - "--compiler-options*"
     - "--expt-extended-lambda"
     - "--expt-relaxed-constexpr"
