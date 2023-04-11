@@ -1,6 +1,6 @@
 {
   "id": "rust",
-  "version": "23.4.0",
+  "version": "23.6.0",
   "name": "Rust",
   "documentationURL": "https://github.com/rapidsai/devcontainers/features/tree/main/src/rust",
   "description": "Installs Rust, common Rust utilities, and their required dependencies",
