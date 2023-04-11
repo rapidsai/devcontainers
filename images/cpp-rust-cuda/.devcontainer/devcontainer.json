@@ -39,40 +39,5 @@
     "./features/rust",
     "./features/cuda",
     "./features/utils"
-  ],
-  "updateContentCommand": [
-    "bash",
-    "-li",
-    "+o",
-    "history",
-    "/opt/devcontainer/bin/update-content-command.sh"
-  ],
-  "onCreateCommand": [
-    "bash",
-    "-li",
-    "+o",
-    "history",
-    "/opt/devcontainer/bin/on-create-command.sh"
-  ],
-  "postCreateCommand": [
-    "bash",
-    "-li",
-    "+o",
-    "history",
-    "/opt/devcontainer/bin/post-create-command.sh"
-  ],
-  "postStartCommand": [
-    "bash",
-    "-li",
-    "+o",
-    "history",
-    "/opt/devcontainer/bin/post-start-command.sh"
-  ],
-  "postAttachCommand": [
-    "bash",
-    "-li",
-    "+o",
-    "history",
-    "/opt/devcontainer/bin/post-attach-command.sh"
   ]
 }

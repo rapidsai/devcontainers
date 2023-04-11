@@ -1,11 +1,13 @@
-#! /usr/bin/env -S bash -euo pipefail
+#! /usr/bin/env bash
 
 clone_${NAME}() {
+    set -euo pipefail;
+
     if [[ ! -d ~/'${SRC_PATH}/.git' ]]; then
 
         local git_tag='${GIT_TAG}';
         local git_args="${@}";
-        if echo "${git_args}" | grep -qE '(\-b |\-b=|\-\-branch |\-\-branch=)'; then
+        if ! echo "${git_args}" | grep -qE '(\-b |\-b=|\-\-branch |\-\-branch=)'; then
             git_args="${git_args:+"$git_args "}${git_tag:+"--branch $git_tag"}";
         fi
 
@@ -24,4 +26,4 @@ clone_${NAME}() {
     fi
 }
 
-clone_${NAME} "$@";
+(clone_${NAME} "$@");

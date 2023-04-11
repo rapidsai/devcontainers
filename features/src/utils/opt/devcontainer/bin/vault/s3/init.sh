@@ -1,93 +1,102 @@
 #! /usr/bin/env bash
 
-set -euo pipefail;
+vault_s3_init() {
 
-# Attempt to retrieve temporary AWS credentials from a vault
-# instance using GitHub OAuth.
+    set -euo pipefail;
 
-if [[ -z "${VAULT_HOST:-}" ]]; then exit 0; fi
-if [[ -z "${SCCACHE_BUCKET:-}" ]]; then exit 0; fi
+    # Attempt to retrieve temporary AWS credentials from a vault
+    # instance using GitHub OAuth.
 
-# Initialize the GitHub CLI with the appropriate user scopes
-. /opt/devcontainer/bin/github/cli/init.sh;
+    if [[ -z "${VAULT_HOST:-}" ]]; then return; fi
+    if [[ -z "${SCCACHE_BUCKET:-}" ]]; then return; fi
 
-# Check whether the user is in one of the allowed GitHub orgs
-eval "$(/opt/devcontainer/bin/vault/s3/orgs.sh "$VAULT_HOST")";
+    # Initialize the GitHub CLI with the appropriate user scopes
+    eval "export $(devcontainer-utils-init-github-cli)";
 
-if [[ -z "${user_orgs:-}" ]]; then
-    exit 0;
-fi
+    if [[ -z "${GITHUB_USER:-}" ]]; then return; fi
 
-# Remove existing credentials in case vault declines to issue new ones.
-rm -rf ~/.aws/{config,credentials};
+    # Check whether the user is in one of the allowed GitHub orgs
+    local allowed_orgs="${VAULT_GITHUB_ORGS:-nvidia nv-morpheus nv-legate rapids}";
+    allowed_orgs="${allowed_orgs// /|}";
+    allowed_orgs="${allowed_orgs//;/|}";
+    allowed_orgs="${allowed_orgs//,/|}";
 
-echo ""
-echo "Attempting to use your GitHub account to authenticate";
-echo "with vault at '$VAULT_HOST'.";
-echo ""
+    local user_orgs="$(                              \
+        gh api user/orgs --jq '.[].login'            \
+            -H "Accept: application/vnd.github+json" \
+      | grep --color=never -E "(${allowed_orgs})"    \
+    )";
 
-vault_token=null;
+    if [[ -z "${user_orgs:-}" ]]; then return; fi
 
-# Attempt to authenticate with GitHub
-eval "$(/opt/devcontainer/bin/vault/auth/github.sh "$VAULT_HOST" ${user_orgs})";
+    # Remove existing credentials in case vault declines to issue new ones.
+    rm -rf ~/.aws/{stamp,config,credentials};
 
-if [[ "${vault_token:-null}" == null ]]; then
-    echo "Your GitHub user was not recognized by vault. Exiting." >&2;
-    exit 1;
-fi
+    echo ""
+    echo "Attempting to use your GitHub account to authenticate";
+    echo "with vault at '${VAULT_HOST}'.";
+    echo ""
 
-echo "Successfully authenticated with vault!";
+    local vault_token=null;
 
-ttl="${VAULT_S3_TTL:-"43200s"}";
-uri="${VAULT_S3_URI:-"v1/aws/creds/devs"}";
+    # Attempt to authenticate with GitHub
+    eval "$(devcontainer-utils-vault-auth-github "${VAULT_HOST}" ${user_orgs})";
 
-# Generate temporary AWS creds
-aws_creds="$(                               \
-    curl -s                                 \
-        -X GET                              \
-        -H "X-Vault-Token: $vault_token"    \
-        -H "Content-Type: application/json" \
-        "$VAULT_HOST/$uri?ttl=$ttl"         \
-  | jq -r '.data'                           \
-)";
+    if [[ "${vault_token:-null}" == null ]]; then
+        echo "Your GitHub user was not recognized by vault. Exiting." >&2;
+        return;
+    fi
 
-unset vault_token;
+    echo "Successfully authenticated with vault!";
 
-aws_access_key_id="$(echo "$aws_creds" | jq -r '.access_key')";
-aws_secret_access_key="$(echo "$aws_creds" | jq -r '.secret_key')";
+    local ttl="${VAULT_S3_TTL:-"43200s"}";
+    local uri="${VAULT_S3_URI:-"v1/aws/creds/devs"}";
 
-unset aws_creds;
+    # Generate temporary AWS creds
+    local aws_creds="$(                         \
+        curl -s                                 \
+            -X GET                              \
+            -H "X-Vault-Token: $vault_token"    \
+            -H "Content-Type: application/json" \
+            "${VAULT_HOST}/$uri?ttl=$ttl"       \
+      | jq -r '.data'                           \
+    )";
 
-if [[ "${aws_access_key_id:-null}" == null ]]; then
-    echo "Failed to generate temporary AWS S3 credentials. Exiting." >&2;
-    exit 1;
-fi;
-if [[ "${aws_secret_access_key:-null}" == null ]]; then
-    echo "Failed to generate temporary AWS S3 credentials. Exiting." >&2;
-    exit 1;
-fi;
+    local aws_access_key_id="$(echo "$aws_creds" | jq -r '.access_key')";
+    local aws_secret_access_key="$(echo "$aws_creds" | jq -r '.secret_key')";
 
-# Generate AWS config files
-mkdir -p ~/.aws;
+    if [[ "${aws_access_key_id:-null}" == null ]]; then
+        echo "Failed to generate temporary AWS S3 credentials. Exiting." >&2;
+        return;
+    fi
 
-echo "$(date '+%s')" > ~/.aws/stamp;
+    if [[ "${aws_secret_access_key:-null}" == null ]]; then
+        echo "Failed to generate temporary AWS S3 credentials. Exiting." >&2;
+        return;
+    fi
 
-cat <<EOF > ~/.aws/config
+    # Generate AWS config files
+    mkdir -p ~/.aws;
+
+    echo "$(date '+%s')" > ~/.aws/stamp;
+
+    cat <<EOF > ~/.aws/config
 [default]
-${SCCACHE_REGION:+region=$SCCACHE_REGION}
 ${SCCACHE_BUCKET:+bucket=$SCCACHE_BUCKET}
+${SCCACHE_REGION:+region=$SCCACHE_REGION}
 EOF
-cat <<EOF > ~/.aws/credentials
+
+    cat <<EOF > ~/.aws/credentials
 [default]
 aws_access_key_id=$aws_access_key_id
 aws_secret_access_key=$aws_secret_access_key
 EOF
 
-unset aws_access_key_id;
-unset aws_secret_access_key;
+    chmod 0600 ~/.aws/{config,credentials};
 
-chmod 0600 ~/.aws/{config,credentials};
+    echo "Successfully generated temporary AWS S3 credentials!";
+}
 
-. /opt/devcontainer/bin/vault/s3/export.sh
+(vault_s3_init "$@");
 
-echo "Successfully generated temporary AWS S3 credentials!";
+. devcontainer-utils-vault-s3-export;
