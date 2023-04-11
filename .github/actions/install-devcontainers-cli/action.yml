@@ -12,8 +12,6 @@ runs:
     - name: Install devcontainers CLI
       shell: bash
       run: |
-        if [[ "${{ contains(runner.arch, 'ARM') }}" == true ]]; then
-          sudo apt update;
-          sudo apt install -y --no-install-recommends build-essential;
-        fi
+        sudo apt update;
+        sudo apt install -y --no-install-recommends build-essential;
         npm install -g @devcontainers/cli;
