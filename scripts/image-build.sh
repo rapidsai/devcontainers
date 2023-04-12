@@ -11,7 +11,7 @@ build_image() {
 
     exec devcontainer build \
         --workspace-folder $cwd/images/$img \
-        --image-name docker.io/rapidsai/devcontainers:23.04-$img-ubuntu22.04;
+        --image-name docker.io/rapidsai/devcontainers:23.06-$img-ubuntu22.04;
 }
 
 build_image "$@";

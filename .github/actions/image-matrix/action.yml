@@ -20,28 +20,23 @@ outputs:
 runs:
   using: composite
   steps:
-    - name: Get last successful main commit sha
+    - id: get-pr-info
       if: inputs.full_matrix != true
-      uses: nrwl/nx-set-shas@v3
-      id: last_main_commit
-      with:
-        workflow-id: release.yml
-        main-branch-name: branch-23.04
-        set-environment-variables-for-job: false
-        last-successful-event: workflow_dispatch
+      name: Get last successful main commit sha
+      uses: rapidsai/shared-action-workflows/get-pr-info@5587af9ed225f712d20368998e731ce575a0de39
 
     - name: Check if files changed
       if: inputs.full_matrix != true
       id: changes
       uses: tj-actions/changed-files@v35.4.4
       with:
-        base_sha: ${{ steps.last_main_commit.outputs.base }}
+        base_sha: ${{ fromJSON(steps.get-pr-info.outputs.pr-info).base.sha }}
         files: |
           images/**
           .github/workflows/test.yml
+          .github/actions/build-image/action.yml
           .github/actions/image-matrix/action.yml
           .github/workflows/build-and-test-image.yml
-          .github/actions/build-and-test-image/action.yml
 
     - name: Report changes
       if: inputs.full_matrix != true

@@ -50,9 +50,9 @@ jobs:
           MAMBAFORGE: "${{ inputs.MAMBAFORGE }}"
 
       - name: Build and test ${{ steps.info.outputs.tag }}-${{ matrix.arch }}
-        uses: ./.github/actions/build-and-test-image
+        uses: ./.github/actions/build-image
         with:
           arch: "${{ matrix.arch }}"
           dir: "${{ steps.info.outputs.dir }}"
           tag: "${{ steps.info.outputs.tag }}"
-          repository: "${{ vars.DOCKERHUB_REPOSITORY || github.repository }}"
+          repo: "${{ vars.DOCKERHUB_REPOSITORY || github.repository }}"
