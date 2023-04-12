@@ -30,7 +30,7 @@ jobs:
         name: Determine image matrix
         uses: ./.github/actions/image-matrix
         with:
-          full_matrix: true
+          full_matrix: 'true'
 
   push-images:
     name: Image

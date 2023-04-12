@@ -109,7 +109,7 @@ jobs:
         name: Determine image matrix
         uses: ./.github/actions/image-matrix
         with:
-          full_matrix: false
+          full_matrix: 'false'
           features: "${{ needs.features-matrix.outputs.features }}"
           scenarios: "${{ needs.features-matrix.outputs.scenarios }}"
 

@@ -10,8 +10,8 @@ inputs:
     type: string
     required: false
   full_matrix:
-    type: boolean
-    default: true
+    type: string
+    default: 'true'
 
 outputs:
   matrix:
@@ -21,12 +21,12 @@ runs:
   using: composite
   steps:
     - id: get-pr-info
-      if: inputs.full_matrix != true
+      if: inputs.full_matrix != 'true'
       name: Get last successful main commit sha
       uses: rapidsai/shared-action-workflows/get-pr-info@5587af9ed225f712d20368998e731ce575a0de39
 
     - name: Check if files changed
-      if: inputs.full_matrix != true
+      if: inputs.full_matrix != 'true'
       id: changes
       uses: tj-actions/changed-files@v35.4.4
       with:
@@ -39,7 +39,7 @@ runs:
           .github/workflows/build-and-test-image.yml
 
     - name: Report changes
-      if: inputs.full_matrix != true
+      if: inputs.full_matrix != 'true'
       shell: bash
       run: echo '${{ toJSON(steps.changes.outputs) }}'
 
