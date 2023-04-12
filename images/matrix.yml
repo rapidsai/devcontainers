@@ -26,9 +26,9 @@
 - { CPP: "cpp", LLVM: "llvm16", CUDA: "cuda12.1", MAMBAFORGE: "mambaforge" }
 
 # images/cpp-llvm-cuda-nvhpc
-- { CPP: "cpp", LLVM: "llvm15", CUDA: "cuda12.0", NVHPC: "nvhpc23.1" }
+# - { CPP: "cpp", LLVM: "llvm15", CUDA: "cuda12.0", NVHPC: "nvhpc23.1" }
 - { CPP: "cpp", LLVM: "llvm15", CUDA: "cuda12.0", NVHPC: "nvhpc23.3" }
-- { CPP: "cpp", LLVM: "llvm16", CUDA: "cuda12.0", NVHPC: "nvhpc23.1" }
+# - { CPP: "cpp", LLVM: "llvm16", CUDA: "cuda12.0", NVHPC: "nvhpc23.1" }
 - { CPP: "cpp", LLVM: "llvm16", CUDA: "cuda12.0", NVHPC: "nvhpc23.3" }
 
 # images/cpp-llvm-mambaforge
@@ -36,9 +36,9 @@
 - { CPP: "cpp", LLVM: "llvm16", MAMBAFORGE: "mambaforge" }
 
 # images/cpp-llvm-nvhpc
-- { CPP: "cpp", LLVM: "llvm15", NVHPC: "nvhpc23.1" }
+# - { CPP: "cpp", LLVM: "llvm15", NVHPC: "nvhpc23.1" }
 - { CPP: "cpp", LLVM: "llvm15", NVHPC: "nvhpc23.3" }
-- { CPP: "cpp", LLVM: "llvm16", NVHPC: "nvhpc23.1" }
+# - { CPP: "cpp", LLVM: "llvm16", NVHPC: "nvhpc23.1" }
 - { CPP: "cpp", LLVM: "llvm16", NVHPC: "nvhpc23.3" }
 
 # images/cpp-llvm-rust
@@ -58,7 +58,7 @@
 - { CPP: "cpp", LLVM: "llvm16", RUST: "rust", CUDA: "cuda12.1", MAMBAFORGE: "mambaforge" }
 
 # images/cpp-nvhpc
-- { CPP: "cpp", NVHPC: "nvhpc23.1" }
+# - { CPP: "cpp", NVHPC: "nvhpc23.1" }
 - { CPP: "cpp", NVHPC: "nvhpc23.3" }
 
 # images/cpp-rust-cuda
