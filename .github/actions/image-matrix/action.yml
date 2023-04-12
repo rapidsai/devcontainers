@@ -23,7 +23,7 @@ runs:
     - id: get-pr-info
       if: inputs.full_matrix != true
       name: Get last successful main commit sha
-      uses: rapidsai/shared-action-workflows/get-pr-info
+      uses: rapidsai/shared-action-workflows/get-pr-info@5587af9ed225f712d20368998e731ce575a0de39
 
     - name: Check if files changed
       if: inputs.full_matrix != true
