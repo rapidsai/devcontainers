@@ -39,10 +39,13 @@ apt-add-repository -y "deb https://developer.download.nvidia.com/hpc-sdk/ubuntu/
 echo "Installing NVHPC SDK...";
 
 NVHPC_VERSION="${VERSION:-${NVHPCVERSION:-}}";
+NVHPC_VERSION_YEAR=$(echo "${NVHPC_VERSION}" | cut -d'.' -f1);
+NVHPC_VERSION_YEAR="20${NVHPC_VERSION_YEAR}";
 
 DEBIAN_FRONTEND=noninteractive              \
 apt-get install -y --no-install-recommends  \
     nvhpc-${NVHPC_VERSION/./-}              \
+    nvhpc-${NVHPC_VERSION_YEAR}=${NVHPC_VERSION} \
     ;
 
 export NVHPC="/opt/nvidia/hpc_sdk";
