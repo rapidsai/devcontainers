@@ -1,0 +1,56 @@
+name: build-image
+
+description: Build image
+
+inputs:
+  dir:
+    type: string
+    required: true
+    description: Image dir
+  tag:
+    type: string
+    required: true
+    description: Image tag
+  arch:
+    type: string
+    required: true
+    description: Image arch
+  repo:
+    type: string
+    required: true
+    description: Image repo
+
+outputs:
+  repo:
+    value: ${{ steps.build.outputs.repo }}
+
+runs:
+  using: composite
+  steps:
+
+    - name: Setup runner environment
+      uses: ./.github/actions/setup-runner-env
+
+    - name: Copy common scripts into features
+      uses: ./.github/actions/copy-common-scripts
+
+    - name: Install devcontainers CLI
+      uses: ./.github/actions/install-devcontainers-cli
+
+    - id: build
+      name: Build ghcr.io/${{ github.repository_owner }}/devcontainers:${{ inputs.tag }}-${{ inputs.arch }}
+      name: Build ${{ inputs.repo }}:${{ inputs.tag }}-${{ inputs.arch }}
+      shell: bash
+      env:
+        NODE_NO_WARNINGS: 1
+      run: |
+        repo="$(echo "${{ inputs.repo }}" | tr '[:upper:]' '[:lower:]')";
+        echo "repo=${repo}" >> $GITHUB_OUTPUT;
+
+        devcontainer build \
+          --platform "linux/${{ inputs.arch }}" \
+          --cache-from "${repo}:${{ inputs.tag }}" \
+          --image-name "${repo}:${{ inputs.tag }}" \
+          --workspace-folder "images/${{ inputs.dir }}" \
+          --output "type=oci,dest=${{ runner.temp }}/${{ inputs.arch }}.tar" \
+          ;

@@ -39,9 +39,9 @@ runs:
         files: |
           images/**
           .github/workflows/test.yml
+          .github/actions/build-image/action.yml
           .github/actions/image-matrix/action.yml
           .github/workflows/build-and-test-image.yml
-          .github/actions/build-and-test-image/action.yml
 
     - name: Report changes
       if: inputs.full_matrix != true

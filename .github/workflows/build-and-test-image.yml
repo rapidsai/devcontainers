@@ -50,7 +50,7 @@ jobs:
           MAMBAFORGE: "${{ inputs.MAMBAFORGE }}"
 
       - name: Build and test ${{ steps.info.outputs.tag }}-${{ matrix.arch }}
-        uses: ./.github/actions/build-and-test-image
+        uses: ./.github/actions/build-image
         with:
           arch: "${{ matrix.arch }}"
           dir: "${{ steps.info.outputs.dir }}"
