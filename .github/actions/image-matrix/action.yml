@@ -30,7 +30,7 @@ runs:
       id: changes
       uses: tj-actions/changed-files@v35.4.4
       with:
-        base_sha: ${{ fromJSON(steps.get-pr-info.outputs.pr-info).base.ref }}
+        base_sha: ${{ fromJSON(steps.get-pr-info.outputs.pr-info).base.sha }}
         files: |
           images/**
           .github/workflows/test.yml
