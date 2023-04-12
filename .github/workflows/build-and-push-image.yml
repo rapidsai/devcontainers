@@ -68,7 +68,7 @@ jobs:
         with:
           retention-days: 1
           name: ${{ steps.info.outputs.tag }}
-          path: ${{ runner.temp }}/${{ matrix.arch }}.tar
+          path: ${{ runner.temp }}/${{ steps.info.outputs.tag }}/${{ matrix.arch }}.tar
 
   push-to-dockerhub:
     name: Push to Docker Hub
@@ -91,7 +91,7 @@ jobs:
         uses: actions/download-artifact@v3
         with:
           name: ${{ needs.build-and-upload.outputs.tag }}
-          path: ${{ runner.temp }}
+          path: ${{ runner.temp }}/${{ needs.build-and-upload.outputs.tag }}
 
       - name: Login to Docker Hub
         uses: docker/login-action@v2
@@ -102,10 +102,11 @@ jobs:
       - name: Push multiarch manifest to Docker Hub
         shell: bash --noprofile --norc -x -eo pipefail {0}
         env:
+          tag: "${{ needs.build-and-upload.outputs.tag }}"
           name: "${{ needs.build-and-upload.outputs.repo }}:${{ needs.build-and-upload.outputs.tag }}"
         run: |
 
-          find "${{ runner.temp }}/" -type f -name '*.tar';
+          find "${{ runner.temp }}/${tag}/" -type f -name '*.tar';
 
           docker manifest rm ${name} || true;
 
@@ -113,7 +114,7 @@ jobs:
 
           for arch in "amd64" "arm64"; do
             # Load and push the linux/$arch image and read its local hash
-            hash="$(docker load --input "${{ runner.temp }}/${arch}.tar" | tail -n1 | cut -d':' -f3)";
+            hash="$(docker load --input "${{ runner.temp }}/${tag}/${arch}.tar" | tail -n1 | cut -d':' -f3)";
             # Tag the loaded image with the final name
             docker image tag ${hash} ${name};
             # Push the local image to the registry to get its remote hash
