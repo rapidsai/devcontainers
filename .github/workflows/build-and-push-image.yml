@@ -55,19 +55,19 @@ jobs:
           MAMBAFORGE: "${{ inputs.MAMBAFORGE }}"
 
       - id: build
-        name: Build ${{ steps.json.outputs.tag }}-${{ matrix.arch }}
+        name: Build ${{ steps.info.outputs.tag }}-${{ matrix.arch }}
         uses: ./.github/actions/build-image
         with:
           arch: "${{ matrix.arch }}"
           dir: "${{ steps.info.outputs.dir }}"
-          tag: "${{ steps.json.outputs.tag }}"
+          tag: "${{ steps.info.outputs.tag }}"
           repo: "${{ vars.DOCKERHUB_REPOSITORY || github.repository }}"
 
-      - name: Upload ${{ steps.json.outputs.tag }}-${{ matrix.arch }}
+      - name: Upload ${{ steps.info.outputs.tag }}-${{ matrix.arch }}
         uses: actions/upload-artifact@v3
         with:
           retention-days: 1
-          name: ${{ steps.json.outputs.tag }}
+          name: ${{ steps.info.outputs.tag }}
           path: ${{ runner.temp }}/${{ matrix.arch }}.tar
 
   push-to-dockerhub:
