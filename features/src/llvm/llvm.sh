@@ -125,7 +125,20 @@ LLVM_VERSION_PATTERNS[13]="-13"
 LLVM_VERSION_PATTERNS[14]="-14"
 LLVM_VERSION_PATTERNS[15]="-15"
 LLVM_VERSION_PATTERNS[16]="-16"
-LLVM_VERSION_PATTERNS[17]=""
+LLVM_VERSION_PATTERNS[17]="-17"
+LLVM_VERSION_PATTERNS[18]="-18"
+LLVM_VERSION_PATTERNS[19]="-19"
+LLVM_VERSION_PATTERNS[20]="-20"
+LLVM_VERSION_PATTERNS[21]="-21"
+LLVM_VERSION_PATTERNS[22]="-22"
+LLVM_VERSION_PATTERNS[23]="-23"
+LLVM_VERSION_PATTERNS[24]="-24"
+LLVM_VERSION_PATTERNS[25]="-25"
+LLVM_VERSION_PATTERNS[26]="-26"
+LLVM_VERSION_PATTERNS[27]="-27"
+LLVM_VERSION_PATTERNS[28]="-28"
+LLVM_VERSION_PATTERNS[29]="-29"
+LLVM_VERSION_PATTERNS[30]=""
 
 if [ ! ${LLVM_VERSION_PATTERNS[$LLVM_VERSION]+_} ]; then
     echo "This script does not support LLVM version $LLVM_VERSION"
@@ -161,8 +174,17 @@ if [[ -z "`apt-key list 2> /dev/null | grep -i llvm`" ]]; then
     # Delete the key in the old format
     apt-key del AF4F7421
 fi
-add-apt-repository "${REPO_NAME}"
+
+cat <<"EOF" >> "/etc/apt/preferences.d/llvm-$LLVM_VERSION"
+Package: *
+Pin: origin *llvm.org*
+Pin-Priority: 600
+EOF
+
+add-apt-repository -n -y "${REPO_NAME}"
+
 apt-get update
+
 PKG="clang-$LLVM_VERSION lldb-$LLVM_VERSION lld-$LLVM_VERSION clangd-$LLVM_VERSION"
 if [[ $ALL -eq 1 ]]; then
     # same as in test-install.sh
@@ -174,8 +196,6 @@ if [[ $ALL -eq 1 ]]; then
     if test $LLVM_VERSION -gt 11; then
         PKG="$PKG libunwind-$LLVM_VERSION-dev"
     fi
-    if test $LLVM_VERSION -gt 14; then
-        PKG="$PKG libclang-rt-$LLVM_VERSION-dev libpolly-$LLVM_VERSION-dev"
-    fi
 fi
-apt-get install -y -o Dpkg::Options::="--force-overwrite" $PKG
+
+apt-get install -y $PKG
