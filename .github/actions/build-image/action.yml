@@ -46,12 +46,10 @@ runs:
         repo="$(echo "${{ inputs.repo }}" | tr '[:upper:]' '[:lower:]')";
         echo "repo=${repo}" >> $GITHUB_OUTPUT;
 
-        mkdir -p "${{ runner.temp }}/${{ inputs.tag }}/";
-
         devcontainer build \
           --platform "linux/${{ inputs.arch }}" \
           --cache-from "${repo}:${{ inputs.tag }}" \
           --image-name "${repo}:${{ inputs.tag }}" \
           --workspace-folder "images/${{ inputs.dir }}" \
-          --output "type=oci,dest=${{ runner.temp }}/${{ inputs.tag }}/${{ inputs.arch }}.tar" \
+          --output "type=oci,dest=${{ runner.temp }}/${{ inputs.arch }}.tar" \
           ;
