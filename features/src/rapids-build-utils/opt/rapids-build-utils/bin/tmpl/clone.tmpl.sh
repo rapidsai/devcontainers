@@ -13,11 +13,11 @@ clone_${NAME}() {
 
         echo 'Cloning ${NAME}' 1>&2;
 
-        ${GIT_HOST}-repo-clone \
-            '${GIT_UPSTREAM}'  \
-            '${GIT_REPO}'      \
-            '${SRC_PATH}'      \
-             ${git_args}       \
+        devcontainer-utils-clone-${GIT_HOST}-repo \
+            '${GIT_UPSTREAM}'                     \
+            '${GIT_REPO}'                         \
+            '${SRC_PATH}'                         \
+             ${git_args}                          \
             ;
 
         rapids-generate-scripts;
