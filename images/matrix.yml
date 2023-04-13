@@ -22,9 +22,9 @@
 
 # images/cpp-llvm-cuda-mambaforge
 # - { CPP: "cpp", LLVM: "llvm15", CUDA: "cuda11.8", MAMBAFORGE: "mambaforge" }
-- { CPP: "cpp", LLVM: "llvm15", CUDA: "cuda12.1", MAMBAFORGE: "mambaforge" }
+# - { CPP: "cpp", LLVM: "llvm15", CUDA: "cuda12.1", MAMBAFORGE: "mambaforge" }
 - { CPP: "cpp", LLVM: "llvm16", CUDA: "cuda11.8", MAMBAFORGE: "mambaforge" }
-# - { CPP: "cpp", LLVM: "llvm16", CUDA: "cuda12.1", MAMBAFORGE: "mambaforge" }
+- { CPP: "cpp", LLVM: "llvm16", CUDA: "cuda12.1", MAMBAFORGE: "mambaforge" }
 
 # images/cpp-llvm-cuda-nvhpc
 # - { CPP: "cpp", LLVM: "llvm15", CUDA: "cuda12.0", NVHPC: "nvhpc23.1" }
