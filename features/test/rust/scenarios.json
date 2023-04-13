@@ -3,7 +3,7 @@
     "image": "ubuntu:22.04",
     "features": {
       "llvm": {
-        "version": "15"
+        "version": "16"
       },
       "rust": {
         "version": "1.62.0"

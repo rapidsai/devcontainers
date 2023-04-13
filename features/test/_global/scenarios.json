@@ -40,7 +40,7 @@
         "version": "0.4.0"
       },
       "llvm": {
-        "version": "15"
+        "version": "16"
       },
       "cuda": {
         "version": "12.1"

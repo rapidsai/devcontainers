@@ -152,7 +152,7 @@ fi
 
 # install everything
 
-if [[ ! -f /etc/apt/trusted.gpg.d/apt.llvm.org.asc ]]; then
+if [ ! -f /etc/apt/trusted.gpg.d/apt.llvm.org.asc ]; then
     # download GPG key once
     wget -qO- https://apt.llvm.org/llvm-snapshot.gpg.key | tee /etc/apt/trusted.gpg.d/apt.llvm.org.asc
 fi
@@ -161,8 +161,17 @@ if [[ -z "`apt-key list 2> /dev/null | grep -i llvm`" ]]; then
     # Delete the key in the old format
     apt-key del AF4F7421
 fi
-add-apt-repository "${REPO_NAME}"
+
+cat <<"EOF" >> "/etc/apt/preferences.d/llvm-$LLVM_VERSION"
+Package: *
+Pin: origin *llvm.org*
+Pin-Priority: 600
+EOF
+
+add-apt-repository -n -y "${REPO_NAME}"
+
 apt-get update
+
 PKG="clang-$LLVM_VERSION lldb-$LLVM_VERSION lld-$LLVM_VERSION clangd-$LLVM_VERSION"
 if [[ $ALL -eq 1 ]]; then
     # same as in test-install.sh
@@ -178,4 +187,5 @@ if [[ $ALL -eq 1 ]]; then
         PKG="$PKG libclang-rt-$LLVM_VERSION-dev libpolly-$LLVM_VERSION-dev"
     fi
 fi
-apt-get install -y -o Dpkg::Options::="--force-overwrite" $PKG
+
+apt-get install -y $PKG
