@@ -152,7 +152,7 @@ fi
 
 # install everything
 
-if [[ ! -f /etc/apt/trusted.gpg.d/apt.llvm.org.asc ]]; then
+if [ ! -f /etc/apt/trusted.gpg.d/apt.llvm.org.asc ]; then
     # download GPG key once
     wget -qO- https://apt.llvm.org/llvm-snapshot.gpg.key | tee /etc/apt/trusted.gpg.d/apt.llvm.org.asc
 fi
@@ -182,6 +182,9 @@ if [[ $ALL -eq 1 ]]; then
     fi
     if test $LLVM_VERSION -gt 11; then
         PKG="$PKG libunwind-$LLVM_VERSION-dev"
+    fi
+    if test $LLVM_VERSION -gt 14; then
+        PKG="$PKG libclang-rt-$LLVM_VERSION-dev libpolly-$LLVM_VERSION-dev"
     fi
 fi
 
