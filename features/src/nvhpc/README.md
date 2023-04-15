@@ -17,6 +17,13 @@ A feature to install the NVHPC SDK
 |-----|-----|-----|-----|
 | version | Version of NVHPC SDK to install. | string | 23.1 |
 
+## Customizations
+
+### VS Code Extensions
+
+- `ms-vscode.cpptools`
+- `nvidia.nsight-vscode-edition`
+
 
 
 ---

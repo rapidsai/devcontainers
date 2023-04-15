@@ -17,6 +17,16 @@ A feature to install LLVM compilers and tools
 |-----|-----|-----|-----|
 | version | LLVM version to install. | string | dev |
 
+## Customizations
+
+### VS Code Extensions
+
+- `cschlosser.doxdocgen`
+- `llvm-vs-code-extensions.vscode-clangd`
+- `ms-vscode.cpptools`
+- `vadimcn.vscode-lldb`
+- `seaube.clangformat`
+
 
 
 ---

@@ -20,6 +20,16 @@ Installs Rust, common Rust utilities, and their required dependencies
 | updateRc | - | boolean | true |
 | updateRust | - | boolean | false |
 
+## Customizations
+
+### VS Code Extensions
+
+- `vadimcn.vscode-lldb`
+- `mutantdino.resourcemonitor`
+- `rust-lang.rust-analyzer`
+- `tamasfe.even-better-toml`
+- `serayuzgur.crates`
+
 
 
 ## OS Support
