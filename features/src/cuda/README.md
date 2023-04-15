@@ -18,6 +18,13 @@ A feature to install the NVIDIA CUDA Toolkit
 | version | Version of the CUDA Toolkit to install. | string | 12.1 |
 | pruneStaticLibs | Whether to remove static libs from the CUDA Toolkit to save image size | boolean | false |
 
+## Customizations
+
+### VS Code Extensions
+
+- `ms-vscode.cpptools`
+- `nvidia.nsight-vscode-edition`
+
 
 
 ---
