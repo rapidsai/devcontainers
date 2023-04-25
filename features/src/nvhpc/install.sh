@@ -63,16 +63,8 @@ bash "${NVHPC_ROOT}/compilers/bin/makelocalrc" \
 # export envvars in bashrc files
 append_to_etc_bashrc "$(cat .bashrc | envsubst)";
 append_to_all_bashrcs "$(cat .bashrc | envsubst)";
-
-cat<<EOF | tee /etc/profile.d/91-nvhpc.sh >/dev/null && chmod +x /etc/profile.d/91-nvhpc.sh
-#! /usr/bin/env bash
-
-# export envvars
-$(cat .bashrc | envsubst)
-
-# Activate nvhpc modules when /etc/profile is run
-$(cat etc/profile.d/91-nvhpc.sh)
-EOF
+# export envvars in /etc/profile.d
+add_etc_profile_d_script nvhpc "$(cat .bashrc etc/profile.d/nvhpc.sh | envsubst)";
 
 # Clean up
 # rm -rf /tmp/*;

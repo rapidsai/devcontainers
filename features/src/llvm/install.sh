@@ -82,6 +82,8 @@ export LLVM_VERSION="${LLVM_VERSION}";
 # export envvars in bashrc files
 append_to_etc_bashrc "$(cat .bashrc | envsubst)";
 append_to_all_bashrcs "$(cat .bashrc | envsubst)";
+# export envvars in /etc/profile.d
+add_etc_profile_d_script llvm "$(cat .bashrc | envsubst)";
 
 # Copy clangd config into etc/skel + user home dirs
 for_each_user_bashrc "$(cat <<EOF

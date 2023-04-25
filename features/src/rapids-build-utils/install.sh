@@ -58,6 +58,8 @@ yq shell-completion bash | tee /etc/bash_completion.d/yq >/dev/null;
 append_to_etc_bashrc "$(cat .bashrc)";
 # Activate venv in ~/.bashrc
 append_to_all_bashrcs "$(cat .bashrc)";
+# export envvars in /etc/profile.d
+add_etc_profile_d_script rapids-build-utils "$(cat .bashrc)";
 
 # Clean up
 # rm -rf /tmp/*;

@@ -37,6 +37,8 @@ conda clean --force-pkgs-dirs --all --yes;
 append_to_etc_bashrc "$(cat .bashrc)";
 # Activate conda in ~/.bashrc
 append_to_all_bashrcs "$(cat .bashrc)";
+# export envvars in /etc/profile.d
+add_etc_profile_d_script mambaforge "$(cat .bashrc)";
 
 # Update the devcontainers/features/common-utils __bash_prompt fn
 # to insert ${CONDA_PROMPT_MODIFIER} into the dev container's PS1

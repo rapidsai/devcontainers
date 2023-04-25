@@ -9,7 +9,12 @@ cd "$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )";
 # install global/common scripts
 . ./common/install.sh;
 
-check_packages jq git gcc g++ make wget file unzip ca-certificates bash-completion;
+PKG="jq git make wget file unzip ca-certificates bash-completion";
+
+if ! type gcc &>/dev/null; then PKG+=" gcc"; fi
+if ! type g++ &>/dev/null; then PKG+=" g++"; fi
+
+check_packages $PKG;
 
 if ! type cmake &>/dev/null; then
     CMAKE_VERSION=latest;

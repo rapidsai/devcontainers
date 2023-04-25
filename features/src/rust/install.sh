@@ -133,6 +133,8 @@ if [ "${UPDATE_RC}" = "true" ]; then
     append_etc_zshrc "$(cat .bashrc | envsubst)";
     append_to_etc_bashrc "$(cat .bashrc | envsubst)";
     append_to_all_bashrcs "$(cat .bashrc | envsubst)";
+    # export envvars in /etc/profile.d
+    add_etc_profile_d_script rust "$(cat .bashrc | envsubst)";
 fi
 
 # Make files writable for rustlang group

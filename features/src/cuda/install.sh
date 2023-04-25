@@ -143,6 +143,8 @@ rm -rf $(find /usr/lib -mindepth 1 -type d -regex "^.*/libcutensor/.*$" | grep -
 # export envvars in bashrc files
 append_to_etc_bashrc "$(cat .bashrc | envsubst)";
 append_to_all_bashrcs "$(cat .bashrc | envsubst)";
+# export envvars in /etc/profile.d
+add_etc_profile_d_script cuda "$(cat .bashrc | envsubst)";
 
 # Required for nvidia-docker v1
 echo "/usr/local/nvidia/lib" >> /etc/ld.so.conf.d/nvidia.conf;
