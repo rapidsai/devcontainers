@@ -22,9 +22,6 @@
       "description": "LLVM version to install."
     }
   },
-  "containerEnv": {
-    "BASH_ENV": "/etc/bash.bash_env"
-  },
   "capAdd": [
     "SYS_PTRACE"
   ],

@@ -5,6 +5,9 @@
 #-------------------------------------------------------------------------------------------------------------
 set -ex
 
+export CARGO_HOME="/usr/local/cargo";
+export RUSTUP_HOME="/usr/local/rustup";
+
 UPDATE_RC="${UPDATERC:-"true"}";
 UPDATE_RUST="${UPDATERUST:-"false"}";
 RUST_VERSION="${VERSION:-"latest"}";
@@ -91,7 +94,7 @@ if [ "${RUST_VERSION}" = "none" ] || type rustup > /dev/null 2>&1; then
 else
     if [ "${RUST_VERSION}" != "latest" ] && [ "${RUST_VERSION}" != "lts" ] && [ "${RUST_VERSION}" != "stable" ]; then
         # Find version using soft match
-        if ! type git > /dev/null 2>&1; then
+        if ! type git &>/dev/null; then
             check_packages git;
         fi
 
@@ -130,11 +133,16 @@ rustup component add rls rust-analysis rust-src rustfmt clippy 2>&1;
 
 # Add CARGO_HOME, RUSTUP_HOME and bin directory into bashrc/zshrc files (unless disabled)
 if [ "${UPDATE_RC}" = "true" ]; then
-    append_etc_zshrc "$(cat .bashrc | envsubst)";
-    append_to_etc_bashrc "$(cat .bashrc | envsubst)";
-    append_to_all_bashrcs "$(cat .bashrc | envsubst)";
+    vars_=();
+    vars_+=('$CARGO_HOME');
+    vars_+=('$RUSTUP_HOME');
+    printf -v vars_ '%s,' "${vars_[@]}";
+
+    append_etc_zshrc "$(cat .bashrc | envsubst "${vars_%,}")";
+    append_to_etc_bashrc "$(cat .bashrc | envsubst "${vars_%,}")";
+    append_to_all_bashrcs "$(cat .bashrc | envsubst "${vars_%,}")";
     # export envvars in /etc/profile.d
-    add_etc_profile_d_script rust "$(cat .bashrc | envsubst)";
+    add_etc_profile_d_script rust "$(cat .bashrc | envsubst "${vars_%,}")";
 fi
 
 # Make files writable for rustlang group

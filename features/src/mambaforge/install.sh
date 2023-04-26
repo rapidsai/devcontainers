@@ -26,7 +26,7 @@ echo "Installing Mambaforge...";
 rm -rf /opt/conda;
 /bin/bash /tmp/miniforge.sh -b -p /opt/conda;
 
-export PATH="${PATH}:/opt/conda/bin";
+export PATH="/opt/conda/bin:${PATH}";
 
 conda clean --tarballs --index-cache --packages --yes;
 find /opt/conda -follow -type f -name '*.a' -delete;
@@ -34,10 +34,20 @@ find /opt/conda -follow -type f -name '*.pyc' -delete;
 conda clean --force-pkgs-dirs --all --yes;
 
 # Activate conda in /etc/bash.bashrc
-append_to_etc_bashrc "$(cat .bashrc)";
+append_to_etc_bashrc "
+if ! type conda &>/dev/null; then . /opt/conda/etc/profile.d/conda.sh; fi;
+if ! type mamba &>/dev/null; then . /opt/conda/etc/profile.d/mamba.sh; fi;
+$(cat .bashrc)
+";
 # Activate conda in ~/.bashrc
-append_to_all_bashrcs "$(cat .bashrc)";
+append_to_all_bashrcs "
+if ! type conda &>/dev/null; then . /opt/conda/etc/profile.d/conda.sh; fi;
+if ! type mamba &>/dev/null; then . /opt/conda/etc/profile.d/mamba.sh; fi;
+$(cat .bashrc)
+";
 # export envvars in /etc/profile.d
+ln -s /opt/conda/etc/profile.d/conda.sh /etc/profile.d/$(($(ls -1q /etc/profile.d/*.sh | wc -l) + 20))-conda.sh;
+ln -s /opt/conda/etc/profile.d/mamba.sh /etc/profile.d/$(($(ls -1q /etc/profile.d/*.sh | wc -l) + 20))-mamba.sh;
 add_etc_profile_d_script mambaforge "$(cat .bashrc)";
 
 # Update the devcontainers/features/common-utils __bash_prompt fn

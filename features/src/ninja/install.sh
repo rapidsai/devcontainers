@@ -9,12 +9,27 @@ cd "$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )";
 # install global/common scripts
 . ./common/install.sh;
 
-PKG="jq git make wget file unzip ca-certificates bash-completion";
+PKG=();
+PKG+=("jq");
+PKG+=("git");
+PKG+=("make");
+PKG+=("wget");
+PKG+=("file");
+PKG+=("unzip");
+PKG+=("ca-certificates");
+PKG+=("bash-completion");
+PKG_TO_REMOVE=();
 
-if ! type gcc &>/dev/null; then PKG+=" gcc"; fi
-if ! type g++ &>/dev/null; then PKG+=" g++"; fi
+if ! type gcc &>/dev/null; then
+    PKG+=("gcc");
+    PKG_TO_REMOVE+=("gcc");
+fi
+if ! type g++ &>/dev/null; then
+    PKG+=("g++");
+    PKG_TO_REMOVE+=("g++");
+fi
 
-check_packages $PKG;
+check_packages ${PKG[@]};
 
 if ! type cmake &>/dev/null; then
     CMAKE_VERSION=latest;
@@ -65,3 +80,8 @@ rm -rf /var/cache/apt/*;
 rm -rf /var/lib/apt/lists/*;
 rm -rf /tmp/{cmake,ninja};
 rm -rf /tmp/cmake_${CMAKE_VERSION}.sh;
+
+if [[ ${#PKG_TO_REMOVE[@]} -gt 0 ]]; then
+    DEBIAN_FRONTEND=noninteractive apt-get -y remove ${PKG_TO_REMOVE[@]};
+    DEBIAN_FRONTEND=noninteractive apt-get -y autoremove;
+fi
