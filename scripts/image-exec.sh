@@ -12,7 +12,7 @@ exec_image() {
 
     exec docker exec -it -u coder -w /home/coder \
         -e 'VAULT_HOST=https://vault.ops.k8s.rapids.ai' \
-        $(docker ps | grep -P "vsc-$img-[0-9a-z]{32}-uid" | cut -d' ' -f1) \
+        $(docker ps | grep -P "vsc-$img-[0-9a-z]{64}-uid" | cut -d' ' -f1) \
         ${cmd:-bash -li};
 }
 
