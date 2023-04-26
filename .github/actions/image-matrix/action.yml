@@ -20,23 +20,10 @@ outputs:
 runs:
   using: composite
   steps:
-    - id: pr-branch
-      if: inputs.full_matrix != 'true'
-      name: Get PR number
-      shell: bash
-      run: |
-        if [ '${{ github.event_name }}' == 'pull_request' ]; then
-          echo "ref_name=pull-request/$(echo '${{ github.ref }}' | cut -d'/' -f3)" >> $GITHUB_OUTPUT;
-        else
-          echo "ref_name=$GITHUB_REF_NAME" >> $GITHUB_OUTPUT;
-        fi
-
     - id: get-pr-info
       if: inputs.full_matrix != 'true'
       name: Get last successful main commit sha
-      uses: rapidsai/shared-action-workflows/get-pr-info@5587af9ed225f712d20368998e731ce575a0de39
-      env:
-        GITHUB_REF_NAME: ${{ steps.pr-branch.outputs.ref_name }}
+      uses: ./.github/actions/get-pr-info
 
     - name: Check if files changed
       if: inputs.full_matrix != 'true'
