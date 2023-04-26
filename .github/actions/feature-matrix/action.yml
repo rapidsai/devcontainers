@@ -31,9 +31,9 @@ runs:
           features/src/**
           features/test/**
           .github/workflows/test.yml
-          .github/actions/feature-matrix/action.yml
           .github/workflows/build-and-test-feature.yml
           .github/actions/build-and-test-feature/action.yml
+        #  .github/actions/feature-matrix/action.yml
 
     - name: Report changes
       if: inputs.full_matrix != 'true'
