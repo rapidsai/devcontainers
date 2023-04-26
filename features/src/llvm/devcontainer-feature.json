@@ -1,7 +1,7 @@
 {
   "name": "LLVM compilers and tools",
   "id": "llvm",
-  "version": "23.6.1",
+  "version": "23.6.2",
   "description": "A feature to install LLVM compilers and tools",
   "options": {
     "version": {
