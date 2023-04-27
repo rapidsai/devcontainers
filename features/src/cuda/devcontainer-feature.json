@@ -1,7 +1,7 @@
 {
   "name": "CUDA Toolkit",
   "id": "cuda",
-  "version": "23.6.1",
+  "version": "23.6.2",
   "description": "A feature to install the NVIDIA CUDA Toolkit",
   "options": {
     "version": {
@@ -22,7 +22,7 @@
     },
     "pruneStaticLibs": {
       "type": "boolean",
-      "default": false,
+      "default": true,
       "description": "Whether to remove static libs from the CUDA Toolkit to save image size"
     }
   },

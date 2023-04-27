@@ -1,50 +1,22 @@
 - os: "ubuntu:18.04"
   images:
-  - features:
-    - { name: "gcc",  version: "7" }
-    - { name: "cuda", version: "11.0", pruneStaticLibs: true }
-  - features:
-    - { name: "gcc",  version: "8" }
-    - { name: "cuda", version: "11.0", pruneStaticLibs: true }
-  - features:
-    - { name: "gcc",  version: "9" }
-    - { name: "cuda", version: "11.0", pruneStaticLibs: true }
-  - features:
-    - { name: "llvm", version: "9" }
-    - { name: "cuda", version: "11.0", pruneStaticLibs: true }
+  - features: [{ name: "gcc",  version: "7" }, { name: "cuda", version: "11.0" }]
+  - features: [{ name: "gcc",  version: "8" }, { name: "cuda", version: "11.0" }]
+  - features: [{ name: "gcc",  version: "9" }, { name: "cuda", version: "11.0" }]
+  - features: [{ name: "llvm", version: "9" }, { name: "cuda", version: "11.0" }]
 
 - os: "ubuntu:20.04"
   images:
-  - features:
-    - { name: "gcc",  version: "7" }
-    - { name: "cuda", version: "12.1", pruneStaticLibs: true }
-  - features:
-    - { name: "gcc",  version: "8" }
-    - { name: "cuda", version: "12.1", pruneStaticLibs: true }
-  - features:
-    - { name: "gcc",  version: "9" }
-    - { name: "cuda", version: "12.1", pruneStaticLibs: true }
-  - features:
-    - { name: "gcc",  version: "10" }
-    - { name: "cuda", version: "12.1", pruneStaticLibs: true }
-  - features:
-    - { name: "llvm", version: "9" }
-    - { name: "cuda", version: "12.1", pruneStaticLibs: true }
-  - features:
-    - { name: "llvm", version: "10" }
-    - { name: "cuda", version: "12.1", pruneStaticLibs: true }
-  - features:
-    - { name: "llvm", version: "11" }
-    - { name: "cuda", version: "12.1", pruneStaticLibs: true }
-  - features:
-    - { name: "llvm", version: "12" }
-    - { name: "cuda", version: "12.1", pruneStaticLibs: true }
-  - features:
-    - { name: "llvm", version: "13" }
-    - { name: "cuda", version: "12.1", pruneStaticLibs: true }
-  - features:
-    - { name: "llvm", version: "14" }
-    - { name: "cuda", version: "12.1", pruneStaticLibs: true }
+  - features: [{ name: "gcc",  version: "7" }, { name: "cuda", version: "12.1" }]
+  - features: [{ name: "gcc",  version: "8" }, { name: "cuda", version: "12.1" }]
+  - features: [{ name: "gcc",  version: "9" }, { name: "cuda", version: "12.1" }]
+  - features: [{ name: "gcc",  version: "10" }, { name: "cuda", version: "12.1" }]
+  - features: [{ name: "llvm", version: "9" }, { name: "cuda", version: "12.1" }]
+  - features: [{ name: "llvm", version: "10" }, { name: "cuda", version: "12.1" }]
+  - features: [{ name: "llvm", version: "11" }, { name: "cuda", version: "12.1" }]
+  - features: [{ name: "llvm", version: "12" }, { name: "cuda", version: "12.1" }]
+  - features: [{ name: "llvm", version: "13" }, { name: "cuda", version: "12.1" }]
+  - features: [{ name: "llvm", version: "14" }, { name: "cuda", version: "12.1" }]
 
 - os: "ubuntu:22.04"
   images:
@@ -63,6 +35,10 @@
   - features: [{ name: "llvm",  version: "15" }]
   - features: [{ name: "llvm",  version: "16" }]
   - features: [{ name: "llvm",  version: "16" }]
+
+  # cpp-gcc-cuda
+  - features: [{ name: "gcc",   version: "11", }, { name: "cuda",  version: "12.1" }]
+  - features: [{ name: "gcc",   version: "12", }, { name: "cuda",  version: "12.1" }]
 
   # cpp-llvm-cuda
   - features: [{ name: "llvm", version: "15"}, { name: "cuda", version: "11.8" }]
@@ -117,16 +93,3 @@
 
   # cpp-mambaforge
   - features: [{ name: "mambaforge" }]
-
-  - features:
-    - { name: "gcc",   version: "11", }
-    - { name: "cuda",  version: "12.1", pruneStaticLibs: true }
-  - features:
-    - { name: "gcc",   version: "12", }
-    - { name: "cuda",  version: "12.1", pruneStaticLibs: true }
-  - features:
-    - { name: "llvm",  version: "15", }
-    - { name: "cuda",  version: "12.1", pruneStaticLibs: true }
-  - features:
-    - { name: "llvm",  version: "16", }
-    - { name: "cuda",  version: "12.1", pruneStaticLibs: true }
