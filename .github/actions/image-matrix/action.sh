@@ -3,80 +3,66 @@
 # cd to the repo root
 cd "$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )/../../../";
 
-full_matrix="${1:-"false"}";
-features="${2:-"[]"}";
-scenarios="${3:-"[]"}";
-files="${@:4}";
+full_matrix="0";
 
-if `# Include all images if full_matrix is true`                \
-   [ "${full_matrix}" != "false" ]                              \
-   `# Include all images if utils feature changed`              \
-|| echo "${features}"  | grep -q '^utils$'                      \
-|| echo "${scenarios}" | grep -q '^utils$'                      \
-   `# Include all images if matrix or workflows changed`        \
-|| echo "$files" | grep -q -E '^(\.github/|images/matrix\.yml)' \
-; then
-  files="$(find images -mindepth 1 -maxdepth 1 -type d)";
-fi
+case "${1:-}" in
+   "1" | "true" ) full_matrix="1"; shift;;
+   "0" | "false") full_matrix="0"; shift;;
+esac
 
-changed_images="";
-
-# Select the matrix of images whose source files changed
-if echo "$files" | grep -q '^images/'; then
-
-  imgs="$(                 \
-    for x in ${files}; do  \
-      x=${x##images/};     \
-      echo "\"${x%%/*}\""; \
-    done                   \
-  )";
-
-  keys="$(                          \
-    echo ${imgs}                    \
-  | tr '[:lower:]' '[:upper:]'      \
-  | jq -cs 'map(split("-") | sort)' \
-  )";
-
-  changed_images="$(              \
-    cat images/matrix.yml         \
-  | yq -e -o json --no-colors     \
-  | jq -ceM --argjson xs "$keys"  \
-    'map(select(keys == $xs[]))'  \
- || echo ''
-  )";
-
-fi
+features="${1:-"[]"}";
+scenarios="${2:-"[]"}";
+files="${@:3}";
 
 # Select all images that use a changed feature
-changed_features="$(echo "${features}" "${scenarios}"      \
-| jq -e -s 'flatten'                                       \
-| jq -e 'map(select(. != ""))'                             \
-| jq -e 'map(gsub("^utils$";   "cpp"))'                    \
-| jq -e 'map(gsub("^cmake$";   "cpp"))'                    \
-| jq -e 'map(gsub("^ninja$";   "cpp"))'                    \
-| jq -e 'map(gsub("^sccache$"; "cpp"))'                    \
-| jq -e -r 'unique | join("|")'                            \
-|| echo ''                                                 \
+
+common_features="cpp|gitlab-cli";
+
+features="$(echo                        \
+  "${features}"  `# ["foo", "bar"]`     \
+  "${scenarios}" `# ["baz"]`            \
+| jq -e -s 'flatten'                    \
+| jq -e 'map(select(. != ""))'          \
+| jq -e 'map(gsub("^utils$";   "cpp"))' \
+| jq -e 'map(gsub("^cmake$";   "cpp"))' \
+| jq -e 'map(gsub("^ninja$";   "cpp"))' \
+| jq -e 'map(gsub("^sccache$"; "cpp"))' \
+| jq -ec 'unique'                       \
+|| echo ''                              \
 )";
 
-if [[ -n "$changed_features" ]]; then
-  changed_features="$(            \
-    cat images/matrix.yml         \
-  | grep -E "($changed_features)" \
-  | yq -e -o json --no-colors     \
-  | jq -ceM                       \
- || echo ''
+if `# Include all images if full_matrix is true`         \
+   [ "${full_matrix}" == "1" ]                           \
+   `# Include all images if matrix or workflows changed` \
+|| echo "${files}" | grep -qE '^(\.github/|matrix\.yml)' \
+   `# Include all images if cmake, ninja, sccache, `     \
+   `# gitlab-cli, or utils features changed`             \
+|| echo "${features}" | grep -qE "(${common_features})"  \
+; then
+  features="$(                                                  \
+      find features/src -mindepth 1 -maxdepth 1 -type d -print0 \
+    | xargs -0 -r -I% sh -c 'echo -n "\"$(basename %)\","'      \
   )";
+  features="[${features%,}]";
 fi
 
+# Select images that include at least one of the changed features
+changed_images="$( \
+  cat matrix.yml \
+| yq -eMo json    \
+| jq -eMc --argjson xs "$features" '
+  map(.os as $os
+    | .images
+    | map(.features
+      | select(any(IN(.name; $xs[])))
+      | {os: $os, features: .}
+    )
+  ) | flatten | unique'
+)";
+
 if [[ "$changed_images" == "null" ]]; then changed_images=""; fi
-if [[ "$changed_features" == "null" ]]; then changed_features=""; fi
 
 # Concatenate changed feature/image lists and write the matrix
 cat <<EOF
-matrix={"include":$(echo        \
-  "$changed_images"             \
-  "$changed_features"           \
-| jq -scM 'flatten(1) | unique' \
-)}
+matrix={"include":${changed_images:-"[]"}}
 EOF

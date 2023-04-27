@@ -13,8 +13,14 @@ find_features_with_tests() {
   | sort | uniq                                                              ;
 }
 
-full_matrix="${1:-"false"}";
-files="${@:2}";
+full_matrix="0";
+
+case "${1:-}" in
+   "1" | "true" ) full_matrix="1"; shift;;
+   "0" | "false") full_matrix="0"; shift;;
+esac
+
+files="${@}";
 
 features="";
 scenarios="";
