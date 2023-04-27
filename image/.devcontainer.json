@@ -1,0 +1,40 @@
+{
+  "build": {
+    "dockerfile": "./Dockerfile",
+    "context": ".",
+    "args": {
+      "BASE": "ubuntu22.04"
+    }
+  },
+  "remoteUser": "coder",
+  "features": {
+    "ghcr.io/devcontainers/features/common-utils:2": {
+      "uid": "1000",
+      "gid": "1000",
+      "username": "coder",
+      "installZsh": "true",
+      "upgradePackages": "true"
+    },
+    "ghcr.io/devcontainers/features/git:1": {
+      "ppa": "true"
+    },
+    "ghcr.io/devcontainers/features/git-lfs:1": {},
+    "ghcr.io/devcontainers/features/github-cli:1": {},
+    "./features/cmake": {},
+    "./features/ninja": {},
+    "./features/sccache": {
+      "version": "0.4.2"
+    },
+    "./features/utils": {}
+  },
+  "overrideFeatureInstallOrder": [
+    "ghcr.io/devcontainers/features/common-utils",
+    "ghcr.io/devcontainers/features/git",
+    "ghcr.io/devcontainers/features/git-lfs",
+    "ghcr.io/devcontainers/features/github-cli",
+    "./features/cmake",
+    "./features/ninja",
+    "./features/sccache",
+    "./features/utils"
+  ]
+}
