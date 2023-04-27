@@ -25,7 +25,7 @@ runs:
         node-version: '16'
 
     - id: json
-      name: Make image/.devcontainer.json
+      name: Make image/.devcontainer/devcontainer.json
       shell: bash --noprofile --norc -x -eo pipefail {0}
       run: |
         bash --noprofile --norc -x -eo pipefail \

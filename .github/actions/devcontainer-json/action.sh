@@ -16,7 +16,7 @@ echo "tag=${tag}";
 
 node -e "$(cat <<EOF
 
-var json = JSON.parse(require("fs").readFileSync("image/.devcontainer.json"));
+var json = JSON.parse(require("fs").readFileSync("image/.devcontainer/devcontainer.json"));
 
 json.build.args.BASE = "${os}";
 
@@ -27,10 +27,10 @@ ${features}.forEach(({name, ...feature}) => {
   json.overrideFeatureInstallOrder.splice(i, 0, f);
 });
 
-require("fs").writeFileSync("image/.devcontainer.json", JSON.stringify(json));
+require("fs").writeFileSync("image/.devcontainer/devcontainer.json", JSON.stringify(json));
 EOF
 )"
 
 echo "image: ghcr.io/${repo_owner}/devcontainers:${tag}" >&2;
-echo "image/.devcontainer.json:" >&2;
-cat "image/.devcontainer.json" >&2;
+echo "image/.devcontainer/devcontainer.json:" >&2;
+cat "image/.devcontainer/devcontainer.json" >&2;
