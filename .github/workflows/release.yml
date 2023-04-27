@@ -41,12 +41,9 @@ jobs:
       fail-fast: false
       matrix: ${{ fromJSON(needs.image-matrix.outputs.matrix) }}
     with:
-      CPP: "${{ matrix.CPP }}"
-      CUDA: "${{ matrix.CUDA }}"
-      LLVM: "${{ matrix.LLVM }}"
-      RUST: "${{ matrix.RUST }}"
-      NVHPC: "${{ matrix.NVHPC }}"
-      MAMBAFORGE: "${{ matrix.MAMBAFORGE }}"
+      os : "${{ matrix.os }}"
+      tag: "${{ matrix.tag }}"
+      features: "${{ matrix.features }}"
 
   cleanup-ghcr:
     name: Clean up ghcr.io packages

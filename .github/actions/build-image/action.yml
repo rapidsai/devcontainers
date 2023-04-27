@@ -3,10 +3,6 @@ name: build-image
 description: Build image
 
 inputs:
-  dir:
-    type: string
-    required: true
-    description: Image dir
   tag:
     type: string
     required: true
@@ -50,6 +46,6 @@ runs:
           --platform "linux/${{ inputs.arch }}" \
           --cache-from "${repo}:${{ inputs.tag }}" \
           --image-name "${repo}:${{ inputs.tag }}" \
-          --workspace-folder "images/${{ inputs.dir }}" \
+          --workspace-folder "$(realpath -m ./image)" \
           --output "type=oci,dest=${{ runner.temp }}/${{ inputs.arch }}.tar" \
           ;

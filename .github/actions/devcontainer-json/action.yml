@@ -1,0 +1,36 @@
+name: devcontainer-json
+
+description: Make .devcontainer.json
+
+inputs:
+  os:
+    type: string
+    required: true
+  features:
+    type: string
+    required: true
+
+outputs:
+  tag:
+    value: ${{ steps.json.outputs.tag }}
+
+runs:
+  using: composite
+  steps:
+
+    - name: Setup Node.js
+      if: contains(runner.name, 'nvidia') == true
+      uses: actions/setup-node@v3
+      with:
+        node-version: '16'
+
+    - id: json
+      name: Make image/.devcontainer.json
+      shell: bash --noprofile --norc -x -eo pipefail {0}
+      run: |
+        bash --noprofile --norc -x -eo pipefail \
+          .github/actions/devcontainer-json/action.sh \
+          '${{ inputs.os }}' \
+          '${{ inputs.features }}' \
+          '${{ github.repository_owner }}' \
+        | tee -a $GITHUB_OUTPUT;

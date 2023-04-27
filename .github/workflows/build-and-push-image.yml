@@ -3,22 +3,13 @@ name: Build and push devcontainer images
 on:
   workflow_call:
     inputs:
-      CPP:
+      os:
         type: string
         required: true
-      CUDA:
+      tag:
         type: string
         required: true
-      LLVM:
-        type: string
-        required: true
-      RUST:
-        type: string
-        required: true
-      NVHPC:
-        type: string
-        required: true
-      MAMBAFORGE:
+      features:
         type: string
         required: true
 
@@ -27,10 +18,8 @@ jobs:
   build-and-upload:
     name: Build and upload
     runs-on: ${{ fromJSON(github.repository != 'rapidsai/devcontainers' && '"ubuntu-latest"' || format('"linux-{0}-cpu4"', matrix.arch)) }}
-    permissions:
-      packages: write
     outputs:
-      tag: ${{ steps.info.outputs.tag }}
+      tag: ${{ steps.json.outputs.tag }}
       repo: ${{ steps.build.outputs.repo }}
     strategy:
       fail-fast: false
@@ -43,39 +32,32 @@ jobs:
           fetch-depth: 0
           persist-credentials: false
 
-      - id: info
-        name: Determine devcontainer image info
-        uses: ./.github/actions/image-info
+      - id: json
+        name: Write .devcontainer.json
+        uses: ./.github/actions/devcontainer-json
         with:
-          CPP: "${{ inputs.CPP }}"
-          CUDA: "${{ inputs.CUDA }}"
-          LLVM: "${{ inputs.LLVM }}"
-          RUST: "${{ inputs.RUST }}"
-          NVHPC: "${{ inputs.NVHPC }}"
-          MAMBAFORGE: "${{ inputs.MAMBAFORGE }}"
+          os : "${{ inputs.os }}"
+          features: "${{ inputs.features }}"
 
       - id: build
-        name: Build ${{ steps.info.outputs.tag }}-${{ matrix.arch }}
+        name: Build ${{ steps.json.outputs.tag }}-${{ matrix.arch }}
         uses: ./.github/actions/build-image
         with:
           arch: "${{ matrix.arch }}"
-          dir: "${{ steps.info.outputs.dir }}"
-          tag: "${{ steps.info.outputs.tag }}"
+          tag: "${{ steps.json.outputs.tag }}"
           repo: "${{ vars.DOCKERHUB_REPOSITORY || github.repository }}"
 
-      - name: Upload ${{ steps.info.outputs.tag }}-${{ matrix.arch }}
+      - name: Upload ${{ steps.json.outputs.tag }}-${{ matrix.arch }}
         uses: actions/upload-artifact@v3
         with:
           retention-days: 1
-          name: ${{ steps.info.outputs.tag }}
+          name: ${{ steps.json.outputs.tag }}
           path: ${{ runner.temp }}/${{ matrix.arch }}.tar
 
   push-to-dockerhub:
     name: Push to Docker Hub
     needs: build-and-upload
     runs-on: ubuntu-latest
-    permissions:
-      packages: write
     steps:
       - name: Checkout ${{ github.repository }}
         uses: actions/checkout@v3

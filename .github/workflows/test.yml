@@ -115,7 +115,7 @@ jobs:
 
   test-images:
     if: needs.image-matrix.outputs.matrix != '{"include":[]}'
-    name: Image
+    name: ${{ matrix.tag }}-${{ matrix.os }}
     needs: image-matrix
     secrets: inherit
     uses: ./.github/workflows/build-and-test-image.yml
@@ -123,9 +123,6 @@ jobs:
       fail-fast: false
       matrix: ${{ fromJSON(needs.image-matrix.outputs.matrix) }}
     with:
-      CPP: "${{ matrix.CPP }}"
-      CUDA: "${{ matrix.CUDA }}"
-      LLVM: "${{ matrix.LLVM }}"
-      RUST: "${{ matrix.RUST }}"
-      NVHPC: "${{ matrix.NVHPC }}"
-      MAMBAFORGE: "${{ matrix.MAMBAFORGE }}"
+      os : "${{ matrix.os }}"
+      tag: "${{ matrix.tag }}"
+      features: "${{ matrix.features }}"

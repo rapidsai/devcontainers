@@ -32,11 +32,12 @@ runs:
       with:
         base_sha: ${{ fromJSON(steps.get-pr-info.outputs.pr-info).base.sha }}
         files: |
-          images/**
+          image/*
+          matrix.yml
           .github/workflows/test.yml
           .github/actions/build-image/action.yml
           .github/workflows/build-and-test-image.yml
-        #  .github/actions/image-matrix/action.yml
+          .github/actions/image-matrix/action.yml
 
     - name: Report changes
       if: inputs.full_matrix != 'true'
