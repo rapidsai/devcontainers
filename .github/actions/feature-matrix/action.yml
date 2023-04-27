@@ -42,9 +42,10 @@ runs:
 
     - name: Determine the feature matrix
       id: matrix
-      shell: bash --noprofile --norc -x -eo pipefail {0}
+      shell: bash
       run: |
-        .github/actions/feature-matrix/action.sh \
+        bash --noprofile --norc -x -eo pipefail \
+          .github/actions/feature-matrix/action.sh \
           '${{ inputs.full_matrix }}' \
           '${{ steps.changes.outputs.all_changed_and_modified_files }}' \
         | tee -a $GITHUB_OUTPUT;

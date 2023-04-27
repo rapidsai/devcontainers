@@ -1,5 +1,8 @@
 #! /usr/bin/env bash
 
+# cd to the repo root
+cd "$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )/../../../";
+
 join_with_delimiter() {
   local IFS='' delim=$1; shift; echo -n "$1"; shift; echo -n "${*/#/$delim}";
 }
@@ -10,7 +13,7 @@ find_features_with_tests() {
   | sort | uniq                                                              ;
 }
 
-full_matrix="${1:-false}";
+full_matrix="${1:-"false"}";
 files="${@:2}";
 
 features="";
