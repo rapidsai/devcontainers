@@ -25,7 +25,7 @@ files="${@}";
 features="";
 scenarios="";
 
-if [ "$full_matrix" != "false" ] || echo "$files" | grep -q ".github/"; then
+if [ "${full_matrix}" == "1" ] || echo "$files" | grep -q ".github/"; then
   features="$(find_features_with_tests 'test.sh' 'features/test')";
   scenarios="$(find_features_with_tests 'scenarios.json' 'features/test')";
 elif echo "$files" | grep -q "features/"; then

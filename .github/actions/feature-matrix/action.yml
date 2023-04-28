@@ -18,7 +18,7 @@ runs:
   steps:
     - id: get-pr-info
       if: inputs.full_matrix != 'true'
-      name: Get last successful main commit sha
+      name: Get PR target branch info
       uses: ./.github/actions/get-pr-info
 
     - name: Check if files changed
@@ -31,9 +31,10 @@ runs:
           features/src/**
           features/test/**
           .github/workflows/test.yml
+          .github/actions/feature-matrix/action.sh
+          .github/actions/feature-matrix/action.yml
           .github/workflows/build-and-test-feature.yml
           .github/actions/build-and-test-feature/action.yml
-        #  .github/actions/feature-matrix/action.yml
 
     - name: Report changes
       if: inputs.full_matrix != 'true'

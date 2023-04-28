@@ -19,7 +19,7 @@ runs:
   steps:
 
     - name: Setup Node.js
-      if: contains(runner.name, 'nvidia') == true
+      if: contains(runner.name, 'rapidsai') == true
       uses: actions/setup-node@v3
       with:
         node-version: '16'
