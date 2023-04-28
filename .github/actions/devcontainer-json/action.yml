@@ -1,0 +1,41 @@
+name: devcontainer-json
+
+description: Make .devcontainer.json
+
+inputs:
+  os:
+    type: string
+    required: true
+  features:
+    type: string
+    required: true
+
+outputs:
+  tag:
+    value: ${{ steps.json.outputs.tag }}
+
+runs:
+  using: composite
+  steps:
+
+    - name: Setup Node.js
+      if: contains(runner.name, 'rapidsai') == true
+      uses: actions/setup-node@v3
+      with:
+        node-version: '16'
+
+    - id: json
+      name: Make image/.devcontainer/devcontainer.json
+      shell: bash
+      run: |
+        bash --noprofile --norc -x -eo pipefail       \
+          .github/actions/devcontainer-json/action.sh \
+          '${{ inputs.os }}' '${{ inputs.features }}' \
+        3>> $GITHUB_OUTPUT                            \
+        4> image/.devcontainer/devcontainer.json.out  ;
+
+        mv image/.devcontainer/devcontainer.json{.out,};
+
+        echo "tag=${tag}";
+        echo -n "devcontainer=";
+        cat "image/.devcontainer/devcontainer.json"

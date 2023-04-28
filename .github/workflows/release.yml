@@ -32,8 +32,8 @@ jobs:
         with:
           full_matrix: 'true'
 
-  push-images:
-    name: Image
+  build-and-push-images:
+    name: ${{ matrix.name }}
     needs: image-matrix
     secrets: inherit
     uses: ./.github/workflows/build-and-push-image.yml
@@ -41,18 +41,5 @@ jobs:
       fail-fast: false
       matrix: ${{ fromJSON(needs.image-matrix.outputs.matrix) }}
     with:
-      CPP: "${{ matrix.CPP }}"
-      CUDA: "${{ matrix.CUDA }}"
-      LLVM: "${{ matrix.LLVM }}"
-      RUST: "${{ matrix.RUST }}"
-      NVHPC: "${{ matrix.NVHPC }}"
-      MAMBAFORGE: "${{ matrix.MAMBAFORGE }}"
-
-  cleanup-ghcr:
-    name: Clean up ghcr.io packages
-    needs: push-images
-    secrets: inherit
-    uses: ./.github/workflows/cleanup-ghcr.yml
-    with:
-      cut-off: "1 second ago UTC"
-      untagged-only: true
+      os : "${{ matrix.os }}"
+      features: "${{ toJSON(matrix.features) }}"

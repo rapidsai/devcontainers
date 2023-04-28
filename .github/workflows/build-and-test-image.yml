@@ -3,22 +3,10 @@ name: Build and test devcontainer images
 on:
   workflow_call:
     inputs:
-      CPP:
+      os:
         type: string
         required: true
-      CUDA:
-        type: string
-        required: true
-      LLVM:
-        type: string
-        required: true
-      RUST:
-        type: string
-        required: true
-      NVHPC:
-        type: string
-        required: true
-      MAMBAFORGE:
+      features:
         type: string
         required: true
 
@@ -38,21 +26,16 @@ jobs:
           fetch-depth: 0
           persist-credentials: false
 
-      - id: info
-        name: Determine devcontainer image info
-        uses: ./.github/actions/image-info
+      - id: json
+        name: Write .devcontainer.json
+        uses: ./.github/actions/devcontainer-json
         with:
-          CPP: "${{ inputs.CPP }}"
-          CUDA: "${{ inputs.CUDA }}"
-          LLVM: "${{ inputs.LLVM }}"
-          RUST: "${{ inputs.RUST }}"
-          NVHPC: "${{ inputs.NVHPC }}"
-          MAMBAFORGE: "${{ inputs.MAMBAFORGE }}"
+          os : "${{ inputs.os }}"
+          features: "${{ inputs.features }}"
 
-      - name: Build and test ${{ steps.info.outputs.tag }}-${{ matrix.arch }}
+      - name: Build and test ${{ steps.json.outputs.tag }}-${{ matrix.arch }}
         uses: ./.github/actions/build-image
         with:
           arch: "${{ matrix.arch }}"
-          dir: "${{ steps.info.outputs.dir }}"
-          tag: "${{ steps.info.outputs.tag }}"
+          tag: "${{ steps.json.outputs.tag }}"
           repo: "${{ vars.DOCKERHUB_REPOSITORY || github.repository }}"
