@@ -7,8 +7,8 @@ os="${1:-}";
 features="${2:-}";
 
 VERSION="$(git describe --abbrev=0 --tags | sed 's/[a-zA-Z]//g' | cut -d '.' -f -2)";
-sdk="cpp-$(node -p "${features}.map((x) => x.name + (x.version || '')).join('-')")";
-tag="${VERSION:-latest}-${sdk}-$(echo "${os}" | tr -d :)";
+tag="cpp-$(node -p "${features}.map((x) => x.name + (x.version || '')).join('-')")";
+tag="${VERSION:-latest}-${tag}-$(echo "${os}" | tr -d :)";
 
 echo "tag=${tag}" >&3;
 

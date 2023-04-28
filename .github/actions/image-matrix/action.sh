@@ -58,7 +58,7 @@ changed_images="$( \
     | {
         os: $os,
         features: .,
-        tag: . | map(.name + .version) | join("-")
+        name: (. + [{name:$os}]) | map(.name + .version) | join(" ")
       }
     )
   ) | flatten | unique'

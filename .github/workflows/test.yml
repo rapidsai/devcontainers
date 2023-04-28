@@ -115,7 +115,7 @@ jobs:
 
   test-images:
     if: needs.image-matrix.outputs.matrix != '{"include":[]}'
-    name: ${{ matrix.tag }}-${{ matrix.os }}
+    name: ${{ matrix.name }}
     needs: image-matrix
     secrets: inherit
     uses: ./.github/workflows/build-and-test-image.yml
@@ -124,5 +124,4 @@ jobs:
       matrix: ${{ fromJSON(needs.image-matrix.outputs.matrix) }}
     with:
       os : "${{ matrix.os }}"
-      tag: "${{ matrix.tag }}"
       features: "${{ toJSON(matrix.features) }}"

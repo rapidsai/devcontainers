@@ -6,9 +6,6 @@ on:
       os:
         type: string
         required: true
-      tag:
-        type: string
-        required: true
       features:
         type: string
         required: true
@@ -84,7 +81,6 @@ jobs:
       - name: Push multiarch manifest to Docker Hub
         shell: bash --noprofile --norc -x -eo pipefail {0}
         env:
-          tag: "${{ needs.build-and-upload.outputs.tag }}"
           name: "${{ needs.build-and-upload.outputs.repo }}:${{ needs.build-and-upload.outputs.tag }}"
         run: |
 

@@ -32,8 +32,8 @@ jobs:
         with:
           full_matrix: 'true'
 
-  push-images:
-    name: Image
+  build-and-push-images:
+    name: ${{ matrix.name }}
     needs: image-matrix
     secrets: inherit
     uses: ./.github/workflows/build-and-push-image.yml
@@ -42,14 +42,4 @@ jobs:
       matrix: ${{ fromJSON(needs.image-matrix.outputs.matrix) }}
     with:
       os : "${{ matrix.os }}"
-      tag: "${{ matrix.tag }}"
       features: "${{ toJSON(matrix.features) }}"
-
-  cleanup-ghcr:
-    name: Clean up ghcr.io packages
-    needs: push-images
-    secrets: inherit
-    uses: ./.github/workflows/cleanup-ghcr.yml
-    with:
-      cut-off: "1 second ago UTC"
-      untagged-only: true
