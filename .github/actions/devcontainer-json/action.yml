@@ -33,4 +33,5 @@ runs:
           '${{ inputs.os }}' \
           '${{ inputs.features }}' \
         3>> $GITHUB_OUTPUT \
-        4> image/.devcontainer/devcontainer.json;
+        4> image/.devcontainer/devcontainer.json.out;
+        mv image/.devcontainer/devcontainer.json{.out,};
