@@ -35,3 +35,7 @@ runs:
         4> image/.devcontainer/devcontainer.json.out  ;
 
         mv image/.devcontainer/devcontainer.json{.out,};
+
+        echo "tag=${tag}";
+        echo -n "devcontainer=";
+        cat "image/.devcontainer/devcontainer.json"
