@@ -12,9 +12,8 @@ runs:
   using: composite
   steps:
     - name: Free up disk space
-      shell: bash
+      shell: bash --noprofile --norc -x -eo pipefail {0}
       run: |
-          set -x;
           df -h;
           docker images;
           sudo swapoff -a;

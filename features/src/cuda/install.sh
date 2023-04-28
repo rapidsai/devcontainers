@@ -67,10 +67,12 @@ cuda_ver="${VERSION:-12.1.0}";
 cuda_ver=$(echo "${cuda_ver}" | cut -d'.' -f3 --complement);
 
 cudapath="${CUDA_HOME}-${cuda_ver}";
+nccl_tag="cuda${cuda_ver}";
 cuda_ver="${cuda_ver/./-}";
 
 check_packages                          \
-    libnccl-dev                         \
+    "libnccl-dev=*+${nccl_tag}"         \
+    "libnccl2=*+${nccl_tag}"            \
     cuda-compiler-${cuda_ver}           \
     cuda-nvml-dev-${cuda_ver}           \
     cuda-libraries-dev-${cuda_ver}      \

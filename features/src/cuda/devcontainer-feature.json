@@ -22,7 +22,7 @@
     },
     "pruneStaticLibs": {
       "type": "boolean",
-      "default": false,
+      "default": true,
       "description": "Whether to remove static libs from the CUDA Toolkit to save image size"
     }
   },
