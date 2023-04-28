@@ -28,10 +28,10 @@ runs:
       name: Make image/.devcontainer/devcontainer.json
       shell: bash --noprofile --norc -x -eo pipefail {0}
       run: |
-        bash --noprofile --norc -x -eo pipefail \
+        bash --noprofile --norc -x -eo pipefail       \
           .github/actions/devcontainer-json/action.sh \
-          '${{ inputs.os }}' \
-          '${{ inputs.features }}' \
-        3>> $GITHUB_OUTPUT \
-        4> image/.devcontainer/devcontainer.json.out;
+          '${{ inputs.os }}' '${{ inputs.features }}' \
+        3>> $GITHUB_OUTPUT                            \
+        4> image/.devcontainer/devcontainer.json.out  ;
+
         mv image/.devcontainer/devcontainer.json{.out,};
