@@ -57,7 +57,7 @@ changed_images="$( \
       | select(any(IN(.name; $xs[])))
     | {
         os: $os,
-        features: . | tostring,
+        features: .,
         tag: . | map(.name + .version) | join("-")
       }
     )

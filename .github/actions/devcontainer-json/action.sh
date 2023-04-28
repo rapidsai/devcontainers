@@ -5,14 +5,12 @@ cd "$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )/../../../";
 
 os="${1:-}";
 features="${2:-}";
-repo_owner="${3:-}";
 
 VERSION="$(git describe --abbrev=0 --tags | sed 's/[a-zA-Z]//g' | cut -d '.' -f -2)";
-VER="$(echo "${VERSION}" | sed -E 's/0([0-9]+)/\1/g' | cut -d '.' --complement -f3)";
 sdk="cpp-$(node -p "${features}.map((x) => x.name + x.version).join('-')")";
 tag="${VERSION:-latest}-${sdk}-$(echo "${os}" | tr -d :)";
 
-echo "tag=${tag}";
+echo "tag=${tag}" >&3;
 
 node -e "$(cat <<EOF
 
@@ -27,10 +25,6 @@ ${features}.forEach(({name, ...feature}) => {
   json.overrideFeatureInstallOrder.splice(i, 0, f);
 });
 
-require("fs").writeFileSync("image/.devcontainer/devcontainer.json", JSON.stringify(json));
+console.log(JSON.stringify(json));
 EOF
-)"
-
-echo "image: ghcr.io/${repo_owner}/devcontainers:${tag}" >&2;
-echo "image/.devcontainer/devcontainer.json:" >&2;
-cat "image/.devcontainer/devcontainer.json" >&2;
+)" >&4;

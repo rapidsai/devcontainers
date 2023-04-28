@@ -43,7 +43,7 @@ jobs:
     with:
       os : "${{ matrix.os }}"
       tag: "${{ matrix.tag }}"
-      features: "${{ matrix.features }}"
+      features: "${{ toJSON(matrix.features) }}"
 
   cleanup-ghcr:
     name: Clean up ghcr.io packages

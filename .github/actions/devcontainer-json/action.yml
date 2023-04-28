@@ -32,5 +32,5 @@ runs:
           .github/actions/devcontainer-json/action.sh \
           '${{ inputs.os }}' \
           '${{ inputs.features }}' \
-          '${{ github.repository_owner }}' \
-        | tee -a $GITHUB_OUTPUT;
+        3>> $GITHUB_OUTPUT \
+        4> image/.devcontainer/devcontainer.json;

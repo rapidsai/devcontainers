@@ -1,3 +1,5 @@
+# CCCL devcontainers
+
 - os: "ubuntu:18.04"
   images:
   - features: [{ name: "gcc",  version: "7" }, { name: "cuda", version: "11.0" }]
@@ -20,76 +22,77 @@
 
 - os: "ubuntu:22.04"
   images:
-  # cpp-nvhpc
-  - features: [{ name: "nvhpc", version: "23.1"}]
-  - features: [{ name: "nvhpc", version: "23.3"}]
+  - features: [{ name: "nvhpc", version: "23.1" }]
+  - features: [{ name: "nvhpc", version: "23.3" }]
+  - features: [{ name: "gcc",  version: "11" }, { name: "cuda", version: "12.1" }]
+  - features: [{ name: "gcc",  version: "12" }, { name: "cuda", version: "12.1" }]
+  - features: [{ name: "llvm", version: "15" }, { name: "cuda", version: "12.1" }]
+  - features: [{ name: "llvm", version: "16" }, { name: "cuda", version: "12.1" }]
 
-  # cpp-cuda
+# RAPIDS devcontainers
+
+- os: "ubuntu:22.04"
+  images:
+  # cuda
   - features: [{ name: "cuda",  version: "11.8" }]
   - features: [{ name: "cuda",  version: "12.1" }]
 
-  # cpp-cuda-mambaforge
+  # cuda-mambaforge
   - features: [{ name: "cuda",  version: "11.8" }, { name: "mambaforge" }]
 
-  # cpp-llvm
+  # llvm
   - features: [{ name: "llvm",  version: "15" }]
   - features: [{ name: "llvm",  version: "16" }]
   - features: [{ name: "llvm",  version: "16" }]
 
-  # cpp-gcc-cuda
-  - features: [{ name: "gcc",   version: "11", }, { name: "cuda",  version: "12.1" }]
-  - features: [{ name: "gcc",   version: "12", }, { name: "cuda",  version: "12.1" }]
+  # llvm-cuda
+  - features: [{ name: "llvm", version: "15" }, { name: "cuda", version: "11.8" }]
+  - features: [{ name: "llvm", version: "15" }, { name: "cuda", version: "12.0" }]
+  - features: [{ name: "llvm", version: "16" }, { name: "cuda", version: "11.8" }]
+  - features: [{ name: "llvm", version: "16" }, { name: "cuda", version: "12.0" }]
 
-  # cpp-llvm-cuda
-  - features: [{ name: "llvm", version: "15"}, { name: "cuda", version: "11.8" }]
-  - features: [{ name: "llvm", version: "15"}, { name: "cuda", version: "12.0" }]
-  - features: [{ name: "llvm", version: "15"}, { name: "cuda", version: "12.1" }]
-  - features: [{ name: "llvm", version: "16"}, { name: "cuda", version: "11.8" }]
-  - features: [{ name: "llvm", version: "16"}, { name: "cuda", version: "12.0" }]
-  - features: [{ name: "llvm", version: "16"}, { name: "cuda", version: "12.1" }]
+  # llvm-cuda-mambaforge
+  - features: [{ name: "llvm", version: "15" }, { name: "cuda", version: "11.8" }, { name: "mambaforge" }]
+  - features: [{ name: "llvm", version: "16" }, { name: "cuda", version: "11.8" }, { name: "mambaforge" }]
 
-  # cpp-llvm-cuda-mambaforge
-  - features: [{ name: "llvm", version: "15"}, { name: "cuda", version: "11.8" }, { name: "mambaforge" }]
-  - features: [{ name: "llvm", version: "16"}, { name: "cuda", version: "11.8" }, { name: "mambaforge" }]
+  - features: [{ name: "llvm", version: "15" }, { name: "nvhpc", version: "23.1" }]
+  - features: [{ name: "llvm", version: "15" }, { name: "nvhpc", version: "23.3" }]
+  - features: [{ name: "llvm", version: "16" }, { name: "nvhpc", version: "23.1" }]
+  - features: [{ name: "llvm", version: "16" }, { name: "nvhpc", version: "23.3" }]
 
-  - features: [{ name: "llvm", version: "15"}, { name: "nvhpc", version: "23.1" }]
-  - features: [{ name: "llvm", version: "15"}, { name: "nvhpc", version: "23.3" }]
-  - features: [{ name: "llvm", version: "16"}, { name: "nvhpc", version: "23.1" }]
-  - features: [{ name: "llvm", version: "16"}, { name: "nvhpc", version: "23.3" }]
+  # llvm-cuda-nvhpc
+  - features: [{ name: "llvm", version: "15" }, { name: "cuda", version: "12.0" }, { name: "nvhpc", version: "23.1" }]
+  - features: [{ name: "llvm", version: "15" }, { name: "cuda", version: "12.0" }, { name: "nvhpc", version: "23.3" }]
+  - features: [{ name: "llvm", version: "16" }, { name: "cuda", version: "12.0" }, { name: "nvhpc", version: "23.1" }]
+  - features: [{ name: "llvm", version: "16" }, { name: "cuda", version: "12.0" }, { name: "nvhpc", version: "23.3" }]
 
-  # cpp-llvm-cuda-nvhpc
-  - features: [{ name: "llvm", version: "15"}, { name: "cuda", version: "12.0" }, { name: "nvhpc", version: "23.1" }]
-  - features: [{ name: "llvm", version: "15"}, { name: "cuda", version: "12.0" }, { name: "nvhpc", version: "23.3" }]
-  - features: [{ name: "llvm", version: "16"}, { name: "cuda", version: "12.0" }, { name: "nvhpc", version: "23.1" }]
-  - features: [{ name: "llvm", version: "16"}, { name: "cuda", version: "12.0" }, { name: "nvhpc", version: "23.3" }]
+  # llvm-mambaforge
+  - features: [{ name: "llvm", version: "15" }, { name: "mambaforge" }]
+  - features: [{ name: "llvm", version: "16" }, { name: "mambaforge" }]
 
-  # cpp-llvm-mambaforge
-  - features: [{ name: "llvm", version: "15"}, { name: "mambaforge" }]
-  - features: [{ name: "llvm", version: "16"}, { name: "mambaforge" }]
+  # llvm-nvhpc
+  - features: [{ name: "llvm", version: "15" }, { name: "nvhpc", version: "23.1" }]
+  - features: [{ name: "llvm", version: "15" }, { name: "nvhpc", version: "23.3" }]
+  - features: [{ name: "llvm", version: "16" }, { name: "nvhpc", version: "23.1" }]
+  - features: [{ name: "llvm", version: "16" }, { name: "nvhpc", version: "23.3" }]
 
-  # cpp-llvm-nvhpc
-  - features: [{ name: "llvm", version: "15"}, { name: "nvhpc", version: "23.1" }]
-  - features: [{ name: "llvm", version: "15"}, { name: "nvhpc", version: "23.3" }]
-  - features: [{ name: "llvm", version: "16"}, { name: "nvhpc", version: "23.1" }]
-  - features: [{ name: "llvm", version: "16"}, { name: "nvhpc", version: "23.3" }]
+  # llvm-rust
+  - features: [{ name: "llvm", version: "15" }, { name: "rust" }]
+  - features: [{ name: "llvm", version: "16" }, { name: "rust" }]
 
-  # cpp-llvm-rust
-  - features: [{ name: "llvm", version: "15"}, { name: "rust" }]
-  - features: [{ name: "llvm", version: "16"}, { name: "rust" }]
+  # llvm-rust-cuda-mambaforge
+  - features: [{ name: "llvm", version: "15" }, { name: "rust" }, { name: "cuda", version: "11.8" }, { name: "mambaforge" }]
+  - features: [{ name: "llvm", version: "16" }, { name: "rust" }, { name: "cuda", version: "11.8" }, { name: "mambaforge" }]
 
-  # cpp-llvm-rust-cuda-mambaforge
-  - features: [{ name: "llvm", version: "15"}, { name: "rust" }, { name: "cuda", version: "11.8" }, { name: "mambaforge" }]
-  - features: [{ name: "llvm", version: "16"}, { name: "rust" }, { name: "cuda", version: "11.8" }, { name: "mambaforge" }]
-
-  # cpp-rust-cuda
+  # rust-cuda
   - features: [{ name: "rust" }, { name: "cuda", version: "11.8" }]
   - features: [{ name: "rust" }, { name: "cuda", version: "12.1" }]
 
-  # cpp-rust-cuda-mambaforge
+  # rust-cuda-mambaforge
   - features: [{ name: "rust" }, { name: "cuda", version: "11.8" }, { name: "mambaforge" }]
 
   # cuda-mambaforge
   - features: [{ name: "cuda", version: "11.8" }, { name: "mambaforge" }]
 
-  # cpp-mambaforge
+  # mambaforge
   - features: [{ name: "mambaforge" }]
