@@ -127,6 +127,7 @@ if type sccache >/dev/null 2>&1 && test -n "${SCCACHE_BUCKET}"; then (
                 echo "Success!";
             fi
             break;
+        fi
         if test "${__sccache_starts__}" -gt "19"; then
             echo "Skipping.";
             break;
