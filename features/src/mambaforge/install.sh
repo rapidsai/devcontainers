@@ -34,19 +34,19 @@ find /opt/conda -follow -type f -name '*.pyc' -delete;
 conda clean --force-pkgs-dirs --all --yes;
 
 # Activate conda in /etc/bash.bashrc
-append_to_etc_bashrc '
+append_to_etc_bashrc "
 for x in "conda" "mamba"; do
-    if ! type $x | grep -q function; then . /opt/conda/etc/profile.d/$x.sh; fi;
+    if ! type \$x | grep -q function; then . /opt/conda/etc/profile.d/\$x.sh; fi;
 done
 $(cat .bashrc)
-';
+";
 # Activate conda in ~/.bashrc
-append_to_all_bashrcs '
+append_to_all_bashrcs "
 for x in "conda" "mamba"; do
-    if ! type $x | grep -q function; then . /opt/conda/etc/profile.d/$x.sh; fi;
+    if ! type \$x | grep -q function; then . /opt/conda/etc/profile.d/\$x.sh; fi;
 done
 $(cat .bashrc)
-';
+";
 # export envvars in /etc/profile.d
 ln -s /opt/conda/etc/profile.d/conda.sh /etc/profile.d/$(($(ls -1q /etc/profile.d/*.sh | wc -l) + 20))-conda.sh;
 ln -s /opt/conda/etc/profile.d/mamba.sh /etc/profile.d/$(($(ls -1q /etc/profile.d/*.sh | wc -l) + 20))-mamba.sh;
