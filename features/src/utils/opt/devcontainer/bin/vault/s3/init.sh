@@ -118,19 +118,25 @@ EOF
 
 . ~/.bashrc;
 
-if [[ -n "${SCCACHE_BUCKET}" ]]; then
+if type sccache >/dev/null 2>&1 && test -n "${SCCACHE_BUCKET}"; then (
     __sccache_starts__=0;
-    sccache --stop-server &>/dev/null || true;
     while test 1; do
-        if test SCCACHE_NO_DAEMON=1 sccache --show-stats &>/dev/null; then
-            . devcontainer-utils-vault-s3-export 0;
+        sccache --stop-server &>/dev/null || true;
+        if SCCACHE_NO_DAEMON=1 sccache --show-stats &>/dev/null; then
+            if test "$__sccache_starts__" -gt "0"; then
+                echo "Success!";
+            fi
             break;
-        elif test "$__sccache_starts__" -ge 20; then
-            . devcontainer-utils-vault-s3-export 1;
+        elif test "$__sccache_starts__" -ge "20"; then
+            echo "Skipping.";
             break;
         fi
         __sccache_starts__=$((__sccache_starts__ + 1));
+        if test "$__sccache_starts__" -eq "1"; then
+            echo -n "Waiting for AWS S3 credentials to propagate... ";
+        fi
         sleep 1;
     done;
     unset __sccache_starts__;
+)
 fi
