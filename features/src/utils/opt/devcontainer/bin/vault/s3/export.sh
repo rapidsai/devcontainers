@@ -24,14 +24,14 @@ test_s3_creds_and_update_envvars() {
     sed -Ei '/^unset SCCACHE_BUCKET;$/d' ~/.bashrc;
     sed -Ei '/^unset SCCACHE_REGION;$/d' ~/.bashrc;
 
-    local s3_status="${1:-$(devcontainer-utils-vault-s3-test &> /dev/null; echo $?)}";
+    local s3_status="${1:-$(devcontainer-utils-vault-s3-test >/dev/null 2>&1; echo $?)}";
 
     case $s3_status in
         [0] ) # bucket is read + write
             append_envvar "SCCACHE_BUCKET" "$(grep 'bucket=' ~/.aws/config | sed 's/bucket=//')";
             append_envvar "SCCACHE_REGION" "$(grep 'region=' ~/.aws/config | sed 's/region=//')";
             # install a crontab to refresh creds
-            if ! crontab -l &> /dev/null; then
+            if ! crontab -l >/dev/null 2>&1; then
                 crontab -u $(whoami) /opt/devcontainer/cron/vault-s3-init;
                 sudo cron;
             fi

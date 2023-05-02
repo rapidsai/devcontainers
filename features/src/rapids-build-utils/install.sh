@@ -10,7 +10,7 @@ cd "$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )";
 check_packages jq sudo wget gettext-base bash-completion ca-certificates;
 
 # Install yq if not installed
-if ! type yq &>/dev/null; then
+if ! type yq >/dev/null 2>&1; then
     YQ_VERSION=latest;
     find_version_from_git_tags YQ_VERSION https://github.com/mikefarah/yq;
 

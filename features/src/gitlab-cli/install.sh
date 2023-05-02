@@ -47,7 +47,7 @@ export DEBIAN_FRONTEND=noninteractive;
 
 # Install curl, apt-transport-https, curl, or git if missing
 check_packages curl ca-certificates apt-transport-https;
-if ! type git &>/dev/null; then
+if ! type git >/dev/null 2>&1; then
     check_packages git;
 fi
 

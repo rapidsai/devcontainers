@@ -20,18 +20,18 @@ PKG+=("ca-certificates");
 PKG+=("bash-completion");
 PKG_TO_REMOVE=();
 
-if ! type gcc &>/dev/null; then
+if ! type gcc >/dev/null 2>&1; then
     PKG+=("gcc");
     PKG_TO_REMOVE+=("gcc");
 fi
-if ! type g++ &>/dev/null; then
+if ! type g++ >/dev/null 2>&1; then
     PKG+=("g++");
     PKG_TO_REMOVE+=("g++");
 fi
 
 check_packages ${PKG[@]};
 
-if ! type cmake &>/dev/null; then
+if ! type cmake >/dev/null 2>&1; then
     CMAKE_VERSION=latest;
     find_version_from_git_tags CMAKE_VERSION https://github.com/Kitware/CMake;
 

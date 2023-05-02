@@ -26,7 +26,7 @@ check_nightly_version_formatting() {
 
     local version_date=$(echo ${requested_version} | sed -e "s/^nightly-//")
 
-    date -d ${version_date} &>/dev/null
+    date -d ${version_date} >/dev/null 2>&1
     if [ $? != 0 ]; then
         echo -e "Invalid ${variable_name} value: ${requested_version}\nNightly version should be in the format nightly-YYYY-MM-DD" >&2
         exit 1
@@ -50,7 +50,7 @@ lldb_pkg="lldb";
 
 if [[ -n "${LLVM_VERSION:-}" ]]; then
     lldb_pkg="lldb-${LLVM_VERSION}";
-elif type llvm-config &> /dev/null; then
+elif type llvm-config >/dev/null 2>&1; then
     lldb_pkg="lldb-$(llvm-config --version | cut -d':' -f3 | cut -d'.' -f1)";
 fi
 
@@ -94,7 +94,7 @@ if [ "${RUST_VERSION}" = "none" ] || type rustup > /dev/null 2>&1; then
 else
     if [ "${RUST_VERSION}" != "latest" ] && [ "${RUST_VERSION}" != "lts" ] && [ "${RUST_VERSION}" != "stable" ]; then
         # Find version using soft match
-        if ! type git &>/dev/null; then
+        if ! type git >/dev/null 2>&1; then
             check_packages git;
         fi
 

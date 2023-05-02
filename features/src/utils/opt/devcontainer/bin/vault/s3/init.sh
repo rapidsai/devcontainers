@@ -55,7 +55,7 @@ vault_s3_init() {
     eval "$(devcontainer-utils-vault-auth-github "${VAULT_HOST}" ${user_orgs})";
 
     if [[ "${vault_token:-null}" == null ]]; then
-        echo "Your GitHub user was not recognized by vault. Exiting." >&2;
+        echo "Your GitHub user was not recognized by vault. Skipping." >&2;
         devcontainer-utils-vault-s3-export 1;
         return;
     fi
@@ -79,13 +79,13 @@ vault_s3_init() {
     local aws_secret_access_key="$(echo "$aws_creds" | jq -r '.secret_key')";
 
     if [[ "${aws_access_key_id:-null}" == null ]]; then
-        echo "Failed to generate temporary AWS S3 credentials. Exiting." >&2;
+        echo "Failed to generate temporary AWS S3 credentials. Skipping." >&2;
         devcontainer-utils-vault-s3-export 1;
         return;
     fi
 
     if [[ "${aws_secret_access_key:-null}" == null ]]; then
-        echo "Failed to generate temporary AWS S3 credentials. Exiting." >&2;
+        echo "Failed to generate temporary AWS S3 credentials. Skipping." >&2;
         devcontainer-utils-vault-s3-export 1;
         return;
     fi
@@ -121,18 +121,18 @@ EOF
 if type sccache >/dev/null 2>&1 && test -n "${SCCACHE_BUCKET}"; then (
     __sccache_starts__=0;
     while test 1; do
-        sccache --stop-server &>/dev/null || true;
-        if SCCACHE_NO_DAEMON=1 sccache --show-stats &>/dev/null; then
-            if test "$__sccache_starts__" -gt "0"; then
+        sccache --stop-server >/dev/null 2>&1 || true;
+        if SCCACHE_NO_DAEMON=1 sccache --show-stats >/dev/null 2>&1; then
+            if test "${__sccache_starts__}" -gt "0"; then
                 echo "Success!";
             fi
             break;
-        elif test "$__sccache_starts__" -ge "20"; then
+        if test "${__sccache_starts__}" -gt "19"; then
             echo "Skipping.";
             break;
         fi
-        __sccache_starts__=$((__sccache_starts__ + 1));
-        if test "$__sccache_starts__" -eq "1"; then
+        __sccache_starts__="$((__sccache_starts__ + 1))";
+        if test "${__sccache_starts__}" -eq "1"; then
             echo -n "Waiting for AWS S3 credentials to propagate... ";
         fi
         sleep 1;

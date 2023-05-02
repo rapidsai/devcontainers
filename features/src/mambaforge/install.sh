@@ -36,14 +36,14 @@ conda clean --force-pkgs-dirs --all --yes;
 # Activate conda in /etc/bash.bashrc
 append_to_etc_bashrc "
 for x in "conda" "mamba"; do
-    if ! type \$x | grep -q function; then . /opt/conda/etc/profile.d/\$x.sh; fi;
+    if ! type \$x >/dev/null 2>&1 | grep -q function; then . /opt/conda/etc/profile.d/\$x.sh; fi;
 done
 $(cat .bashrc)
 ";
 # Activate conda in ~/.bashrc
 append_to_all_bashrcs "
 for x in "conda" "mamba"; do
-    if ! type \$x | grep -q function; then . /opt/conda/etc/profile.d/\$x.sh; fi;
+    if ! type \$x >/dev/null 2>&1 | grep -q function; then . /opt/conda/etc/profile.d/\$x.sh; fi;
 done
 $(cat .bashrc)
 ";

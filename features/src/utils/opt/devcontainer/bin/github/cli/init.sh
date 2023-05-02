@@ -13,7 +13,7 @@ init_github_cli() {
     else
         local ssh_result="$(ssh -T git@github.com 2>&1 || true)";
         local ssh_success="You've successfully authenticated, but GitHub does not provide shell access.";
-        if [[ "$(echo "$ssh_result" | grep -q "$ssh_success" &>/dev/null; echo $?)" == 0 ]]; then
+        if [[ "$(echo "$ssh_result" | grep -q "$ssh_success" >/dev/null 2>&1; echo $?)" == 0 ]]; then
             git_protocol="--git-protocol ssh";
             if type ssh-keygen > /dev/null 2>&1; then
                 avoid_gh_cli_ssh_keygen_prompt=1;
@@ -46,7 +46,7 @@ init_github_cli() {
         for VAR in GH_TOKEN GITHUB_TOKEN; do
             if [[ -n "$(eval "echo \${${VAR}:-}")" ]]; then
                 for ENVFILE in /etc/profile "$HOME/.bashrc"; do
-                    if [[ "$(grep -q -E "^${VAR}=$" "$ENVFILE" &>/dev/null; echo $?)" != 0 ]]; then
+                    if [[ "$(grep -q -E "^${VAR}=$" "$ENVFILE" >/dev/null 2>&1; echo $?)" != 0 ]]; then
                         echo "${VAR}=" | sudo tee -a "$ENVFILE" >/dev/null || true;
                     fi
                 done
@@ -55,8 +55,8 @@ init_github_cli() {
         done
     fi
 
-    if [[ $(gh auth status &>/dev/null; echo $?) != 0 ]]; then
-        echo "Logging into GitHub...";
+    if [[ $(gh auth status >/dev/null 2>&1; echo $?) != 0 ]]; then
+        echo "Logging into GitHub..." >&2;
         local ssh_keygen="$(which ssh-keygen || echo "")";
         if [[ -n "$avoid_gh_cli_ssh_keygen_prompt" && -n "$ssh_keygen" ]]; then
             sudo mv $ssh_keygen{,.bak} || true;
@@ -66,7 +66,7 @@ init_github_cli() {
             sudo mv $ssh_keygen{.bak,} || true;
         fi
     elif [[ -n "${needed_scopes}" ]]; then
-        echo "Logging into GitHub...";
+        echo "Logging into GitHub..." >&2;
         gh auth refresh --hostname github.com $(scope_flags ${active_scopes} ${needed_scopes});
     fi
 
