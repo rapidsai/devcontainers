@@ -35,14 +35,14 @@ conda clean --force-pkgs-dirs --all --yes;
 
 # Activate conda in /etc/bash.bashrc
 append_to_etc_bashrc "
-if ! type conda &>/dev/null; then . /opt/conda/etc/profile.d/conda.sh; fi;
-if ! type mamba &>/dev/null; then . /opt/conda/etc/profile.d/mamba.sh; fi;
+. /opt/conda/etc/profile.d/conda.sh;
+. /opt/conda/etc/profile.d/mamba.sh;
 $(cat .bashrc)
 ";
 # Activate conda in ~/.bashrc
 append_to_all_bashrcs "
-if ! type conda &>/dev/null; then . /opt/conda/etc/profile.d/conda.sh; fi;
-if ! type mamba &>/dev/null; then . /opt/conda/etc/profile.d/mamba.sh; fi;
+. /opt/conda/etc/profile.d/conda.sh;
+. /opt/conda/etc/profile.d/mamba.sh;
 $(cat .bashrc)
 ";
 # export envvars in /etc/profile.d
