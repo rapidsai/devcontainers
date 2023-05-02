@@ -7,13 +7,22 @@ vault_s3_init() {
     # Attempt to retrieve temporary AWS credentials from a vault
     # instance using GitHub OAuth.
 
-    if [[ -z "${VAULT_HOST:-}" ]]; then return; fi
-    if [[ -z "${SCCACHE_BUCKET:-}" ]]; then return; fi
+    if [[ -z "${VAULT_HOST:-}" ]]; then
+        devcontainer-utils-vault-s3-export 1;
+        return;
+    fi
+    if [[ -z "${SCCACHE_BUCKET:-}" ]]; then
+        devcontainer-utils-vault-s3-export 1;
+        return;
+    fi
 
     # Initialize the GitHub CLI with the appropriate user scopes
     eval "export $(devcontainer-utils-init-github-cli)";
 
-    if [[ -z "${GITHUB_USER:-}" ]]; then return; fi
+    if [[ -z "${GITHUB_USER:-}" ]]; then
+        devcontainer-utils-vault-s3-export 1;
+        return;
+    fi
 
     # Check whether the user is in one of the allowed GitHub orgs
     local allowed_orgs="${VAULT_GITHUB_ORGS:-nvidia nv-morpheus nv-legate rapids}";
@@ -27,7 +36,10 @@ vault_s3_init() {
       | grep --color=never -E "(${allowed_orgs})"    \
     )";
 
-    if [[ -z "${user_orgs:-}" ]]; then return; fi
+    if [[ -z "${user_orgs:-}" ]]; then
+        devcontainer-utils-vault-s3-export 1;
+        return;
+    fi
 
     # Remove existing credentials in case vault declines to issue new ones.
     rm -rf ~/.aws/{stamp,config,credentials};
@@ -44,6 +56,7 @@ vault_s3_init() {
 
     if [[ "${vault_token:-null}" == null ]]; then
         echo "Your GitHub user was not recognized by vault. Exiting." >&2;
+        devcontainer-utils-vault-s3-export 1;
         return;
     fi
 
@@ -67,11 +80,13 @@ vault_s3_init() {
 
     if [[ "${aws_access_key_id:-null}" == null ]]; then
         echo "Failed to generate temporary AWS S3 credentials. Exiting." >&2;
+        devcontainer-utils-vault-s3-export 1;
         return;
     fi
 
     if [[ "${aws_secret_access_key:-null}" == null ]]; then
         echo "Failed to generate temporary AWS S3 credentials. Exiting." >&2;
+        devcontainer-utils-vault-s3-export 1;
         return;
     fi
 
@@ -94,9 +109,28 @@ EOF
 
     chmod 0600 ~/.aws/{config,credentials};
 
+    devcontainer-utils-vault-s3-export 0;
+
     echo "Successfully generated temporary AWS S3 credentials!";
 }
 
 (vault_s3_init "$@");
 
-. devcontainer-utils-vault-s3-export;
+. ~/.bashrc;
+
+if [[ -n "${SCCACHE_BUCKET}" ]]; then
+    __sccache_starts__=0;
+    sccache --stop-server &>/dev/null || true;
+    while test 1; do
+        if test SCCACHE_NO_DAEMON=1 sccache --show-stats &>/dev/null; then
+            . devcontainer-utils-vault-s3-export 0;
+            break;
+        elif test "$__sccache_starts__" -ge 20; then
+            . devcontainer-utils-vault-s3-export 1;
+            break;
+        fi
+        __sccache_starts__=$((__sccache_starts__ + 1));
+        sleep 1;
+    done;
+    unset __sccache_starts__;
+fi
