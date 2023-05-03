@@ -7,12 +7,7 @@ vault_s3_init() {
     # Attempt to retrieve temporary AWS credentials from a vault
     # instance using GitHub OAuth.
 
-    if [[ -z "${VAULT_HOST:-}" ]]; then
-        devcontainer-utils-vault-s3-export 1;
-        return;
-    fi
-    if [[ -z "${SCCACHE_BUCKET:-}" ]]; then
-        devcontainer-utils-vault-s3-export 1;
+    if [ -z "${VAULT_HOST:-}" ] || [ -z "${SCCACHE_BUCKET:-}" ]; then
         return;
     fi
 
@@ -20,7 +15,6 @@ vault_s3_init() {
     eval "export $(devcontainer-utils-init-github-cli)";
 
     if [[ -z "${GITHUB_USER:-}" ]]; then
-        devcontainer-utils-vault-s3-export 1;
         return;
     fi
 
@@ -37,7 +31,6 @@ vault_s3_init() {
     )";
 
     if [[ -z "${user_orgs:-}" ]]; then
-        devcontainer-utils-vault-s3-export 1;
         return;
     fi
 
@@ -56,7 +49,6 @@ vault_s3_init() {
 
     if [[ "${vault_token:-null}" == null ]]; then
         echo "Your GitHub user was not recognized by vault. Skipping." >&2;
-        devcontainer-utils-vault-s3-export 1;
         return;
     fi
 
@@ -80,13 +72,11 @@ vault_s3_init() {
 
     if [[ "${aws_access_key_id:-null}" == null ]]; then
         echo "Failed to generate temporary AWS S3 credentials. Skipping." >&2;
-        devcontainer-utils-vault-s3-export 1;
         return;
     fi
 
     if [[ "${aws_secret_access_key:-null}" == null ]]; then
         echo "Failed to generate temporary AWS S3 credentials. Skipping." >&2;
-        devcontainer-utils-vault-s3-export 1;
         return;
     fi
 
@@ -109,35 +99,31 @@ EOF
 
     chmod 0600 ~/.aws/{config,credentials};
 
-    devcontainer-utils-vault-s3-export 0;
-
     echo "Successfully generated temporary AWS S3 credentials!";
 }
 
 (vault_s3_init "$@");
 
-. ~/.bashrc;
-
-if type sccache >/dev/null 2>&1 && test -n "${SCCACHE_BUCKET}"; then (
-    __sccache_starts__=0;
-    while test 1; do
-        sccache --stop-server >/dev/null 2>&1 || true;
-        if SCCACHE_NO_DAEMON=1 sccache --show-stats >/dev/null 2>&1; then
-            if test "${__sccache_starts__}" -gt "0"; then
-                echo "Success!";
-            fi
+if [ -n "${VAULT_HOST:-}" ] && [ -n "${SCCACHE_BUCKET:-}" ]; then
+    __s3_checks__="0";
+    __s3_status__="1";
+    while true; do
+        __s3_status__="$(devcontainer-utils-vault-s3-test >/dev/null 2>&1; echo $?)";
+        if [ "${__s3_status__}" -ne "1" ]; then
+            if [ "${__s3_checks__}" -gt "0" ]; then echo "Success!"; fi
             break;
         fi
-        if test "${__sccache_starts__}" -gt "19"; then
-            echo "Skipping.";
+        if [ "${__s3_checks__}" -ge "20" ]; then
+            if [ "${__s3_checks__}" -gt "0" ]; then echo "Skipping."; fi
             break;
         fi
-        __sccache_starts__="$((__sccache_starts__ + 1))";
-        if test "${__sccache_starts__}" -eq "1"; then
+        __s3_checks__="$((__s3_checks__ + 1))";
+        if [ "${__s3_checks__}" -eq "1" ]; then
             echo -n "Waiting for AWS S3 credentials to propagate... ";
         fi
         sleep 1;
-    done;
-    unset __sccache_starts__;
-)
+    done
+    . devcontainer-utils-vault-s3-export "${__s3_status__}";
+    unset __s3_checks__;
+    unset __s3_status__;
 fi

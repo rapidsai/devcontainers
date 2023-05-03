@@ -69,6 +69,9 @@ for_each_user_bashrc 'sed -i -re "s/^(HIST(FILE)?SIZE=).*$/\1/g" "$0"';
 # Append history lines as soon as they're entered
 append_to_all_bashrcs 'PROMPT_COMMAND="history -a; $PROMPT_COMMAND"';
 
+# export envvars in /etc/profile.d
+add_etc_profile_d_script devcontainer-utils "";
+
 # Add GitHub's public keys to known_hosts
 known_hosts="$(curl -s https://api.github.com/meta | jq -r '.ssh_keys | map("github.com \(.)") | .[]' || echo "")";
 
