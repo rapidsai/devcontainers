@@ -16,9 +16,7 @@
     }
   },
   "containerEnv": {
-    "MAMBA_NO_BANNER": "1",
-    "BASH_ENV": "/etc/bash.bash_env",
-    "PATH": "${PATH}:/opt/conda/bin"
+    "BASH_ENV": "/etc/bash.bash_env"
   },
   "customizations": {
     "vscode": {

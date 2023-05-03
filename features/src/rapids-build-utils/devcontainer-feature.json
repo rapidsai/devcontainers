@@ -4,7 +4,6 @@
   "version": "23.6.4",
   "description": "A feature to install the RAPIDS devcontainer build utilities",
   "containerEnv": {
-    "CONDA_ALWAYS_YES": "true",
     "BASH_ENV": "/etc/bash.bash_env"
   },
   "updateContentCommand": [
