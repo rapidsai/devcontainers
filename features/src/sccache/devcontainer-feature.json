@@ -1,7 +1,7 @@
 {
   "name": "sccache",
   "id": "sccache",
-  "version": "23.6.1",
+  "version": "23.6.2",
   "description": "A feature to install sccache",
   "options": {
     "version": {
@@ -16,5 +16,8 @@
       "default": "latest",
       "description": "sccache version to install."
     }
+  },
+  "containerEnv": {
+    "BASH_ENV": "/etc/bash.bash_env"
   }
 }

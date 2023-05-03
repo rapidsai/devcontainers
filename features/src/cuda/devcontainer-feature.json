@@ -1,7 +1,7 @@
 {
   "name": "CUDA Toolkit",
   "id": "cuda",
-  "version": "23.6.3",
+  "version": "23.6.4",
   "description": "A feature to install the NVIDIA CUDA Toolkit",
   "options": {
     "version": {
@@ -27,6 +27,7 @@
     }
   },
   "containerEnv": {
+    "BASH_ENV": "/etc/bash.bash_env",
     "NVIDIA_VISIBLE_DEVICES": "all",
     "NVIDIA_DRIVER_CAPABILITIES": "all"
   },
