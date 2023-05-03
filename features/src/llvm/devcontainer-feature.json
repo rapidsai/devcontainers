@@ -1,7 +1,7 @@
 {
   "name": "LLVM compilers and tools",
   "id": "llvm",
-  "version": "23.6.2",
+  "version": "23.6.3",
   "description": "A feature to install LLVM compilers and tools",
   "options": {
     "version": {
@@ -21,6 +21,9 @@
       "default": "dev",
       "description": "LLVM version to install."
     }
+  },
+  "containerEnv": {
+    "BASH_ENV": "/etc/bash.bash_env"
   },
   "capAdd": [
     "SYS_PTRACE"
