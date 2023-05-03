@@ -1,0 +1,1 @@
+export LIT_VERSION="${LIT_VERSION}";
