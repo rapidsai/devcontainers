@@ -1,6 +1,6 @@
 {
   "id": "rust",
-  "version": "23.6.1",
+  "version": "23.6.2",
   "name": "Rust",
   "documentationURL": "https://github.com/rapidsai/devcontainers/features/tree/main/src/rust",
   "description": "Installs Rust, common Rust utilities, and their required dependencies",
@@ -35,6 +35,9 @@
       "type": "boolean",
       "default": false
     }
+  },
+  "containerEnv": {
+    "BASH_ENV": "/etc/bash.bash_env"
   },
   "capAdd": [
     "SYS_PTRACE"
