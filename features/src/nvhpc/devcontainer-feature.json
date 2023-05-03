@@ -1,7 +1,7 @@
 {
   "name": "NVHPC SDK",
   "id": "nvhpc",
-  "version": "23.6.1",
+  "version": "23.6.2",
   "description": "A feature to install the NVHPC SDK",
   "options": {
     "version": {
@@ -15,9 +15,6 @@
       "default": "23.1",
       "description": "Version of NVHPC SDK to install."
     }
-  },
-  "containerEnv": {
-    "BASH_ENV": "/etc/bash.bash_env"
   },
   "capAdd": [
     "SYS_PTRACE"

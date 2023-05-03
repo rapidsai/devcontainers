@@ -27,7 +27,7 @@ BASE_URL="http://apt.llvm.org"
 needed_binaries=(lsb_release wget add-apt-repository gpg)
 missing_binaries=()
 for binary in "${needed_binaries[@]}"; do
-    if ! which $binary &>/dev/null ; then
+    if ! which $binary >/dev/null 2>&1 ; then
         missing_binaries+=($binary)
     fi
 done
@@ -139,7 +139,7 @@ if [[ -n "${CODENAME}" ]]; then
     REPO_NAME="deb ${BASE_URL}/${CODENAME}/  llvm-toolchain${LINKNAME}${LLVM_VERSION_STRING} main"
 
     # check if the repository exists for the distro and version
-    if ! wget -q --method=HEAD ${BASE_URL}/${CODENAME} &> /dev/null; then
+    if ! wget -q --method=HEAD ${BASE_URL}/${CODENAME} >/dev/null 2>&1; then
         if [[ -n "${CODENAME_FROM_ARGUMENTS}" ]]; then
             echo "Specified codename '${CODENAME}' is not supported by this script."
         else

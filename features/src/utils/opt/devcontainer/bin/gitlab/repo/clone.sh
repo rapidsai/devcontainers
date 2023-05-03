@@ -19,7 +19,7 @@ clone_gitlab_repo() {
     local src="${orig}/${repo}";
     local dst="${user}/${repo}";
 
-    local fork="$(glab repo view "${dst}" &>/dev/null; \
+    local fork="$(glab repo view "${dst}" >/dev/null 2>&1; \
         if [ $? -eq 0 ]; then echo "${dst}"; fi;)";
 
     if [[ -z "$fork" ]]; then

@@ -2,7 +2,7 @@
 
 # Respect --noprofile and --norc
 if [[ ! $(ps -o args= -p $$) =~ (--noprofile) ]]; then
-    # Otherwise, initialize non-login/non-interactive shells like interactive login shells
+    # Otherwise, initialize non-login shells like login shells
     if ! shopt -q login_shell; then
         if [ -f /etc/profile ]; then
             . /etc/profile

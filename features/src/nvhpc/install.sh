@@ -22,7 +22,7 @@ check_packages                  \
     ;
 
 # Ensure lmod preceeds nvhpc's profile init
-mv /etc/profile.d/{,90-}lmod.sh;
+mv /etc/profile.d/lmod.{,_}sh;
 
 echo "Downloading NVHPC gpg key...";
 
@@ -58,21 +58,21 @@ bash "${NVHPC_ROOT}/compilers/bin/makelocalrc" \
     -x "${NVHPC_ROOT}/compilers/bin" \
     -gcc "$(which gcc)" \
     -gpp "$(which g++)" \
-    -g77 "$(which gfortran)"
+    -g77 "$(which gfortran)";
+
+vars_=();
+vars_+=('$NVHPC');
+vars_+=('$NVHPC_VERSION');
+vars_+=('$NVHPC_ROOT');
+vars_+=('$NVHPC_CUDA_HOME');
+vars_+=('$LIBRARY_PATH');
+printf -v vars_ '%s,' "${vars_[@]}";
 
 # export envvars in bashrc files
-append_to_etc_bashrc "$(cat .bashrc | envsubst)";
-append_to_all_bashrcs "$(cat .bashrc | envsubst)";
-
-cat<<EOF | tee /etc/profile.d/91-nvhpc.sh >/dev/null && chmod +x /etc/profile.d/91-nvhpc.sh
-#! /usr/bin/env bash
-
-# export envvars
-$(cat .bashrc | envsubst)
-
-# Activate nvhpc modules when /etc/profile is run
-$(cat etc/profile.d/91-nvhpc.sh)
-EOF
+append_to_etc_bashrc "$(cat .bashrc | envsubst "${vars_%,}")";
+append_to_all_bashrcs "$(cat .bashrc | envsubst "${vars_%,}")";
+# export envvars in /etc/profile.d
+add_etc_profile_d_script nvhpc "$(cat .bashrc etc/profile.d/nvhpc.sh | envsubst "${vars_%,}")";
 
 # Clean up
 # rm -rf /tmp/*;

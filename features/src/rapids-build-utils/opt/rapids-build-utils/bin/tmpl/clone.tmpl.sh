@@ -18,6 +18,9 @@ clone_${NAME}() {
             '${GIT_REPO}'                         \
             '${SRC_PATH}'                         \
              ${git_args}                          \
+             --tags                               \
+             --recurse-submodules -j $(nproc)     \
+             -c checkout.defaultRemote=upstream   \
             ;
 
         rapids-generate-scripts;

@@ -10,7 +10,7 @@ cd "$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )";
 check_packages jq cron curl sudo wget gettext-base bash-completion ca-certificates;
 
 # Install yq if not installed
-if ! type yq &>/dev/null; then
+if ! type yq >/dev/null 2>&1; then
     YQ_VERSION=latest;
     find_version_from_git_tags YQ_VERSION https://github.com/mikefarah/yq;
 
@@ -68,6 +68,9 @@ for_each_user_bashrc 'sed -i -re "s/^(HIST(FILE)?SIZE=).*$/\1/g" "$0"';
 
 # Append history lines as soon as they're entered
 append_to_all_bashrcs 'PROMPT_COMMAND="history -a; $PROMPT_COMMAND"';
+
+# export envvars in /etc/profile.d
+add_etc_profile_d_script devcontainer-utils "";
 
 # Add GitHub's public keys to known_hosts
 known_hosts="$(curl -s https://api.github.com/meta | jq -r '.ssh_keys | map("github.com \(.)") | .[]' || echo "")";

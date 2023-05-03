@@ -110,6 +110,14 @@ prepend_to_etc_zshrc() {
 
 export -f prepend_to_etc_zshrc;
 
+add_etc_profile_d_script() {
+    local name="$(($(ls -1q /etc/profile.d/*.sh | wc -l) + 20))-${1}.sh";
+    echo -e "#! /usr/bin/env bash\n${@:2}" > "/etc/profile.d/${name}";
+    chmod +x "/etc/profile.d/${name}";
+}
+
+export -f add_etc_profile_d_script;
+
 # Figure out correct version of a three part version number is not passed
 find_version_from_git_tags() {
     check_packages git;
