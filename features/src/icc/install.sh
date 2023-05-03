@@ -27,8 +27,10 @@ export PATH="$PATH:/opt/intel/oneapi/compiler/${ICC_VERSION}/linux/bin";
 export ICC_VERSION="${ICC_VERSION}";
 
 # export envvars in bashrc files
-append_to_etc_bashrc "$(cat .bashrc | envsubst)";
-append_to_all_bashrcs "$(cat .bashrc | envsubst)";
+append_to_etc_bashrc "$(cat .bashrc | envsubst '$ICC_VERSION')";
+append_to_all_bashrcs "$(cat .bashrc | envsubst '$ICC_VERSION')";
+# export envvars in /etc/profile.d
+add_etc_profile_d_script icc "$(cat .bashrc | envsubst '$ICC_VERSION')";
 
 # Clean up
 # rm -rf /tmp/*;
