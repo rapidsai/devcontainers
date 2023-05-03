@@ -10,7 +10,7 @@ cd "$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )";
 check_packages jq sudo wget gettext-base bash-completion ca-certificates;
 
 # Install yq if not installed
-if ! type yq &>/dev/null; then
+if ! type yq >/dev/null 2>&1; then
     YQ_VERSION=latest;
     find_version_from_git_tags YQ_VERSION https://github.com/mikefarah/yq;
 
@@ -58,6 +58,8 @@ yq shell-completion bash | tee /etc/bash_completion.d/yq >/dev/null;
 append_to_etc_bashrc "$(cat .bashrc)";
 # Activate venv in ~/.bashrc
 append_to_all_bashrcs "$(cat .bashrc)";
+# export envvars in /etc/profile.d
+add_etc_profile_d_script rapids-build-utils "$(cat .bashrc)";
 
 # Clean up
 # rm -rf /tmp/*;

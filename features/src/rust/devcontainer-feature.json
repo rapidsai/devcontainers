@@ -1,6 +1,6 @@
 {
   "id": "rust",
-  "version": "23.6.0",
+  "version": "23.6.1",
   "name": "Rust",
   "documentationURL": "https://github.com/rapidsai/devcontainers/features/tree/main/src/rust",
   "description": "Installs Rust, common Rust utilities, and their required dependencies",
@@ -35,11 +35,6 @@
       "type": "boolean",
       "default": false
     }
-  },
-  "containerEnv": {
-    "CARGO_HOME": "/usr/local/cargo",
-    "RUSTUP_HOME": "/usr/local/rustup",
-    "PATH": "/usr/local/cargo/bin:${PATH}"
   },
   "capAdd": [
     "SYS_PTRACE"

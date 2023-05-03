@@ -5,6 +5,9 @@
 #-------------------------------------------------------------------------------------------------------------
 set -ex
 
+export CARGO_HOME="/usr/local/cargo";
+export RUSTUP_HOME="/usr/local/rustup";
+
 UPDATE_RC="${UPDATERC:-"true"}";
 UPDATE_RUST="${UPDATERUST:-"false"}";
 RUST_VERSION="${VERSION:-"latest"}";
@@ -23,7 +26,7 @@ check_nightly_version_formatting() {
 
     local version_date=$(echo ${requested_version} | sed -e "s/^nightly-//")
 
-    date -d ${version_date} &>/dev/null
+    date -d ${version_date} >/dev/null 2>&1
     if [ $? != 0 ]; then
         echo -e "Invalid ${variable_name} value: ${requested_version}\nNightly version should be in the format nightly-YYYY-MM-DD" >&2
         exit 1
@@ -47,7 +50,7 @@ lldb_pkg="lldb";
 
 if [[ -n "${LLVM_VERSION:-}" ]]; then
     lldb_pkg="lldb-${LLVM_VERSION}";
-elif type llvm-config &> /dev/null; then
+elif type llvm-config >/dev/null 2>&1; then
     lldb_pkg="lldb-$(llvm-config --version | cut -d':' -f3 | cut -d'.' -f1)";
 fi
 
@@ -91,7 +94,7 @@ if [ "${RUST_VERSION}" = "none" ] || type rustup > /dev/null 2>&1; then
 else
     if [ "${RUST_VERSION}" != "latest" ] && [ "${RUST_VERSION}" != "lts" ] && [ "${RUST_VERSION}" != "stable" ]; then
         # Find version using soft match
-        if ! type git > /dev/null 2>&1; then
+        if ! type git >/dev/null 2>&1; then
             check_packages git;
         fi
 
@@ -130,9 +133,16 @@ rustup component add rls rust-analysis rust-src rustfmt clippy 2>&1;
 
 # Add CARGO_HOME, RUSTUP_HOME and bin directory into bashrc/zshrc files (unless disabled)
 if [ "${UPDATE_RC}" = "true" ]; then
-    append_etc_zshrc "$(cat .bashrc | envsubst)";
-    append_to_etc_bashrc "$(cat .bashrc | envsubst)";
-    append_to_all_bashrcs "$(cat .bashrc | envsubst)";
+    vars_=();
+    vars_+=('$CARGO_HOME');
+    vars_+=('$RUSTUP_HOME');
+    printf -v vars_ '%s,' "${vars_[@]}";
+
+    append_etc_zshrc "$(cat .bashrc | envsubst "${vars_%,}")";
+    append_to_etc_bashrc "$(cat .bashrc | envsubst "${vars_%,}")";
+    append_to_all_bashrcs "$(cat .bashrc | envsubst "${vars_%,}")";
+    # export envvars in /etc/profile.d
+    add_etc_profile_d_script rust "$(cat .bashrc | envsubst "${vars_%,}")";
 fi
 
 # Make files writable for rustlang group

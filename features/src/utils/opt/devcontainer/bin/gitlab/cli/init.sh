@@ -25,7 +25,7 @@ init_gitlab_cli() {
         glab config set --global git_protocol https;
     fi
 
-    if [[ $(glab auth status 2>&1 | grep "No token provided" &>/dev/null; echo $?) == 0 ]]; then
+    if [[ $(glab auth status 2>&1 | grep "No token provided" >/dev/null 2>&1; echo $?) == 0 ]]; then
         if [[ -z "${GITLAB_TOKEN:-}" ]]; then
             glab auth login --hostname gitlab.com;
         else

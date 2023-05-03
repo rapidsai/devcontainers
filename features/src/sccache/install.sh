@@ -22,6 +22,13 @@ wget --no-hsts -q -O- "https://github.com/mozilla/sccache/releases/download/v$SC
     | tar -C /usr/bin -zf - --wildcards --strip-components=1 -x */sccache \
  && chmod +x /usr/bin/sccache;
 
+# export envvars in /etc/bash.bashrc
+append_to_etc_bashrc "$(cat .bashrc)";
+# export envvars in ~/.bashrc
+append_to_all_bashrcs "$(cat .bashrc)";
+# export envvars in /etc/profile.d
+add_etc_profile_d_script sccache "$(cat .bashrc)";
+
 # Clean up
 # rm -rf /tmp/*;
 rm -rf /var/tmp/*;

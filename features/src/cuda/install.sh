@@ -59,6 +59,10 @@ apt-get update;
 
 echo "Installing dev CUDA toolkit..."
 
+export CUDA_HOME="/usr/local/cuda";
+export LIBRARY_PATH="${CUDA_HOME}/lib64/stubs";
+export LD_LIBRARY_PATH="/usr/local/nvidia/lib:/usr/local/nvidia/lib64${LD_LIBRARY_PATH:+:$LD_LIBRARY_PATH}";
+
 cuda_ver="${VERSION:-12.1.0}";
 cuda_ver=$(echo "${cuda_ver}" | cut -d'.' -f3 --complement);
 
@@ -142,9 +146,22 @@ fi
 
 rm -rf $(find /usr/lib -mindepth 1 -type d -regex "^.*/libcutensor/.*$" | grep -Ev "^.*/libcutensor/${CUDA_VERSION_MAJOR}$");
 
+vars_=();
+vars_+=('$NVARCH');
+vars_+=('$CUDA_HOME');
+vars_+=('$CUDA_VERSION');
+vars_+=('$CUDA_VERSION_MAJOR');
+vars_+=('$CUDA_VERSION_MINOR');
+vars_+=('$CUDA_VERSION_PATCH');
+vars_+=('$LIBRARY_PATH');
+vars_+=('$LD_LIBRARY_PATH');
+printf -v vars_ '%s,' "${vars_[@]}";
+
 # export envvars in bashrc files
-append_to_etc_bashrc "$(cat .bashrc | envsubst)";
-append_to_all_bashrcs "$(cat .bashrc | envsubst)";
+append_to_etc_bashrc "$(cat .bashrc | envsubst "${vars_%,}")";
+append_to_all_bashrcs "$(cat .bashrc | envsubst "${vars_%,}")";
+# export envvars in /etc/profile.d
+add_etc_profile_d_script cuda "$(cat .bashrc | envsubst "${vars_%,}")";
 
 # Required for nvidia-docker v1
 echo "/usr/local/nvidia/lib" >> /etc/ld.so.conf.d/nvidia.conf;

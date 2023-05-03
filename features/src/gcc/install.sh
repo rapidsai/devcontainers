@@ -25,11 +25,7 @@ GCC_VERSION="${VERSION:-${GCC_VERSION_DEFAULT}}";
 
 if [[ "${GCC_VERSION}" != "${GCC_VERSION_DEFAULT}" ]]; then
     apt-add-repository -y ppa:ubuntu-toolchain-r/test;
-    # Removing gcc-<ver>-base should remove everything that needs it
-    apt-get remove -y gcc-${GCC_VERSION_DEFAULT}-base;
-    apt-get autoremove -y;
-
-    # Install only gcc-<ver>
+    # Install gcc-${GCC_VERSION}
     DEBIAN_FRONTEND=noninteractive              \
     apt-get install -y --no-install-recommends  \
         {gcc,g++,gfortran}-${GCC_VERSION}       \
@@ -49,6 +45,8 @@ export GCC_VERSION;
 # export envvars in bashrc files
 append_to_etc_bashrc "$(cat .bashrc | envsubst)";
 append_to_all_bashrcs "$(cat .bashrc | envsubst)";
+# export envvars in /etc/profile.d
+add_etc_profile_d_script gcc "$(cat .bashrc | envsubst)";
 
 # Clean up
 # rm -rf /tmp/*;

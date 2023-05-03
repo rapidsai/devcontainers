@@ -1,7 +1,7 @@
 {
   "name": "Ninja build",
   "id": "ninja",
-  "version": "23.6.0",
+  "version": "23.6.1",
   "description": "A feature to install ninja-build",
   "options": {
     "version": {
