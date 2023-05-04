@@ -1,7 +1,7 @@
 #! /usr/bin/env bash
 set -ex
 
-ICC_VERSION="${VERSION:-$DEFAULT}";
+ICC_VERSION="${VERSION:-latest}";
 
 # Ensure we're in this feature's directory during build
 cd "$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )";
@@ -11,26 +11,47 @@ cd "$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )";
 
 check_packages                  \
     gpg                         \
+    lmod                        \
     dirmngr                     \
     apt-utils                   \
     gettext-base                \
-    bash-completion             \
     software-properties-common  \
     ;
 
-# Snag Intel stuff
-wget -O- https://apt.repos.intel.com/intel-gpg-keys/GPG-PUB-KEY-INTEL-SW-PRODUCTS.PUB | gpg --dearmor | tee /usr/share/keyrings/oneapi-archive-keyring.gpg > /dev/null;
-echo "deb [signed-by=/usr/share/keyrings/oneapi-archive-keyring.gpg] https://apt.repos.intel.com/oneapi all main" | tee /etc/apt/sources.list.d/oneAPI.list;
-apt-get update; apt-get install -y --no-install-recommends intel-dpcpp-cpp-compiler-${ICC_VERSION};
+# Ensure lmod preceeds oneapi's profile init
+if [ -f /etc/profile.d/lmod.sh ]; then
+    mv /etc/profile.d/lmod.{,_}sh;
+fi
 
-export PATH="$PATH:/opt/intel/oneapi/compiler/${ICC_VERSION}/linux/bin";
-export ICC_VERSION="${ICC_VERSION}";
+# Add Intel repo signing key
+wget --no-hsts -q -O- https://apt.repos.intel.com/intel-gpg-keys/GPG-PUB-KEY-INTEL-SW-PRODUCTS.PUB \
+   | gpg --dearmor -o /etc/apt/trusted.gpg.d/oneapi-archive-keyring.gpg;
+
+chmod 0644 /etc/apt/trusted.gpg.d/*.gpg || true;
+
+# Add OneAPI apt repository
+apt-add-repository -y "deb https://apt.repos.intel.com/oneapi all main";
+
+if [ "$ICC_VERSION" = "latest" ]; then
+    ICC_VERSION="$(apt-cache search intel-oneapi-dpcpp-cpp | cut -sd' ' -f1 | sort -rh | head -n1 | cut -sd'-' -f5)";
+fi
+
+DEBIAN_FRONTEND=noninteractive \
+apt-get -y install --no-install-recommends \
+    "intel-oneapi-dpcpp-cpp-${ICC_VERSION}" \
+    "intel-oneapi-compiler-dpcpp-cpp-and-cpp-classic-${ICC_VERSION}";
+
+export ICC_VERSION;
+
+vars_=();
+vars_+=('$ICC_VERSION');
+printf -v vars_ '%s,' "${vars_[@]}";
 
 # export envvars in bashrc files
-append_to_etc_bashrc "$(cat .bashrc | envsubst '$ICC_VERSION')";
-append_to_all_bashrcs "$(cat .bashrc | envsubst '$ICC_VERSION')";
+append_to_etc_bashrc "$(cat <(cat .bashrc | envsubst "${vars_%,}") etc/profile.d/oneapi.sh)";
+append_to_all_bashrcs "$(cat <(cat .bashrc | envsubst "${vars_%,}") etc/profile.d/oneapi.sh)";
 # export envvars in /etc/profile.d
-add_etc_profile_d_script icc "$(cat .bashrc | envsubst '$ICC_VERSION')";
+add_etc_profile_d_script oneapi "$(cat <(cat .bashrc | envsubst "${vars_%,}") etc/profile.d/oneapi.sh)";
 
 # Clean up
 # rm -rf /tmp/*;

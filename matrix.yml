@@ -10,6 +10,8 @@ x-gcc-10: &gcc_10 { name: "gcc", version: "10" }
 x-gcc-11: &gcc_11 { name: "gcc", version: "11" }
 x-gcc-12: &gcc_12 { name: "gcc", version: "12" }
 
+x-icc: &icc_2022 { name: "icc", version: "2022.2.1" }
+
 x-llvm-9: &llvm_9 { name: "llvm", version: "9" }
 x-llvm-10: &llvm_10 { name: "llvm", version: "10" }
 x-llvm-11: &llvm_11 { name: "llvm", version: "11" }
@@ -33,6 +35,7 @@ include:
 
 - os: "ubuntu:18.04"
   images:
+  - features: [*icc_2022, *cuda_prev_min, *python, *lit]
   - features: [*gcc_7, *cuda_prev_min, *python, *lit]
   - features: [*gcc_8, *cuda_prev_min, *python, *lit]
   - features: [*gcc_9, *cuda_prev_min, *python, *lit]
@@ -40,6 +43,7 @@ include:
 
 - os: "ubuntu:20.04"
   images:
+  - features: [*icc_2022, *cuda_curr_max, *python, *lit]
   - features: [*gcc_7, *cuda_curr_max, *python, *lit]
   - features: [*gcc_8, *cuda_curr_max, *python, *lit]
   - features: [*gcc_9, *cuda_curr_max, *python, *lit]
@@ -55,6 +59,7 @@ include:
   images:
   - features: [*nvhpc_prev, *python, *lit]
   - features: [*nvhpc_curr, *python, *lit]
+  - features: [*icc_2022, *cuda_curr_max, *python, *lit]
   - features: [*gcc_11, *cuda_curr_max, *python, *lit]
   - features: [*gcc_12, *cuda_curr_max, *python, *lit]
   - features: [*llvm_prev, *cuda_curr_max, *python, *lit]

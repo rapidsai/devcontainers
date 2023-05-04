@@ -7,12 +7,13 @@
     "version": {
       "type": "string",
       "proposals": [
-        "2022.2.0",
-        "2022.2.1",
+        "latest",
+        "2023.1.0",
         "2023.0.0",
-        "2023.1.0"
+        "2022.2.1",
+        "2022.2.0"
       ],
-      "default": "2022.2.1",
+      "default": "latest",
       "description": "intel toolchain version to install."
     }
   }
