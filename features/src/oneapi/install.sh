@@ -12,6 +12,7 @@ cd "$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )";
 check_packages                  \
     gpg                         \
     lmod                        \
+    wget                        \
     dirmngr                     \
     apt-utils                   \
     gettext-base                \
@@ -35,6 +36,8 @@ apt-add-repository -y "deb https://apt.repos.intel.com/oneapi all main";
 if [ "$ICC_VERSION" = "latest" ]; then
     ICC_VERSION="$(apt-cache search intel-oneapi-dpcpp-cpp | cut -sd' ' -f1 | sort -rh | head -n1 | cut -sd'-' -f5)";
 fi
+
+apt-cache search intel-oneapi-dpcpp-cpp;
 
 DEBIAN_FRONTEND=noninteractive \
 apt-get -y install --no-install-recommends \
