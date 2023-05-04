@@ -2,4 +2,4 @@ export NVHPC="${NVHPC}";
 export NVHPC_VERSION="${NVHPC_VERSION}";
 export NVHPC_ROOT="${NVHPC_ROOT}";
 export NVHPC_CUDA_HOME="${NVHPC_CUDA_HOME}";
-export LIBRARY_PATH="${LIBRARY_PATH}";
+export LIBRARY_PATH="${LIBRARY_PATH:-$NVHPC_ROOT/cuda/lib64/stubs}";

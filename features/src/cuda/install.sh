@@ -60,8 +60,8 @@ apt-get update;
 echo "Installing dev CUDA toolkit..."
 
 export CUDA_HOME="/usr/local/cuda";
-export LIBRARY_PATH="${CUDA_HOME}/lib64/stubs";
-export LD_LIBRARY_PATH="/usr/local/nvidia/lib:/usr/local/nvidia/lib64${LD_LIBRARY_PATH:+:$LD_LIBRARY_PATH}";
+export LIBRARY_PATH="${LIBRARY_PATH:+$LIBRARY_PATH:}${CUDA_HOME}/lib64/stubs";
+export LD_LIBRARY_PATH="${LD_LIBRARY_PATH:+$LD_LIBRARY_PATH:}/usr/local/nvidia/lib:/usr/local/nvidia/lib64";
 
 cuda_ver="${VERSION:-12.1.0}";
 cuda_ver=$(echo "${cuda_ver}" | cut -d'.' -f3 --complement);
@@ -153,8 +153,6 @@ vars_+=('$CUDA_VERSION');
 vars_+=('$CUDA_VERSION_MAJOR');
 vars_+=('$CUDA_VERSION_MINOR');
 vars_+=('$CUDA_VERSION_PATCH');
-vars_+=('$LIBRARY_PATH');
-vars_+=('$LD_LIBRARY_PATH');
 printf -v vars_ '%s,' "${vars_[@]}";
 
 # export envvars in bashrc files
