@@ -22,7 +22,9 @@ check_packages                  \
     ;
 
 # Ensure lmod preceeds nvhpc's profile init
-mv /etc/profile.d/lmod.{,_}sh;
+if [ -f /etc/profile.d/lmod.sh ]; then
+    mv /etc/profile.d/lmod.{,_}sh;
+fi
 
 echo "Downloading NVHPC gpg key...";
 
@@ -69,10 +71,10 @@ vars_+=('$LIBRARY_PATH');
 printf -v vars_ '%s,' "${vars_[@]}";
 
 # export envvars in bashrc files
-append_to_etc_bashrc "$(cat .bashrc | envsubst "${vars_%,}")";
-append_to_all_bashrcs "$(cat .bashrc | envsubst "${vars_%,}")";
+append_to_etc_bashrc "$(cat <(cat .bashrc | envsubst "${vars_%,}") etc/profile.d/nvhpc.sh)";
+append_to_all_bashrcs "$(cat <(cat .bashrc | envsubst "${vars_%,}") etc/profile.d/nvhpc.sh)";
 # export envvars in /etc/profile.d
-add_etc_profile_d_script nvhpc "$(cat .bashrc etc/profile.d/nvhpc.sh | envsubst "${vars_%,}")";
+add_etc_profile_d_script nvhpc "$(cat <(cat .bashrc | envsubst "${vars_%,}") etc/profile.d/nvhpc.sh)";
 
 # Clean up
 # rm -rf /tmp/*;

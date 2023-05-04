@@ -1,98 +1,134 @@
+x-cuda-prev-min: &cuda_prev_min { name: "cuda", version: "11.0" }
+x-cuda-prev-max: &cuda_prev_max { name: "cuda", version: "11.8" }
+x-cuda-curr-min: &cuda_curr_min { name: "cuda", version: "12.0" }
+x-cuda-curr-max: &cuda_curr_max { name: "cuda", version: "12.1" }
+
+x-gcc-7: &gcc_7 { name: "gcc", version: "7" }
+x-gcc-8: &gcc_8 { name: "gcc", version: "8" }
+x-gcc-9: &gcc_9 { name: "gcc", version: "9" }
+x-gcc-10: &gcc_10 { name: "gcc", version: "10" }
+x-gcc-11: &gcc_11 { name: "gcc", version: "11" }
+x-gcc-12: &gcc_12 { name: "gcc", version: "12" }
+
+x-oneapi: &oneapi_2022 { name: "oneapi", version: "2022.2.1" }
+
+x-llvm-9: &llvm_9 { name: "llvm", version: "9" }
+x-llvm-10: &llvm_10 { name: "llvm", version: "10" }
+x-llvm-11: &llvm_11 { name: "llvm", version: "11" }
+x-llvm-12: &llvm_12 { name: "llvm", version: "12" }
+x-llvm-13: &llvm_13 { name: "llvm", version: "13" }
+x-llvm-14: &llvm_14 { name: "llvm", version: "14" }
+x-llvm-prev: &llvm_prev { name: "llvm", version: "15" }
+x-llvm-curr: &llvm_curr { name: "llvm", version: "16" }
+
+x-nvhpc-prev: &nvhpc_prev { name: "nvhpc", version: "23.1" }
+x-nvhpc-curr: &nvhpc_curr { name: "nvhpc", version: "23.3" }
+
+x-rust: &rust { name: "rust" }
+x-mambaforge: &conda { name: "mambaforge" }
+
+x-python: &python { name: "ghcr.io/devcontainers/features/python:1", hide: true }
+x-lit: &lit { name: "python-lit", hide: true }
+
+include:
 # CCCL devcontainers
 
 - os: "ubuntu:18.04"
   images:
-  - features: [{ name: "gcc",  version: "7" }, { name: "cuda", version: "11.0" }]
-  - features: [{ name: "gcc",  version: "8" }, { name: "cuda", version: "11.0" }]
-  - features: [{ name: "gcc",  version: "9" }, { name: "cuda", version: "11.0" }]
-  - features: [{ name: "llvm", version: "9" }, { name: "cuda", version: "11.0" }]
+  - features: [*oneapi_2022, *cuda_prev_min, *python, *lit]
+  - features: [*gcc_7, *cuda_prev_min, *python, *lit]
+  - features: [*gcc_8, *cuda_prev_min, *python, *lit]
+  - features: [*gcc_9, *cuda_prev_min, *python, *lit]
+  - features: [*llvm_9, *cuda_prev_min, *python, *lit]
 
 - os: "ubuntu:20.04"
   images:
-  - features: [{ name: "gcc",  version: "7" }, { name: "cuda", version: "12.1" }]
-  - features: [{ name: "gcc",  version: "8" }, { name: "cuda", version: "12.1" }]
-  - features: [{ name: "gcc",  version: "9" }, { name: "cuda", version: "12.1" }]
-  - features: [{ name: "gcc",  version: "10" }, { name: "cuda", version: "12.1" }]
-  - features: [{ name: "llvm", version: "9" }, { name: "cuda", version: "12.1" }]
-  - features: [{ name: "llvm", version: "10" }, { name: "cuda", version: "12.1" }]
-  - features: [{ name: "llvm", version: "11" }, { name: "cuda", version: "12.1" }]
-  - features: [{ name: "llvm", version: "12" }, { name: "cuda", version: "12.1" }]
-  - features: [{ name: "llvm", version: "13" }, { name: "cuda", version: "12.1" }]
-  - features: [{ name: "llvm", version: "14" }, { name: "cuda", version: "12.1" }]
+  - features: [*oneapi_2022, *cuda_curr_max, *python, *lit]
+  - features: [*gcc_7, *cuda_curr_max, *python, *lit]
+  - features: [*gcc_8, *cuda_curr_max, *python, *lit]
+  - features: [*gcc_9, *cuda_curr_max, *python, *lit]
+  - features: [*gcc_10, *cuda_curr_max, *python, *lit]
+  - features: [*llvm_9, *cuda_curr_max, *python, *lit]
+  - features: [*llvm_10, *cuda_curr_max, *python, *lit]
+  - features: [*llvm_11, *cuda_curr_max, *python, *lit]
+  - features: [*llvm_12, *cuda_curr_max, *python, *lit]
+  - features: [*llvm_13, *cuda_curr_max, *python, *lit]
+  - features: [*llvm_14, *cuda_curr_max, *python, *lit]
 
 - os: "ubuntu:22.04"
   images:
-  - features: [{ name: "nvhpc", version: "23.1" }]
-  - features: [{ name: "nvhpc", version: "23.3" }]
-  - features: [{ name: "gcc",  version: "11" }, { name: "cuda", version: "12.1" }]
-  - features: [{ name: "gcc",  version: "12" }, { name: "cuda", version: "12.1" }]
-  - features: [{ name: "llvm", version: "15" }, { name: "cuda", version: "12.1" }]
-  - features: [{ name: "llvm", version: "16" }, { name: "cuda", version: "12.1" }]
+  - features: [*nvhpc_prev, *python, *lit]
+  - features: [*nvhpc_curr, *python, *lit]
+  - features: [*oneapi_2022, *cuda_curr_max, *python, *lit]
+  - features: [*gcc_11, *cuda_curr_max, *python, *lit]
+  - features: [*gcc_12, *cuda_curr_max, *python, *lit]
+  - features: [*llvm_prev, *cuda_curr_max, *python, *lit]
+  - features: [*llvm_curr, *cuda_curr_max, *python, *lit]
 
 # RAPIDS devcontainers
 
 - os: "ubuntu:22.04"
   images:
   # cuda
-  - features: [{ name: "cuda",  version: "11.8" }]
-  - features: [{ name: "cuda",  version: "12.1" }]
+  - features: [*cuda_prev_max]
+  - features: [*cuda_curr_max]
 
   # cuda-mambaforge
-  - features: [{ name: "cuda",  version: "11.8" }, { name: "mambaforge" }]
+  - features: [*cuda_prev_max, *conda]
 
   # llvm
-  - features: [{ name: "llvm",  version: "15" }]
-  - features: [{ name: "llvm",  version: "16" }]
-  - features: [{ name: "llvm",  version: "16" }]
+  - features: [*llvm_prev]
+  - features: [*llvm_curr]
+  - features: [*llvm_curr]
 
   # llvm-cuda
-  - features: [{ name: "llvm", version: "15" }, { name: "cuda", version: "11.8" }]
-  - features: [{ name: "llvm", version: "15" }, { name: "cuda", version: "12.0" }]
-  - features: [{ name: "llvm", version: "16" }, { name: "cuda", version: "11.8" }]
-  - features: [{ name: "llvm", version: "16" }, { name: "cuda", version: "12.0" }]
+  - features: [*llvm_prev, *cuda_prev_max]
+  - features: [*llvm_prev, *cuda_curr_min]
+  - features: [*llvm_curr, *cuda_prev_max]
+  - features: [*llvm_curr, *cuda_curr_min]
 
   # llvm-cuda-mambaforge
-  - features: [{ name: "llvm", version: "15" }, { name: "cuda", version: "11.8" }, { name: "mambaforge" }]
-  - features: [{ name: "llvm", version: "16" }, { name: "cuda", version: "11.8" }, { name: "mambaforge" }]
+  - features: [*llvm_prev, *cuda_prev_max, *conda]
+  - features: [*llvm_curr, *cuda_prev_max, *conda]
 
-  - features: [{ name: "llvm", version: "15" }, { name: "nvhpc", version: "23.1" }]
-  - features: [{ name: "llvm", version: "15" }, { name: "nvhpc", version: "23.3" }]
-  - features: [{ name: "llvm", version: "16" }, { name: "nvhpc", version: "23.1" }]
-  - features: [{ name: "llvm", version: "16" }, { name: "nvhpc", version: "23.3" }]
+  - features: [*llvm_prev, *nvhpc_prev]
+  - features: [*llvm_prev, *nvhpc_curr]
+  - features: [*llvm_curr, *nvhpc_prev]
+  - features: [*llvm_curr, *nvhpc_curr]
 
   # llvm-cuda-nvhpc
-  - features: [{ name: "llvm", version: "15" }, { name: "cuda", version: "12.0" }, { name: "nvhpc", version: "23.1" }]
-  - features: [{ name: "llvm", version: "15" }, { name: "cuda", version: "12.0" }, { name: "nvhpc", version: "23.3" }]
-  - features: [{ name: "llvm", version: "16" }, { name: "cuda", version: "12.0" }, { name: "nvhpc", version: "23.1" }]
-  - features: [{ name: "llvm", version: "16" }, { name: "cuda", version: "12.0" }, { name: "nvhpc", version: "23.3" }]
+  - features: [*llvm_prev, *cuda_curr_min, *nvhpc_prev]
+  - features: [*llvm_prev, *cuda_curr_min, *nvhpc_curr]
+  - features: [*llvm_curr, *cuda_curr_min, *nvhpc_prev]
+  - features: [*llvm_curr, *cuda_curr_min, *nvhpc_curr]
 
   # llvm-mambaforge
-  - features: [{ name: "llvm", version: "15" }, { name: "mambaforge" }]
-  - features: [{ name: "llvm", version: "16" }, { name: "mambaforge" }]
+  - features: [*llvm_prev, *conda]
+  - features: [*llvm_curr, *conda]
 
   # llvm-nvhpc
-  - features: [{ name: "llvm", version: "15" }, { name: "nvhpc", version: "23.1" }]
-  - features: [{ name: "llvm", version: "15" }, { name: "nvhpc", version: "23.3" }]
-  - features: [{ name: "llvm", version: "16" }, { name: "nvhpc", version: "23.1" }]
-  - features: [{ name: "llvm", version: "16" }, { name: "nvhpc", version: "23.3" }]
+  - features: [*llvm_prev, *nvhpc_prev]
+  - features: [*llvm_prev, *nvhpc_curr]
+  - features: [*llvm_curr, *nvhpc_prev]
+  - features: [*llvm_curr, *nvhpc_curr]
 
   # llvm-rust
-  - features: [{ name: "llvm", version: "15" }, { name: "rust" }]
-  - features: [{ name: "llvm", version: "16" }, { name: "rust" }]
+  - features: [*llvm_prev, *rust]
+  - features: [*llvm_curr, *rust]
 
   # llvm-rust-cuda-mambaforge
-  - features: [{ name: "llvm", version: "15" }, { name: "rust" }, { name: "cuda", version: "11.8" }, { name: "mambaforge" }]
-  - features: [{ name: "llvm", version: "16" }, { name: "rust" }, { name: "cuda", version: "11.8" }, { name: "mambaforge" }]
+  - features: [*llvm_prev, *rust, *cuda_prev_max, *conda]
+  - features: [*llvm_curr, *rust, *cuda_prev_max, *conda]
 
   # rust-cuda
-  - features: [{ name: "rust" }, { name: "cuda", version: "11.8" }]
-  - features: [{ name: "rust" }, { name: "cuda", version: "12.1" }]
+  - features: [*rust, *cuda_prev_max]
+  - features: [*rust, *cuda_curr_max]
 
   # rust-cuda-mambaforge
-  - features: [{ name: "rust" }, { name: "cuda", version: "11.8" }, { name: "mambaforge" }]
+  - features: [*rust, *cuda_prev_max, *conda]
 
   # cuda-mambaforge
-  - features: [{ name: "cuda", version: "11.8" }, { name: "mambaforge" }]
+  - features: [*cuda_prev_max, *conda]
 
   # mambaforge
-  - features: [{ name: "mambaforge" }]
+  - features: [*conda]

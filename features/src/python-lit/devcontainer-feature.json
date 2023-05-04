@@ -1,0 +1,17 @@
+{
+  "name": "python-lit testing framework",
+  "id": "python-lit",
+  "version": "23.6.0",
+  "description": "A feature to install python-lit",
+  "options": {
+    "version": {
+      "type": "string",
+      "proposals": [
+        "latest",
+        "16.0.2"
+      ],
+      "default": "latest",
+      "description": "lit version to install."
+    }
+  }
+}

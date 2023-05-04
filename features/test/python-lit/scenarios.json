@@ -1,0 +1,13 @@
+{
+  "py3_10": {
+    "image": "ubuntu:22.04",
+    "features": {
+      "ghcr.io/devcontainers/features/python:1": {},
+      "python-lit": {}
+    },
+    "overrideFeatureInstallOrder": [
+      "ghcr.io/devcontainers/features/python",
+      "./python-lit"
+    ]
+  }
+}

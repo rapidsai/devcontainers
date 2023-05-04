@@ -47,21 +47,30 @@ if `# Include all images if full_matrix is true`         \
 fi
 
 # Select images that include at least one of the changed features
-changed_images="$( \
-  cat matrix.yml \
+
+changed_images="$(\
+  cat matrix.yml  \
 | yq -eMo json    \
 | jq -eMc --argjson xs "$features" '
-  map(.os as $os
+  .include
+  | map(.os as $os
     | .images
     | map(.features
       | select(any(IN(.name; $xs[])))
-    | {
+      | {
         os: $os,
         features: .,
-        name: (. + [{name:$os}]) | map(.name + .version) | join(" ")
+        name: (.
+          | map(.
+            | select(.hide != true)
+            | (.name | split("/")[-1] | split(":")[0]) + (.version // "" | tostring))
+          )
+          | (. + [$os])
+          | join(" "),
       }
     )
-  ) | flatten | unique'
+  )
+  | flatten | unique'
 )";
 
 if [[ "$changed_images" == "null" ]]; then changed_images=""; fi
