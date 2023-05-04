@@ -104,8 +104,10 @@ EOF
 
 (vault_s3_init "$@");
 
+__s3_status__="";
+__s3_checks__="0";
+
 if [ -n "${VAULT_HOST:-}" ] && [ -n "${SCCACHE_BUCKET:-}" ]; then
-    __s3_checks__="0";
     __s3_status__="1";
     while true; do
         __s3_status__="$(devcontainer-utils-vault-s3-test >/dev/null 2>&1; echo $?)";
@@ -123,7 +125,8 @@ if [ -n "${VAULT_HOST:-}" ] && [ -n "${SCCACHE_BUCKET:-}" ]; then
         fi
         sleep 1;
     done
-    . devcontainer-utils-vault-s3-export "${__s3_status__}";
-    unset __s3_checks__;
-    unset __s3_status__;
 fi
+
+. devcontainer-utils-vault-s3-export "${__s3_status__}";
+unset __s3_checks__;
+unset __s3_status__;
