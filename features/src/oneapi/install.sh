@@ -1,6 +1,11 @@
 #! /usr/bin/env bash
 set -ex
 
+# Intel only publishes its compilers for x86
+if [[ "$(uname -p)" != "x86_64" ]]; then
+    exit 0;
+fi
+
 ICC_VERSION="${VERSION:-latest}";
 
 # Ensure we're in this feature's directory during build
@@ -36,8 +41,6 @@ apt-add-repository -y "deb https://apt.repos.intel.com/oneapi all main";
 if [ "$ICC_VERSION" = "latest" ]; then
     ICC_VERSION="$(apt-cache search intel-oneapi-dpcpp-cpp | cut -sd' ' -f1 | sort -rh | head -n1 | cut -sd'-' -f5)";
 fi
-
-apt-cache search intel-oneapi-dpcpp-cpp;
 
 DEBIAN_FRONTEND=noninteractive \
 apt-get -y install --no-install-recommends \
