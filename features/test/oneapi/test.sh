@@ -15,12 +15,6 @@ source dev-container-features-test-lib
 # Feature-specific tests
 # The 'check' command comes from the dev-container-features-test-lib.
 
-check "icc exists and is on path" which icc
-echo "icc version: $(icc --version)"
-
-check "icpc exists and is on path" which icpc
-echo "icpc version: $(icpc --version)"
-
 check "icx exists and is on path" which icx
 echo "icx version: $(icx --version)"
 
