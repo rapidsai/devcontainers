@@ -1,5 +1,5 @@
 
-# Intel oneapi toolchain (icc)
+# Intel oneapi toolchain (oneapi)
 
 A feature to install the Intel oneapi toolchain
 
@@ -7,7 +7,7 @@ A feature to install the Intel oneapi toolchain
 
 ```json
 "features": {
-    "ghcr.io/rapidsai/devcontainers/features/icc:23": {}
+    "ghcr.io/rapidsai/devcontainers/features/oneapi:23": {}
 }
 ```
 
