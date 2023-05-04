@@ -1,8 +1,8 @@
 {
-  "name": "Intel dpcpp toolchain",
+  "name": "Intel oneapi toolchain",
   "id": "icc",
   "version": "23.6.0",
-  "description": "A feature to install the Intel dpcpp toolchain",
+  "description": "A feature to install the Intel oneapi toolchain",
   "options": {
     "version": {
       "type": "string",
