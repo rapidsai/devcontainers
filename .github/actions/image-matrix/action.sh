@@ -48,8 +48,8 @@ fi
 
 # Select images that include at least one of the changed features
 
-changed_images="$( \
-  cat matrix.yml \
+changed_images="$(\
+  cat matrix.yml  \
 | yq -eMo json    \
 | jq -eMc --argjson xs "$features" '
   .include
@@ -63,7 +63,7 @@ changed_images="$( \
         name: (.
           | map(.
             | select(.hide != true)
-            | (.name | split("/")[-1] | split(":")[0]) + .version)
+            | (.name | split("/")[-1] | split(":")[0]) + (.version | tostring))
           )
           | (. + [$os])
           | join(" "),
