@@ -63,7 +63,7 @@ changed_images="$(\
         name: (.
           | map(.
             | select(.hide != true)
-            | (.name | split("/")[-1] | split(":")[0]) + (.version | tostring))
+            | (.name | split("/")[-1] | split(":")[0]) + (.version // "" | tostring))
           )
           | (. + [$os])
           | join(" "),
