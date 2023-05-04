@@ -31,8 +31,8 @@ fi
 
 check_packages ${PKG[@]} ${PKG_TO_REMOVE[@]};
 
-python -m pip install wheel;
-python -m pip install psutil $LIT_VERSION_TO_INSTALL;
+CC=gcc CXX=g++ python -m pip install wheel;
+CC=gcc CXX=g++ python -m pip install psutil $LIT_VERSION_TO_INSTALL;
 
 export LIT_VERSION="$(lit --version | grep -o -e '[0-9].*')";
 
