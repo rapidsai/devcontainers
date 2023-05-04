@@ -1,6 +1,6 @@
 {
   "name": "Intel oneapi toolchain",
-  "id": "icc",
+  "id": "oneapi",
   "version": "23.6.0",
   "description": "A feature to install the Intel oneapi toolchain",
   "options": {
