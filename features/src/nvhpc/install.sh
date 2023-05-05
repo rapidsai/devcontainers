@@ -67,7 +67,6 @@ vars_+=('$NVHPC');
 vars_+=('$NVHPC_VERSION');
 vars_+=('$NVHPC_ROOT');
 vars_+=('$NVHPC_CUDA_HOME');
-vars_+=('$LIBRARY_PATH');
 printf -v vars_ '%s,' "${vars_[@]}";
 
 # export envvars in bashrc files
