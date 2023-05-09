@@ -9,10 +9,10 @@ for default_conda_env_name in ${DEFAULT_CONDA_ENV:-} ${CONDA_DEFAULT_ENV:-} base
 done;
 
 if [ -n "${CONDA_EXE:-}" ]; then
-    conda_bin_paths=();
-    conda_bin_paths+=("$(dirname "$(dirname "${CONDA_EXE}")")/condabin");
-    conda_bin_paths+=("${CONDA_PREFIX:-/opt/conda}/bin");
-    for conda_bin_path in ${conda_bin_paths[@]}; do
+    conda_bin_paths="";
+    conda_bin_paths="${conda_bin_paths} $(dirname "$(dirname "${CONDA_EXE}")")/condabin";
+    conda_bin_paths="${conda_bin_paths} ${CONDA_PREFIX:-/opt/conda}/bin";
+    for conda_bin_path in ${conda_bin_paths}; do
         if [ -n "${PATH##*"$conda_bin_path"*}" ]; then
             export PATH="$conda_bin_path:$PATH";
         fi
