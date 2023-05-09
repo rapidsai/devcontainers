@@ -55,11 +55,6 @@ install_utility devcontainer-utils-vault-s3-test     vault/s3/test.sh;
 install_utility devcontainer-utils-vault-s3-export   vault/s3/export.sh;
 install_utility devcontainer-utils-vault-auth-github vault/auth/github.sh;
 
-# Install aws-curl helper (https://github.com/sormy/aws-curl)
-curl -s -o /usr/bin/aws-curl \
-    https://raw.githubusercontent.com/sormy/aws-curl/ddbb3ddd24eff32d6d5ad40e9ff0deffa7e74e6a/aws-curl \
- && chmod +x /usr/bin/aws-curl;
-
 # Enable GCC colors
 for_each_user_bashrc 'sed -i -re "s/^#(export GCC_COLORS)/\1/g" "$0"';
 

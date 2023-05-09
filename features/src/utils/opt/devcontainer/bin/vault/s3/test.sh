@@ -1,65 +1,44 @@
 #! /usr/bin/env bash
 
-# Test AWS S3 credentials are still valid the same way sccache does
+# Test sccache AWS S3 credentials are valid
 
 test_aws_creds() {
 
     set -euo pipefail;
 
-    if [[ ! -f ~/.aws/stamp ]]; then exit 1; fi;
-    if [[ ! -f ~/.aws/config ]]; then exit 1; fi;
-    if [[ ! -f ~/.aws/credentials ]]; then exit 1; fi;
+    if ! type sccache >/dev/null 2>&1; then exit 1; fi;
 
-    local bucket="$(grep 'bucket=' ~/.aws/config | sed 's/bucket=//')";
-    if [[ -z "${bucket:-}" ]]; then exit 1; fi;
+    if [ -f ~/.aws/stamp ]; then
+        if [ $(($(date '+%s') - $(cat ~/.aws/stamp))) -gt $((3600 * 8)) ]; then
+            exit 1;
+        fi
+    fi
 
-    local region="$(grep 'region=' ~/.aws/config | sed 's/region=//')";
+    local bucket="$(grep 'bucket=' ~/.aws/config 2>/dev/null | sed 's/bucket=//' || echo "${SCCACHE_BUCKET:-}")";
+    if [ -z "${bucket:-}" ]; then exit 1; fi
 
-    local aws_access_key_id="$(grep 'aws_access_key_id=' ~/.aws/credentials | sed 's/aws_access_key_id=//')";
-    if [[ -z "${aws_access_key_id:-}" ]]; then exit 1; fi;
+    local region="$(grep 'region=' ~/.aws/config 2>/dev/null | sed 's/region=//' || echo "${SCCACHE_REGION:-${AWS_DEFAULT_REGION:-}}")";
+    local aws_access_key_id="$(grep 'aws_access_key_id=' ~/.aws/credentials 2>/dev/null | sed 's/aws_access_key_id=//' || echo "${AWS_ACCESS_KEY_ID:-}")";
+    local aws_secret_access_key="$(grep 'aws_secret_access_key=' ~/.aws/credentials 2>/dev/null | sed 's/aws_secret_access_key=//' || echo "${AWS_SECRET_ACCESS_KEY:-}")";
 
-    local aws_secret_access_key="$(grep 'aws_secret_access_key=' ~/.aws/credentials | sed 's/aws_secret_access_key=//')";
-    if [[ -z "${aws_access_key_id:-}" ]]; then exit 1; fi;
+    sccache --stop-server >/dev/null 2>&1 || true;
 
-    local aws_session_token="$(grep 'aws_session_token=' ~/.aws/credentials | sed 's/aws_session_token=//')";
-
-    local code=;
-
-    # Test GET
-    code=$(                                                     \
-        AWS_SESSION_TOKEN="$aws_session_token"                  \
-        AWS_ACCESS_KEY_ID="$aws_access_key_id"                  \
-        AWS_SECRET_ACCESS_KEY="$aws_secret_access_key"          \
-        aws-curl                                                \
-            -s -o /dev/null -w "%{http_code}"                   \
-            -X GET ${region:+--region $region}                  \
-            "https://${bucket}.s3.amazonaws.com/.sccache_check" \
-    );
-
-    if  [ "${code}" -lt 200 ] \
-     || [ "${code}" -gt 299 ] \
-     && [ "${code}" -ne 404 ] ; then
+    if ! \
+       SCCACHE_NO_DAEMON=1 \
+       AWS_ACCESS_KEY_ID=${aws_access_key_id} \
+       AWS_SECRET_ACCESS_KEY=${aws_secret_access_key} \
+       SCCACHE_BUCKET=${bucket} SCCACHE_REGION=${region} \
+       sccache --show-stats 2>&1 | grep -qE 'Cache location \s+ s3'; then
+        if SCCACHE_NO_DAEMON=1 \
+           SCCACHE_S3_NO_CREDENTIALS=1 \
+           AWS_ACCESS_KEY_ID=${aws_access_key_id} \
+           AWS_SECRET_ACCESS_KEY=${aws_secret_access_key} \
+           SCCACHE_BUCKET=${bucket} SCCACHE_REGION=${region} \
+           sccache --show-stats 2>&1 | grep -qE 'Cache location \s+ s3'; then
+            exit 2;
+        fi
         exit 1;
     fi
-
-    echo -n "Hello, World!" > /tmp/.sccache_check;
-
-    # Test PUT
-    code=$(                                                     \
-        AWS_SESSION_TOKEN="$aws_session_token"                  \
-        AWS_ACCESS_KEY_ID="$aws_access_key_id"                  \
-        AWS_SECRET_ACCESS_KEY="$aws_secret_access_key"          \
-        aws-curl -d @/tmp/.sccache_check                        \
-            -s -o /dev/null -w "%{http_code}"                   \
-            -X PUT ${region:+--region $region}                  \
-            "https://${bucket}.s3.amazonaws.com/.sccache_check" \
-    );
-
-    if  [ "${code}" -lt 200 ] \
-     || [ "${code}" -gt 299 ] ; then
-        exit 2;
-    fi
-
     exit 0;
 }
 

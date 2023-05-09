@@ -17,7 +17,10 @@ init_git_cli_config() {
         if [[ -z "$GITHUB_USER" ]]; then exit 1; fi
         local git_user_name="$(gh api user --jq '.name')";
         if [[ $? != 0 ]]; then git_user_name=""; fi;
-        if [[ -z "$git_user_name" && -t 0 && "${CODESPACES:-false}" != true ]]; then
+        if [ -t 0 ]                              \
+        && [ -t /dev/tty ]                       \
+        && [ -z "$git_user_name" ]               \
+        && [ "${CODESPACES:-false}" -neq "true" ]; then
             read -p "Git user.name: " git_user_name </dev/tty;
         fi
         git config --global user.name "${git_user_name:-anon}";
@@ -25,7 +28,10 @@ init_git_cli_config() {
 
     if [[ -z "$(git config --get user.email)" ]]; then
         local git_user_email="";
-        if [[ -z "$git_user_email" && -t 0 && "${CODESPACES:-false}" != true ]]; then
+        if [ -t 0 ]                              \
+        && [ -t /dev/tty ]                       \
+        && [ -z "$git_user_email" ]              \
+        && [ "${CODESPACES:-false}" -neq "true" ]; then
             read -p "Git user.email: " git_user_email </dev/tty;
         fi
         git config --global user.email "${git_user_email:-users.noreply.github.com}";
