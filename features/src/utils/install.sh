@@ -40,6 +40,7 @@ install_utility() {
     update-alternatives --install "/usr/bin/$1" "$1" "/opt/devcontainer/bin/$2" 0;
 }
 
+install_utility devcontainer-utils-parse-args parse-args.sh;
 install_utility devcontainer-utils-post-attach-command post-attach-command.sh;
 install_utility devcontainer-utils-init-git git/init.sh;
 
