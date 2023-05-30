@@ -19,12 +19,14 @@ python_pkg_names() {
              || echo ''                           \
             )";
         fi
-        if [[ -z "${name}" && -f "${dir}/pyproject.toml" ]]; then
+        if type python >/dev/null 2>&1 \
+        && [ -z "${name}" ] \
+        && [ -f "${dir}/pyproject.toml" ]; then
             name="$(python -c "\
 import toml;\
 print(toml.load('${dir}/pyproject.toml')['project']['name'])")";
         fi
-        if [[ -n "${name}" ]]; then
+        if [ -n "${name}" ]; then
             echo "${name}";
         fi
     done
