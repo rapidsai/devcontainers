@@ -105,53 +105,81 @@ generate_scripts() {
 
 generate_clone_scripts() {
 
+    # Generate and install the "clone-<repo>" scripts
+
     set -euo pipefail;
 
     # Ensure we're in this script's directory
     cd "$( cd "$( dirname "$(realpath -m "${BASH_SOURCE[0]}")" )" && pwd )";
 
-    # Generate and install the "clone-<repo>" scripts
-    local manifest="$(cat /opt/rapids-build-utils/manifest.yaml)";
-    local names=($(echo -e "$manifest" | yq eval '.repos[].name' -));
+    # PS4='+ ${LINENO}: '; set -x;
 
-    local cpp_build_dirs=();
+    local project_manifest_yml="${PROJECT_MANIFEST_YML:-"/opt/rapids-build-utils/manifest.yaml"}";
+
+    eval "$(
+        yq -Mo json "${project_manifest_yml}" \
+      | jq -r "$(cat <<"________EOF" | tr -s '[:space:]'
+        [
+          paths(arrays) as $path | {
+            "key": ($path + ["length"]) | join("_"),
+            "val": getpath($path) | length
+          }
+        ] + [
+          paths(scalars) as $path | {
+            "key": $path | join("_"),
+            "val": getpath($path)
+          }
+        ]
+        | map(select(.key | startswith("repos")))
+        | map("local " + .key + "=" + (.val | @sh))[]
+________EOF
+)")";
 
     declare -A name_to_path;
     declare -A name_to_cpp_sub_dir;
 
-    for i in "${!names[@]}"; do
-        local name="${names[$i]}";
-        local path="$(         echo -e "$manifest" | yq eval ".repos | map(select(.name == \"${name}\") | .path)         | flatten | join(\" \")" -)";
-        local cpp_args="$(     echo -e "$manifest" | yq eval ".repos | map(select(.name == \"${name}\") | .cpp.args)     | flatten | join(\" \")" -)";
-        local cpp_sub_dir="$(  echo -e "$manifest" | yq eval ".repos | map(select(.name == \"${name}\") | .cpp.sub_dir)  | flatten | join(\" \")" -)";
-        local cpp_depends="$(  echo -e "$manifest" | yq eval ".repos | map(select(.name == \"${name}\") | .cpp.depends)  | flatten | join(\" \")" -)";
-        local git_tag="$(      echo -e "$manifest" | yq eval ".repos | map(select(.name == \"${name}\") | .git.tag)      | flatten | join(\" \")" -)";
-        local git_repo="$(     echo -e "$manifest" | yq eval ".repos | map(select(.name == \"${name}\") | .git.repo)     | flatten | join(\" \")" -)";
-        local git_host="$(     echo -e "$manifest" | yq eval ".repos | map(select(.name == \"${name}\") | .git.host)     | flatten | join(\" \")" -)";
-        local git_upstream="$( echo -e "$manifest" | yq eval ".repos | map(select(.name == \"${name}\") | .git.upstream) | flatten | join(\" \")" -)";
+    local i=0;
+    local repos_length="${repos_length:-0}";
 
-        name_to_path[$name]="$path";
-        name_to_cpp_sub_dir[$name]="$cpp_sub_dir";
-        cpp_build_dirs+=(~/"${path}${cpp_sub_dir:+/$cpp_sub_dir}/build/latest");
+    for ((i=0; i < repos_length; i++)); do
 
-        local depends=();
+        local repo="repos_${i}";
+        local name="${repo}_name";
+        local path="${repo}_path";
+        local cpp_args="${repo}_cpp_args";
+        local cpp_sub_dir="${repo}_cpp_sub_dir";
+        local cpp_depends_length="${repo}_cpp_depends_length";
+        local git_repo="${repo}_git_repo";
+        local git_host="${repo}_git_host";
+        local git_tag="${repo}_git_tag";
+        local git_upstream="${repo}_git_upstream";
 
-        for dep in ${cpp_depends}; do
-            local dep_name="${name_to_path[$dep]}";
-            local dep_path="${name_to_cpp_sub_dir[$dep]}";
-            depends+=("${dep_name}${dep_path:+/$dep_path}");
+        name_to_path[${!name:-}]="${!path:-}";
+        name_to_cpp_sub_dir[${!name:-}]="${!cpp_sub_dir:-}";
+
+        local cpp_depends=();
+
+        local j=0;
+        local cpp_depends_length="${!cpp_depends_length:-0}";
+
+        for ((j=0; j < cpp_depends_length; j++)); do
+            local dep="${repo}_cpp_depends_${j}";
+            local dep_name="${name_to_path[${!dep}]}";
+            local dep_path="${name_to_cpp_sub_dir[${!dep}]}";
+            cpp_depends+=("${dep_name}${dep_path:+/$dep_path}");
         done
 
-        NAME="${name}"                 \
-        SRC_PATH="${path}"             \
-        CPP_SRC="${cpp_sub_dir}"       \
-        CPP_DEPS="${depends[@]}"       \
-        CPP_ARGS="${cpp_args}"         \
-        GIT_TAG="${git_tag}"           \
-        GIT_REPO="${git_repo}"         \
-        GIT_HOST="${git_host}"         \
-        GIT_UPSTREAM="${git_upstream}" \
+        NAME="${!name:-}"                 \
+        SRC_PATH="${!path:-}"             \
+        CPP_SRC="${!cpp_sub_dir:-}"       \
+        CPP_DEPS="${cpp_depends[@]}"      \
+        CPP_ARGS="${!cpp_args:-}"         \
+        GIT_TAG="${!git_tag:-}"           \
+        GIT_REPO="${!git_repo:-}"         \
+        GIT_HOST="${!git_host:-}"         \
+        GIT_UPSTREAM="${!git_upstream:-}" \
             generate_scripts;
+
     done
 
     unset name_to_path;
