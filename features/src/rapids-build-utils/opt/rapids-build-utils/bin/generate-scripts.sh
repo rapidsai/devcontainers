@@ -49,31 +49,30 @@ generate_scripts() {
 
     if [[ -d ~/"${lib}/.git" ]]; then
 
+        cat ./tmpl/clean.tmpl.sh        \
+          | NAME="${lib}"               \
+          generate_script "clean-${lib}";
+
         local src="${lib}${CPP_SRC:+/$CPP_SRC}";
 
-        local deps="$(echo -n "${CPP_DEPS:-}"                           \
-          | xargs -r -d' ' -I{} bash -c '                               \
-            echo -n "-D${0%%/*}_ROOT=$(realpath -m ~/$0/build/latest) " \
-            ' {}                                                        \
+        local deps="$(echo -n "${CPP_DEPS:-}"                            \
+          | xargs -r -d' ' -I{} bash -c                                  \
+           'echo -n "-D${0%%/*}_ROOT=$(realpath -m ~/$0/build/latest) "' \
+           {}                                                            \
         )";
 
         local args="${CPP_ARGS:-}";
+        local script_name;
 
-        cat ./tmpl/cpp-build.tmpl.sh        \
-          | NAME="${lib}"                   \
-            CPP_LIB="${lib}"                \
-            CPP_SRC="${src}"                \
-            CPP_DEPS="${deps}"              \
-            CPP_ARGS="${args}"              \
-          generate_script "build-${lib}-cpp";
-
-        cat ./tmpl/cpp-configure.tmpl.sh        \
-          | NAME="${lib}"                       \
-            CPP_LIB="${lib}"                    \
-            CPP_SRC="${src}"                    \
-            CPP_DEPS="${deps}"                  \
-            CPP_ARGS="${args}"                  \
-          generate_script "configure-${lib}-cpp";
+        for script_name in "configure" "build" "clean"; do
+            cat ./tmpl/cpp-${script_name}.tmpl.sh        \
+              | NAME="${lib}"                            \
+                CPP_LIB="${lib}"                         \
+                CPP_SRC="${src}"                         \
+                CPP_DEPS="${deps}"                       \
+                CPP_ARGS="${args}"                       \
+              generate_script "${script_name}-${lib}-cpp";
+        done
 
         local py_libs=($(rapids-python-pkg-names $lib));
         local py_dirs=($(rapids-python-pkg-roots $lib));
@@ -81,15 +80,21 @@ generate_scripts() {
         for i in "${!py_libs[@]}"; do
             local py_dir="${py_dirs[$i]}";
             local py_lib="${py_libs[$i]}";
-            cat ./tmpl/python-build.tmpl.sh           \
-              | NAME="${lib}"                         \
-                CPP_LIB="${lib}"                      \
-                CPP_SRC="${src}"                      \
-                CPP_DEPS="${deps}"                    \
-                CPP_ARGS="${args}"                    \
-                PY_SRC="${py_dir}"                    \
-                PY_LIB="${py_lib}"                    \
-              generate_script "build-${py_lib}-python";
+            for script_name in "build" "clean"; do
+                cat ./tmpl/python-${script_name}.tmpl.sh  \
+                  | NAME="${lib}"                         \
+                    CPP_LIB="${lib}"                      \
+                    CPP_SRC="${src}"                      \
+                    CPP_DEPS="${deps}"                    \
+                    CPP_ARGS="${args}"                    \
+                    PY_SRC="${py_dir}"                    \
+                    PY_LIB="${py_lib}"                    \
+                  generate_script "${script_name}-${py_lib}-python";
+            done
+
+            cat ./tmpl/clean.tmpl.sh           \
+              | NAME="${py_lib}"               \
+              generate_script "clean-${py_lib}";
         done
 
         sudo find /opt/rapids-build-utils \
@@ -153,9 +158,12 @@ generate_clone_scripts() {
     unset name_to_cpp_sub_dir;
 }
 
-(remove_script_for_pattern '^clone-[\w-]+' );
-(remove_script_for_pattern '^build-[\w-]+-cpp');
-(remove_script_for_pattern '^configure-[\w-]+-cpp');
-(remove_script_for_pattern '^build-[\w-]+-python');
+(remove_script_for_pattern '^clone-[\w-]+$');
+(remove_script_for_pattern '^clean-[\w-]+$');
+(remove_script_for_pattern '^build-[\w-]+-cpp$');
+(remove_script_for_pattern '^clean-[\w-]+-cpp$');
+(remove_script_for_pattern '^configure-[\w-]+-cpp$');
+(remove_script_for_pattern '^build-[\w-]+-python$');
+(remove_script_for_pattern '^clean-[\w-]+-python$');
 
 (generate_clone_scripts "$@");
