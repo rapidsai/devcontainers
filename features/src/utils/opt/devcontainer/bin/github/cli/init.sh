@@ -1,19 +1,16 @@
 #! /usr/bin/env bash
 
-
 init_github_cli() {
 
     set -euo pipefail;
 
-    local git_protocol=;
+    local git_protocol="--git-protocol https";
     local avoid_gh_cli_ssh_keygen_prompt=;
 
-    if [[ "${CODESPACES:-false}" == true ]]; then
+    if [[ "${CODESPACES:-false}" == "true" ]]; then
         git_protocol="--git-protocol https";
     else
-        local ssh_result="$(ssh -T git@github.com 2>&1 || true)";
-        local ssh_success="You've successfully authenticated, but GitHub does not provide shell access.";
-        if [[ "$(echo "$ssh_result" | grep -q "$ssh_success" >/dev/null 2>&1; echo $?)" == 0 ]]; then
+        if ssh -T git@${GITHUB_HOST:-github.com} 2>&1 | grep -q "You've successfully authenticated"; then
             git_protocol="--git-protocol ssh";
             if type ssh-keygen > /dev/null 2>&1; then
                 avoid_gh_cli_ssh_keygen_prompt=1;
@@ -58,33 +55,35 @@ init_github_cli() {
     if [[ $(gh auth status >/dev/null 2>&1; echo $?) != 0 ]]; then
         echo "Logging into GitHub..." >&2;
         local ssh_keygen="$(which ssh-keygen || echo "")";
-        if [[ -n "$avoid_gh_cli_ssh_keygen_prompt" && -n "$ssh_keygen" ]]; then
+        if [ -n "${ssh_keygen}" ] \
+        && [ -n "${avoid_gh_cli_ssh_keygen_prompt}" ]; then
             sudo mv $ssh_keygen{,.bak} || true;
         fi
-        gh auth login --hostname github.com --web ${git_protocol} $(scope_flags ${active_scopes} ${needed_scopes});
-        if [[ -n "$avoid_gh_cli_ssh_keygen_prompt" && -n "$ssh_keygen" ]]; then
+        gh auth login --hostname "${GITHUB_HOST:-github.com}" --web ${git_protocol} $(scope_flags ${active_scopes} ${needed_scopes});
+        if [ -n "${ssh_keygen}" ] \
+        && [ -n "${avoid_gh_cli_ssh_keygen_prompt}" ]; then
             sudo mv $ssh_keygen{.bak,} || true;
         fi
     elif [[ -n "${needed_scopes}" ]]; then
         echo "Logging into GitHub..." >&2;
-        gh auth refresh --hostname github.com $(scope_flags ${active_scopes} ${needed_scopes});
+        gh auth refresh --hostname "${GITHUB_HOST:-github.com}" $(scope_flags ${active_scopes} ${needed_scopes});
     fi
 
-    gh auth setup-git --hostname github.com;
+    gh auth setup-git --hostname "${GITHUB_HOST:-github.com}";
 
     local github_user="${GITHUB_USER:-}";
 
-    if [[ -z "${github_user:-}" ]]; then
-        if [[ -f ~/.config/gh/hosts.yml ]]; then
+    if [ -z "${github_user:-}" ]; then
+        if [ -f ~/.config/gh/hosts.yml ]; then
             github_user="$(grep --color=never 'user:' ~/.config/gh/hosts.yml | cut -d ':' -f2 | tr -d '[:space:]' || echo '')";
         fi
     fi
 
-    if [[ -z "${github_user:-}" ]]; then
-        github_user="$(gh api user --jq '.login')";
+    if [ -z "${github_user:-}" ]; then
+        github_user="$(gh api user 2>/dev/null --jq '.login // ""')";
     fi
 
-    echo "GITHUB_USER=$github_user";
+    export GITHUB_USER="${github_user}";
 }
 
-(init_github_cli "$@");
+init_github_cli "$@";
