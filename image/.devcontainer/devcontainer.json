@@ -6,6 +6,9 @@
       "BASE": "ubuntu22.04"
     }
   },
+  "runArgs": [
+    "--network=host"
+  ],
   "remoteUser": "coder",
   "features": {
     "ghcr.io/devcontainers/features/common-utils:2": {
@@ -20,6 +23,7 @@
     },
     "ghcr.io/devcontainers/features/git-lfs:1": {},
     "ghcr.io/devcontainers/features/github-cli:1": {},
+    "./features/gitlab-cli": {},
     "./features/cmake": {},
     "./features/ninja": {},
     "./features/sccache": {
@@ -32,6 +36,7 @@
     "ghcr.io/devcontainers/features/git",
     "ghcr.io/devcontainers/features/git-lfs",
     "ghcr.io/devcontainers/features/github-cli",
+    "./features/gitlab-cli",
     "./features/cmake",
     "./features/ninja",
     "./features/sccache",
