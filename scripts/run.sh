@@ -4,7 +4,7 @@ run_devcontainer() {
 
     set -euo pipefail;
 
-    # PS4='+ ${LINENO}: '; set -x;
+    # PS4="+ ${BASH_SOURCE[0]}:\${LINENO} "; set -x;
 
     # cd to the repo root
     cd "$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )/..";
@@ -12,7 +12,7 @@ run_devcontainer() {
     # Generate the devcontainer
     eval "$(./scripts/generate.sh "$@" | xargs -r -d'\n' -I% echo -n local %\;)";
 
-    mkdir -p -m 0755 .{aws,cache,config};
+    mkdir -p -m 0755 .scratch/.{aws,cache,config};
 
     local env=();
     env+=("TERM=${TERM}");
@@ -33,9 +33,9 @@ run_devcontainer() {
         --workspace-folder "${workspace}" \
         --mount-workspace-git-root false \
         --cache-from "docker.io/rapidsai/devcontainers:${tag}" \
-        --mount "type=bind,source=$(pwd)/.aws,target=/home/coder/.aws" \
-        --mount "type=bind,source=$(pwd)/.cache,target=/home/coder/.cache" \
-        --mount "type=bind,source=$(pwd)/.config,target=/home/coder/.config" \
+        --mount "type=bind,source=$(pwd)/.scratch/.aws,target=/home/coder/.aws" \
+        --mount "type=bind,source=$(pwd)/.scratch/.cache,target=/home/coder/.cache" \
+        --mount "type=bind,source=$(pwd)/.scratch/.config,target=/home/coder/.config" \
         --mount "type=bind,source=$(pwd)/features/src/utils/opt/devcontainer,target=/opt/devcontainer" \
         --additional-features '{ "./features/rapids-build-utils": {} }' \
         --mount "type=bind,source=$(pwd)/features/src/rapids-build-utils/opt/rapids-build-utils,target=/opt/rapids-build-utils" \

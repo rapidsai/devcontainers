@@ -51,7 +51,7 @@ clone_github_repo() {
 
     source devcontainer-utils-init-github-cli;
 
-    # PS4='+ ${LINENO}: '; set -x;
+    # PS4="+ ${BASH_SOURCE[0]}:\${LINENO}: "; set -x;
 
     local branch="";
 
@@ -81,11 +81,11 @@ clone_github_repo() {
 
     if [ -n "${fork:-}" ]; then
         origin="${fork}";
-    else
+    elif devcontainer-utils-shell-is-interactive; then
         while true; do
             local CHOICE;
             read -p "'${GITHUB_HOST:-github.com}/${user}/${name}.git' not found.
-    Fork '${upstream}' into '${user}/${name}' now (y/n)? " CHOICE </dev/tty
+    Fork '${upstream}' into '${user}/${name}' now (y/n)? " CHOICE <$(tty)
             case "${CHOICE:-}" in
                 [Nn]* ) origin="${upstream}"; break;;
                 [Yy]* ) origin="${user}/${name}";

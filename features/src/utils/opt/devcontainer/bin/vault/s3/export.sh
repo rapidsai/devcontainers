@@ -22,6 +22,8 @@ test_s3_creds_and_update_envvars() {
 
     set -euo pipefail;
 
+    # PS4="+ ${BASH_SOURCE[0]}:\${LINENO} "; set -x;
+
     remove_envvar "SCCACHE_BUCKET";
     remove_envvar "SCCACHE_REGION";
     remove_envvar "SCCACHE_S3_NO_CREDENTIALS";
@@ -35,12 +37,19 @@ test_s3_creds_and_update_envvars() {
         sudo sed -Ei '/^unset AWS_SECRET_ACCESS_KEY;$/d' "${file}";
     done
 
-    local s3_status="${1:-$(devcontainer-utils-vault-s3-test >/dev/null 2>&1; echo $?)}";
+    local bucket="${SCCACHE_BUCKET:-"$(grep 'bucket=' ~/.aws/config 2>/dev/null | sed 's/bucket=//' || echo)"}";
+    local region="${SCCACHE_REGION:-"$(grep 'region=' ~/.aws/config 2>/dev/null | sed 's/region=//' || echo "${AWS_DEFAULT_REGION:-}")"}";
+    local aws_access_key_id="${AWS_ACCESS_KEY_ID:-"$(grep 'aws_access_key_id=' ~/.aws/credentials 2>/dev/null | sed 's/aws_access_key_id=//' || echo)"}";
+    local aws_secret_access_key="${AWS_SECRET_ACCESS_KEY:-"$(grep 'aws_secret_access_key=' ~/.aws/credentials 2>/dev/null | sed 's/aws_secret_access_key=//' || echo)"}";
 
-    local bucket="$(grep 'bucket=' ~/.aws/config 2>/dev/null | sed 's/bucket=//' || echo "${SCCACHE_BUCKET:-}")";
-    local region="$(grep 'region=' ~/.aws/config 2>/dev/null | sed 's/region=//' || echo "${SCCACHE_REGION:-${AWS_DEFAULT_REGION:-}}")";
-    local aws_access_key_id="$(grep 'aws_access_key_id=' ~/.aws/credentials 2>/dev/null | sed 's/aws_access_key_id=//' || echo "${AWS_ACCESS_KEY_ID:-}")";
-    local aws_secret_access_key="$(grep 'aws_secret_access_key=' ~/.aws/credentials 2>/dev/null | sed 's/aws_secret_access_key=//' || echo "${AWS_SECRET_ACCESS_KEY:-}")";
+    local s3_status="${1:-$(                              \
+        SCCACHE_BUCKET=${bucket}                          \
+        SCCACHE_REGION=${region}                          \
+        AWS_ACCESS_KEY_ID=${aws_access_key_id}            \
+        AWS_SECRET_ACCESS_KEY=${aws_secret_access_key}    \
+        devcontainer-utils-vault-s3-test >/dev/null 2>&1; \
+        echo $?;                                          \
+    )}";
 
     use_aws_config_vars() {
         append_envvar "SCCACHE_BUCKET" "${bucket}";

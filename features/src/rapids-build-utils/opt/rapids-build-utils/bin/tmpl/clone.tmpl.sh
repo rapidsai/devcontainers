@@ -3,7 +3,7 @@
 clone_${NAME}() {
     set -euo pipefail;
 
-    # PS4='+ ${LINENO}: '; set -x;
+    # PS4="+ ${BASH_SOURCE[0]}:\${LINENO} "; set -x;
 
     if [[ ! -d ~/"${SRC_PATH}"/.git ]]; then
 

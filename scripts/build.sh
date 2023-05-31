@@ -4,7 +4,7 @@ build_devcontainer() {
 
     set -euo pipefail;
 
-    # PS4='+ ${LINENO}: '; set -x;
+    # PS4="+ ${BASH_SOURCE[0]}:\${LINENO} "; set -x;
 
     # cd to the repo root
     cd "$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )/..";

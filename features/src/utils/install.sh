@@ -41,6 +41,7 @@ install_utility() {
 }
 
 install_utility devcontainer-utils-parse-args parse-args.sh;
+install_utility devcontainer-utils-shell-is-interactive shell-is-interactive.sh;
 install_utility devcontainer-utils-post-attach-command post-attach-command.sh;
 install_utility devcontainer-utils-init-git git/init.sh;
 install_utility devcontainer-utils-clone-git-repo git/repo/clone.sh;
@@ -81,18 +82,21 @@ gitlab.com ecdsa-sha2-nistp256 AAAAE2VjZHNhLXNoYTItbmlzdHAyNTYAAAAIbmlzdHAyNTYAA
 EOF
 )";
 
-if [[ -n "$known_hosts" ]]; then
-    for_each_user_bashrc "$(cat <<EOF
-    home="\$(dirname "\$(realpath -m "\$0")")"       \
- && mkdir -p -m 0700 "\$home/.ssh"                   \
- && echo "$known_hosts" >> "\$home/.ssh/known_hosts" \
- && chmod 644 "\$home/.ssh/known_hosts"              ;
-EOF
-)";
+for dir in $(for_each_user_bashrc 'echo "$(dirname "$(realpath -m "$0")")"'); do
+    # Copy in default git config
+    cp .gitconfig "${dir}"/.gitconfig;
+    # Create or update ~/.ssh/known_hosts
+    mkdir -p -m 0700 "${dir}"/.ssh;
+    touch "${dir}"/.ssh/known_hosts;
+    chmod 644 "${dir}"/.ssh/known_hosts;
+    cat <<____EOF >> "${dir}"/.ssh/known_hosts
+${known_hosts}
+____EOF
+done
 
-    find_non_root_user;
-    chown -R ${USERNAME}:${USERNAME} "$(bash -c "echo ~${USERNAME}/.ssh")";
-fi
+find_non_root_user;
+user_home="$(bash -c "echo ~${USERNAME}")";
+chown -R ${USERNAME}:${USERNAME} "${user_home}";
 
 # Generate bash completions
 if dpkg -s bash-completion >/dev/null 2>&1; then

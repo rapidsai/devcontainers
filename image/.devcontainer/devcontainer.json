@@ -6,9 +6,6 @@
       "BASE": "ubuntu22.04"
     }
   },
-  "runArgs": [
-    "--network=host"
-  ],
   "remoteUser": "coder",
   "features": {
     "ghcr.io/devcontainers/features/common-utils:2": {
@@ -27,7 +24,7 @@
     "./features/cmake": {},
     "./features/ninja": {},
     "./features/sccache": {
-      "version": "0.4.2"
+      "version": "0.5.0"
     },
     "./features/utils": {}
   },

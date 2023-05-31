@@ -1,5 +1,7 @@
 #! /usr/bin/env bash
 
+# PS4="+ ${BASH_SOURCE[0]}:\${LINENO} "; set -x;
+
 devcontainer-utils-init-git;
 
 # Refresh the S3 creds if they don't exist, are expired, or are <= 4 hours from expiring

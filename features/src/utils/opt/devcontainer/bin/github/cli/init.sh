@@ -4,6 +4,13 @@ init_github_cli() {
 
     set -euo pipefail;
 
+    # PS4="+ ${BASH_SOURCE[0]}:\${LINENO} "; set -x;
+
+    if ! type gh > /dev/null 2>&1; then
+        export GITHUB_USER="";
+        return;
+    fi
+
     local git_protocol="--git-protocol https";
     local avoid_gh_cli_ssh_keygen_prompt=;
 
@@ -38,7 +45,7 @@ init_github_cli() {
         <(echo -n "${active_scopes}" | xargs -r -n1 -d' ' echo | sort) \
     )";
 
-    if [[ -n "${needed_scopes}" ]]; then
+    if [ -n "${needed_scopes}" ]; then
         local VAR;
         for VAR in GH_TOKEN GITHUB_TOKEN; do
             if [[ -n "$(eval "echo \${${VAR}:-}")" ]]; then
@@ -52,24 +59,37 @@ init_github_cli() {
         done
     fi
 
-    if [[ $(gh auth status >/dev/null 2>&1; echo $?) != 0 ]]; then
+    if ! gh auth status >/dev/null 2>&1; then
         echo "Logging into GitHub..." >&2;
+
         local ssh_keygen="$(which ssh-keygen || echo "")";
+
         if [ -n "${ssh_keygen}" ] \
         && [ -n "${avoid_gh_cli_ssh_keygen_prompt}" ]; then
             sudo mv $ssh_keygen{,.bak} || true;
         fi
-        gh auth login --hostname "${GITHUB_HOST:-github.com}" --web ${git_protocol} $(scope_flags ${active_scopes} ${needed_scopes});
+
+        gh auth login \
+            --web ${git_protocol} \
+            --hostname "${GITHUB_HOST:-github.com}" \
+            $(scope_flags ${active_scopes} ${needed_scopes}) \
+        || echo "Continuing without logging into GitHub";
+
         if [ -n "${ssh_keygen}" ] \
         && [ -n "${avoid_gh_cli_ssh_keygen_prompt}" ]; then
             sudo mv $ssh_keygen{.bak,} || true;
         fi
-    elif [[ -n "${needed_scopes}" ]]; then
+    elif [ -n "${needed_scopes}" ]; then
         echo "Logging into GitHub..." >&2;
-        gh auth refresh --hostname "${GITHUB_HOST:-github.com}" $(scope_flags ${active_scopes} ${needed_scopes});
+        gh auth refresh \
+            --hostname "${GITHUB_HOST:-github.com}" \
+            $(scope_flags ${active_scopes} ${needed_scopes}) \
+        || echo "Continuing without logging into GitHub";
     fi
 
-    gh auth setup-git --hostname "${GITHUB_HOST:-github.com}";
+    if gh auth status >/dev/null 2>&1; then
+        gh auth setup-git --hostname "${GITHUB_HOST:-github.com}";
+    fi
 
     local github_user="${GITHUB_USER:-}";
 
@@ -80,7 +100,7 @@ init_github_cli() {
     fi
 
     if [ -z "${github_user:-}" ]; then
-        github_user="$(gh api user 2>/dev/null --jq '.login // ""')";
+        github_user="$(gh api user --jq '.login // ""' 2>/dev/null || echo)";
     fi
 
     export GITHUB_USER="${github_user}";

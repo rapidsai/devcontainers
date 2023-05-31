@@ -4,7 +4,7 @@ clone_git_repo() {
 
     set -euo pipefail;
 
-    # PS4='+ ${LINENO}: '; set -x;
+    # PS4="+ ${BASH_SOURCE[0]}:\${LINENO} "; set -x;
 
     local branch="";
     local upstream="";

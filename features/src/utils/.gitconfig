@@ -1,0 +1,10 @@
+[user]
+	name = anon
+	email = users.noreply.github.com
+[pull]
+	rebase = false
+[codespaces-theme]
+	hide-status = 1
+[devcontainers-theme]
+	show-dirty = 0
+	hide-status = 1

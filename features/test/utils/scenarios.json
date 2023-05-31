@@ -1,0 +1,110 @@
+{
+  "ubuntu18.04": {
+    "image": "ubuntu:18.04",
+    "remoteUser": "coder",
+    "features": {
+      "ghcr.io/devcontainers/features/common-utils:2": {
+        "uid": "1000",
+        "gid": "1000",
+        "username": "coder",
+        "installZsh": "true",
+        "upgradePackages": "true"
+      },
+      "ghcr.io/devcontainers/features/git:1": {
+        "ppa": "true"
+      },
+      "ghcr.io/devcontainers/features/git-lfs:1": {},
+      "ghcr.io/devcontainers/features/github-cli:1": {},
+      "gitlab-cli": {},
+      "cmake": {},
+      "ninja": {},
+      "sccache": {
+        "version": "0.5.0"
+      },
+      "utils": {}
+    },
+    "overrideFeatureInstallOrder": [
+      "ghcr.io/devcontainers/features/common-utils",
+      "ghcr.io/devcontainers/features/git",
+      "ghcr.io/devcontainers/features/git-lfs",
+      "ghcr.io/devcontainers/features/github-cli",
+      "./gitlab-cli",
+      "./cmake",
+      "./ninja",
+      "./sccache",
+      "./utils"
+    ]
+  },
+  "ubuntu20.04": {
+    "image": "ubuntu:20.04",
+    "remoteUser": "coder",
+    "features": {
+      "ghcr.io/devcontainers/features/common-utils:2": {
+        "uid": "1000",
+        "gid": "1000",
+        "username": "coder",
+        "installZsh": "true",
+        "upgradePackages": "true"
+      },
+      "ghcr.io/devcontainers/features/git:1": {
+        "ppa": "true"
+      },
+      "ghcr.io/devcontainers/features/git-lfs:1": {},
+      "ghcr.io/devcontainers/features/github-cli:1": {},
+      "gitlab-cli": {},
+      "cmake": {},
+      "ninja": {},
+      "sccache": {
+        "version": "0.5.0"
+      },
+      "utils": {}
+    },
+    "overrideFeatureInstallOrder": [
+      "ghcr.io/devcontainers/features/common-utils",
+      "ghcr.io/devcontainers/features/git",
+      "ghcr.io/devcontainers/features/git-lfs",
+      "ghcr.io/devcontainers/features/github-cli",
+      "./gitlab-cli",
+      "./cmake",
+      "./ninja",
+      "./sccache",
+      "./utils"
+    ]
+  },
+  "ubuntu22.04": {
+    "image": "ubuntu:22.04",
+    "remoteUser": "coder",
+    "features": {
+      "ghcr.io/devcontainers/features/common-utils:2": {
+        "uid": "1000",
+        "gid": "1000",
+        "username": "coder",
+        "installZsh": "true",
+        "upgradePackages": "true"
+      },
+      "ghcr.io/devcontainers/features/git:1": {
+        "ppa": "true"
+      },
+      "ghcr.io/devcontainers/features/git-lfs:1": {},
+      "ghcr.io/devcontainers/features/github-cli:1": {},
+      "gitlab-cli": {},
+      "cmake": {},
+      "ninja": {},
+      "sccache": {
+        "version": "0.5.0"
+      },
+      "utils": {}
+    },
+    "overrideFeatureInstallOrder": [
+      "ghcr.io/devcontainers/features/common-utils",
+      "ghcr.io/devcontainers/features/git",
+      "ghcr.io/devcontainers/features/git-lfs",
+      "ghcr.io/devcontainers/features/github-cli",
+      "./gitlab-cli",
+      "./cmake",
+      "./ninja",
+      "./sccache",
+      "./utils"
+    ]
+  }
+}
