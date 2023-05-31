@@ -43,6 +43,7 @@ install_utility() {
 install_utility devcontainer-utils-parse-args parse-args.sh;
 install_utility devcontainer-utils-post-attach-command post-attach-command.sh;
 install_utility devcontainer-utils-init-git git/init.sh;
+install_utility devcontainer-utils-clone-git-repo git/repo/clone.sh;
 
 install_utility devcontainer-utils-init-github-cli   github/cli/init.sh;
 install_utility devcontainer-utils-clone-github-repo github/repo/clone.sh;
