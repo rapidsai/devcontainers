@@ -43,10 +43,17 @@ make_pip_env() {
             pip_noinstall+=($(rapids-python-conda-pkg-names "${lib}"));
 
             rapids-dependency-file-generator \
-                --file_key all \
-                --output requirements \
+                --file_key py_build_${lib}   \
+                --file_key py_run_${lib}     \
+                --file_key py_test_${lib}    \
+                --file_key py_build          \
+                --file_key py_run            \
+                --file_key py_test           \
+                --file_key all               \
+                --output requirements        \
                 --config ~/"${lib}/dependencies.yaml" \
                 --matrix "arch=$(uname -m);cuda=${cuda_version};py=${python_version}" \
+                --stdout \
           | grep -v '^#' \
           | sed -E "s/-cu([0-9]+)/-cu${CUDA_VERSION_MAJOR}/g" \
             > /tmp/${lib}.requirements.txt;
