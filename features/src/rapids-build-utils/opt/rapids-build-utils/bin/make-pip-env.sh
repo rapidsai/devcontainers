@@ -53,7 +53,7 @@ make_pip_env() {
                 --output requirements        \
                 --config ~/"${lib}/dependencies.yaml" \
                 --matrix "arch=$(uname -m);cuda=${cuda_version};py=${python_version}" \
-                --stdout \
+                `# --stdout` \
           | grep -v '^#' \
           | sed -E "s/-cu([0-9]+)/-cu${CUDA_VERSION_MAJOR}/g" \
             > /tmp/${lib}.requirements.txt;
