@@ -35,15 +35,14 @@ include:
 
 - os: "ubuntu:18.04"
   images:
-  - features: [*oneapi_2022, *cuda_prev_min, *python, *lit]
   - features: [*gcc_7, *cuda_prev_min, *python, *lit]
   - features: [*gcc_8, *cuda_prev_min, *python, *lit]
   - features: [*gcc_9, *cuda_prev_min, *python, *lit]
   - features: [*llvm_9, *cuda_prev_min, *python, *lit]
+  - features: [*oneapi_2022, *cuda_prev_min, *python, *lit]
 
 - os: "ubuntu:20.04"
   images:
-  - features: [*oneapi_2022, *cuda_curr_max, *python, *lit]
   - features: [*gcc_7, *cuda_curr_max, *python, *lit]
   - features: [*gcc_8, *cuda_curr_max, *python, *lit]
   - features: [*gcc_9, *cuda_curr_max, *python, *lit]
@@ -54,16 +53,17 @@ include:
   - features: [*llvm_12, *cuda_curr_max, *python, *lit]
   - features: [*llvm_13, *cuda_curr_max, *python, *lit]
   - features: [*llvm_14, *cuda_curr_max, *python, *lit]
+  - features: [*oneapi_2022, *cuda_curr_max, *python, *lit]
 
 - os: "ubuntu:22.04"
   images:
   - features: [*nvhpc_prev, *python, *lit]
   - features: [*nvhpc_curr, *python, *lit]
-  - features: [*oneapi_2022, *cuda_curr_max, *python, *lit]
   - features: [*gcc_11, *cuda_curr_max, *python, *lit]
   - features: [*gcc_12, *cuda_curr_max, *python, *lit]
   - features: [*llvm_prev, *cuda_curr_max, *python, *lit]
   - features: [*llvm_curr, *cuda_curr_max, *python, *lit]
+  - features: [*oneapi_2022, *cuda_curr_max, *python, *lit]
 
 # RAPIDS devcontainers
 
@@ -89,11 +89,6 @@ include:
   # llvm-cuda-mambaforge
   - features: [*llvm_prev, *cuda_prev_max, *conda]
   - features: [*llvm_curr, *cuda_prev_max, *conda]
-
-  - features: [*llvm_prev, *nvhpc_prev]
-  - features: [*llvm_prev, *nvhpc_curr]
-  - features: [*llvm_curr, *nvhpc_prev]
-  - features: [*llvm_curr, *nvhpc_curr]
 
   # llvm-cuda-nvhpc
   - features: [*llvm_prev, *cuda_curr_min, *nvhpc_prev]
@@ -125,9 +120,6 @@ include:
 
   # rust-cuda-mambaforge
   - features: [*rust, *cuda_prev_max, *conda]
-
-  # cuda-mambaforge
-  - features: [*cuda_prev_max, *conda]
 
   # mambaforge
   - features: [*conda]
