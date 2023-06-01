@@ -79,7 +79,6 @@ include:
   # llvm
   - features: [*llvm_prev]
   - features: [*llvm_curr]
-  - features: [*llvm_curr]
 
   # llvm-cuda
   - features: [*llvm_prev, *cuda_prev_max]
