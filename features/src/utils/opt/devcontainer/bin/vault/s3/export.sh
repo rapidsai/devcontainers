@@ -55,6 +55,8 @@ test_s3_creds_and_update_envvars() {
         append_envvar "SCCACHE_BUCKET" "${bucket}";
         append_envvar "SCCACHE_REGION" "${region}";
 
+        mkdir -p ~/.aws;
+
         cat <<EOF > ~/.aws/config
 [default]
 ${bucket:+"bucket=${bucket}"}
