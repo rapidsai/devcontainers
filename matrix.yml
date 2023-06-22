@@ -42,7 +42,6 @@ include:
   - features: [*gcc_8, *cuda_prev_min, *python, *lit]
   - features: [*gcc_9, *cuda_prev_min, *python, *lit]
   - features: [*llvm_9, *cuda_prev_min, *python, *lit]
-  - features: [*gcc_6, *cuda_curr_max, *python, *lit]
 
 - os: "ubuntu:20.04"
   images:
