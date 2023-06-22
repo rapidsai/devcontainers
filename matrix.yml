@@ -46,6 +46,7 @@ include:
 - os: "ubuntu:20.04"
   images:
   - features: [*oneapi_2022, *cuda_curr_max, *python, *lit]
+  - features: [*gcc_6, *cuda_curr_max, *python, *lit]
   - features: [*gcc_7, *cuda_curr_max, *python, *lit]
   - features: [*gcc_8, *cuda_curr_max, *python, *lit]
   - features: [*gcc_9, *cuda_curr_max, *python, *lit]
