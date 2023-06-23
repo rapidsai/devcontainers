@@ -23,7 +23,15 @@ if ! type yq >/dev/null 2>&1; then
 fi
 
 # Remove built-in anacron configs
-rm -rf /etc/crontab /etc/cron.*;
+# rm -rf /etc/crontab /etc/cron.*;
+
+# Allow crond to be run by users in the "crontab" group
+chgrp crontab "$(realpath -m $(which cron))";
+chmod u+s "$(realpath -m $(which cron))";
+
+touch /var/log/devcontainer-utils-vault-s3-creds-refresh.log;
+chmod 0664 /var/log/devcontainer-utils-vault-s3-creds-refresh.log;
+chgrp crontab /var/log/devcontainer-utils-vault-s3-creds-refresh.log;
 
 # Install Devcontainer utility scripts to /opt/devcontainer
 cp -ar ./opt/devcontainer /opt/;
@@ -31,10 +39,6 @@ cp -ar ./opt/devcontainer /opt/;
 find /opt/devcontainer \
     \( -type d -exec chmod 0775 {} \; \
     -o -type f -exec chmod 0755 {} \; \);
-
-touch /var/log/vault-s3-init.log;
-chmod 0777 /var/log/vault-s3-init.log;
-chmod 0644 /opt/devcontainer/cron/vault-s3-init;
 
 install_utility() {
     update-alternatives --install "/usr/bin/$1" "$1" "/opt/devcontainer/bin/$2" 0;
@@ -53,10 +57,14 @@ install_utility devcontainer-utils-init-gitlab-cli                    gitlab/cli
 install_utility devcontainer-utils-clone-gitlab-repo                  gitlab/repo/clone.sh;
 install_utility devcontainer-utils-print-missing-gitlab-token-warning gitlab/print-missing-token-warning.sh;
 
-install_utility devcontainer-utils-vault-s3-init     vault/s3/init.sh;
-install_utility devcontainer-utils-vault-s3-test     vault/s3/test.sh;
-install_utility devcontainer-utils-vault-s3-export   vault/s3/export.sh;
 install_utility devcontainer-utils-vault-auth-github vault/auth/github.sh;
+
+install_utility devcontainer-utils-vault-s3-init            vault/s3/init.sh;
+install_utility devcontainer-utils-vault-s3-creds-generate  vault/s3/creds/generate.sh;
+install_utility devcontainer-utils-vault-s3-creds-persist   vault/s3/creds/persist.sh;
+install_utility devcontainer-utils-vault-s3-creds-propagate vault/s3/creds/propagate.sh;
+install_utility devcontainer-utils-vault-s3-creds-schedule  vault/s3/creds/schedule.sh;
+install_utility devcontainer-utils-vault-s3-creds-test      vault/s3/creds/test.sh;
 
 # Enable GCC colors
 for_each_user_bashrc 'sed -i -re "s/^#(export GCC_COLORS)/\1/g" "$0"';
@@ -94,9 +102,14 @@ ${known_hosts}
 ____EOF
 done
 
+# Find the non-root user
 find_non_root_user;
-user_home="$(bash -c "echo ~${USERNAME}")";
-chown -R ${USERNAME}:${USERNAME} "${user_home}";
+# Add user to the crontab group
+usermod -aG crontab ${USERNAME};
+# Allow user to edit the crontab
+echo ${USERNAME} >> /etc/cron.allow;
+# Ensure the user owns their homedir
+chown -R ${USERNAME}:${USERNAME} "$(bash -c "echo ~${USERNAME}")";
 
 # Generate bash completions
 if dpkg -s bash-completion >/dev/null 2>&1; then

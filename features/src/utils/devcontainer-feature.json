@@ -1,11 +1,14 @@
 {
   "name": "devcontainer utils",
   "id": "utils",
-  "version": "23.6.4",
+  "version": "23.6.5",
   "description": "A feature to install my devcontainer utilities",
   "containerEnv": {
     "BASH_ENV": "/etc/bash.bash_env"
   },
+  "postCreateCommand": [
+    "cron"
+  ],
   "postAttachCommand": [
     "/bin/bash",
     "-li",

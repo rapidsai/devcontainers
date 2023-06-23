@@ -2,6 +2,15 @@
   "ubuntu18.04": {
     "image": "ubuntu:18.04",
     "remoteUser": "coder",
+    "containerEnv": {
+      "gh_token": "${localEnv:gh_token}",
+      "vault_host": "${localEnv:vault_host}",
+      "VAULT_S3_TTL": "${localEnv:VAULT_S3_TTL}",
+      "rw_sccache_bucket": "${localEnv:rw_sccache_bucket}",
+      "rw_sccache_region": "${localEnv:rw_sccache_region}",
+      "ro_sccache_bucket": "${localEnv:ro_sccache_bucket}",
+      "ro_sccache_region": "${localEnv:ro_sccache_region}"
+    },
     "features": {
       "ghcr.io/devcontainers/features/common-utils:2": {
         "uid": "1000",
@@ -19,7 +28,7 @@
       "cmake": {},
       "ninja": {},
       "sccache": {
-        "version": "0.5.0"
+        "version": "0.5.3"
       },
       "utils": {}
     },
@@ -38,6 +47,15 @@
   "ubuntu20.04": {
     "image": "ubuntu:20.04",
     "remoteUser": "coder",
+    "containerEnv": {
+      "gh_token": "${localEnv:gh_token}",
+      "vault_host": "${localEnv:vault_host}",
+      "VAULT_S3_TTL": "${localEnv:VAULT_S3_TTL}",
+      "rw_sccache_bucket": "${localEnv:rw_sccache_bucket}",
+      "rw_sccache_region": "${localEnv:rw_sccache_region}",
+      "ro_sccache_bucket": "${localEnv:ro_sccache_bucket}",
+      "ro_sccache_region": "${localEnv:ro_sccache_region}"
+    },
     "features": {
       "ghcr.io/devcontainers/features/common-utils:2": {
         "uid": "1000",
@@ -55,7 +73,7 @@
       "cmake": {},
       "ninja": {},
       "sccache": {
-        "version": "0.5.0"
+        "version": "0.5.3"
       },
       "utils": {}
     },
@@ -74,6 +92,15 @@
   "ubuntu22.04": {
     "image": "ubuntu:22.04",
     "remoteUser": "coder",
+    "containerEnv": {
+      "gh_token": "${localEnv:gh_token}",
+      "vault_host": "${localEnv:vault_host}",
+      "VAULT_S3_TTL": "${localEnv:VAULT_S3_TTL}",
+      "rw_sccache_bucket": "${localEnv:rw_sccache_bucket}",
+      "rw_sccache_region": "${localEnv:rw_sccache_region}",
+      "ro_sccache_bucket": "${localEnv:ro_sccache_bucket}",
+      "ro_sccache_region": "${localEnv:ro_sccache_region}"
+    },
     "features": {
       "ghcr.io/devcontainers/features/common-utils:2": {
         "uid": "1000",
@@ -91,7 +118,7 @@
       "cmake": {},
       "ninja": {},
       "sccache": {
-        "version": "0.5.0"
+        "version": "0.5.3"
       },
       "utils": {}
     },

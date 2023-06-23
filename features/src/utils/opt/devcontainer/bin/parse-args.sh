@@ -1,9 +1,7 @@
 #! /usr/bin/env bash
 
-clone_git_repo() {
+parse_args() {
     set -euo pipefail;
-
-    # PS4="+ ${BASH_SOURCE[0]}:\${LINENO} "; set -x;
 
     local keys=();
     local rest=();
@@ -12,7 +10,7 @@ clone_git_repo() {
     local vars="^(.*)$";
     if [ "${1:-}" = "--names" ]; then
         shift;
-        vars="^(${1})$";
+        vars="^($(tr -d '[:space:]' <<< "${1}"))$";
         shift;
     fi
 
@@ -23,25 +21,30 @@ clone_git_repo() {
 
         if false; then
             continue;
+        # read args from stdin
+        elif grep -qP '^-$' <<< "${arg:-}"; then
+            shift;
+            set -- ${@} $(cat - | xargs -r echo);
+            continue;
         # --
-        elif echo "${arg:-}" | grep -qP '^--$'; then
+        elif grep -qP '^--$' <<< "${arg:-}"; then
             shift;
             rest+=("${@}");
             break;
         # -foo=bar | --foo=bar
-        elif echo "${arg:-}" | grep -qP '^--?[^\s]+=.*$'; then
+        elif grep -qP '^--?[^\s]+=.*$' <<< "${arg:-}"; then
             shift;
             key="${arg#-}";
             key="${key#-}";
             key="${key%=*}";
             val="${arg#*=}";
         # -foo bar | --foo bar
-        elif echo "${arg:-}" | grep -qP '^--?[\w]+$'; then
+        elif grep -qP '^--?[\w]+$' <<< "${arg:-}"; then
             shift;
             key="${arg#-}";
             key="${key#-}";
-            if [ -n "${1:-}" ]; then
-                if echo "${1}" | grep -qP '^-.*$'; then
+            if ! grep -qE "^$" <<< "${1:-}"; then
+                if grep -qP '^-.*$' <<< "${1}"; then
                     val="true";
                 else
                     val="${1}";
@@ -67,13 +70,21 @@ clone_git_repo() {
     keys+=("__rest__");
     dict["__rest__"]="(${rest[@]})";
 
-    keys="$(echo "${keys[@]}" | xargs -r -d' ' -n1 echo -e | sort -d | uniq)";
+    keys=($(echo "${keys[@]}" | xargs -r -d' ' -n1 echo -e | sort -s | uniq));
 
-    # { set +x; } 2>/dev/null;
+    { set +x; } 2>/dev/null;
 
-    for key in ${keys}; do
-        echo "${key}=${dict[$key]}";
+    local keyi=1;
+
+    for ((keyi=1; keyi < ${#keys[@]}; keyi+=1)); do
+        echo "${keys[$keyi]}=${dict[${keys[$keyi]}]}";
     done
+
+    echo "${keys[0]}=${dict[${keys[0]}]}";
 }
 
-clone_git_repo "$@";
+# if test -n "${devcontainer_utils_debug:-}"; then
+#     PS4="+ ${BASH_SOURCE[0]}:\${LINENO} "; set -x;
+# fi
+
+(parse_args "$@");

@@ -16,7 +16,8 @@ files="${@:3}";
 
 # Select all images that use a changed feature
 
-common_features="cpp|gitlab-cli";
+# common_features="cpp|gitlab-cli";
+common_features="gitlab-cli";
 
 features="$(echo                        \
   "${features}"  `# ["foo", "bar"]`     \
