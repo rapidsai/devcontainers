@@ -27,7 +27,7 @@ jobs:
           || echo "ok=false" | tee -a $GITHUB_OUTPUT;
 
   print-workflow-token-scopes:
-    if: needs.check-event.outputs.ok == 'true' && secrets.WORKFLOW_TOKEN != ''
+    if: needs.check-event.outputs.ok == 'true'
     name: Print WORKFLOW_TOKEN scopes
     needs: check-event
     runs-on: ubuntu-latest
