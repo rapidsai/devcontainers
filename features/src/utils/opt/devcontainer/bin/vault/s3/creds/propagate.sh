@@ -10,21 +10,19 @@ ensure_s3_creds_have_propagated() {
 
     local num_restarts="0";
 
-    sccache --stop-server >/dev/null 2>&1 || true;
+    if test -n "$(pgrep sccache || echo)"; then
+        sccache --stop-server >/dev/null 2>&1 || true;
+    fi
 
     while true; do
 
         if SCCACHE_NO_DAEMON=1 sccache --show-stats >/dev/null 2>&1; then
             if [ "${num_restarts}" -gt "0" ]; then echo "Success!"; fi
-            sccache --stop-server >/dev/null 2>&1 || true;
-            sccache --start-server >/dev/null 2>&1 || true;
             exit 0;
         fi
 
         if [ "${num_restarts}" -ge "20" ]; then
             if [ "${num_restarts}" -gt "0" ]; then echo "Skipping."; fi
-            sccache --stop-server >/dev/null 2>&1 || true;
-            sccache --start-server >/dev/null 2>&1 || true;
             exit 1;
         fi
 

@@ -2,8 +2,8 @@
 
 s3_bucket_args() {
     cat <<____EOF
-        --region='${SCCACHE_REGION:-"${AWS_DEFAULT_REGION:-}"}'
         --bucket='${SCCACHE_BUCKET:-}'
+        --region='${SCCACHE_REGION:-"${AWS_DEFAULT_REGION:-}"}'
 ____EOF
 }
 
@@ -56,6 +56,7 @@ init_vault_s3_creds() {
                 esac
             fi
         fi
+        . /etc/profile.d/*-devcontainer-utils.sh;
         # start the sccache server
         sccache --start-server >/dev/null 2>&1 || true;
     fi

@@ -15,7 +15,7 @@ source dev-container-features-test-lib
 # Feature-specific tests
 # The 'check' command comes from the dev-container-features-test-lib.
 
-export VAULT_S3_TTL="${VAULT_S3_TTL:-"300"}";
+export VAULT_S3_TTL="${VAULT_S3_TTL:-"900"}";
 
 cp ~/.bashrc /tmp/.bashrc-clean;
 
@@ -52,7 +52,9 @@ reset_state() {
     sudo chmod +x "${utils_profile_script}";
     . ~/.bashrc;
 
-    sccache --stop-server >/dev/null 2>&1 || true;
+    if test -n "$(pgrep sccache || echo)"; then
+        sccache --stop-server >/dev/null 2>&1 || true;
+    fi
 }
 
 write_bad_creds() {
@@ -66,33 +68,12 @@ write_bad_creds() {
     ";
 }
 
-print_config_files() {
-
-    if test -f ~/.aws/config; then
-        echo ~/.aws/config:;
-        cat ~/.aws/config;
-        echo;
-    fi
-
-    echo ~/.bashrc:;
-    tail -n5 ~/.bashrc;
-    echo;
-
-    echo "${utils_profile_script}:";
-    cat "${utils_profile_script}";
-    echo;
-}
-
 expect_s3_cache_is_used() {
-    source "${utils_profile_script}";
-    sccache --stop-server >/dev/null 2>&1 || true;
     sccache --show-stats | grep "Cache location";
     sccache --show-stats 2>&1 | grep -qE 'Cache location \s+ s3';
 }
 
 expect_local_disk_cache_is_used() {
-    source "${utils_profile_script}";
-    sccache --stop-server >/dev/null 2>&1 || true;
     sccache --show-stats | grep "Cache location";
     sccache --show-stats 2>&1 | grep -qE 'Cache location \s+ Local disk';
 }
