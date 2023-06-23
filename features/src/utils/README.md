@@ -1,7 +1,7 @@
 
-# devcontainer utils (utils)
+# devcontainer-utils (utils)
 
-A feature to install my devcontainer utilities
+A feature to install RAPIDS devcontainer utility scripts
 
 ## Example Usage
 
