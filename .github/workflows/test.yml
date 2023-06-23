@@ -26,10 +26,27 @@ jobs:
           && echo "ok=true"  | tee -a $GITHUB_OUTPUT \
           || echo "ok=false" | tee -a $GITHUB_OUTPUT;
 
-  validate-features-json:
-    if: needs.check-event.outputs.ok == 'true'
-    name: Validate features
+  print-workflow-token-scopes:
+    if: needs.check-event.outputs.ok == 'true' && secrets.WORKFLOW_TOKEN != ''
+    name: Print WORKFLOW_TOKEN scopes
     needs: check-event
+    runs-on: ubuntu-latest
+    outputs:
+      ok: 'false'
+    steps:
+      - name: Print WORKFLOW_TOKEN scopes
+        shell: bash --noprofile --norc -x -eo pipefail {0}
+        run: |
+          GITHUB_TOKEN= GH_TOKEN=${{ secrets.WORKFLOW_TOKEN }} \
+              gh api -i -X GET --silent rate_limit 2>/dev/null \
+            | grep -i 'x-oauth-scopes:'                        \
+            | cut -d' ' -f1 --complement                       \
+            | tr -d ','                                        ;
+
+  validate-features-json:
+    if: needs.print-workflow-token-scopes.outputs.ok == 'true'
+    name: Validate features
+    needs: print-workflow-token-scopes
     secrets: inherit
     uses: ./.github/workflows/validate-features-json.yml
 
