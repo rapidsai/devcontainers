@@ -23,21 +23,13 @@ runs:
     - name: Install devcontainers CLI
       uses: ./.github/actions/install-devcontainers-cli
 
-    - name: Get AWS credentials for sccache bucket
-      uses: aws-actions/configure-aws-credentials@v2
-      if: github.repository == 'rapidsai/devcontainers'
-      with:
-        aws-region: us-east-2
-        role-duration-seconds: "300" # 5 minutes
-        role-to-assume: arn:aws:iam::279114543810:role/gha-oidc-rapidsai
-
     - name: Test feature
       shell: bash
       run: |
         devcontainer features test ${{ inputs.args }} ./features;
       env:
         NODE_NO_WARNINGS: 1
-        VAULT_S3_TTL: "300" # 5 minutes
+        VAULT_S3_TTL: "900" # 15 minutes
         gh_token: "${{ inputs.gh_token }}"
         vault_host: "${{ inputs.vault_host }}"
         rw_sccache_bucket: "${{ inputs.rw_sccache_bucket }}"
