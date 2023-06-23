@@ -1,0 +1,137 @@
+{
+  "ubuntu18.04": {
+    "image": "ubuntu:18.04",
+    "remoteUser": "coder",
+    "containerEnv": {
+      "gh_token": "${localEnv:gh_token}",
+      "vault_host": "${localEnv:vault_host}",
+      "VAULT_S3_TTL": "${localEnv:VAULT_S3_TTL}",
+      "rw_sccache_bucket": "${localEnv:rw_sccache_bucket}",
+      "rw_sccache_region": "${localEnv:rw_sccache_region}",
+      "ro_sccache_bucket": "${localEnv:ro_sccache_bucket}",
+      "ro_sccache_region": "${localEnv:ro_sccache_region}"
+    },
+    "features": {
+      "ghcr.io/devcontainers/features/common-utils:2": {
+        "uid": "1000",
+        "gid": "1000",
+        "username": "coder",
+        "installZsh": "true",
+        "upgradePackages": "true"
+      },
+      "ghcr.io/devcontainers/features/git:1": {
+        "ppa": "true"
+      },
+      "ghcr.io/devcontainers/features/git-lfs:1": {},
+      "ghcr.io/devcontainers/features/github-cli:1": {},
+      "gitlab-cli": {},
+      "cmake": {},
+      "ninja": {},
+      "sccache": {
+        "version": "0.5.3"
+      },
+      "utils": {}
+    },
+    "overrideFeatureInstallOrder": [
+      "ghcr.io/devcontainers/features/common-utils",
+      "ghcr.io/devcontainers/features/git",
+      "ghcr.io/devcontainers/features/git-lfs",
+      "ghcr.io/devcontainers/features/github-cli",
+      "./gitlab-cli",
+      "./cmake",
+      "./ninja",
+      "./sccache",
+      "./utils"
+    ]
+  },
+  "ubuntu20.04": {
+    "image": "ubuntu:20.04",
+    "remoteUser": "coder",
+    "containerEnv": {
+      "gh_token": "${localEnv:gh_token}",
+      "vault_host": "${localEnv:vault_host}",
+      "VAULT_S3_TTL": "${localEnv:VAULT_S3_TTL}",
+      "rw_sccache_bucket": "${localEnv:rw_sccache_bucket}",
+      "rw_sccache_region": "${localEnv:rw_sccache_region}",
+      "ro_sccache_bucket": "${localEnv:ro_sccache_bucket}",
+      "ro_sccache_region": "${localEnv:ro_sccache_region}"
+    },
+    "features": {
+      "ghcr.io/devcontainers/features/common-utils:2": {
+        "uid": "1000",
+        "gid": "1000",
+        "username": "coder",
+        "installZsh": "true",
+        "upgradePackages": "true"
+      },
+      "ghcr.io/devcontainers/features/git:1": {
+        "ppa": "true"
+      },
+      "ghcr.io/devcontainers/features/git-lfs:1": {},
+      "ghcr.io/devcontainers/features/github-cli:1": {},
+      "gitlab-cli": {},
+      "cmake": {},
+      "ninja": {},
+      "sccache": {
+        "version": "0.5.3"
+      },
+      "utils": {}
+    },
+    "overrideFeatureInstallOrder": [
+      "ghcr.io/devcontainers/features/common-utils",
+      "ghcr.io/devcontainers/features/git",
+      "ghcr.io/devcontainers/features/git-lfs",
+      "ghcr.io/devcontainers/features/github-cli",
+      "./gitlab-cli",
+      "./cmake",
+      "./ninja",
+      "./sccache",
+      "./utils"
+    ]
+  },
+  "ubuntu22.04": {
+    "image": "ubuntu:22.04",
+    "remoteUser": "coder",
+    "containerEnv": {
+      "gh_token": "${localEnv:gh_token}",
+      "vault_host": "${localEnv:vault_host}",
+      "VAULT_S3_TTL": "${localEnv:VAULT_S3_TTL}",
+      "rw_sccache_bucket": "${localEnv:rw_sccache_bucket}",
+      "rw_sccache_region": "${localEnv:rw_sccache_region}",
+      "ro_sccache_bucket": "${localEnv:ro_sccache_bucket}",
+      "ro_sccache_region": "${localEnv:ro_sccache_region}"
+    },
+    "features": {
+      "ghcr.io/devcontainers/features/common-utils:2": {
+        "uid": "1000",
+        "gid": "1000",
+        "username": "coder",
+        "installZsh": "true",
+        "upgradePackages": "true"
+      },
+      "ghcr.io/devcontainers/features/git:1": {
+        "ppa": "true"
+      },
+      "ghcr.io/devcontainers/features/git-lfs:1": {},
+      "ghcr.io/devcontainers/features/github-cli:1": {},
+      "gitlab-cli": {},
+      "cmake": {},
+      "ninja": {},
+      "sccache": {
+        "version": "0.5.3"
+      },
+      "utils": {}
+    },
+    "overrideFeatureInstallOrder": [
+      "ghcr.io/devcontainers/features/common-utils",
+      "ghcr.io/devcontainers/features/git",
+      "ghcr.io/devcontainers/features/git-lfs",
+      "ghcr.io/devcontainers/features/github-cli",
+      "./gitlab-cli",
+      "./cmake",
+      "./ninja",
+      "./sccache",
+      "./utils"
+    ]
+  }
+}

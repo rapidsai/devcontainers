@@ -23,7 +23,15 @@ if ! type yq >/dev/null 2>&1; then
 fi
 
 # Remove built-in anacron configs
-rm -rf /etc/crontab /etc/cron.*;
+# rm -rf /etc/crontab /etc/cron.*;
+
+# Allow crond to be run by users in the "crontab" group
+chgrp crontab "$(realpath -m $(which cron))";
+chmod u+s "$(realpath -m $(which cron))";
+
+touch /var/log/devcontainer-utils-vault-s3-creds-refresh.log;
+chmod 0664 /var/log/devcontainer-utils-vault-s3-creds-refresh.log;
+chgrp crontab /var/log/devcontainer-utils-vault-s3-creds-refresh.log;
 
 # Install Devcontainer utility scripts to /opt/devcontainer
 cp -ar ./opt/devcontainer /opt/;
@@ -32,16 +40,15 @@ find /opt/devcontainer \
     \( -type d -exec chmod 0775 {} \; \
     -o -type f -exec chmod 0755 {} \; \);
 
-touch /var/log/vault-s3-init.log;
-chmod 0777 /var/log/vault-s3-init.log;
-chmod 0644 /opt/devcontainer/cron/vault-s3-init;
-
 install_utility() {
     update-alternatives --install "/usr/bin/$1" "$1" "/opt/devcontainer/bin/$2" 0;
 }
 
+install_utility devcontainer-utils-parse-args parse-args.sh;
+install_utility devcontainer-utils-shell-is-interactive shell-is-interactive.sh;
 install_utility devcontainer-utils-post-attach-command post-attach-command.sh;
 install_utility devcontainer-utils-init-git git/init.sh;
+install_utility devcontainer-utils-clone-git-repo git/repo/clone.sh;
 
 install_utility devcontainer-utils-init-github-cli   github/cli/init.sh;
 install_utility devcontainer-utils-clone-github-repo github/repo/clone.sh;
@@ -50,10 +57,14 @@ install_utility devcontainer-utils-init-gitlab-cli                    gitlab/cli
 install_utility devcontainer-utils-clone-gitlab-repo                  gitlab/repo/clone.sh;
 install_utility devcontainer-utils-print-missing-gitlab-token-warning gitlab/print-missing-token-warning.sh;
 
-install_utility devcontainer-utils-vault-s3-init     vault/s3/init.sh;
-install_utility devcontainer-utils-vault-s3-test     vault/s3/test.sh;
-install_utility devcontainer-utils-vault-s3-export   vault/s3/export.sh;
 install_utility devcontainer-utils-vault-auth-github vault/auth/github.sh;
+
+install_utility devcontainer-utils-vault-s3-init            vault/s3/init.sh;
+install_utility devcontainer-utils-vault-s3-creds-generate  vault/s3/creds/generate.sh;
+install_utility devcontainer-utils-vault-s3-creds-persist   vault/s3/creds/persist.sh;
+install_utility devcontainer-utils-vault-s3-creds-propagate vault/s3/creds/propagate.sh;
+install_utility devcontainer-utils-vault-s3-creds-schedule  vault/s3/creds/schedule.sh;
+install_utility devcontainer-utils-vault-s3-creds-test      vault/s3/creds/test.sh;
 
 # Enable GCC colors
 for_each_user_bashrc 'sed -i -re "s/^#(export GCC_COLORS)/\1/g" "$0"';
@@ -67,21 +78,38 @@ append_to_all_bashrcs 'PROMPT_COMMAND="history -a; $PROMPT_COMMAND"';
 # export envvars in /etc/profile.d
 add_etc_profile_d_script devcontainer-utils "";
 
-# Add GitHub's public keys to known_hosts
+known_hosts="";
+# Add GitHub's key fingerprints to known_hosts
 known_hosts="$(curl -s https://api.github.com/meta | jq -r '.ssh_keys | map("github.com \(.)") | .[]' || echo "")";
-
-if [[ -n "$known_hosts" ]]; then
-    for_each_user_bashrc "$(cat <<EOF
-    home="\$(dirname "\$(realpath -m "\$0")")"       \
- && mkdir -p -m 0700 "\$home/.ssh"                   \
- && echo "$known_hosts" >> "\$home/.ssh/known_hosts" \
- && chmod 644 "\$home/.ssh/known_hosts"              ;
+# Add GitLab's key fingerprints to known_hosts
+known_hosts+="$(cat <<EOF
+# https://docs.gitlab.com/ee/user/gitlab_com/index.html#ssh-known_hosts-entries
+gitlab.com ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIAfuCHKVTjquxvt6CM6tdG4SLp1Btn/nOeHHE5UOzRdf
+gitlab.com ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQCsj2bNKTBSpIYDEGk9KxsGh3mySTRgMtXL583qmBpzeQ+jqCMRgBqB98u3z++J1sKlXHWfM9dyhSevkMwSbhoR8XIq/U0tCNyokEi/ueaBMCvbcTHhO7FcwzY92WK4Yt0aGROY5qX2UKSeOvuP4D6TPqKF1onrSzH9bx9XUf2lEdWT/ia1NEKjunUqu1xOB/StKDHMoX4/OKyIzuS0q/T1zOATthvasJFoPrAjkohTyaDUz2LN5JoH839hViyEG82yB+MjcFV5MU3N1l1QL3cVUCh93xSaua1N85qivl+siMkPGbO5xR/En4iEY6K2XPASUEMaieWVNTRCtJ4S8H+9
+gitlab.com ecdsa-sha2-nistp256 AAAAE2VjZHNhLXNoYTItbmlzdHAyNTYAAAAIbmlzdHAyNTYAAABBBFSMqzJeV9rUzU4kWitGjeR4PWSa29SPqJ1fVkhtj3Hw9xjLVXVYrU9QlYWrOLXBpQ6KWjbjTDTdDkoohFzgbEY=
 EOF
 )";
 
-    find_non_root_user;
-    chown -R ${USERNAME}:${USERNAME} "$(bash -c "echo ~${USERNAME}/.ssh")";
-fi
+for dir in $(for_each_user_bashrc 'echo "$(dirname "$(realpath -m "$0")")"'); do
+    # Copy in default git config
+    cp .gitconfig "${dir}"/.gitconfig;
+    # Create or update ~/.ssh/known_hosts
+    mkdir -p -m 0700 "${dir}"/.ssh;
+    touch "${dir}"/.ssh/known_hosts;
+    chmod 644 "${dir}"/.ssh/known_hosts;
+    cat <<____EOF >> "${dir}"/.ssh/known_hosts
+${known_hosts}
+____EOF
+done
+
+# Find the non-root user
+find_non_root_user;
+# Add user to the crontab group
+usermod -aG crontab ${USERNAME};
+# Allow user to edit the crontab
+echo ${USERNAME} >> /etc/cron.allow;
+# Ensure the user owns their homedir
+chown -R ${USERNAME}:${USERNAME} "$(bash -c "echo ~${USERNAME}")";
 
 # Generate bash completions
 if dpkg -s bash-completion >/dev/null 2>&1; then

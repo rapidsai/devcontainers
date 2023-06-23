@@ -29,3 +29,9 @@ jobs:
         uses: ./.github/actions/build-and-test-feature
         with:
           args: "${{ inputs.args }}"
+          gh_token: "${{ secrets.GIST_REPO_READ_ORG_GITHUB_TOKEN }}"
+          vault_host: "${{ secrets.GIST_REPO_READ_ORG_GITHUB_TOKEN && 'https://vault.ops.k8s.rapids.ai' || '' }}"
+          rw_sccache_bucket: "${{ secrets.GIST_REPO_READ_ORG_GITHUB_TOKEN && 'rapids-sccache-devs' || '' }}"
+          rw_sccache_region: "${{ vars.AWS_REGION }}"
+          ro_sccache_bucket: rapids-sccache-east
+          ro_sccache_region: "${{ vars.AWS_REGION }}"

@@ -18,27 +18,23 @@ runs:
       with:
         retries: 3
         script: |
-          const eventName = '${{ github.event_name }}';
-          const pull_number = '${{ inputs.pr_number }}' ||
-            (eventName == 'pull_request') && (() => {
-              return '${{ github.ref }}'.split('/')[2];
-            })() ||
-            (eventName == 'push') && (() => {
-              const branch = '${{ github.ref_name }}';
-              const prBranchPattern = new RegExp('^pull-request/[0-9]+$');
-              if (!branch.match(prBranchPattern)) {
-                throw new Error(`${branch} does not match PR branch pattern.`);
-              }
-              return branch.split('/')[1];
-            })() ||
-            (() => {
-              throw new Error(`Could not determine pull request number.`);
-            })();
-
-          const {data: pullRequest} = await github.rest.pulls.get({
-            pull_number: pull_number,
-            owner: context.repo.owner,
-            repo: context.repo.repo,
-          });
-
-          return pullRequest;
+          return (
+            await github.rest.pulls.get({
+              repo: context.repo.repo,
+              owner: context.repo.owner,
+              pull_number: (() => {
+                switch('${{ github.event_name }}') {
+                  case 'pull_request':
+                  case 'pull_request_target':
+                    return '${{ github.ref }}'.split('/')[2];
+                  case 'push':
+                    const branch = '${{ github.ref_name }}';
+                    if (!branch.match(new RegExp('^pull-request/[0-9]+$'))) {
+                      throw new Error(`${branch} does not match PR branch pattern.`);
+                    }
+                    return branch.split('/')[1];
+                }
+                throw new Error(`Could not determine pull request number.`);
+              })()
+            })
+          ).data;
