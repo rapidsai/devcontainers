@@ -12,6 +12,12 @@ run_devcontainer() {
     # Generate the devcontainer
     eval "$(./scripts/generate.sh "$@" | xargs -r -d'\n' -I% echo -n local %\;)";
 
+    # Build and tag the devcontainer
+    devcontainer build \
+        --workspace-folder "${workspace}" \
+        --image-name "docker.io/rapidsai/devcontainers:${tag}" \
+        ;
+
     mkdir -p -m 0755 .scratch/.{aws,cache,config};
 
     local env=();
