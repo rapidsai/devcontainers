@@ -17,7 +17,7 @@ init_github_cli() {
     if [[ "${CODESPACES:-false}" == "true" ]]; then
         git_protocol="--git-protocol https";
     else
-        if ssh -T git@${GITHUB_HOST:-github.com} 2>&1 | grep -q "You've successfully authenticated"; then
+        if grep -q "You've successfully authenticated" <<< "$(ssh -T git@${GITHUB_HOST:-github.com} 2>&1)"; then
             git_protocol="--git-protocol ssh";
             if type ssh-keygen > /dev/null 2>&1; then
                 avoid_gh_cli_ssh_keygen_prompt=1;
