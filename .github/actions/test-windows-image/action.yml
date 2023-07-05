@@ -1,0 +1,38 @@
+name: "Test Windows images"
+description: "Tests MSVC and CUDA on each container"
+
+inputs:
+  repo:
+    type: string
+    required: true
+    description: Image repository
+  win_edition:
+    type: string
+    required: true
+    description: Windows edition
+  isolation:
+    type: string
+    required: true
+    description: Which Windows isolation mode to build for
+  vs_version:
+    type: string
+    required: true
+    description: MSVC version
+  cuda_version:
+    type: string
+    required: true
+    description: CUDA version
+
+runs:
+  using: composite
+  steps:
+    - name: "Test ${{ inputs.image }}"
+      id: image_test
+      shell: powershell
+      run: |
+        .github\actions\test-windows-image\action.ps1  `
+          -cudaVersion ${{ inputs.cuda_version }}      `
+          -msvcVersion ${{ inputs.vs_version }}        `
+          -edition ${{ inputs.win_edition }}           `
+          -isolation ${{ inputs.isolation }}           `
+          -repo ${{ inputs.repo }}

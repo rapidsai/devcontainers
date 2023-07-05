@@ -1,0 +1,28 @@
+name: "Create and push image manifest"
+description: "Push an image manifest that combines several images"
+
+inputs:
+  repo:
+    type: string
+    required: true
+    description: Image repository
+  vs_version:
+    type: string
+    required: true
+    description: MSVC version
+  cuda_version:
+    type: string
+    required: true
+    description: CUDA version
+
+runs:
+  using: composite
+  steps:
+    - name: Run action script to build images
+      id: build
+      shell: powershell
+      run: |
+        .github\actions\create-and-push-manifest\action.ps1 `
+          -cudaVersion ${{ inputs.cuda_version }}           `
+          -msvcVersion ${{ inputs.vs_version }}             `
+          -repo ${{ inputs.repo }}

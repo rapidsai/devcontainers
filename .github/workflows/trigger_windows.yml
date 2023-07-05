@@ -1,0 +1,75 @@
+name: Build Windows Images
+
+on:
+  push:
+    paths: [.github/**, images/**]
+    branches: [ "main" ]
+  pull_request:
+    paths: [.github/**, images/**]
+    branches: [ "main" ]
+
+  workflow_dispatch:
+
+jobs:
+  build-all-images:
+    name: Build Windows images
+    strategy:
+      fail-fast: false
+      matrix:
+        runner: [windows-2019, windows-2022]
+        cuda_version: ["12.1", "11.1"]
+        edition: [windows-2019, windows-2022]
+        vs_version: ["2017", "2019", "2022"]
+        exclude:
+          # https://learn.microsoft.com/en-us/virtualization/windowscontainers/deploy-containers/version-compatibility
+          # Exclude Incompatible windows builds
+          - runner: windows-2019
+            edition: windows-2022
+          - runner: windows-2022
+            edition: windows-2019
+          # Exclude MSVC 2022 and 11.1 as it is unsupported
+          - vs_version: "2022"
+            cuda_version: "11.1"
+    uses: ./.github/workflows/windows_build.yml
+    with:
+      runner: ${{ matrix.runner }}
+      win_edition: ${{ matrix.edition }}
+      vs_version: ${{ matrix.vs_version }}
+      cuda_version: ${{ matrix.cuda_version }}
+      push_image: ${{ github.event_name == 'push' && github.ref == 'refs/heads/main' }}
+
+  create-manifests:
+    name: Create Windows image manifests
+    needs: build-all-images
+    runs-on: windows-2022
+    strategy:
+      fail-fast: false
+      matrix:
+        cuda_version: ["12.1", "11.1"]
+        vs_version: ["2017", "2019", "2022"]
+        exclude:
+          # Exclude MSVC 2022 and 11.1 as it is unsupported
+          - vs_version: "2022"
+            cuda_version: "11.1"
+
+    steps:
+      - name: Checkout ${{ github.repository }}
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+
+      - name: Login to ghcr.io
+        uses: docker/login-action@v2
+        with:
+          registry: ghcr.io
+          username: ${{ github.repository_owner }}
+          password: ${{ github.token }}
+
+      - name: Create manifest
+        if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/main' }}
+        uses: ./.github/actions/create-and-push-manifest
+        with:
+          vs_version: ${{ matrix.vs_version }}
+          cuda_version: ${{ matrix.cuda_version }}
+          repo: ghcr.io/${{ github.repository }}

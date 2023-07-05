@@ -1,0 +1,71 @@
+on:
+  workflow_call:
+    inputs:
+      runner:
+        type: string
+        required: true
+        description: Runner to execute on
+      win_edition:
+        type: string
+        required: true
+        description: Windows edition
+      vs_version:
+        type: string
+        required: true
+        description: MSVC version
+      cuda_version:
+        type: string
+        required: true
+        description: CUDA version
+      push_image:
+        type: boolean
+        description: Push images only if true
+
+jobs:
+  build_windows_image:
+    runs-on: ${{ inputs.runner }}
+    name: "Build image: ${{ inputs.win_edition }} + VS ${{ inputs.vs_version }} + CUDA ${{ inputs.cuda_version }}"
+    steps:
+      - name: Checkout ${{ github.repository }}
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+
+      - name: Login to ghcr.io
+        uses: docker/login-action@v2
+        with:
+          registry: ghcr.io
+          username: ${{ github.repository_owner }}
+          password: ${{ github.token }}
+
+      - name: "Build image: ${{ matrix.edition }} + VS${{ matrix.version }}"
+        id: build_image
+        uses: ./.github/actions/build-windows-image
+        with:
+          repo: ghcr.io/${{ github.repository }}
+          win_edition: ${{ inputs.win_edition }}
+          vs_version: ${{ inputs.vs_version }}
+          cuda_version: ${{ inputs.cuda_version }}
+          isolation: process
+
+      - name: "Test image: ${{ steps.build_image.outputs.image }}"
+        id: test_image
+        uses: ./.github/actions/test-windows-image
+        with:
+          repo: ghcr.io/${{ github.repository }}
+          win_edition: ${{ inputs.win_edition }}
+          vs_version: ${{ inputs.vs_version }}
+          cuda_version: ${{ inputs.cuda_version }}
+          isolation: process
+
+      - name: "Push image: ${{ steps.build_image.outputs.image }}"
+        if: ${{ inputs.push_image }}
+        id: push_image
+        uses: ./.github/actions/push-windows-image
+        with:
+          repo: ghcr.io/${{ github.repository }}
+          win_edition: ${{ inputs.win_edition }}
+          vs_version: ${{ inputs.vs_version }}
+          cuda_version: ${{ inputs.cuda_version }}
+          isolation: process

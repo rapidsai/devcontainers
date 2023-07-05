@@ -1,0 +1,38 @@
+name: "Push Windows images"
+description: "Push tested windows images"
+
+inputs:
+  repo:
+    type: string
+    required: true
+    description: Image repository
+  win_edition:
+    type: string
+    required: true
+    description: Windows edition
+  isolation:
+    type: string
+    required: true
+    description: Which Windows isolation mode to build for
+  vs_version:
+    type: string
+    required: true
+    description: MSVC version
+  cuda_version:
+    type: string
+    required: true
+    description: CUDA version
+
+runs:
+  using: composite
+  steps:
+    - name: "Push ${{ inputs.image }}"
+      id: push
+      shell: powershell
+      run: |
+        .github\actions\push-windows-image\action.ps1  `
+          -cudaVersion ${{ inputs.cuda_version }}      `
+          -msvcVersion ${{ inputs.vs_version }}        `
+          -edition ${{ inputs.win_edition }}           `
+          -isolation ${{ inputs.isolation }}           `
+          -repo ${{ inputs.repo }}
