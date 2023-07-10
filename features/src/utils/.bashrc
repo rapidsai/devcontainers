@@ -10,21 +10,21 @@ if test -n "${PROMPT_COMMAND##*"history -a"*}"; then
 fi
 
 # Define XDG_CACHE_HOME
-if test -n "${XDG_CACHE_HOME:-}"; then
+if test -z "${XDG_CACHE_HOME:-}"; then
     export XDG_CACHE_HOME="${HOME}/.cache";
 fi
 
 # Define XDG_STATE_HOME
-if test -n "${XDG_STATE_HOME:-}"; then
+if test -z "${XDG_STATE_HOME:-}"; then
     export XDG_STATE_HOME="${HOME}/.local/state";
 fi
 
 # Default python history to ~/.local/state/.python_history
-if test -n "${PYTHONHISTFILE:-}"; then
+if test -z "${PYTHONHISTFILE:-}"; then
     export PYTHONHISTFILE="${XDG_STATE_HOME}/.python_history";
 fi
 
 # Default python startup file to `devcontainer-utils-python-repl-startup` script.
-if test -n "${PYTHONSTARTUP:-}"; then
+if test -z "${PYTHONSTARTUP:-}"; then
     export PYTHONSTARTUP="$(which devcontainer-utils-python-repl-startup)";
 fi
