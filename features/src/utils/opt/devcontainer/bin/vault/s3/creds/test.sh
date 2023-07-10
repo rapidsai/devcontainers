@@ -38,22 +38,21 @@ test_aws_creds() {
 
     if ! sccache --show-stats 2>&1 | grep -qE 'Cache location \s+ s3'; then
 
-        # # Disabled until sccache v0.5.4 is released (see https://github.com/mozilla/sccache/issues/1799)
-        # export SCCACHE_S3_NO_CREDENTIALS="1";
+        export SCCACHE_S3_NO_CREDENTIALS="1";
 
-        # export AWS_ACCESS_KEY_ID=;
-        # export AWS_SESSION_TOKEN=;
-        # export AWS_SECRET_ACCESS_KEY=;
-        # export -n AWS_ACCESS_KEY_ID;
-        # export -n AWS_SESSION_TOKEN;
-        # export -n AWS_SECRET_ACCESS_KEY;
-        # unset AWS_ACCESS_KEY_ID;
-        # unset AWS_SESSION_TOKEN;
-        # unset AWS_SECRET_ACCESS_KEY;
+        export AWS_ACCESS_KEY_ID=;
+        export AWS_SESSION_TOKEN=;
+        export AWS_SECRET_ACCESS_KEY=;
+        export -n AWS_ACCESS_KEY_ID;
+        export -n AWS_SESSION_TOKEN;
+        export -n AWS_SECRET_ACCESS_KEY;
+        unset AWS_ACCESS_KEY_ID;
+        unset AWS_SESSION_TOKEN;
+        unset AWS_SECRET_ACCESS_KEY;
 
-        # if sccache --show-stats 2>&1 | grep -qE 'Cache location \s+ s3'; then
-        #     exit 2;
-        # fi
+        if sccache --show-stats 2>&1 | grep -qE 'Cache location \s+ s3'; then
+            exit 2;
+        fi
 
         exit 1;
     fi

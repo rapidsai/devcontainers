@@ -28,7 +28,7 @@
       "cmake": {},
       "ninja": {},
       "sccache": {
-        "version": "0.5.3"
+        "version": "0.5.4"
       },
       "utils": {}
     },
@@ -73,7 +73,7 @@
       "cmake": {},
       "ninja": {},
       "sccache": {
-        "version": "0.5.3"
+        "version": "0.5.4"
       },
       "utils": {}
     },
@@ -118,7 +118,7 @@
       "cmake": {},
       "ninja": {},
       "sccache": {
-        "version": "0.5.3"
+        "version": "0.5.4"
       },
       "utils": {}
     },
