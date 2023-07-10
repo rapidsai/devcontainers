@@ -99,6 +99,7 @@ for dir in $(for_each_user_bashrc 'echo "$(dirname "$(realpath -m "$0")")"'); do
     # Create ~/.cache, i.e. $XDG_CACHE_HOME
     mkdir -p -m 0755 "${dir}"/.cache;
     # Create ~/.local/state, i.e. $XDG_STATE_HOME
+    mkdir -p -m 0755 "${dir}"/.local/bin;
     mkdir -p -m 0755 "${dir}"/.local/state;
     # Create or update ~/.ssh/known_hosts
     mkdir -p -m 0700 "${dir}"/.ssh;
