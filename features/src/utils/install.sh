@@ -47,6 +47,7 @@ install_utility() {
 install_utility devcontainer-utils-parse-args parse-args.sh;
 install_utility devcontainer-utils-shell-is-interactive shell-is-interactive.sh;
 install_utility devcontainer-utils-post-attach-command post-attach-command.sh;
+install_utility devcontainer-utils-post-attach-command-entrypoint post-attach-command-entrypoint.sh;
 install_utility devcontainer-utils-init-git git/init.sh;
 install_utility devcontainer-utils-clone-git-repo git/repo/clone.sh;
 
