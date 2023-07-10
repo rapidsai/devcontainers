@@ -47,6 +47,8 @@ install_utility() {
 install_utility devcontainer-utils-parse-args parse-args.sh;
 install_utility devcontainer-utils-shell-is-interactive shell-is-interactive.sh;
 install_utility devcontainer-utils-post-attach-command post-attach-command.sh;
+install_utility devcontainer-utils-post-attach-command-entrypoint post-attach-command-entrypoint.sh;
+install_utility devcontainer-utils-python-repl-startup python-repl-startup.py;
 install_utility devcontainer-utils-init-git git/init.sh;
 install_utility devcontainer-utils-clone-git-repo git/repo/clone.sh;
 
@@ -72,11 +74,12 @@ for_each_user_bashrc 'sed -i -re "s/^#(export GCC_COLORS)/\1/g" "$0"';
 # Unlimited history size
 for_each_user_bashrc 'sed -i -re "s/^(HIST(FILE)?SIZE=).*$/\1/g" "$0"';
 
-# Append history lines as soon as they're entered
-append_to_all_bashrcs 'PROMPT_COMMAND="history -a; $PROMPT_COMMAND"';
+# export envvars in bashrc files
+append_to_etc_bashrc "$(cat .bashrc)";
+append_to_all_bashrcs "$(cat .bashrc)";
 
 # export envvars in /etc/profile.d
-add_etc_profile_d_script devcontainer-utils "";
+add_etc_profile_d_script devcontainer-utils "$(cat .bashrc)";
 
 known_hosts="";
 # Add GitHub's key fingerprints to known_hosts
@@ -93,6 +96,11 @@ EOF
 for dir in $(for_each_user_bashrc 'echo "$(dirname "$(realpath -m "$0")")"'); do
     # Copy in default git config
     cp .gitconfig "${dir}"/.gitconfig;
+    # Create ~/.cache, i.e. $XDG_CACHE_HOME
+    mkdir -p -m 0755 "${dir}"/.cache;
+    # Create ~/.local/state, i.e. $XDG_STATE_HOME
+    mkdir -p -m 0755 "${dir}"/.local/bin;
+    mkdir -p -m 0755 "${dir}"/.local/state;
     # Create or update ~/.ssh/known_hosts
     mkdir -p -m 0700 "${dir}"/.ssh;
     touch "${dir}"/.ssh/known_hosts;
