@@ -26,7 +26,7 @@
     "./features/cmake": {},
     "./features/ninja": {},
     "./features/sccache": {
-      "version": "0.5.3"
+      "version": "0.5.4"
     },
     "./features/utils": {}
   },

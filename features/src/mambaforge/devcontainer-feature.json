@@ -1,7 +1,7 @@
 {
   "name": "Mambaforge",
   "id": "mambaforge",
-  "version": "23.8.2",
+  "version": "23.8.3",
   "description": "A feature to install mambaforge",
   "options": {
     "version": {
