@@ -72,53 +72,53 @@ include:
 - os: "ubuntu:22.04"
   images:
   # cuda
-  - features: [*cuda_prev_max]
-  - features: [*cuda_curr_max]
+  - features: [*cuda_prev_max, *python]
+  - features: [*cuda_curr_max, *python]
 
   # cuda-mambaforge
   - features: [*cuda_prev_max, *conda]
 
   # llvm
-  - features: [*llvm_prev]
-  - features: [*llvm_curr]
+  - features: [*llvm_prev, *python]
+  - features: [*llvm_curr, *python]
 
   # llvm-cuda
-  - features: [*llvm_prev, *cuda_prev_max]
-  - features: [*llvm_prev, *cuda_curr_min]
-  - features: [*llvm_curr, *cuda_prev_max]
-  - features: [*llvm_curr, *cuda_curr_min]
+  - features: [*llvm_prev, *cuda_prev_max, *python]
+  - features: [*llvm_prev, *cuda_curr_min, *python]
+  - features: [*llvm_curr, *cuda_prev_max, *python]
+  - features: [*llvm_curr, *cuda_curr_min, *python]
 
   # llvm-cuda-mambaforge
   - features: [*llvm_prev, *cuda_prev_max, *conda]
   - features: [*llvm_curr, *cuda_prev_max, *conda]
 
   # llvm-cuda-nvhpc
-  - features: [*llvm_prev, *cuda_curr_min, *nvhpc_prev]
-  - features: [*llvm_prev, *cuda_curr_min, *nvhpc_curr]
-  - features: [*llvm_curr, *cuda_curr_min, *nvhpc_prev]
-  - features: [*llvm_curr, *cuda_curr_min, *nvhpc_curr]
+  - features: [*llvm_prev, *cuda_curr_min, *nvhpc_prev, *python]
+  - features: [*llvm_prev, *cuda_curr_min, *nvhpc_curr, *python]
+  - features: [*llvm_curr, *cuda_curr_min, *nvhpc_prev, *python]
+  - features: [*llvm_curr, *cuda_curr_min, *nvhpc_curr, *python]
 
   # llvm-mambaforge
   - features: [*llvm_prev, *conda]
   - features: [*llvm_curr, *conda]
 
   # llvm-nvhpc
-  - features: [*llvm_prev, *nvhpc_prev]
-  - features: [*llvm_prev, *nvhpc_curr]
-  - features: [*llvm_curr, *nvhpc_prev]
-  - features: [*llvm_curr, *nvhpc_curr]
+  - features: [*llvm_prev, *nvhpc_prev, *python]
+  - features: [*llvm_prev, *nvhpc_curr, *python]
+  - features: [*llvm_curr, *nvhpc_prev, *python]
+  - features: [*llvm_curr, *nvhpc_curr, *python]
 
   # llvm-rust
-  - features: [*llvm_prev, *rust]
-  - features: [*llvm_curr, *rust]
+  - features: [*llvm_prev, *rust, *python]
+  - features: [*llvm_curr, *rust, *python]
 
   # llvm-rust-cuda-mambaforge
   - features: [*llvm_prev, *rust, *cuda_prev_max, *conda]
   - features: [*llvm_curr, *rust, *cuda_prev_max, *conda]
 
   # rust-cuda
-  - features: [*rust, *cuda_prev_max]
-  - features: [*rust, *cuda_curr_max]
+  - features: [*rust, *cuda_prev_max, *python]
+  - features: [*rust, *cuda_curr_max, *python]
 
   # rust-cuda-mambaforge
   - features: [*rust, *cuda_prev_max, *conda]
