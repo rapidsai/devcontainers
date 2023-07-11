@@ -98,9 +98,10 @@ for dir in $(for_each_user_bashrc 'echo "$(dirname "$(realpath -m "$0")")"'); do
     cp .gitconfig "${dir}"/.gitconfig;
     # Create ~/.cache, i.e. $XDG_CACHE_HOME
     mkdir -p -m 0755 "${dir}"/.cache;
+    # Create ~/.cache, i.e. $XDG_CONFIG_HOME
+    mkdir -p -m 0755 "${dir}"/.config/{clangd,pip};
     # Create ~/.local/state, i.e. $XDG_STATE_HOME
-    mkdir -p -m 0755 "${dir}"/.local/bin;
-    mkdir -p -m 0755 "${dir}"/.local/state;
+    mkdir -p -m 0755 "${dir}"/.local/{bin,state};
     # Create or update ~/.ssh/known_hosts
     mkdir -p -m 0700 "${dir}"/.ssh;
     touch "${dir}"/.ssh/known_hosts;
