@@ -14,6 +14,11 @@ if test -z "${XDG_CACHE_HOME:-}"; then
     export XDG_CACHE_HOME="${HOME}/.cache";
 fi
 
+# Define XDG_CONFIG_HOME
+if test -z "${XDG_CONFIG_HOME:-}"; then
+    export XDG_CONFIG_HOME="${HOME}/.config";
+fi
+
 # Define XDG_STATE_HOME
 if test -z "${XDG_STATE_HOME:-}"; then
     export XDG_STATE_HOME="${HOME}/.local/state";
