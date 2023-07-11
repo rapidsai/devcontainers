@@ -24,6 +24,11 @@ if test -z "${XDG_STATE_HOME:-}"; then
     export XDG_STATE_HOME="${HOME}/.local/state";
 fi
 
+# Define HISTFILE
+if test -z "${HISTFILE:-}"; then
+    export HISTFILE="${XDG_STATE_HOME}/._bash_history";
+fi
+
 # Default python history to ~/.local/state/.python_history
 if test -z "${PYTHONHISTFILE:-}"; then
     export PYTHONHISTFILE="${XDG_STATE_HOME}/.python_history";
