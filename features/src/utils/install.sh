@@ -101,7 +101,7 @@ for dir in $(for_each_user_bashrc 'echo "$(dirname "$(realpath -m "$0")")"'); do
     # Create ~/.cache, i.e. $XDG_CONFIG_HOME
     mkdir -p -m 0755 "${dir}"/.config/{clangd,pip};
     # Create ~/.local/state, i.e. $XDG_STATE_HOME
-    mkdir -p -m 0755 "${dir}"/.local/{bin,state};
+    mkdir -p -m 0755 "${dir}"/.local/state;
     # Create or update ~/.ssh/known_hosts
     mkdir -p -m 0700 "${dir}"/.ssh;
     touch "${dir}"/.ssh/known_hosts;
@@ -111,14 +111,26 @@ ${known_hosts}
 ____EOF
 done
 
+rm -rf /root/.cache;
+rm -rf /root/.local/{bin,state};
+rm -rf /root/.config/{clangd,pip};
+
 # Find the non-root user
 find_non_root_user;
+
+USERHOME="$(bash -c "echo ~${USERNAME}")";
+
 # Add user to the crontab group
-usermod -aG crontab ${USERNAME};
+usermod -aG crontab "${USERNAME}";
+
 # Allow user to edit the crontab
-echo ${USERNAME} >> /etc/cron.allow;
+echo "${USERNAME}" >> /etc/cron.allow;
+
+# Create ~/.cache, i.e. $XDG_CONFIG_HOME
+mkdir -p -m 0755 "${USERHOME}"/.local/bin;
+
 # Ensure the user owns their homedir
-chown -R ${USERNAME}:${USERNAME} "$(bash -c "echo ~${USERNAME}")";
+chown -R "${USERNAME}:${USERNAME}" "${USERHOME}";
 
 # Generate bash completions
 if dpkg -s bash-completion >/dev/null 2>&1; then
