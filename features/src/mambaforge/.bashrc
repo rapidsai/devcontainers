@@ -2,7 +2,7 @@ export MAMBA_NO_BANNER="${MAMBA_NO_BANNER:-1}";
 
 for default_conda_env_name in ${DEFAULT_CONDA_ENV:-} ${CONDA_DEFAULT_ENV:-} base; do
     if [ -z "${default_conda_env_name:-}" ]; then continue; fi
-    if echo "${CONDA_PROMPT_MODIFIER:-}" | grep -qF "($default_conda_env_name)"; then
+    if grep -qF "(${default_conda_env_name})" <<< "${CONDA_PROMPT_MODIFIER:-}"; then
         break;
     fi
     conda activate "$default_conda_env_name" 2>/dev/null && break || continue;
