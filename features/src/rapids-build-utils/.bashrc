@@ -1,4 +1,10 @@
-export CONDA_ALWAYS_YES=true;
+export CONDA_ALWAYS_YES="true";
+export CC="${CC:-"$(which gcc)"}";
+export CXX="${CXX:-"$(which g++)"}";
+export CUDAARCHS="${CUDAARCHS:-native}";
+export CUDAHOSTCXX="${CUDAHOSTCXX:-"${CXX}"}";
+export CMAKE_BUILD_TYPE="${CMAKE_BUILD_TYPE:-Release}";
+export CMAKE_EXPORT_COMPILE_COMMANDS="${CMAKE_EXPORT_COMPILE_COMMANDS:-ON}";
 
 if [[ "${PYTHON_PACKAGE_MANAGER:-}" == "pip" ]]; then
     if  [ -n "${DEFAULT_VIRTUAL_ENV:-}" ] \
