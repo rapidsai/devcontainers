@@ -41,14 +41,19 @@ apt-add-repository -y "deb https://developer.download.nvidia.com/hpc-sdk/ubuntu/
 echo "Installing NVHPC SDK...";
 
 NVHPC_VERSION="${VERSION:-${NVHPCVERSION:-}}";
-NVHPC_VERSION_YEAR=$(echo "${NVHPC_VERSION}" | cut -d'.' -f1);
-NVHPC_VERSION_YEAR="20${NVHPC_VERSION_YEAR}";
+NVHPC_VERSION_MAJOR=$(echo "${NVHPC_VERSION}" | cut -d'.' -f1);
+NVHPC_VERSION_MINOR=$(echo "${NVHPC_VERSION}" | cut -d'.' -f2);
 
-DEBIAN_FRONTEND=noninteractive              \
-apt-get install -y --no-install-recommends  \
-    nvhpc-${NVHPC_VERSION/./-}              \
-    nvhpc-${NVHPC_VERSION_YEAR}=${NVHPC_VERSION} \
-    ;
+pkgs=();
+pkgs+=("nvhpc-${NVHPC_VERSION/./-}");
+
+# only <= nvhpc-23-3 has a dependency on the nvhpc-2023 package
+if [ "${NVHPC_VERSION_MAJOR}" -le 23 ] \
+&& [ "${NVHPC_VERSION_MINOR}" -le 3 ]; then
+    pkgs+=("nvhpc-20${NVHPC_VERSION_MAJOR}=${NVHPC_VERSION}");
+fi
+
+check_packages ${pkgs[@]};
 
 export NVHPC="/opt/nvidia/hpc_sdk";
 export NVHPC_VERSION="${NVHPC_VERSION}";
