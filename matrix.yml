@@ -12,8 +12,8 @@ x-gcc-11: &gcc_11 { name: "gcc", version: "11" }
 x-gcc-12: &gcc_12 { name: "gcc", version: "12" }
 x-gcc-env: &gcc_env {CC: "gcc", CXX: "g++"}
 
-x-oneapi: &oneapi_2022 { name: "oneapi", version: "2022.2.1" }
-x-oneapi-env: &onapi_env {CC: "icpc", CXX: "icpx"}
+x-oneapi: &oneapi_2022 { name: "oneapi", version: "2023.2.0" }
+x-oneapi-env: &onapi_env {CC: "icc", CXX: "icpc"}
 
 x-llvm-9: &llvm_9 { name: "llvm", version: "9" }
 x-llvm-10: &llvm_10 { name: "llvm", version: "10" }
