@@ -95,7 +95,7 @@ EOF
 
 for dir in $(for_each_user_bashrc 'echo "$(dirname "$(realpath -m "$0")")"'); do
     # Copy in default git config
-    cp .gitconfig "${dir}"/.gitconfig;
+    cp .gitconfig "${dir}"/.gitconfig.default;
     # Create ~/.cache, i.e. $XDG_CACHE_HOME
     mkdir -p -m 0755 "${dir}"/.cache;
     # Create ~/.cache, i.e. $XDG_CONFIG_HOME

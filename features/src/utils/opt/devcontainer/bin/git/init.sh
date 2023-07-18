@@ -6,6 +6,14 @@ init_git_cli_config() {
 
     # PS4="+ ${BASH_SOURCE[0]}:\${LINENO} "; set -x;
 
+    if ! test -f ~/.gitconfig; then
+        if test -f ~/.gitconfig.default; then
+            cp -a ~/.gitconfig{.default,};
+        else
+            touch ~/.gitconfig;
+        fi
+    fi
+
     if [ -z "$(git config --get user.name)" ]; then
         local git_user_name_default="anon";
         local git_user_name="${git_user_name_default}";
