@@ -3,8 +3,9 @@
 # cd to the repo root
 cd "$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )/../../../";
 
-os="${1:-}";
-features="${2:-}";
+os="${1:-"ubuntu:22.04"}";
+features="${2:-"[]"}";
+container_env="${3:-"null"}";
 
 VERSION="$(git describe --abbrev=0 --tags | sed 's/[a-zA-Z]//g' | cut -d '.' -f -2)";
 tag="$(node -p "$(cat <<EOF
@@ -25,6 +26,7 @@ node -e "$(cat <<EOF
 const json = JSON.parse(require('fs').readFileSync('image/.devcontainer/devcontainer.json'));
 
 json.build.args.BASE = '${os}';
+json.containerEnv = ${container_env} || undefined;
 
 ${features}.forEach(({name, ...feature}) => {
   const i = json.overrideFeatureInstallOrder.length - 1;

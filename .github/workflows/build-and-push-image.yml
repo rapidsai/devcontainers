@@ -9,6 +9,9 @@ on:
       features:
         type: string
         required: true
+      container_env:
+        type: string
+        required: false
 
 jobs:
 
@@ -35,6 +38,7 @@ jobs:
         with:
           os : "${{ inputs.os }}"
           features: "${{ inputs.features }}"
+          container_env: "${{ inputs.container_env }}"
 
       - id: build
         name: Build ${{ steps.json.outputs.tag }}-${{ matrix.arch }}

@@ -55,10 +55,11 @@ changed_images="$(\
   .include
   | map(.os as $os
     | .images
-    | map(.features
+    | map(.env as $env | .features
       | select(any(IN(.name; $xs[])))
       | {
         os: $os,
+        env: $env,
         features: .,
         name: (.
           | map(.

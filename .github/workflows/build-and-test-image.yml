@@ -9,6 +9,9 @@ on:
       features:
         type: string
         required: true
+      container_env:
+        type: string
+        required: false
 
 jobs:
 
@@ -30,8 +33,9 @@ jobs:
         name: Write .devcontainer.json
         uses: ./.github/actions/devcontainer-json
         with:
-          os : "${{ inputs.os }}"
+          os: "${{ inputs.os }}"
           features: "${{ inputs.features }}"
+          container_env: "${{ inputs.container_env }}"
 
       - name: Build and test ${{ steps.json.outputs.tag }}-${{ matrix.arch }}
         uses: ./.github/actions/build-image
