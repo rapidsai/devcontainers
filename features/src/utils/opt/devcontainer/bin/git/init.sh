@@ -9,8 +9,6 @@ init_git_cli_config() {
     if ! test -f ~/.gitconfig; then
         if test -f ~/.gitconfig.default; then
             cp -a ~/.gitconfig{.default,};
-        else
-            touch ~/.gitconfig;
         fi
     fi
 
