@@ -1,6 +1,8 @@
 [user]
 	name = anon
 	email = users.noreply.github.com
+[init]
+	defaultBranch = main
 [pull]
 	rebase = false
 [codespaces-theme]
