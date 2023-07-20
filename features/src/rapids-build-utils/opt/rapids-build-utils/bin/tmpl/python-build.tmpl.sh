@@ -14,6 +14,11 @@ build_${PY_LIB}_python() {
         build-${CPP_LIB}-cpp "$@";
     fi
 
+    eval "$(                                  \
+        rapids-get-jobs-and-archs "$@"        \
+      | xargs -r -d'\n' -I% echo -n local %\; \
+    )";
+
     # Define both lowercase and uppercase
     # `-DFIND_<lib>_CPP=ON` and `-DFIND_<LIB>_CPP=ON` because the RAPIDS
     # scikit-build CMakeLists.txt's aren't 100% consistent in the casing
@@ -33,7 +38,7 @@ build_${PY_LIB}_python() {
 
     local ninja_args=();
     ninja_args+=("-v");
-    ninja_args+=("-j${PARALLEL_LEVEL:-$(nproc --ignore=2)}");
+    ninja_args+=("-j${n_jobs}");
 
     local pip_args=();
     pip_args+=("-vv");
@@ -45,10 +50,13 @@ build_${PY_LIB}_python() {
 
     trap "rm -rf ~/${PY_SRC}/$(echo "${PY_LIB}" | tr '-' '_').egg-info" EXIT;
 
+    JOBS=${n_jobs}                                    \
+    PARALLEL_LEVEL=${n_jobs}                          \
     CMAKE_GENERATOR="Ninja"                           \
     SKBUILD_BUILD_OPTIONS="${ninja_args[@]}"          \
     SETUPTOOLS_ENABLE_FEATURES="legacy-editable"      \
     CMAKE_ARGS="$(rapids-parse-cmake-args ${cmake_args[@]})" \
+    NVCC_APPEND_FLAGS="--threads=${n_arch} ${NVCC_APPEND_FLAGS:-}" \
         python -m pip install ${pip_args[@]}          \
     ;
 }
