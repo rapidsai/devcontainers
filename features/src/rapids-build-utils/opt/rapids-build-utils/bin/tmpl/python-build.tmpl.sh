@@ -50,13 +50,14 @@ build_${PY_LIB}_python() {
 
     trap "rm -rf ~/${PY_SRC}/$(echo "${PY_LIB}" | tr '-' '_').egg-info" EXIT;
 
-    JOBS=${n_jobs}                                    \
-    PARALLEL_LEVEL=${n_jobs}                          \
+    time                                              \
+    JOBS="${n_jobs}"                                  \
+    PARALLEL_LEVEL="${n_jobs}"                        \
     CMAKE_GENERATOR="Ninja"                           \
     SKBUILD_BUILD_OPTIONS="${ninja_args[@]}"          \
     SETUPTOOLS_ENABLE_FEATURES="legacy-editable"      \
+    CUDAFLAGS="${CUDAFLAGS:+$CUDAFLAGS }--threads ${n_arch}" \
     CMAKE_ARGS="$(rapids-parse-cmake-args ${cmake_args[@]})" \
-    NVCC_APPEND_FLAGS="--threads=${n_arch} ${NVCC_APPEND_FLAGS:-}" \
         python -m pip install ${pip_args[@]}          \
     ;
 }

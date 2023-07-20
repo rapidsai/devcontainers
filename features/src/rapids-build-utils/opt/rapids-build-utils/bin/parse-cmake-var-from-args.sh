@@ -5,10 +5,10 @@ parse_cmake_var_from_args() {
 
     eval "$(                                       \
         rapids-parse-cmake-vars-from-args "${@:2}" \
-      | xargs -r -d'\n' -I% echo -n local %\;      \
+      | xargs -r -d'\n' -I% echo -n export %\;     \
     )";
 
-    echo "\$$1" | envsubst "\$$1";
+    envsubst "\$$1" <<< "\$$1";
 }
 
 (parse_cmake_var_from_args "$@");
