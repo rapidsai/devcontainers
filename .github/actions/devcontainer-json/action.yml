@@ -9,6 +9,9 @@ inputs:
   features:
     type: string
     required: true
+  container_env:
+    type: string
+    required: false
 
 outputs:
   tag:
@@ -30,7 +33,9 @@ runs:
       run: |
         bash --noprofile --norc -x -eo pipefail       \
           .github/actions/devcontainer-json/action.sh \
-          '${{ inputs.os }}' '${{ inputs.features }}' \
+          '${{ inputs.os }}'                          \
+          '${{ inputs.features }}'                    \
+          '${{ inputs.container_env }}'               \
         3>> $GITHUB_OUTPUT                            \
         4> image/.devcontainer/devcontainer.json.out  ;
 

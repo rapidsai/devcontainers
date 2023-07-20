@@ -17,9 +17,9 @@ generate_devcontainer() {
     ln -s "$(realpath ./features/src)" "${workspace}/.devcontainer/features";
 
     # Generate tag and devcontainer.json
-    .github/actions/devcontainer-json/action.sh \
-        "${1:-"ubuntu:22.04"}" "${2:-"[]"}"     \
-        3>&1                                    \
+    .github/actions/devcontainer-json/action.sh           \
+        "${1:-"ubuntu:22.04"}" "${2:-"[]"}" "${3:-"{}"}"  \
+        3>&1                                              \
         4> "${workspace}/.devcontainer/devcontainer.json" \
         ;
 

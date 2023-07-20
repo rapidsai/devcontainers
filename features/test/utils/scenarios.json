@@ -20,7 +20,8 @@
         "upgradePackages": "true"
       },
       "ghcr.io/devcontainers/features/git:1": {
-        "ppa": "true"
+        "ppa": "true",
+        "version": "latest"
       },
       "ghcr.io/devcontainers/features/git-lfs:1": {},
       "ghcr.io/devcontainers/features/github-cli:1": {},
@@ -65,7 +66,8 @@
         "upgradePackages": "true"
       },
       "ghcr.io/devcontainers/features/git:1": {
-        "ppa": "true"
+        "ppa": "true",
+        "version": "latest"
       },
       "ghcr.io/devcontainers/features/git-lfs:1": {},
       "ghcr.io/devcontainers/features/github-cli:1": {},
@@ -110,7 +112,8 @@
         "upgradePackages": "true"
       },
       "ghcr.io/devcontainers/features/git:1": {
-        "ppa": "true"
+        "ppa": "true",
+        "version": "latest"
       },
       "ghcr.io/devcontainers/features/git-lfs:1": {},
       "ghcr.io/devcontainers/features/github-cli:1": {},

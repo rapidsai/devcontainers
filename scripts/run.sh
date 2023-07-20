@@ -75,7 +75,7 @@ run_devcontainer() {
 ________
 )" EXIT;
 
-    local cmds="${@:3}";
+    local cmds="${@:4}";
 
     devcontainer exec \
         ${remote_envs} \

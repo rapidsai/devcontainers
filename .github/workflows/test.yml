@@ -125,3 +125,4 @@ jobs:
     with:
       os : "${{ matrix.os }}"
       features: "${{ toJSON(matrix.features) }}"
+      container_env: "${{ toJSON(matrix.env) }}"

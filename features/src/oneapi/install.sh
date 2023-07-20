@@ -44,7 +44,8 @@ fi
 
 DEBIAN_FRONTEND=noninteractive \
 apt-get -y install --no-install-recommends \
-    "intel-oneapi-dpcpp-cpp-${ICC_VERSION}";
+    "intel-oneapi-dpcpp-cpp-${ICC_VERSION}" \
+    "intel-oneapi-compiler-dpcpp-cpp-and-cpp-classic-${ICC_VERSION}";
 
 export ICC_VERSION;
 

@@ -10,8 +10,10 @@ x-gcc-9: &gcc_9 { name: "gcc", version: "9" }
 x-gcc-10: &gcc_10 { name: "gcc", version: "10" }
 x-gcc-11: &gcc_11 { name: "gcc", version: "11" }
 x-gcc-12: &gcc_12 { name: "gcc", version: "12" }
+x-gcc-env: &gcc_env {CC: "gcc", CXX: "g++"}
 
-x-oneapi: &oneapi_2022 { name: "oneapi", version: "2022.2.1" }
+x-oneapi: &oneapi_2022 { name: "oneapi", version: "2023.2.0" }
+x-oneapi-env: &onapi_env {CC: "icc", CXX: "icpc"}
 
 x-llvm-9: &llvm_9 { name: "llvm", version: "9" }
 x-llvm-10: &llvm_10 { name: "llvm", version: "10" }
@@ -21,9 +23,11 @@ x-llvm-13: &llvm_13 { name: "llvm", version: "13" }
 x-llvm-14: &llvm_14 { name: "llvm", version: "14" }
 x-llvm-prev: &llvm_prev { name: "llvm", version: "15" }
 x-llvm-curr: &llvm_curr { name: "llvm", version: "16" }
+x-llvm-env: &llvm_env {CC: "clang", CXX: "clang++"}
 
 x-nvhpc-prev: &nvhpc_prev { name: "nvhpc", version: "23.3" }
 x-nvhpc-curr: &nvhpc_curr { name: "nvhpc", version: "23.5" }
+x-nvhpc-env: &nvhpc_env {CC: "nvc", CXX: "nvc++"}
 
 x-rust: &rust { name: "rust" }
 x-mambaforge: &conda { name: "mambaforge" }
@@ -36,36 +40,36 @@ include:
 
 - os: "ubuntu:18.04"
   images:
-  - features: [*gcc_6, *cuda_prev_min, *python, *lit]
-  - features: [*gcc_7, *cuda_prev_min, *python, *lit]
-  - features: [*gcc_8, *cuda_prev_min, *python, *lit]
-  - features: [*gcc_9, *cuda_prev_min, *python, *lit]
-  - features: [*llvm_9, *cuda_prev_min, *python, *lit]
-  - features: [*oneapi_2022, *cuda_prev_min, *python, *lit]
+  - {features: [*gcc_6, *cuda_prev_min, *python, *lit], env: *gcc_env}
+  - {features: [*gcc_7, *cuda_prev_min, *python, *lit], env: *gcc_env}
+  - {features: [*gcc_8, *cuda_prev_min, *python, *lit], env: *gcc_env}
+  - {features: [*gcc_9, *cuda_prev_min, *python, *lit], env: *gcc_env}
+  - {features: [*llvm_9, *cuda_prev_min, *python, *lit], env: *llvm_env}
+  - {features: [*oneapi_2022, *cuda_prev_min, *python, *lit], env: *onapi_env}
 
 - os: "ubuntu:20.04"
   images:
-  - features: [*gcc_7, *cuda_curr_max, *python, *lit]
-  - features: [*gcc_8, *cuda_curr_max, *python, *lit]
-  - features: [*gcc_9, *cuda_curr_max, *python, *lit]
-  - features: [*gcc_10, *cuda_curr_max, *python, *lit]
-  - features: [*llvm_9, *cuda_curr_max, *python, *lit]
-  - features: [*llvm_10, *cuda_curr_max, *python, *lit]
-  - features: [*llvm_11, *cuda_curr_max, *python, *lit]
-  - features: [*llvm_12, *cuda_curr_max, *python, *lit]
-  - features: [*llvm_13, *cuda_curr_max, *python, *lit]
-  - features: [*llvm_14, *cuda_curr_max, *python, *lit]
-  - features: [*oneapi_2022, *cuda_curr_max, *python, *lit]
+  - {features: [*gcc_7, *cuda_curr_max, *python, *lit], env: *gcc_env}
+  - {features: [*gcc_8, *cuda_curr_max, *python, *lit], env: *gcc_env}
+  - {features: [*gcc_9, *cuda_curr_max, *python, *lit], env: *gcc_env}
+  - {features: [*gcc_10, *cuda_curr_max, *python, *lit], env: *gcc_env}
+  - {features: [*llvm_9, *cuda_curr_max, *python, *lit], env: *llvm_env}
+  - {features: [*llvm_10, *cuda_curr_max, *python, *lit], env: *llvm_env}
+  - {features: [*llvm_11, *cuda_curr_max, *python, *lit], env: *llvm_env}
+  - {features: [*llvm_12, *cuda_curr_max, *python, *lit], env: *llvm_env}
+  - {features: [*llvm_13, *cuda_curr_max, *python, *lit], env: *llvm_env}
+  - {features: [*llvm_14, *cuda_curr_max, *python, *lit], env: *llvm_env}
+  - {features: [*oneapi_2022, *cuda_curr_max, *python, *lit], env: *onapi_env}
 
 - os: "ubuntu:22.04"
   images:
-  - features: [*nvhpc_prev, *python, *lit]
-  - features: [*nvhpc_curr, *python, *lit]
-  - features: [*gcc_11, *cuda_curr_max, *python, *lit]
-  - features: [*gcc_12, *cuda_curr_max, *python, *lit]
-  - features: [*llvm_prev, *cuda_curr_max, *python, *lit]
-  - features: [*llvm_curr, *cuda_curr_max, *python, *lit]
-  - features: [*oneapi_2022, *cuda_curr_max, *python, *lit]
+  - {features: [*nvhpc_prev, *python, *lit], env: *nvhpc_env}
+  - {features: [*nvhpc_curr, *python, *lit], env: *nvhpc_env}
+  - {features: [*gcc_11, *cuda_curr_max, *python, *lit], env: *gcc_env}
+  - {features: [*gcc_12, *cuda_curr_max, *python, *lit], env: *gcc_env}
+  - {features: [*llvm_prev, *cuda_curr_max, *python, *lit], env: *llvm_env}
+  - {features: [*llvm_curr, *cuda_curr_max, *python, *lit], env: *llvm_env}
+  - {features: [*oneapi_2022, *cuda_curr_max, *python, *lit], env: *onapi_env}
 
 # RAPIDS devcontainers
 
