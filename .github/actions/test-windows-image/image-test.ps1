@@ -20,6 +20,10 @@ try {
     cl .\test.cpp
     TestReturnCode
 
+    Write-Output "Test git"
+    git --version
+    TestReturnCode
+
     Write-Output "Test CMake"
     cmake --version
     TestReturnCode
