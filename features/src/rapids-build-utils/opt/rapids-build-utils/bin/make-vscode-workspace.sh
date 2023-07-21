@@ -28,21 +28,22 @@ lib_entries() {
         cat<<EOF
 { "name": "$lib", "path": "$lib" }
 EOF
-        cpp_lib_entry $lib;
+        cpp_lib_entries $lib;
         python_lib_entries $lib;
     done;
 }
 
-cpp_lib_entry() {
+cpp_lib_entries() {
     local dir=~/"$1";
     find "$dir"                                        \
       -maxdepth 2 -type f                              \
       -name CMakeLists.txt                             \
       -exec dirname {} \;                              \
 `# substitute for "head -n1" that doesn't close stdin` \
-  | sed -n "1,1p"                                      \
+`#  | sed -n "1,1p"`                                   \
   | grep -vE "^${dir}$"                                \
   | xargs -r -d'\n' -I% realpath --relative-to=$HOME % \
+  | sort -bd                                           \
   | xargs -r -d'\n' -I% bash -c 'cat<<EOF
 { "name": "${0/"$1/"/┕ }", "path": "$0" }
 EOF' % $1
@@ -65,7 +66,8 @@ make_vscode_workspace() {
 {
   "folders": [
 $(get_repos | with_git_dirs \
-    | lib_entries \
+    | lib_entries           \
+    | uniq                  \
     | xargs -r -d'\n' -I% echo -e '    %,'
 )
   ],
