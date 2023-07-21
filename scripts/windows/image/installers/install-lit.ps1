@@ -4,6 +4,7 @@ Start-Process -Wait -FilePath .\python_installer.exe -ArgumentList "/quiet Inclu
 $ENV:PATH = "C:\Python;$ENV:PATH"
 $ENV:PATH = "C:\Python\Scripts;$ENV:PATH"
 
+python -m pip install --upgrade pip
 python -m pip install wheel
 python -m pip install lit
 
