@@ -46,7 +46,7 @@ make_conda_env() {
       | grep -v '^name:' \
       | grep -v -P '^(.*?)\-(.*?)rapids-(.*?)$' \
       | grep -v -P '^(.*?)\-(.*?)(\.git\@[^(main|master)])(.*?)$' \
-      | grep -v -P "^(.*?)\-(.*?)($(rapids-join-strings "|" ${conda_noinstall[@]}))$" \
+      | grep -v -P "^(.*?)\-(.*?)($(rapids-join-strings "|" ${conda_noinstall[@]}))(=.*|>.*|<.*)?$" \
     > "${new_env_path}";
 
     rm ${conda_env_yamls[@]};
