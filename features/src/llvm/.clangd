@@ -33,23 +33,27 @@ CompileFlags:
     - "-ferror-limit=0"
     - "-fmacro-backtrace-limit=0"
     - "-ftemplate-backtrace-limit=0"
+    # Skip the CUDA version check
+    - "--no-cuda-version-check"
   Remove:
-    # strip unknown arch flags
+    # remove gcc's -fcoroutines
+    - -fcoroutines
+    # remove nvc++ flags unknown to clang
+    - "-gpu=*"
+    - "-stdpar*"
+    # remove nvcc flags unknown to clang
     - "-arch*"
     - "-gencode*"
     - "--generate-code*"
-    # strip unknown nvc++ flags
-    - "-gpu=*"
-    - "-stdpar*"
-    - "--diag_suppress*"
-    # strip gcc's -fcoroutines
-    - -fcoroutines
-    # strip unknown nvcc flags
     - "-ccbin*"
+    - "-t=*"
+    - "--threads*"
     - "-Xptxas*"
     - "-Xcudafe*"
     - "-Xfatbin*"
     - "-Xcompiler*"
+    - "--diag-suppress*"
+    - "--diag_suppress*"
     - "--compiler-options*"
     - "--expt-extended-lambda"
     - "--expt-relaxed-constexpr"
