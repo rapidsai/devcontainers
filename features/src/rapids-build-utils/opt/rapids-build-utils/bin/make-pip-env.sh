@@ -27,8 +27,9 @@ make_pip_env() {
 
     local pip_noinstall=();
     local pip_reqs_txts=();
+    local project_manifest_yml="${PROJECT_MANIFEST_YML:-"/opt/rapids-build-utils/manifest.yaml"}";
 
-    for lib in $(yq eval '.repos[].name' /opt/rapids-build-utils/manifest.yaml); do
+    for lib in $(yq eval '.repos[].name' "${project_manifest_yml}"); do
         pip_noinstall+=("lib${lib}" "${lib}");
     done
 
