@@ -29,8 +29,12 @@ clone_${NAME}() {
             ~/"${SRC_PATH}";
 
         git -C ~/"${SRC_PATH}" config --add remote.upstream.fetch '^refs/heads/pull-request/*';
-        git -C ~/"${SRC_PATH}" branch --remotes -d \
-            $(git -C ~/"${SRC_PATH}" branch --remotes --list 'upstream/pull-request/*');
+
+        local upstream_branches="$(git -C ~/"${SRC_PATH}" branch --remotes --list 'upstream/pull-request/*')";
+        if test -n "${upstream_branches:-}"; then
+            git -C ~/"${SRC_PATH}" branch --remotes -d "${upstream_branches}";
+        fi
+
         git -C ~/"${SRC_PATH}" remote prune upstream;
 
         rapids-generate-scripts;
