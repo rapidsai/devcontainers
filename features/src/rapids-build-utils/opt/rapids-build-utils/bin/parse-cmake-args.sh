@@ -20,7 +20,7 @@ parse_cmake_args() {
             continue;
         fi
         shift;
-        args+=("$ARG");
+        args+=("$(printf %q "${ARG}")");
     done;
 
     echo ${args[@]};

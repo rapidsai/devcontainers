@@ -43,6 +43,7 @@ update-alternatives --install /usr/bin/rapids-parse-cmake-vars-from-args rapids-
 update-alternatives --install /usr/bin/rapids-python-pkg-roots           rapids-python-pkg-roots           /opt/rapids-build-utils/bin/python-pkg-roots.sh           0;
 update-alternatives --install /usr/bin/rapids-python-pkg-names           rapids-python-pkg-names           /opt/rapids-build-utils/bin/python-pkg-names.sh           0;
 update-alternatives --install /usr/bin/rapids-python-conda-pkg-names     rapids-python-conda-pkg-names     /opt/rapids-build-utils/bin/python-conda-pkg-names.sh     0;
+update-alternatives --install /usr/bin/rapids-get-jobs-and-archs         rapids-get-jobs-and-archs         /opt/rapids-build-utils/bin/get-jobs-and-archs.sh         0;
 
 find /opt/rapids-build-utils \
     \( -type d -exec chmod 0775 {} \; \

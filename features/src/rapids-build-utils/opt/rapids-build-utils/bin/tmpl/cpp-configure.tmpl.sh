@@ -27,6 +27,13 @@ configure_${CPP_LIB}_cpp() {
     cmake_args+=(${CPP_ARGS});
     cmake_args+=(${@});
 
+    eval "$(                                  \
+        rapids-get-jobs-and-archs "$@"        \
+      | xargs -r -d'\n' -I% echo -n local %\; \
+    )";
+
+    time                                                     \
+    CUDAFLAGS="${CUDAFLAGS:+$CUDAFLAGS }--threads ${n_arch}" \
     cmake $(rapids-parse-cmake-args ${cmake_args[@]});
 
     if [[ ! -L ${source_dir}/compile_commands.json \

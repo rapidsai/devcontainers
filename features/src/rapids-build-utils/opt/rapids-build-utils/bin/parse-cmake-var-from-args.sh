@@ -3,10 +3,12 @@
 parse_cmake_var_from_args() {
     set -euo pipefail;
 
-    echo "$(                                                  \
-        export $(rapids-parse-cmake-vars-from-args "${@:2}"); \
-        echo "\$$1" | envsubst "\$$1";                        \
+    eval "$(                                       \
+        rapids-parse-cmake-vars-from-args "${@:2}" \
+      | xargs -r -d'\n' -I% echo -n export %\;     \
     )";
+
+    envsubst "\$$1" <<< "\$$1";
 }
 
 (parse_cmake_var_from_args "$@");

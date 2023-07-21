@@ -8,8 +8,7 @@ parse_cmake_vars_from_args() {
     args="$(rapids-join-strings "\n" $args)";
     echo -e "$args" \
   | grep '\-D' \
-  | sed -r 's/^-D//' \
-  | xargs -d'\n' -I{} echo -n "{} ";
+  | sed -r 's/^-D//';
 }
 
 (parse_cmake_vars_from_args "$@");
