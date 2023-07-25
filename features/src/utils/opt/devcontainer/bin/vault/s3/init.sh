@@ -57,7 +57,7 @@ init_vault_s3_creds() {
                 fi
             elif devcontainer-utils-vault-s3-creds-propagate; then
                 # Block until the new temporary AWS S3 credentials propagate
-                ;
+                echo -n "";
             fi
         fi
         . /etc/profile.d/*-devcontainer-utils.sh;
