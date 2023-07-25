@@ -4,7 +4,7 @@ configure_${CPP_LIB}_cpp() {
 
     set -euo pipefail;
 
-    if [[ ! -d ~/${CPP_LIB}/.git ]]; then
+    if [[ ! -d ~/${CPP_SRC} ]]; then
         exit 1;
     fi
 

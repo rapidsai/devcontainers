@@ -4,6 +4,10 @@ build_${CPP_LIB}_cpp() {
 
     set -euo pipefail;
 
+    if [[ ! -d ~/${CPP_SRC} ]]; then
+        exit 1;
+    fi
+
     configure-${CPP_LIB}-cpp "$@";
 
     eval "$(                                  \
