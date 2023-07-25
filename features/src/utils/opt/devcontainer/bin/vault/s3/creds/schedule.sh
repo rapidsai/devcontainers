@@ -30,7 +30,7 @@ $(date --date="@${then}" '+%M %H %d %m %w') \
 bash -lc 'devcontainer-utils-vault-s3-creds-generate && devcontainer-utils-vault-s3-creds-schedule' 2>&1 | tee -a /var/log/devcontainer-utils-vault-s3-creds-refresh.log
 ____EOF
 
-    /etc/init.d/cron reload >/dev/null 2>&1;
+    sudo /etc/init.d/cron restart >/dev/null 2>&1;
 }
 
 if test -n "${devcontainer_utils_debug:-}"; then
