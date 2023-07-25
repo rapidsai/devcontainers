@@ -20,40 +20,44 @@ init_vault_s3_creds() {
     set -euo pipefail;
 
     if type sccache >/dev/null; then
-        if test -n "${SCCACHE_BUCKET:-}"                  \
-        && grep -qE "^$" <<< "${AWS_ACCESS_KEY_ID:-}"     \
-        && grep -qE "^$" <<< "${AWS_SECRET_ACCESS_KEY:-}" ; then
-            if test -n "${VAULT_HOST:-}"                  ; then
-                # Generate S3 creds if they don't exist (or are expired)
-                if ! devcontainer-utils-vault-s3-creds-test 2>&1 >/dev/null; then
-                    devcontainer-utils-vault-s3-creds-generate;
+        if test -n "${SCCACHE_BUCKET:-}"; then
+            if grep -qE "^$" <<< "${AWS_ACCESS_KEY_ID:-}"     \
+            && grep -qE "^$" <<< "${AWS_SECRET_ACCESS_KEY:-}" ; then
+                if test -n "${VAULT_HOST:-}"                  ; then
+                    # Generate S3 creds if they don't exist (or are expired)
+                    if ! devcontainer-utils-vault-s3-creds-test 2>&1 >/dev/null; then
+                        devcontainer-utils-vault-s3-creds-generate;
+                    fi
+                    # Persist creds in ~/.aws dir
+                    devcontainer-utils-vault-s3-creds-persist <<< "
+                        $(s3_bucket_args)
+                        $(s3_bucket_auth)
+                    ";
+                    # Install a crontab to refresh the credentials
+                    devcontainer-utils-vault-s3-creds-schedule;
+                else
+                    # If credentials have been mounted in, ensure they're used
+                    case $(devcontainer-utils-vault-s3-creds-test; echo $?) in
+                        # bucket is read + write with the current credentials
+                        [0] )
+                            devcontainer-utils-vault-s3-creds-persist <<< "
+                                $(s3_bucket_args)
+                                $(s3_bucket_auth)
+                            ";;
+                        # bucket is read-only and should be accessed without credentials
+                        [2] )
+                            devcontainer-utils-vault-s3-creds-persist <<< "
+                                --no_credentials
+                                $(s3_bucket_args)
+                            ";;
+                          # bucket is inaccessible
+                          * )
+                            devcontainer-utils-vault-s3-creds-persist <<< "--no_bucket --no_region";;
+                    esac
                 fi
-                # Persist creds in ~/.aws dir
-                devcontainer-utils-vault-s3-creds-persist <<< "
-                    $(s3_bucket_args)
-                    $(s3_bucket_auth)
-                ";
-                # Install a crontab to refresh the credentials
-                devcontainer-utils-vault-s3-creds-schedule;
-            else
-                # If credentials have been mounted in, ensure they're used
-                case $(devcontainer-utils-vault-s3-creds-test; echo $?) in
-                    # bucket is read + write with the current credentials
-                    [0] )
-                        devcontainer-utils-vault-s3-creds-persist <<< "
-                            $(s3_bucket_args)
-                            $(s3_bucket_auth)
-                        ";;
-                    # bucket is read-only and should be accessed without credentials
-                    [2] )
-                        devcontainer-utils-vault-s3-creds-persist <<< "
-                            --no_credentials
-                            $(s3_bucket_args)
-                        ";;
-                      # bucket is inaccessible
-                      * )
-                        devcontainer-utils-vault-s3-creds-persist <<< "--no_bucket --no_region";;
-                esac
+            elif devcontainer-utils-vault-s3-creds-propagate; then
+                # Block until the new temporary AWS S3 credentials propagate
+                echo -n "";
             fi
         fi
         . /etc/profile.d/*-devcontainer-utils.sh;
