@@ -55,9 +55,9 @@ init_vault_s3_creds() {
                             devcontainer-utils-vault-s3-creds-persist <<< "--no_bucket --no_region";;
                     esac
                 fi
-            else
+            elif devcontainer-utils-vault-s3-creds-propagate; then
                 # Block until the new temporary AWS S3 credentials propagate
-                devcontainer-utils-vault-s3-creds-propagate;
+                ;
             fi
         fi
         . /etc/profile.d/*-devcontainer-utils.sh;
