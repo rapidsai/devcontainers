@@ -34,15 +34,29 @@ EOF
     done;
 }
 
+cpp_lib_dirs() {
+    eval "$(                                  \
+        rapids-list-repos --repo "${1}"       \
+      | xargs -r -d'\n' -I% echo -n local %\; \
+    )";
+
+    local i=0;
+    for ((i=0; i < ${repos_length:-0}; i+=1)); do
+        local repo="repos_${i}";
+        local repo_path="${repo}_path";
+        local cpp_length="${repo}_cpp_length";
+
+        local j=0;
+        for ((j=0; j < ${!cpp_length:-0}; j+=1)); do
+            local cpp_name="${repo}_cpp_${j}_name";
+            local cpp_sub_dir="${repo}_cpp_${j}_sub_dir";
+            echo ~/"${!repo_path:-}/${!cpp_sub_dir:-}";
+        done
+    done
+}
+
 cpp_lib_entries() {
-    local dir=~/"$1";
-    find "$dir"                                        \
-      -maxdepth 2 -type f                              \
-      -name CMakeLists.txt                             \
-      -exec dirname {} \;                              \
-`# substitute for "head -n1" that doesn't close stdin` \
-`#  | sed -n "1,1p"`                                   \
-  | grep -vE "^${dir}$"                                \
+    cpp_lib_dirs "$@"                                  \
   | xargs -r -d'\n' -I% realpath --relative-to=$HOME % \
   | sort -bd                                           \
   | xargs -r -d'\n' -I% bash -c 'cat<<EOF

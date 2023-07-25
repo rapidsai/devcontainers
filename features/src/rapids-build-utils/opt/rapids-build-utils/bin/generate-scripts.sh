@@ -151,26 +151,10 @@ generate_scripts() {
 
     # PS4="+ ${BASH_SOURCE[0]}:\${LINENO} "; set -x;
 
-    local project_manifest_yml="${PROJECT_MANIFEST_YML:-"/opt/rapids-build-utils/manifest.yaml"}";
-
-    eval "$(
-        yq -Mo json "${project_manifest_yml}" \
-      | jq -r "$(cat <<"________EOF" | tr -s '[:space:]'
-        [
-          paths(arrays) as $path | {
-            "key": ($path + ["length"]) | join("_"),
-            "val": getpath($path) | length
-          }
-        ] + [
-          paths(scalars) as $path | {
-            "key": $path | join("_"),
-            "val": getpath($path)
-          }
-        ]
-        | map(select(.key | startswith("repos")))
-        | map("local " + .key + "=" + (.val | @sh))[]
-________EOF
-)")";
+    eval "$(                                  \
+        rapids-list-repos "$@"                \
+      | xargs -r -d'\n' -I% echo -n local %\; \
+    )";
 
     declare -A name_to_path;
     declare -A name_to_cpp_sub_dir;
