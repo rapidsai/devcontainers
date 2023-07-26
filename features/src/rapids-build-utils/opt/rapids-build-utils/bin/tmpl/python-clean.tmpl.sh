@@ -6,7 +6,7 @@ clean_${CPP_LIB}_cpp() {
 
     local py_lib="$(tr '-' '_' <<< "${PY_LIB}")";
 
-    rm -rf ~/"${PY_SRC}/_skbuild";
+    rm -rf ~/"${PY_SRC}"/{build,_skbuild};
     rm -rf ~/"${PY_SRC}/${py_lib}.egg-info";
 
     if test -d ~/"${PY_SRC}/${PY_LIB}"/; then
