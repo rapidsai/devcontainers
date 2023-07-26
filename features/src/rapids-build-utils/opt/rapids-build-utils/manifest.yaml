@@ -14,15 +14,25 @@ repos:
     repo: rmm
     <<: *git_defaults
 
+- name: kvikio
+  path: kvikio
+  cpp:
+    - name: KvikIO
+      sub_dir: cpp
+      depends: []
+  git:
+    repo: kvikio
+    <<: *git_defaults
+
 - name: cudf
   path: cudf
   cpp:
     - name: cudf
       sub_dir: cpp
-      depends: [rmm]
+      depends: [rmm, KvikIO]
     - name: cudf_kafka
       sub_dir: cpp/libcudf_kafka
-      depends: [rmm, cudf]
+      depends: [rmm, KvikIO, cudf]
   git:
     repo: cudf
     <<: *git_defaults

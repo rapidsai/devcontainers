@@ -37,9 +37,8 @@ clone_${NAME}() {
 
         git -C ~/"${SRC_PATH}" remote prune upstream;
 
-        rapids-generate-scripts;
-
-        rapids-make-vscode-workspace --update;
+        rapids-update-content-command;
+        rapids-post-attach-command;
     fi
 }
 

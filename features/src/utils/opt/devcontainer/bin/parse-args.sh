@@ -39,7 +39,7 @@ parse_args() {
             key="${key%=*}";
             val="${arg#*=}";
         # -foo bar | --foo bar
-        elif grep -qP '^--?[\w]+$' <<< "${arg:-}"; then
+        elif grep -qP '^--?[^\s]+$' <<< "${arg:-}"; then
             shift;
             key="${arg#-}";
             key="${key#-}";

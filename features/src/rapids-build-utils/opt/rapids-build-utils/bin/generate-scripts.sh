@@ -76,14 +76,6 @@ generate_cpp_scripts() {
 
     local src="${path}${CPP_SRC:+/$CPP_SRC}";
 
-    local args="${CPP_ARGS:-}";
-
-    local deps="$(echo -n "${CPP_DEPS:-}"                                \
-      | xargs -r -d' ' -I{} bash -c                                      \
-       'echo -n "-D${0%%/*}_ROOT=\"$(realpath -m ~/$0/build/latest)\" "' \
-       {}                                                                \
-    )";
-
     local script_name;
 
     for script_name in "configure" "build" "clean"; do
@@ -92,8 +84,8 @@ generate_cpp_scripts() {
           | NAME="${lib}"                              \
             CPP_LIB="${lib}"                           \
             CPP_SRC="${src}"                           \
-            CPP_ARGS="${args}"                         \
-            CPP_DEPS="${deps}"                         \
+            CPP_ARGS="${CPP_ARGS:-}"                   \
+            CPP_DEPS="${CPP_DEPS:=}"                   \
             generate_script "${script_name}-${lib}-cpp";
         ) || true;
     done
@@ -172,11 +164,13 @@ generate_scripts() {
         local git_tag="${repo}_git_tag";
         local git_upstream="${repo}_git_upstream";
 
-        name_to_path[${!repo_name:-}]="${!repo_path:-}";
+        repo_name="$(tr "[:upper:]" "[:lower:]" <<< "${!repo_name:-}")";
+
+        name_to_path["${repo_name:-}"]="${!repo_path:-}";
 
         # Generate a clone script for each repo
         (
-            NAME="${!repo_name:-}"            \
+            NAME="${repo_name:-}"             \
             SRC_PATH="${!repo_path:-}"        \
             GIT_TAG="${!git_tag:-}"           \
             GIT_REPO="${!git_repo:-}"         \
@@ -186,7 +180,7 @@ generate_scripts() {
         ) || true;
 
         if [[ -d ~/"${!repo_path:-}/.git" ]]; then (
-            NAME="${!repo_name:-}"     \
+            NAME="${repo_name:-}"      \
             SRC_PATH="${!repo_path:-}" \
             generate_repo_scripts      ;
         ) || true;
@@ -206,26 +200,32 @@ generate_scripts() {
 
             cpp_libs+=("${!cpp_name:-}");
             cpp_dirs+=("${!repo_path:-}/${!cpp_sub_dir:-}");
+            cpp_name="$(tr "[:upper:]" "[:lower:]" <<< "${!cpp_name:-}")";
 
-            name_to_cpp_sub_dir[${!cpp_name:-}]="${!cpp_sub_dir:-}";
+            name_to_cpp_sub_dir["${cpp_name:-}"]="${!cpp_sub_dir:-}";
 
-            local cpp_depends=();
+            local deps=();
 
             local k=0;
 
             for ((k=0; k < ${!cpp_depends_length:-0}; k+=1)); do
                 local dep="${repo}_cpp_${j}_depends_${k}";
-                local dep_name="${name_to_path[${!dep}]}";
-                local dep_path="${name_to_cpp_sub_dir[${!dep}]}";
-                cpp_depends+=("${dep_name}${dep_path:+/$dep_path}");
+                local dep_=$(tr "[:upper:]" "[:lower:]" <<< "${!dep}");
+                local dep_name="${name_to_path[${dep_}]}";
+                local dep_path="${name_to_cpp_sub_dir[${dep_}]}";
+                local dep_dir="${dep_name}${dep_path:+/$dep_path}";
+
+                deps+=(-D${!dep}_ROOT=\"$(realpath -m ~/${dep_dir}/build/latest)\");
+                deps+=(-D$(tr "[:upper:]" "[:lower:]" <<< "${!dep}")_ROOT=\"$(realpath -m ~/${dep_dir}/build/latest)\");
+                deps+=(-D$(tr "[:lower:]" "[:upper:]" <<< "${!dep}")_ROOT=\"$(realpath -m ~/${dep_dir}/build/latest)\");
             done
 
             if [[ -d ~/"${!repo_path:-}/.git" ]]; then (
-                NAME="${!cpp_name:-}"             \
+                NAME="${cpp_name:-}"              \
                 SRC_PATH="${!repo_path:-}"        \
                 CPP_SRC="${!cpp_sub_dir:-}"       \
                 CPP_ARGS="${!cpp_args:-}"         \
-                CPP_DEPS="${cpp_depends[@]}"      \
+                CPP_DEPS="${deps[@]}"             \
                 generate_cpp_scripts              ;
             ) || true;
             fi
@@ -243,13 +243,15 @@ generate_scripts() {
                 # scikit-build CMakeLists.txt's aren't 100% consistent in the casing
                 local cpp_dir="${cpp_dirs[$k]}";
                 local cpp_lib="${cpp_libs[$k]}";
+                args+=(-DFIND_${cpp_lib}_CPP=ON);
                 args+=(-DFIND_$(tr "[:upper:]" "[:lower:]" <<< "${cpp_lib}")_CPP=ON);
                 args+=(-DFIND_$(tr "[:lower:]" "[:upper:]" <<< "${cpp_lib}")_CPP=ON);
+                deps+=(-D${cpp_lib}_ROOT=\"$(realpath -m ~/${cpp_dir}/build/latest)\");
                 deps+=(-D$(tr "[:upper:]" "[:lower:]" <<< "${cpp_lib}")_ROOT=\"$(realpath -m ~/${cpp_dir}/build/latest)\");
                 deps+=(-D$(tr "[:lower:]" "[:upper:]" <<< "${cpp_lib}")_ROOT=\"$(realpath -m ~/${cpp_dir}/build/latest)\");
             done
 
-            NAME="${!repo_name:-}"      \
+            NAME="${repo_name:-}"       \
             SRC_PATH="${!repo_path:-}"  \
             CPP_ARGS="${args[@]}"       \
             CPP_DEPS="${deps[@]}"       \
