@@ -11,20 +11,20 @@
     "-li",
     "+o",
     "history",
-    "/opt/rapids-build-utils/bin/update-content-command.sh"
+    "rapids-update-content-command"
   ],
   "postStartCommand": [
     "/bin/bash",
     "-li",
     "+o",
     "history",
-    "/opt/rapids-build-utils/bin/post-start-command.sh"
+    "rapids-post-start-command"
   ],
   "postAttachCommand": [
     "/bin/bash",
     "-li",
     "+o",
     "history",
-    "/opt/rapids-build-utils/bin/post-attach-command.sh"
+    "rapids-post-attach-command"
   ]
 }
