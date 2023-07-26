@@ -31,6 +31,9 @@ fi
 
 cp -ar ./opt/rapids-build-utils /opt/;
 
+update-alternatives --install /usr/bin/rapids-update-content-command     rapids-update-content-command     /opt/rapids-build-utils/bin/update-content-command.sh     0;
+update-alternatives --install /usr/bin/rapids-post-start-command         rapids-post-start-command         /opt/rapids-build-utils/bin/post-start-command.sh         0;
+update-alternatives --install /usr/bin/rapids-post-attach-command        rapids-post-attach-command        /opt/rapids-build-utils/bin/post-attach-command.sh        0;
 update-alternatives --install /usr/bin/rapids-generate-scripts           rapids-generate-scripts           /opt/rapids-build-utils/bin/generate-scripts.sh           0;
 update-alternatives --install /usr/bin/rapids-join-strings               rapids-join-strings               /opt/rapids-build-utils/bin/join-strings.sh               0;
 update-alternatives --install /usr/bin/rapids-make-conda-env             rapids-make-conda-env             /opt/rapids-build-utils/bin/make-conda-env.sh             0;
