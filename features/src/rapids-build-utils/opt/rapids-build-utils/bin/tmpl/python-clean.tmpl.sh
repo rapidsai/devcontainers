@@ -1,6 +1,6 @@
 #! /usr/bin/env bash
 
-clean_${CPP_LIB}_cpp() {
+clean_${PY_LIB}_cpp() {
 
     set -euo pipefail;
 
@@ -22,4 +22,4 @@ clean_${CPP_LIB}_cpp() {
     fi
 }
 
-(clean_${CPP_LIB}_cpp "$@");
+(clean_${PY_LIB}_cpp "$@");

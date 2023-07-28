@@ -1,5 +1,7 @@
 #! /usr/bin/env bash
 
+TMPL=/opt/rapids-build-utils/bin/tmpl;
+
 remove_script_for_pattern() {
     set -euo pipefail;
 
@@ -39,97 +41,38 @@ generate_script() {
 }
 
 generate_clone_script() {
-
-    # Ensure we're in this script's directory
-    cd "$( cd "$( dirname "$(realpath -m "${BASH_SOURCE[0]}")" )" && pwd )";
-
-    local lib="${NAME:-}";
-
     (
-        cat ./tmpl/clone.tmpl.sh      \
-      | generate_script "clone-${lib}";
+        cat ${TMPL}/clone.tmpl.sh      \
+      | generate_script "clone-${NAME}";
     ) || true;
 }
 
 generate_repo_scripts() {
-
-    # Ensure we're in this script's directory
-    cd "$( cd "$( dirname "$(realpath -m "${BASH_SOURCE[0]}")" )" && pwd )";
-
-    local lib="${NAME:-}";
-    local path="${SRC_PATH:-}";
-
-    (
-        cat ./tmpl/clean.tmpl.sh      \
-      | NAME="${lib}"                 \
-        generate_script "clean-${lib}";
+    local script_name;
+    for script_name in "configure" "build" "clean"; do (
+        cat ${TMPL}/${script_name}.tmpl.sh     \
+      | generate_script "${script_name}-${NAME}";
     ) || true;
+    done
 }
 
 generate_cpp_scripts() {
-
-    # Ensure we're in this script's directory
-    cd "$( cd "$( dirname "$(realpath -m "${BASH_SOURCE[0]}")" )" && pwd )";
-
-    local lib="${NAME:-}";
-    local path="${SRC_PATH:-}";
-
-    local src="${path}${CPP_SRC:+/$CPP_SRC}";
-
     local script_name;
-
-    for script_name in "configure" "build" "clean"; do
-        (
-            cat ./tmpl/cpp-${script_name}.tmpl.sh      \
-          | NAME="${lib}"                              \
-            CPP_LIB="${lib}"                           \
-            CPP_SRC="${src}"                           \
-            CPP_ARGS="${CPP_ARGS:-}"                   \
-            CPP_DEPS="${CPP_DEPS:=}"                   \
-            generate_script "${script_name}-${lib}-cpp";
-        ) || true;
+    for script_name in "configure" "build" "clean"; do (
+        cat ${TMPL}/cpp-${script_name}.tmpl.sh         \
+      | CPP_SRC="${SRC_PATH:-}${CPP_SRC:+/$CPP_SRC}"   \
+        generate_script "${script_name}-${CPP_LIB}-cpp";
+    ) || true;
     done
-
-    unset script_name;
 }
 
 generate_python_scripts() {
-
-    # Ensure we're in this script's directory
-    cd "$( cd "$( dirname "$(realpath -m "${BASH_SOURCE[0]}")" )" && pwd )";
-
-    local lib="${NAME:-}";
-    local path="${SRC_PATH:-}";
-
     local script_name;
-
-    local py_libs=($(rapids-python-pkg-names "$path"));
-    local py_dirs=($(rapids-python-pkg-roots "$path"));
-
-    for i in "${!py_libs[@]}"; do
-        local py_dir="${py_dirs[$i]}";
-        local py_lib="${py_libs[$i]}";
-        for script_name in "build" "clean"; do
-            (
-                cat ./tmpl/python-${script_name}.tmpl.sh         \
-              | NAME="${lib}"                                    \
-                CPP_LIB="${lib}"                                 \
-                CPP_ARGS="${CPP_ARGS}"                           \
-                CPP_DEPS="${CPP_DEPS}"                           \
-                PY_SRC="${py_dir}"                               \
-                PY_LIB="${py_lib}"                               \
-                generate_script "${script_name}-${py_lib}-python";
-            ) || true;
-        done
-
-        (
-            cat ./tmpl/clean.tmpl.sh         \
-          | NAME="${py_lib}"                 \
-            generate_script "clean-${py_lib}";
-        ) || true;
+    for script_name in "build" "clean"; do (
+        cat ${TMPL}/python-${script_name}.tmpl.sh        \
+      | generate_script "${script_name}-${PY_LIB}-python";
+    ) || true;
     done
-
-    unset script_name;
 }
 
 generate_scripts() {
@@ -151,7 +94,9 @@ generate_scripts() {
     declare -A name_to_path;
     declare -A name_to_cpp_sub_dir;
 
-    local i=0;
+    local i;
+    local j;
+    local k;
 
     for ((i=0; i < ${repos_length:-0}; i+=1)); do
 
@@ -166,8 +111,6 @@ generate_scripts() {
 
         repo_name="$(tr "[:upper:]" "[:lower:]" <<< "${!repo_name:-}")";
 
-        name_to_path["${repo_name:-}"]="${!repo_path:-}";
-
         # Generate a clone script for each repo
         (
             NAME="${repo_name:-}"             \
@@ -179,65 +122,58 @@ generate_scripts() {
             generate_clone_script             ;
         ) || true;
 
-        if [[ -d ~/"${!repo_path:-}/.git" ]]; then (
-            NAME="${repo_name:-}"      \
-            SRC_PATH="${!repo_path:-}" \
-            generate_repo_scripts      ;
-        ) || true;
-        fi
+        if [[ -d ~/"${!repo_path:-}/.git" ]]; then
 
-        local cpp_libs=();
-        local cpp_dirs=();
+            name_to_path["${repo_name:-}"]="${!repo_path:-}";
 
-        local j=0;
+            local cpp_libs=();
+            local cpp_dirs=();
 
-        for ((j=0; j < ${!cpp_length:-0}; j+=1)); do
+            for ((j=0; j < ${!cpp_length:-0}; j+=1)); do
 
-            local cpp_name="${repo}_cpp_${j}_name";
-            local cpp_args="${repo}_cpp_${j}_args";
-            local cpp_sub_dir="${repo}_cpp_${j}_sub_dir";
-            local cpp_depends_length="${repo}_cpp_${j}_depends_length";
+                local cpp_name="${repo}_cpp_${j}_name";
+                local cpp_args="${repo}_cpp_${j}_args";
+                local cpp_sub_dir="${repo}_cpp_${j}_sub_dir";
+                local cpp_depends_length="${repo}_cpp_${j}_depends_length";
 
-            cpp_libs+=("${!cpp_name:-}");
-            cpp_dirs+=("${!repo_path:-}/${!cpp_sub_dir:-}");
-            cpp_name="$(tr "[:upper:]" "[:lower:]" <<< "${!cpp_name:-}")";
+                cpp_libs+=("${!cpp_name:-}");
+                cpp_dirs+=("${!repo_path:-}/${!cpp_sub_dir:-}");
+                cpp_name="$(tr "[:upper:]" "[:lower:]" <<< "${!cpp_name:-}")";
 
-            name_to_cpp_sub_dir["${cpp_name:-}"]="${!cpp_sub_dir:-}";
+                name_to_cpp_sub_dir["${cpp_name:-}"]="${!cpp_sub_dir:-}";
 
-            local deps=();
+                local deps=();
 
-            local k=0;
+                for ((k=0; k < ${!cpp_depends_length:-0}; k+=1)); do
+                    local dep="${repo}_cpp_${j}_depends_${k}";
+                    local dep_name=$(tr "[:upper:]" "[:lower:]" <<< "${!dep}");
+                    if ! test -v name_to_path["${dep_name}"]       \
+                    || ! test -v name_to_cpp_sub_dir["${dep_name}"]; then
+                        continue;
+                    fi
+                    local dep_path="${name_to_path["${dep_name}"]}";
+                    local dep_sub_dir="${name_to_cpp_sub_dir["${dep_name}"]}";
+                    local dep_cpp_path="${dep_path}${dep_sub_dir:+/$dep_sub_dir}";
 
-            for ((k=0; k < ${!cpp_depends_length:-0}; k+=1)); do
-                local dep="${repo}_cpp_${j}_depends_${k}";
-                local dep_=$(tr "[:upper:]" "[:lower:]" <<< "${!dep}");
-                local dep_name="${name_to_path[${dep_}]}";
-                local dep_path="${name_to_cpp_sub_dir[${dep_}]}";
-                local dep_dir="${dep_name}${dep_path:+/$dep_path}";
+                    deps+=(-D${!dep}_ROOT=\"$(realpath -m ~/${dep_cpp_path}/build/latest)\");
+                    deps+=(-D$(tr "[:upper:]" "[:lower:]" <<< "${!dep}")_ROOT=\"$(realpath -m ~/${dep_cpp_path}/build/latest)\");
+                    deps+=(-D$(tr "[:lower:]" "[:upper:]" <<< "${!dep}")_ROOT=\"$(realpath -m ~/${dep_cpp_path}/build/latest)\");
+                done
 
-                deps+=(-D${!dep}_ROOT=\"$(realpath -m ~/${dep_dir}/build/latest)\");
-                deps+=(-D$(tr "[:upper:]" "[:lower:]" <<< "${!dep}")_ROOT=\"$(realpath -m ~/${dep_dir}/build/latest)\");
-                deps+=(-D$(tr "[:lower:]" "[:upper:]" <<< "${!dep}")_ROOT=\"$(realpath -m ~/${dep_dir}/build/latest)\");
+                (
+                    SRC_PATH="${!repo_path:-}"  \
+                    CPP_LIB="${cpp_name:-}"     \
+                    CPP_SRC="${!cpp_sub_dir:-}" \
+                    CPP_ARGS="${!cpp_args:-}"   \
+                    CPP_DEPS="${deps[@]}"       \
+                    generate_cpp_scripts        ;
+                ) || true;
             done
-
-            if [[ -d ~/"${!repo_path:-}/.git" ]]; then (
-                NAME="${cpp_name:-}"              \
-                SRC_PATH="${!repo_path:-}"        \
-                CPP_SRC="${!cpp_sub_dir:-}"       \
-                CPP_ARGS="${!cpp_args:-}"         \
-                CPP_DEPS="${deps[@]}"             \
-                generate_cpp_scripts              ;
-            ) || true;
-            fi
-        done
-
-        if [[ -d ~/"${!repo_path:-}/.git" ]]; then (
 
             local args=();
             local deps=();
-            local k=0;
 
-            for k in "${!cpp_libs[@]}"; do
+            for ((k=0; k < ${#cpp_libs[@]}; k+=1)); do
                 # Define both lowercase and uppercase
                 # `-DFIND_<lib>_CPP=ON` and `-DFIND_<LIB>_CPP=ON` because the RAPIDS
                 # scikit-build CMakeLists.txt's aren't 100% consistent in the casing
@@ -251,12 +187,31 @@ generate_scripts() {
                 deps+=(-D$(tr "[:lower:]" "[:upper:]" <<< "${cpp_lib}")_ROOT=\"$(realpath -m ~/${cpp_dir}/build/latest)\");
             done
 
-            NAME="${repo_name:-}"       \
-            SRC_PATH="${!repo_path:-}"  \
-            CPP_ARGS="${args[@]}"       \
-            CPP_DEPS="${deps[@]}"       \
-            generate_python_scripts     ;
-        ) || true;
+            local py_libs=($(rapids-python-pkg-names "${!repo_path:-}" | tr "[:upper:]" "[:lower:]"));
+            local py_dirs=($(rapids-python-pkg-roots "${!repo_path:-}"));
+
+            for ((k=0; k < ${#py_libs[@]}; k+=1)); do
+                local py_dir="${py_dirs[$k]}";
+                local py_lib="${py_libs[$k]}";
+                (
+                    PY_SRC="${py_dir}"     \
+                    PY_LIB="${py_lib}"     \
+                    CPP_ARGS="${args[@]}"  \
+                    CPP_DEPS="${deps[@]}"  \
+                    generate_python_scripts;
+                ) || true;
+            done
+
+            for ((k=0; k < ${#cpp_libs[@]}; k+=1)); do
+                cpp_libs[$k]="$(tr "[:upper:]" "[:lower:]" <<< "${cpp_libs[$k]}")";
+            done
+
+            (
+                NAME="${repo_name:-}"    \
+                PY_LIB="${py_libs[@]}"   \
+                CPP_LIB="${cpp_libs[@]}" \
+                generate_repo_scripts    ;
+            ) || true;
         fi
     done
 
@@ -274,6 +229,8 @@ fi
 
 (remove_script_for_pattern '^clone-[\w-_]+');
 (remove_script_for_pattern '^clean-[\w-_]+');
+(remove_script_for_pattern '^build-[\w-_]+');
+(remove_script_for_pattern '^configure-[\w-_]+');
 (remove_script_for_pattern '^build-[\w-_]+-cpp');
 (remove_script_for_pattern '^clean-[\w-_]+-cpp');
 (remove_script_for_pattern '^configure-[\w-_]+-cpp');
