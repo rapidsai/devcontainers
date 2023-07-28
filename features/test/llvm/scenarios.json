@@ -23,19 +23,19 @@
       }
     }
   },
-  // "llvm_15": {
-  //   "image": "ubuntu:22.04",
-  //   "features": {
-  //     "llvm": {
-  //       "version": "15"
-  //     }
-  //   }
-  // },
-  "llvm_16": {
+  "llvm_17": {
     "image": "ubuntu:22.04",
     "features": {
       "llvm": {
-        "version": "16"
+        "version": "17"
+      }
+    }
+  },
+  "llvm_dev": {
+    "image": "ubuntu:22.04",
+    "features": {
+      "llvm": {
+        "version": "dev"
       }
     }
   }
