@@ -1,0 +1,15 @@
+concurrency:
+  group: release-on-${{ github.event_name }}-from-${{ github.ref_name }}
+  cancel-in-progress: true
+
+on:
+  workflow_dispatch:
+
+jobs:
+  dispatch:
+    name: Build and push Windows images
+    strategy:
+      fail-fast: false
+    uses: ./.github/workflows/dispatch-windows.yml
+    with:
+      push_image: true
