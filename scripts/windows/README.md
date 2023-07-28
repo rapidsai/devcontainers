@@ -23,7 +23,7 @@ To install Docker Engine via script:
 ## Invoke from within an elevated Powershell prompt
 Invoke-WebRequest -UseBasicParsing "https://raw.githubusercontent.com/microsoft/Windows-Containers/Main/helpful_tools/Install-DockerCE/install-docker-ce.ps1" -o install-docker-ce.ps1
 .\install-docker-ce.ps1
-## Fetch docker-compose plugin
+## Fetch docker-compose plugin (Change output path as needed)
 Invoke-WebRequest -UseBasicParsing "https://github.com/docker/compose/releases/download/v2.18.1/docker-compose-windows-x86_64.exe" -o $Env:ProgramFiles\Docker\docker-compose.exe
 ```
 
