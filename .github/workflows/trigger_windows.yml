@@ -1,12 +1,20 @@
 name: Build Windows Images
 
+concurrency:
+  group: release-on-${{ github.event_name }}-from-${{ github.ref_name }}
+  cancel-in-progress: true
+
 on:
-  push:
-    paths: [.github/**, images/**]
-    branches: [ "main" ]
   pull_request:
-    paths: [.github/**, images/**]
-    branches: [ "main" ]
+    branches:
+      - "pull-request/[0-9]+"
+      - "feature/.*"
+    paths: [.github/actions/windows_build.yml, scripts/windows/**]
+  push:
+    branches:
+      - "pull-request/[0-9]+"
+      - "feature/.*"
+    paths: [.github/actions/windows_build.yml, scripts/windows/**]
 
   workflow_dispatch:
 
