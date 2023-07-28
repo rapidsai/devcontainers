@@ -1,4 +1,4 @@
-name: Build Windows Images
+name: Dispatch Windows Images
 
 concurrency:
   group: release-on-${{ github.event_name }}-from-${{ github.ref_name }}
@@ -6,10 +6,6 @@ concurrency:
 
 on:
   pull_request:
-    branches:
-      - "pull-request/[0-9]+"
-      - "feature/.*"
-    paths: [.github/actions/windows_build.yml, scripts/windows/**]
   push:
     branches:
       - "pull-request/[0-9]+"
@@ -38,7 +34,7 @@ jobs:
           # Exclude MSVC 2022 and 11.1 as it is unsupported
           - vs_version: "2022"
             cuda_version: "11.1"
-    uses: ./.github/workflows/windows_build.yml
+    uses: ./.github/workflows/build-and-push-windows-images.yml
     with:
       runner: ${{ matrix.runner }}
       win_edition: ${{ matrix.edition }}
