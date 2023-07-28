@@ -49,7 +49,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        cuda_version: ["12.1", "11.1"]
+        cuda_version: ["12.2", "11.1"]
         vs_version: ["2017", "2019", "2022"]
         exclude:
           # Exclude MSVC 2022 and 11.1 as it is unsupported
