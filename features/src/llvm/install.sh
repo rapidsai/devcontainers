@@ -9,6 +9,18 @@ cd "$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )";
 
 LLVM_VERSION="${VERSION:-}";
 
+check_packages                  \
+    gpg                         \
+    wget                        \
+    apt-utils                   \
+    lsb-release                 \
+    gettext-base                \
+    bash-completion             \
+    ca-certificates             \
+    apt-transport-https         \
+    software-properties-common  \
+    ;
+
 if [[ -z "$LLVM_VERSION" \
       || "$LLVM_VERSION" == "latest" \
       || "$LLVM_VERSION" == "dev" \
@@ -22,18 +34,6 @@ if [[ -z "$LLVM_VERSION" \
         "tags/llvmorg-" "." "-init" "true";
     LLVM_VERSION="$(echo $LLVM_VERSION | grep -oP '[0-9]+')";
 fi
-
-check_packages                  \
-    gpg                         \
-    wget                        \
-    apt-utils                   \
-    lsb-release                 \
-    gettext-base                \
-    bash-completion             \
-    ca-certificates             \
-    apt-transport-https         \
-    software-properties-common  \
-    ;
 
 echo "Installing llmv-${LLVM_VERSION} compilers and tools";
 
