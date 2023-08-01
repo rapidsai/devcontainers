@@ -78,3 +78,11 @@ jobs:
           vs_version: ${{ matrix.vs_version }}
           cuda_version: ${{ matrix.cuda_version }}
           repo: ghcr.io/${{ github.repository }}
+
+      - name: Create manifest for dockerhub
+        if: ${{ vars.DOCKERHUB_REPOSITORY }}
+        uses: ./.github/actions/create-and-push-manifest
+        with:
+          vs_version: ${{ matrix.vs_version }}
+          cuda_version: ${{ matrix.cuda_version }}
+          repo: ${{ vars.DOCKERHUB_REPOSITORY }}/${{ github.repository }}

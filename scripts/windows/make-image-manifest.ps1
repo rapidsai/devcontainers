@@ -20,10 +20,10 @@ function TestReturnCode {
 Push-location "$PSScriptRoot"
 
 try {
-    $image_name_2019="$(.\generate-image-name.ps1 -clVersion $clVersion -cudaVersion $cudaVersion -edition "windows-2019" -repo $repo)"
-    $image_name_2022="$(.\generate-image-name.ps1 -clVersion $clVersion -cudaVersion $cudaVersion -edition "windows-2022" -repo $repo)"
+    $image_name_2019="$(.\generate-image-name.ps1 -clVersion $clVersion -cudaVersion $cudaVersion -edition "windows2019" -repo $repo)"
+    $image_name_2022="$(.\generate-image-name.ps1 -clVersion $clVersion -cudaVersion $cudaVersion -edition "windows2022" -repo $repo)"
 
-    $manifest_name="${repo}:windows-cuda-${cudaVersion}-cl-${clVersion}"
+    $manifest_name="${repo}:cuda${cudaVersion}-cl${clVersion}"
 
     docker manifest rm $manifest_name
     docker manifest create $manifest_name $image_name_2019 $image_name_2022

@@ -11,7 +11,10 @@ Param(
     $edition,
     [Parameter(Mandatory=$true)]
     [string]
-    $repo
+    $repo,
+    [Parameter(Mandatory=$false)]
+    [string]
+    $prefix=""
 )
 
-Write-Output "${repo}:${edition}-cuda-${cudaVersion}-cl-${clVersion}"
+Write-Output "${repo}:${prefix}cuda${cudaVersion}-cl${clVersion}-${edition}"
