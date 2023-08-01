@@ -65,7 +65,7 @@ jobs:
           password: ${{ github.token }}
 
       - name: Login to Docker Hub
-        if: ${{ inputs.push_image }}
+        if: ${{ inputs.push_image && vars.DOCKERHUB_REPOSITORY }}
         uses: docker/login-action@v2
         with:
           username: ${{ secrets.GPUCIBOT_DOCKERHUB_USER }}
@@ -80,7 +80,7 @@ jobs:
           repo: ghcr.io/${{ github.repository }}
 
       - name: Create manifest for dockerhub
-        if: ${{ vars.DOCKERHUB_REPOSITORY }}
+        if: ${{ inputs.push_image && vars.DOCKERHUB_REPOSITORY }}
         uses: ./.github/actions/create-and-push-manifest
         with:
           vs_version: ${{ matrix.vs_version }}
