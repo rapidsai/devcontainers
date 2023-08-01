@@ -20,8 +20,8 @@ function TestReturnCode {
 Push-location "$PSScriptRoot"
 
 try {
-    $image_name_2019="$(.\generate-image-name.ps1 -clVersion $clVersion -cudaVersion $cudaVersion -edition "windows2019" -repo $repo)"
-    $image_name_2022="$(.\generate-image-name.ps1 -clVersion $clVersion -cudaVersion $cudaVersion -edition "windows2022" -repo $repo)"
+    $image_name_2019="$(.\generate-image-name.ps1 -clVersion $clVersion -cudaVersion $cudaVersion -edition "windows-2019" -repo $repo)"
+    $image_name_2022="$(.\generate-image-name.ps1 -clVersion $clVersion -cudaVersion $cudaVersion -edition "windows-2022" -repo $repo)"
 
     $manifest_name="${repo}:cuda${cudaVersion}-cl${clVersion}"
 
