@@ -1,3 +1,5 @@
+name: Release Windows
+
 concurrency:
   group: release-on-${{ github.event_name }}-from-${{ github.ref_name }}
   cancel-in-progress: true
