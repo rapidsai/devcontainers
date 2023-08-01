@@ -26,7 +26,7 @@ jobs_and_archs() {
             ;;
         ALL | RAPIDS)
             # currently: 60-real;70-real;75-real;80-real;86-real;90
-            # see: https://github.com/rapidsai/rapids-cmake/blob/branch-23.08/rapids-cmake/cuda/set_architectures.cmake#L54
+            # see: https://github.com/rapidsai/rapids-cmake/blob/branch-23.10/rapids-cmake/cuda/set_architectures.cmake#L54
             n_archs=$((6 / 2));
             ;;
         *)
