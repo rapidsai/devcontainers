@@ -43,6 +43,7 @@ jobs:
   dispatch:
     needs: version-and-changes
     if: needs.version-and-changes.outputs.any_changed == 'true'
+    name: Build
     uses: ./.github/workflows/dispatch-windows.yml
     secrets: inherit
     with:

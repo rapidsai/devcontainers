@@ -14,7 +14,7 @@ on:
 
 jobs:
   build-all-images:
-    name: Windows
+    name: cuda${{ matrix.cuda_version}}-${{ matrix.edition }}
     strategy:
       fail-fast: false
       matrix:
