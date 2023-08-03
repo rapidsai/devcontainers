@@ -1,4 +1,4 @@
-name: get-repo-version
+name: Get repository version
 
 on:
   workflow_call:

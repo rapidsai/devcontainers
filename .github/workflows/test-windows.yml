@@ -1,44 +1,50 @@
 name: Test Windows
 
-concurrency:
-  group: test-windows-on-${{ github.event_name }}-from-${{ github.ref_name }}
-  cancel-in-progress: true
-
 on:
-  pull_request:
-    paths: [.github/**/*windows*, scripts/windows/**]
-  push:
-    paths: [.github/**/*windows*, scripts/windows/**]
-    branches:
-      - "pull-request/[0-9]+"
+  workflow_call:
 
 jobs:
-  check-event:
-    name: Check PR Event
+  version-and-changes:
+    name: Check if files changed and get repo version
     runs-on: ubuntu-latest
     outputs:
-      ok: ${{ steps.check_pr_event.outputs.ok }}
+      any_changed: ${{ steps.changes.outputs.any_changed }}
+      repo_version: ${{ steps.version.outputs.repo_version }}
     steps:
-      - id: check_pr_event
-        name: Check PR Event
+      - name: Checkout ${{ github.repository }}
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+
+      - id: get-pr-info
+        if: inputs.full_matrix != 'true'
+        name: Get PR target branch info
+        uses: ./.github/actions/get-pr-info
+
+      - id: version
+        name: Get the repository version from the closest git tag
         shell: bash
         run: |
-          [[ '${{ github.event_name }}' == 'push' && '${{ github.repository }}' == 'rapidsai/devcontainers' ]] || \
-          [[ '${{ github.event_name }}' == 'pull_request' && '${{ github.repository }}' != 'rapidsai/devcontainers' ]] \
-          && echo "ok=true"  | tee -a $GITHUB_OUTPUT \
-          || echo "ok=false" | tee -a $GITHUB_OUTPUT;
+          cat <<EOF | tee "$GITHUB_OUTPUT"
+          repo_version=$(git describe --abbrev=0 --tags | sed 's/[a-zA-Z]//g' | cut -d '.' -f -2)
+          EOF
 
-  version:
-    needs: check-event
-    if: needs.check-event.outputs.ok == 'true'
-    name: Get repository version
-    uses: ./.github/workflows/get-repo-version.yml
+      - id: changes
+        name: Check if files changed
+        if: inputs.full_matrix != 'true'
+        uses: tj-actions/changed-files@v35.4.4
+        with:
+          base_sha: ${{ fromJSON(steps.get-pr-info.outputs.pr-info).base.sha }}
+          files: |
+            .github/**/*windows*
+            scripts/windows/**
 
   dispatch:
-    needs: version
-    name: Build Windows images
+    needs: version-and-changes
+    if: needs.version-and-changes.outputs.any_changed == 'true'
     uses: ./.github/workflows/dispatch-windows.yml
     secrets: inherit
     with:
       push_image: false
-      repo_version: ${{ needs.version.outputs.repo_version }}
+      repo_version: ${{ needs.version-and-changes.outputs.repo_version }}

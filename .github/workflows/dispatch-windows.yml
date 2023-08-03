@@ -14,7 +14,7 @@ on:
 
 jobs:
   build-all-images:
-    name: Build Windows images
+    name: Windows
     strategy:
       fail-fast: false
       matrix:

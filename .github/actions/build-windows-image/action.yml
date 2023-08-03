@@ -1,5 +1,6 @@
-name: "Build Windows images"
-description: "Builds wcow images with MSVC and CUDA"
+name: Build Windows images
+
+description: Builds wcow images with MSVC and CUDA
 
 inputs:
   repo:
