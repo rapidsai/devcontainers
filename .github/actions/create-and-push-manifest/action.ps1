@@ -7,7 +7,10 @@ Param(
     $cudaVersion="latest",
     [Parameter(Mandatory=$true)]
     [string]
-    $repo
+    $repo,
+    [Parameter(Mandatory=$false)]
+    [string]
+    $repoVersion="latest"
 )
 
 $ErrorActionPreference = "Stop"
@@ -17,5 +20,5 @@ $ErrorActionPreference = "Stop"
 $clVerArray = $vsVerToCompilers[$msvcVersion]
 
 foreach ($cl in $clVerArray) {
-    .\scripts\windows\make-image-manifest -clVersion $cl -cudaVersion $cudaVersion -repo $repo
+    .\scripts\windows\make-image-manifest -clVersion $cl -cudaVersion $cudaVersion -repo $repo -repoVersion $repoVersion
 }

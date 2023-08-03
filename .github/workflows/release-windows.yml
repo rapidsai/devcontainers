@@ -1,17 +1,22 @@
 name: Release Windows
 
 concurrency:
-  group: release-on-${{ github.event_name }}-from-${{ github.ref_name }}
+  group: release-windows-on-${{ github.event_name }}-from-${{ github.ref_name }}
   cancel-in-progress: true
 
 on:
   workflow_dispatch:
 
 jobs:
+  version:
+    name: Get repository version
+    uses: ./.github/workflows/get-repo-version.yml
+
   dispatch:
-    name: Build and push Windows images
-    strategy:
-      fail-fast: false
+    needs: version
+    name: Build and Push Windows images
     uses: ./.github/workflows/dispatch-windows.yml
+    secrets: inherit
     with:
       push_image: true
+      repo_version: ${{ needs.version.outputs.repo_version }}

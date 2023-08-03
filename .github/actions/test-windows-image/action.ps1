@@ -13,7 +13,10 @@ Param(
     $isolation="hyperv",
     [Parameter(Mandatory=$true)]
     [string]
-    $repo
+    $repo,
+    [Parameter(Mandatory=$false)]
+    [string]
+    $repoVersion="latest"
 )
 
 function TestReturnCode {
@@ -29,7 +32,7 @@ $ErrorActionPreference = "Stop"
 $clVerArray = ($vsVerToCompilers[$msvcVersion])
 
 foreach($cl in $clVerArray) {
-    $image=$(.\scripts\windows\generate-image-name -clVersion $cl -cudaVersion $cudaVersion -edition $edition -repo $repo)
+    $image=$(.\scripts\windows\generate-image-name -clVersion $cl -cudaVersion $cudaVersion -edition $edition -repo $repo -repoVersion $repoVersion)
     Write-Output "Testing $image"
 
     docker run --mount type=bind,src="$(Get-Location)\.github\actions\test-windows-image",dst="C:\test" $image powershell "C:\test\image-test.ps1"

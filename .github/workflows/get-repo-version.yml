@@ -1,0 +1,30 @@
+name: repo-version
+
+description: Get the repository version from the closest git tag
+
+on:
+  workflow_call:
+    outputs:
+      repo_version:
+        value: ${{ jobs.version.outputs.repo_version }}
+
+jobs:
+  version:
+    name: Get repository version
+    runs-on: ubuntu-latest
+    outputs:
+      repo_version: ${{ steps.version.outputs.repo_version }}
+    steps:
+      - name: Checkout ${{ github.repository }}
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+
+      - id: version
+        name: Get repo version from git tag
+        shell: bash
+        run: |
+          cat <<EOF | tee "$GITHUB_OUTPUT"
+          repo_version=$(git describe --abbrev=0 --tags | sed 's/[a-zA-Z]//g' | cut -d '.' -f -2)
+          EOF

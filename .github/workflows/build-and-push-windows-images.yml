@@ -19,6 +19,10 @@ on:
         type: string
         required: true
         description: CUDA version
+      repo_version:
+        type: string
+        required: true
+        description: Repository version
       push_image:
         type: boolean
         description: Push images only if true
@@ -56,6 +60,7 @@ jobs:
           win_edition: ${{ inputs.win_edition }}
           vs_version: ${{ inputs.vs_version }}
           cuda_version: ${{ inputs.cuda_version }}
+          repo_version: ${{ inputs.repo_version }}
           isolation: process
 
       - name: "Test images"
@@ -66,10 +71,11 @@ jobs:
           win_edition: ${{ inputs.win_edition }}
           vs_version: ${{ inputs.vs_version }}
           cuda_version: ${{ inputs.cuda_version }}
+          repo_version: ${{ inputs.repo_version }}
           isolation: process
 
-      - name: "Push images"
-        if: ${{ inputs.push_image}}
+      - name: "Push images to ghcr"
+        if: ${{ inputs.push_image }}
         id: push_github
         uses: ./.github/actions/push-windows-image
         with:
@@ -77,6 +83,7 @@ jobs:
           win_edition: ${{ inputs.win_edition }}
           vs_version: ${{ inputs.vs_version }}
           cuda_version: ${{ inputs.cuda_version }}
+          repo_version: ${{ inputs.repo_version }}
           isolation: process
 
       - name: "Push images to dockerhub"
@@ -88,4 +95,5 @@ jobs:
           win_edition: ${{ inputs.win_edition }}
           vs_version: ${{ inputs.vs_version }}
           cuda_version: ${{ inputs.cuda_version }}
+          repo_version: ${{ inputs.repo_version }}
           isolation: process

@@ -13,7 +13,10 @@ Param(
     $isolation="hyperv",
     [Parameter(Mandatory=$true)]
     [string]
-    $repo
+    $repo,
+    [Parameter(Mandatory=$false)]
+    [string]
+    $repoVersion="latest"
 )
 
 $ErrorActionPreference = "Stop"
@@ -23,5 +26,5 @@ $ErrorActionPreference = "Stop"
 $clVerArray = $vsVerToCompilers[$msvcVersion]
 
 foreach ($cl in $clVerArray) {
-    .\scripts\windows\build-windows-image.ps1 -clVersion $cl -isolation $isolation -cudaVersion $cudaVersion -edition $edition -repo $repo
+    .\scripts\windows\build-windows-image.ps1 -clVersion $cl -isolation $isolation -cudaVersion $cudaVersion -edition $edition -repo $repo -repoVersion $repoVersion
 }

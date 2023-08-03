@@ -15,6 +15,9 @@ Param(
     [alias ("r", "repo")]
     [string[]]
     $repos,
+    [Parameter(Mandatory=$false)]
+    [string]
+    $repoVersion="latest",
     [switch]
     [alias ("n")]
     $dryrun
@@ -42,11 +45,11 @@ $baserepo, $repos = $repos
 
 # Push to the base repo first, then push to other repos
 foreach($cl in $clVerArray) {
-    $baseimage=$(.\scripts\windows\generate-image-name -clVersion $cl -cudaVersion $cudaVersion -edition $edition -repo $baserepo)
+    $baseimage=$(.\scripts\windows\generate-image-name -clVersion $cl -cudaVersion $cudaVersion -edition $edition -repo $baserepo -repoVersion $repoVersion)
     Dry-Run docker push $baseimage
 
     foreach($repo in $repos) {
-        $image=$(.\scripts\windows\generate-image-name -clVersion $cl -cudaVersion $cudaVersion -edition $edition -repo $repo)
+        $image=$(.\scripts\windows\generate-image-name -clVersion $cl -cudaVersion $cudaVersion -edition $edition -repo $repo -repoVersion $repoVersion)
         Dry-Run docker tag $baseimage $image
         Dry-Run docker push $image
     }

@@ -7,6 +7,10 @@ on:
         type: boolean
         default: false
         description: Enable pushing images
+      repo_version:
+        type: string
+        required: true
+        description: Repository version
 
 jobs:
   build-all-images:
@@ -34,6 +38,7 @@ jobs:
       win_edition: ${{ matrix.edition }}
       vs_version: ${{ matrix.vs_version }}
       cuda_version: ${{ matrix.cuda_version }}
+      repo_version: ${{ inputs.repo_version }}
       push_image: ${{ inputs.push_image }}
 
   create-manifests:
@@ -78,6 +83,7 @@ jobs:
           vs_version: ${{ matrix.vs_version }}
           cuda_version: ${{ matrix.cuda_version }}
           repo: ghcr.io/${{ github.repository }}
+          repo_version: ${{ inputs.repo_version }}
 
       - name: Create manifest for dockerhub
         if: ${{ inputs.push_image && vars.DOCKERHUB_REPOSITORY }}
@@ -85,4 +91,5 @@ jobs:
         with:
           vs_version: ${{ matrix.vs_version }}
           cuda_version: ${{ matrix.cuda_version }}
-          repo: ${{ vars.DOCKERHUB_REPOSITORY }}/${{ github.repository }}
+          repo: ${{ vars.DOCKERHUB_REPOSITORY }}
+          repo_version: ${{ inputs.repo_version }}

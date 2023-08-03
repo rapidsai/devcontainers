@@ -14,7 +14,7 @@ Param(
     $repo,
     [Parameter(Mandatory=$false)]
     [string]
-    $prefix=""
+    $repoVersion="latest"
 )
 
-Write-Output "${repo}:${prefix}cuda${cudaVersion}-cl${clVersion}-${edition}"
+Write-Output "${repo}:${repoVersion}-cuda${cudaVersion}-cl${clVersion}-${edition}"

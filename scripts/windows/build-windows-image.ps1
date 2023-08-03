@@ -16,7 +16,10 @@ Param(
     $isolation="hyperv",
     [Parameter(Mandatory=$false)]
     [string]
-    $repo="local"
+    $repo="local",
+    [Parameter(Mandatory=$false)]
+    [string]
+    $repoVersion="latest"
 )
 
 function TestReturnCode {
@@ -38,7 +41,7 @@ try {
 
     $vsVer = $vsYearToVer[$vsCompilersToYear[$clVersion]]
     # Override defaults in .env.
-    $ENV:IMAGE_NAME="$(.\generate-image-name.ps1 -clVersion $clVersion -cudaVersion $cudaVersion -edition $edition -repo $repo)"
+    $ENV:IMAGE_NAME="$(.\generate-image-name.ps1 -clVersion $clVersion -cudaVersion $cudaVersion -edition $edition -repo $repo -repoVersion $repoVersion)"
     $ENV:ISOLATION="$isolation"
     $ENV:MSVC_VER="$vsVer"
     $ENV:MSVC_COMPILER_VER="$clVersion"

@@ -6,6 +6,10 @@ inputs:
     type: string
     required: true
     description: Image repository
+  repo_version:
+    type: string
+    required: true
+    description: Repository version
   vs_version:
     type: string
     required: true
@@ -25,4 +29,5 @@ runs:
         .github\actions\create-and-push-manifest\action.ps1 `
           -cudaVersion ${{ inputs.cuda_version }}           `
           -msvcVersion ${{ inputs.vs_version }}             `
-          -repo ${{ inputs.repo }}
+          -repo ${{ inputs.repo }}                          `
+          -repoVersion ${{ inputs.repo_version }}

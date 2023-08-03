@@ -6,6 +6,10 @@ inputs:
     type: string
     required: true
     description: Image repository
+  repo_version:
+    type: string
+    required: true
+    description: Repository version
   win_edition:
     type: string
     required: true
@@ -35,4 +39,5 @@ runs:
           -msvcVersion ${{ inputs.vs_version }}        `
           -edition ${{ inputs.win_edition }}           `
           -isolation ${{ inputs.isolation }}           `
-          -repo ${{ inputs.repo }}
+          -repo ${{ inputs.repo }}                     `
+          -repoVersion ${{ inputs.repo_version }}

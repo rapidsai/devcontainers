@@ -8,7 +8,10 @@ Param(
     $cudaVersion="latest",
     [Parameter(Mandatory=$false)]
     [string]
-    $repo="local"
+    $repo="local",
+    [Parameter(Mandatory=$false)]
+    [string]
+    $repoVersion="latest"
 )
 
 function TestReturnCode {
@@ -20,8 +23,8 @@ function TestReturnCode {
 Push-location "$PSScriptRoot"
 
 try {
-    $image_name_2019="$(.\generate-image-name.ps1 -clVersion $clVersion -cudaVersion $cudaVersion -edition "windows-2019" -repo $repo)"
-    $image_name_2022="$(.\generate-image-name.ps1 -clVersion $clVersion -cudaVersion $cudaVersion -edition "windows-2022" -repo $repo)"
+    $image_name_2019="$(.\generate-image-name.ps1 -clVersion $clVersion -cudaVersion $cudaVersion -edition "windows-2019" -repo $repo -repoVersion $repoVersion)"
+    $image_name_2022="$(.\generate-image-name.ps1 -clVersion $clVersion -cudaVersion $cudaVersion -edition "windows-2022" -repo $repo -repoVersion $repoVersion)"
 
     $manifest_name="${repo}:cuda${cudaVersion}-cl${clVersion}"
 

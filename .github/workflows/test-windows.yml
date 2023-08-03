@@ -1,18 +1,44 @@
 name: Test Windows
 
+concurrency:
+  group: test-windows-on-${{ github.event_name }}-from-${{ github.ref_name }}
+  cancel-in-progress: true
+
 on:
   pull_request:
+    paths: [.github/actions/windows_build.yml, scripts/windows/**]
   push:
+    paths: [.github/actions/windows_build.yml, scripts/windows/**]
     branches:
       - "pull-request/[0-9]+"
-      - "feature/.*"
-    paths: [.github/actions/windows_build.yml, scripts/windows/**]
 
 jobs:
+  check-event:
+    name: Check PR Event
+    runs-on: ubuntu-latest
+    outputs:
+      ok: ${{ steps.check_pr_event.outputs.ok }}
+    steps:
+      - id: check_pr_event
+        name: Check PR Event
+        shell: bash
+        run: |
+          [[ '${{ github.event_name }}' == 'push' && '${{ github.repository }}' == 'rapidsai/devcontainers' ]] || \
+          [[ '${{ github.event_name }}' == 'pull_request' && '${{ github.repository }}' != 'rapidsai/devcontainers' ]] \
+          && echo "ok=true"  | tee -a $GITHUB_OUTPUT \
+          || echo "ok=false" | tee -a $GITHUB_OUTPUT;
+
+  version:
+    needs: check-event
+    if: needs.check-event.outputs.ok == 'true'
+    name: Get repository version
+    uses: ./.github/workflows/get-repo-version.yml
+
   dispatch:
-    name: Test Building Windows images
-    strategy:
-      fail-fast: false
+    needs: version
+    name: Build Windows images
     uses: ./.github/workflows/dispatch-windows.yml
+    secrets: inherit
     with:
       push_image: false
+      repo_version: ${{ needs.version.outputs.repo_version }}
