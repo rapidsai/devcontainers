@@ -6,9 +6,9 @@ concurrency:
 
 on:
   pull_request:
-    paths: [.github/actions/windows_build.yml, scripts/windows/**]
+    paths: [.github/actions/**/*windows*, scripts/windows/**]
   push:
-    paths: [.github/actions/windows_build.yml, scripts/windows/**]
+    paths: [.github/actions/**/*windows*, scripts/windows/**]
     branches:
       - "pull-request/[0-9]+"
 
