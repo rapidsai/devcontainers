@@ -1,6 +1,4 @@
-name: repo-version
-
-description: Get the repository version from the closest git tag
+name: get-repo-version
 
 on:
   workflow_call:
@@ -22,7 +20,7 @@ jobs:
           persist-credentials: false
 
       - id: version
-        name: Get repo version from git tag
+        name: Get the repository version from the closest git tag
         shell: bash
         run: |
           cat <<EOF | tee "$GITHUB_OUTPUT"
