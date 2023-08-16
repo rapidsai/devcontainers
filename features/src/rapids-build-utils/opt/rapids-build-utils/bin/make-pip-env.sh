@@ -37,11 +37,11 @@ make_pip_env() {
         if [ -f ~/"${lib}/dependencies.yaml" ]; then
             pip_reqs_txts+=("/tmp/${lib}.requirements.txt");
 
-            for pkg in $(rapids-python-pkg-names "${lib}"); do
+            for pkg in "$(rapids-python-pkg-names "${lib}")"; do
                 pip_noinstall+=("${pkg}" "${pkg}-cu.*");
             done
 
-            pip_noinstall+=($(rapids-python-conda-pkg-names "${lib}"));
+            pip_noinstall+=("$(rapids-python-conda-pkg-names "${lib}")");
 
             rapids-dependency-file-generator \
                 --file_key py_build_${lib}   \
@@ -61,42 +61,47 @@ make_pip_env() {
         fi
     done
 
-    # Generate a combined requirements.txt file
-    cat ${pip_reqs_txts[@]} \
-      | grep -v -P "^($(rapids-join-strings "|" ${pip_noinstall[@]}))==.*$" \
-    > "${new_env_path}";
+    if test ${#pip_reqs_txts[@]} -gt 0; then
+        # Generate a combined requirements.txt file
+        cat ${pip_reqs_txts[@]} \
+          | grep -v -P "^($(rapids-join-strings "|" ${pip_noinstall[@]}))==.*$" \
+        > "${new_env_path}";
 
-    rm ${pip_reqs_txts[@]};
-
-    # If the venv doesn't exist, make one
-    if [ ! -d ~/.local/share/venvs/${env_name} ]; then
-        echo -e "Creating '${env_name}' virtual environment\n" 1>&2;
-        echo -e "Requirements (${env_file_name}):\n" 1>&2;
-        cat "${new_env_path}";
-        echo "";
-
-        python -m venv --system-site-packages ~/.local/share/venvs/${env_name};
-        . ~/.local/share/venvs/${env_name}/bin/activate;
-        python -m pip install --pre -I -r "${new_env_path}";
-    # If the venv does exist but it's different from the generated one,
-    # print the diff between the envs and update it
-    elif ! diff -BNqw "${old_env_path}" "${new_env_path}" >/dev/null 2>&1; then
-        echo -e "Updating '${env_name}' virtual environment\n" 1>&2;
-        echo -e "Requirements (${env_file_name}):\n" 1>&2;
-
-        # Print the diff to the console for debugging
-        [ ! -f "${old_env_path}" ]                         \
-         && cat "${new_env_path}"                          \
-         || diff -BNyw "${old_env_path}" "${new_env_path}" \
-         || true                                           \
-         && echo "";
-
-        # Update the current venv
-        . ~/.local/share/venvs/${env_name}/bin/activate;
-        python -m pip install --pre -U -r "${new_env_path}";
+        rm ${pip_reqs_txts[@]};
     fi
 
-    cp -a "${new_env_path}" "${old_env_path}";
+    if test -f "${new_env_path}"; then
+
+        # If the venv doesn't exist, make one
+        if [ ! -d ~/.local/share/venvs/${env_name} ]; then
+            echo -e "Creating '${env_name}' virtual environment\n" 1>&2;
+            echo -e "Requirements (${env_file_name}):\n" 1>&2;
+            cat "${new_env_path}";
+            echo "";
+
+            python -m venv --system-site-packages ~/.local/share/venvs/${env_name};
+            . ~/.local/share/venvs/${env_name}/bin/activate;
+            python -m pip install --pre -I -r "${new_env_path}";
+        # If the venv does exist but it's different from the generated one,
+        # print the diff between the envs and update it
+        elif ! diff -BNqw "${old_env_path}" "${new_env_path}" >/dev/null 2>&1; then
+            echo -e "Updating '${env_name}' virtual environment\n" 1>&2;
+            echo -e "Requirements (${env_file_name}):\n" 1>&2;
+
+            # Print the diff to the console for debugging
+            [ ! -f "${old_env_path}" ]                         \
+             && cat "${new_env_path}"                          \
+             || diff -BNyw "${old_env_path}" "${new_env_path}" \
+             || true                                           \
+             && echo "";
+
+            # Update the current venv
+            . ~/.local/share/venvs/${env_name}/bin/activate;
+            python -m pip install --pre -U -r "${new_env_path}";
+        fi
+
+        cp -a "${new_env_path}" "${old_env_path}";
+    fi
 }
 
 (make_pip_env "${DEFAULT_VIRTUAL_ENV:-rapids}" "$@");

@@ -27,7 +27,7 @@ import toml;\
 print(toml.load('${dir}/pyproject.toml')['project']['name'])")";
         fi
         if [ -n "${name}" ]; then
-            echo "${name}";
+            echo "${name}" | sed -r "s/ /_/g";
         fi
     done
 }

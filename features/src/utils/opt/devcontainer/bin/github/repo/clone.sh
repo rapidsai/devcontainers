@@ -51,13 +51,12 @@ clone_github_repo() {
 
     source devcontainer-utils-init-github-cli;
 
-    # PS4="+ ${BASH_SOURCE[0]}:\${LINENO}: "; set -x;
-
     local branch="";
 
     eval "$(                                  \
-        devcontainer-utils-parse-args         \
-            --names 'b|branch' "$@"           \
+        devcontainer-utils-parse-args --names '
+            b|branch                          |
+        ' - <<< "$@"                          \
       | xargs -r -d'\n' -I% echo -n local %\; \
     )";
 
@@ -110,5 +109,9 @@ clone_github_repo() {
         ${__rest__[@]}                \
         "${origin}" "${directory}"    ;
 }
+
+if test -n "${devcontainer_utils_debug:-}"; then
+    PS4="+ ${BASH_SOURCE[0]}:\${LINENO} "; set -x;
+fi
 
 clone_github_repo "$@";

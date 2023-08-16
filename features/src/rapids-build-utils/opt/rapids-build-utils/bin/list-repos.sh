@@ -7,11 +7,10 @@ list_repos() {
     local manifest=;
 
     eval "$(                                  \
-        devcontainer-utils-parse-args --names "
+        devcontainer-utils-parse-args --names '
             r|repo                            |
             m|manifest                        |
-            "                                 \
-            - <<< "$@"                        \
+        ' - <<< "$@"                          \
       | xargs -r -d'\n' -I% echo -n local %\; \
     )";
 
@@ -49,5 +48,9 @@ ________EOF
 
     yq -Mo json "${manifest}" | jq -r "${query}";
 }
+
+if test -n "${devcontainer_utils_debug:-}"; then
+    PS4="+ ${BASH_SOURCE[0]}:\${LINENO} "; set -x;
+fi
 
 (list_repos "$@");
