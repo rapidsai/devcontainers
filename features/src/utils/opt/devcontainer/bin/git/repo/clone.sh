@@ -4,16 +4,19 @@ clone_git_repo() {
 
     set -euo pipefail;
 
-    # PS4="+ ${BASH_SOURCE[0]}:\${LINENO} "; set -x;
-
     local branch="";
     local upstream="";
 
     eval "$(                                  \
-        devcontainer-utils-parse-args         \
-            --names 'branch|upstream' "$@"    \
+        devcontainer-utils-parse-args --names '
+            b|branch                          |
+            u|upstream                        |
+        ' - <<< "$@"                          \
       | xargs -r -d'\n' -I% echo -n local %\; \
     )";
+
+    branch="${b:-"${branch:-}"}";
+    upstream="${u:-"${upstream:-}"}";
 
     local nargs="${#__rest__[@]}";
     local origin="${__rest__[$((nargs - 2))]}";
@@ -42,8 +45,12 @@ clone_git_repo() {
 
     if [ -n "${branch:-}" ]; then
         has_branch() {
+            local b="${branch}";
+            for x in '\\' '\/' '.' '+' '^' '$' '*' '?' '!' '|' '=' '-' '[' ']' '(' ')' '{' '}'; do
+                b="${b//"$x"/\\"$x"}";
+            done
             # git ls-remote exits with code 141, so compare the grep output and not just the exit code
-            if [ "$(git ls-remote "${1}" | grep -P "^[0-9a-z]{40}\s+refs/heads/${branch}$" || echo "")" = "" ];
+            if [ "$(git ls-remote "${1}" | grep -P "^[0-9a-z]{40}\s+refs\/heads\/${b}$" || echo "")" = "" ];
             then echo "";
             else echo "1";
             fi
@@ -72,5 +79,9 @@ clone_git_repo() {
 
     git -C "${directory}" submodule update --init --recursive;
 }
+
+if test -n "${devcontainer_utils_debug:-}"; then
+    PS4="+ ${BASH_SOURCE[0]}:\${LINENO} "; set -x;
+fi
 
 clone_git_repo "$@";
