@@ -2,9 +2,9 @@
 
 get_repos_ordered() {
     local project_manifest_yml="${PROJECT_MANIFEST_YML:-"/opt/rapids-build-utils/manifest.yaml"}";
-    local names=($(yq eval '.repos[].name' "${project_manifest_yml}"));
-    for i in "${!names[@]}"; do
-        echo "$i ${names[$i]}";
+    local paths=($(yq eval '.repos[].path' "${project_manifest_yml}"));
+    for i in "${!paths[@]}"; do
+        echo "$i ${paths[$i]}";
     done
 }
 
