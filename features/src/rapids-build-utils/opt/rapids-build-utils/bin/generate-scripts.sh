@@ -91,8 +91,7 @@ generate_scripts() {
       | xargs -r -d'\n' -I% echo -n local %\; \
     )";
 
-    declare -A name_to_path;
-    declare -A name_to_cpp_sub_dir;
+    declare -A cpp_name_to_path;
 
     local i;
     local j;
@@ -124,8 +123,6 @@ generate_scripts() {
 
         if [[ -d ~/"${!repo_path:-}/.git" ]]; then
 
-            name_to_path["${repo_name:-}"]="${!repo_path:-}";
-
             local cpp_libs=();
             local cpp_dirs=();
 
@@ -135,25 +132,23 @@ generate_scripts() {
                 local cpp_args="${repo}_cpp_${j}_args";
                 local cpp_sub_dir="${repo}_cpp_${j}_sub_dir";
                 local cpp_depends_length="${repo}_cpp_${j}_depends_length";
+                local cpp_path="${!repo_path:-}${!cpp_sub_dir:+/${!cpp_sub_dir}}";
 
+                cpp_dirs+=("${cpp_path}");
                 cpp_libs+=("${!cpp_name:-}");
-                cpp_dirs+=("${!repo_path:-}/${!cpp_sub_dir:-}");
                 cpp_name="$(tr "[:upper:]" "[:lower:]" <<< "${!cpp_name:-}")";
 
-                name_to_cpp_sub_dir["${cpp_name:-}"]="${!cpp_sub_dir:-}";
+                cpp_name_to_path["${cpp_name:-}"]="${cpp_path}";
 
                 local deps=();
 
                 for ((k=0; k < ${!cpp_depends_length:-0}; k+=1)); do
                     local dep="${repo}_cpp_${j}_depends_${k}";
-                    local dep_name=$(tr "[:upper:]" "[:lower:]" <<< "${!dep}");
-                    if ! test -v name_to_path["${dep_name}"]       \
-                    || ! test -v name_to_cpp_sub_dir["${dep_name}"]; then
+                    local dep_cpp_name=$(tr "[:upper:]" "[:lower:]" <<< "${!dep}");
+                    if ! test -v cpp_name_to_path["${dep_cpp_name}"]; then
                         continue;
                     fi
-                    local dep_path="${name_to_path["${dep_name}"]}";
-                    local dep_sub_dir="${name_to_cpp_sub_dir["${dep_name}"]}";
-                    local dep_cpp_path="${dep_path}${dep_sub_dir:+/$dep_sub_dir}";
+                    local dep_cpp_path="${cpp_name_to_path["${dep_cpp_name}"]}";
 
                     deps+=(-D${!dep}_ROOT=\"$(realpath -m ~/${dep_cpp_path}/build/latest)\");
                     deps+=(-D$(tr "[:upper:]" "[:lower:]" <<< "${!dep}")_ROOT=\"$(realpath -m ~/${dep_cpp_path}/build/latest)\");
@@ -219,22 +214,21 @@ generate_scripts() {
         \( -type d -exec chmod 0775 {} \; \
         -o -type f -exec chmod 0755 {} \; \);
 
-    unset name_to_path;
-    unset name_to_cpp_sub_dir;
+    unset cpp_name_to_path;
 }
 
 if test -n "${rapids_build_utils_debug:-}"; then
     PS4="+ ${BASH_SOURCE[0]}:\${LINENO} "; set -x;
 fi
 
-(remove_script_for_pattern '^clone-[\w-_]+');
-(remove_script_for_pattern '^clean-[\w-_]+');
-(remove_script_for_pattern '^build-[\w-_]+');
-(remove_script_for_pattern '^configure-[\w-_]+');
-(remove_script_for_pattern '^build-[\w-_]+-cpp');
-(remove_script_for_pattern '^clean-[\w-_]+-cpp');
-(remove_script_for_pattern '^configure-[\w-_]+-cpp');
-(remove_script_for_pattern '^build-[\w-_]+-python');
-(remove_script_for_pattern '^clean-[\w-_]+-python');
+(remove_script_for_pattern '^clone-[\w-_\.]+');
+(remove_script_for_pattern '^clean-[\w-_\.]+');
+(remove_script_for_pattern '^build-[\w-_\.]+');
+(remove_script_for_pattern '^configure-[\w-_\.]+');
+(remove_script_for_pattern '^build-[\w-_\.]+-cpp');
+(remove_script_for_pattern '^clean-[\w-_\.]+-cpp');
+(remove_script_for_pattern '^configure-[\w-_\.]+-cpp');
+(remove_script_for_pattern '^build-[\w-_\.]+-python');
+(remove_script_for_pattern '^clean-[\w-_\.]+-python');
 
 (generate_scripts "$@");
