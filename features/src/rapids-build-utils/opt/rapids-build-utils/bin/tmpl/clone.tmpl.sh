@@ -3,18 +3,18 @@
 clone_${NAME}() {
     set -euo pipefail;
 
-    # PS4="+ ${BASH_SOURCE[0]}:\${LINENO} "; set -x;
-
     if [[ ! -d ~/"${SRC_PATH}"/.git ]]; then
 
         local branch=;
 
         eval "$(                                  \
-            devcontainer-utils-parse-args         \
-                --names 'b|branch' "$@"           \
+            devcontainer-utils-parse-args --names '
+                b|branch                          |
+            ' - <<< "$@"                          \
           | xargs -r -d'\n' -I% echo -n local %\; \
-          # | cat - <(echo 'set -- ${__rest__[@]}') \
         )";
+
+        branch="${b:-${branch:-"${GIT_TAG}"}}";
 
         echo 'Cloning ${NAME}' 1>&2;
 
@@ -23,8 +23,8 @@ clone_${NAME}() {
         __rest__+=(-j $(nproc --ignore=2));
         __rest__+=(-c checkout.defaultRemote=upstream);
 
-        devcontainer-utils-clone-${GIT_HOST}-repo ${__rest__[@]} \
-            --branch "${b:-${branch:-"${GIT_TAG}"}}" \
+        devcontainer-utils-clone-${GIT_HOST}-repo \
+            ${__rest__[@]} --branch "${branch}" \
             "${GIT_UPSTREAM}/${GIT_REPO}" \
             ~/"${SRC_PATH}";
 
@@ -42,4 +42,8 @@ clone_${NAME}() {
     fi
 }
 
-(clone_${NAME} "$@");
+if test -n "${devcontainer_utils_debug:-}"; then
+    PS4="+ ${BASH_SOURCE[0]}:\${LINENO} "; set -x;
+fi
+
+clone_${NAME} "$@";
