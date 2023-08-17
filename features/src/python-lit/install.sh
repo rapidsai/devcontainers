@@ -1,7 +1,7 @@
 #! /usr/bin/env bash
 set -ex
 
-LIT_VERSION="${VERSION:-latest}";
+LIT_VERSION="${LITVERSION:-latest}";
 
 if [ "$LIT_VERSION" -neq "latest" ]; then
   LIT_VERSION_TO_INSTALL="lit==$LIT_VERSION"
@@ -20,7 +20,7 @@ if ! type python >/dev/null 2>&1; then
   exit 1;
 fi
 
-PKG=("gettext-base");
+PKG=("gettext-base" "libtbb-dev");
 PKG_TO_REMOVE=();
 
 # Install gcc and g++ because we have to build psutil wheel for non-x86
@@ -40,7 +40,7 @@ export LIT_VERSION="$(lit --version | grep -o -e '[0-9].*')";
 append_to_etc_bashrc "$(cat .bashrc | envsubst '$LIT_VERSION')";
 append_to_all_bashrcs "$(cat .bashrc | envsubst '$LIT_VERSION')";
 # export envvars in /etc/profile.d
-add_etc_profile_d_script python-lit "$(cat .bashrc | envsubst '$LIT_VERSION')";
+add_etc_profile_d_script cccl-dev "$(cat .bashrc | envsubst '$LIT_VERSION')";
 
 # Clean up
 # rm -rf /tmp/*;

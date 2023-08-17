@@ -34,7 +34,7 @@ x-rust: &rust { name: "rust" }
 x-mambaforge: &conda { name: "mambaforge" }
 
 x-python: &python { name: "ghcr.io/devcontainers/features/python:1", hide: true }
-x-lit: &lit { name: "python-lit", hide: true }
+x-lit: &lit { name: "cccl-dev", hide: true }
 
 include:
 # CCCL devcontainers
