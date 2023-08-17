@@ -1,7 +1,7 @@
 {
   "name": "sccache",
   "id": "sccache",
-  "version": "23.10.0",
+  "version": "23.10.1",
   "description": "A feature to install sccache",
   "options": {
     "version": {
