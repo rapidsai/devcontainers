@@ -39,10 +39,10 @@ init_github_cli() {
 
     local needed_scopes="read:org";
 
-    needed_scopes="$(                                                  \
-      comm -23                                                         \
-        <(echo -n "${needed_scopes}" | xargs -r -n1 -d' ' echo | sort) \
-        <(echo -n "${active_scopes}" | xargs -r -n1 -d' ' echo | sort) \
+    needed_scopes="$(                                                     \
+      comm -23                                                            \
+        <(echo -n "${needed_scopes}" | xargs -r -n1 -d' ' echo | sort -s) \
+        <(echo -n "${active_scopes}" | xargs -r -n1 -d' ' echo | sort -s) \
     )";
 
     if [ -n "${needed_scopes}" ]; then
