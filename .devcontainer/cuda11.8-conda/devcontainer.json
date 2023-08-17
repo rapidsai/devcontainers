@@ -1,6 +1,5 @@
 {
   "shutdownAction": "stopContainer",
-
   "build": {
     "context": "${localWorkspaceFolder}/.devcontainer",
     "dockerfile": "${localWorkspaceFolder}/.devcontainer/rapids.Dockerfile",
@@ -13,25 +12,27 @@
   "hostRequirements": {
     "gpu": true
   },
-
   "features": {
     "./features/rapids-build-utils": {}
   },
-
   "overrideFeatureInstallOrder": [
     "./features/rapids-build-utils"
   ],
-
   "initializeCommand": [
-    "/bin/bash", "-c", "mkdir -m 0755 -p ${localWorkspaceFolder}/../.{aws,cache,config,conda/pkgs,conda/unified} ${localWorkspaceFolder}/../{rmm,kvikio,cudf,raft,cumlprims_mg,cuml,cugraph-ops,cugraph,cuspatial}"
+    "/bin/bash",
+    "-c",
+    "mkdir -m 0755 -p ${localWorkspaceFolder}/../.{aws,cache,config,conda/pkgs,conda/unified} ${localWorkspaceFolder}/../{rmm,kvikio,cudf,raft,cumlprims_mg,cuml,cugraph-ops,cugraph,cuspatial}"
   ],
-
   "updateContentCommand": [
     "/bin/bash",
     "-c",
     "mkdir -m 0755 -p ~/.config/clangd && cp -n /etc/skel/.config/clangd/config.yaml ~/.config/clangd/config.yaml"
   ],
-
+  "postAttachCommand": [
+    "/bin/bash",
+    "-c",
+    "if [ ${CODESPACES:-false} = 'true' ]; then . devcontainer-utils-post-attach-command; . rapids-post-attach-command; fi"
+  ],
   "workspaceFolder": "/home/coder",
   "workspaceMount": "source=${localWorkspaceFolder},target=/home/coder/devcontainers,type=bind,consistency=consistent",
   "mounts": [
@@ -50,7 +51,6 @@
     "source=${localWorkspaceFolder}/../.conda/pkgs,target=/home/coder/.conda/pkgs,type=bind,consistency=consistent",
     "source=${localWorkspaceFolder}/../.conda/unified,target=/home/coder/.conda/envs,type=bind,consistency=consistent"
   ],
-
   "customizations": {
     "vscode": {
       "extensions": [
