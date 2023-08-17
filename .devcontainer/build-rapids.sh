@@ -50,7 +50,7 @@ build_rapids() {
     (
         echo "building RAFT";
         clean-raft;
-        build-raft -DBUILD_PRIMS_BENCH=ON BUILD_ANN_BENCH=ON;
+        build-raft -DBUILD_PRIMS_BENCH=ON -DBUILD_ANN_BENCH=ON;
     ) 2>&1 | maybe_write_build_log raft;
 
     (
