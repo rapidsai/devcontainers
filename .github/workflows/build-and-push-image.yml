@@ -65,7 +65,6 @@ jobs:
         with:
           persist-credentials: false
 
-      - if: contains(runner.name, 'rapidsai') != true
         name: Free up disk space
         uses: ./.github/actions/free-disk-space
         with:
@@ -89,8 +88,6 @@ jobs:
           name: "${{ needs.build-and-upload.outputs.repo }}:${{ needs.build-and-upload.outputs.tag }}"
         run: |
 
-          docker info;
-
           find "${{ runner.temp }}/" -type f -name '*.tar';
 
           docker manifest rm ${name} || true;
@@ -99,7 +96,7 @@ jobs:
 
           for arch in "amd64" "arm64"; do
             # Load the linux/$arch image with the final name
-            docker import "${{ runner.temp }}/${arch}.tar" ${name};
+            docker import --platform "linux/${arch}" "${{ runner.temp }}/${arch}.tar" ${name};
             # Push the local image to the registry to get its remote hash
             hash="$(docker push ${name} | tail -n1 | cut -d' ' -f3)";
             # Save the remote hash for use below
