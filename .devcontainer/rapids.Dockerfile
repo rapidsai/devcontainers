@@ -1,18 +1,15 @@
 # syntax=docker/dockerfile:1.5
 
-ARG CUDA=12.0
-ARG LLVM=16
-ARG RAPIDS=23.10
-ARG DISTRO=ubuntu22.04
-ARG REPO=rapidsai/devcontainers
-
+ARG BASE
 ARG PYTHON_PACKAGE_MANAGER=conda
 
-FROM ${REPO}:${RAPIDS}-cpp-llvm${LLVM}-cuda${CUDA}-${DISTRO} as pip-base
+FROM ${BASE} as pip-base
 
-FROM ${REPO}:${RAPIDS}-cpp-mambaforge-${DISTRO} as conda-base
+ENV DEFAULT_VIRTUAL_ENV=rapids
 
-COPY --from=pip-base /etc/skel/.config/clangd/config.yaml /etc/skel/.config/clangd/config.yaml
+FROM ${BASE} as conda-base
+
+ENV DEFAULT_CONDA_ENV=rapids
 
 FROM ${PYTHON_PACKAGE_MANAGER}-base
 

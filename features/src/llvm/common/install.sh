@@ -11,6 +11,8 @@ src="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 # export bash utility functions
 source "$src/utilities.sh";
 
+# install /etc/skel
+cp -r "$src/etc/skel" /etc/;
 # install /etc/bash.bash_env
 cp "$src/etc/bash.bash_env" /etc/;
 chown root:root /etc/bash.bash_env;

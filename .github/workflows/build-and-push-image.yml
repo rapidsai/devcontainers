@@ -95,11 +95,9 @@ jobs:
           hashes=();
 
           for arch in "amd64" "arm64"; do
-            # Load the linux/$arch and tag the loaded image with the final name
-            docker image tag \
-              $(docker load --input "${{ runner.temp }}/${arch}.tar" | tail -n1 | cut -d' ' -f3) \
-              ${name};
-            # Push the local image to the registry to get its remote hash and save the remote hash for use below
+            # Load the arch-specific image with the final name
+            docker load --input "${{ runner.temp }}/${arch}.tar";
+            # Push the local image to the registry and save the remote hash
             hashes+=("$(docker push ${name} | tail -n1 | cut -d' ' -f3)");
           done
 

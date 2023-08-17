@@ -85,10 +85,6 @@ append_to_all_bashrcs "$(cat .bashrc | envsubst)";
 # export envvars in /etc/profile.d
 add_etc_profile_d_script llvm "$(cat .bashrc | envsubst)";
 
-# Copy clangd config into etc/skel
-mkdir -p -m 0755 /etc/skel/.config/clangd/;
-cp .clangd /etc/skel/.config/clangd/config.yaml;
-
 # Clean up
 # rm -rf /tmp/*;
 rm -rf /var/tmp/*;
