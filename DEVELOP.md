@@ -16,7 +16,7 @@ This repository defines features to install the following dev tools, compilers, 
 * [ninja-build](features/src/ninja/)
 * [NVIDIA HPC SDK](features/src/nvhpc/)
 * [Intel OneAPI compilers](features/src/oneapi/)
-* [lit (from pypi)](features/src/python-lit/)
+* [CCCL development utilities](features/src/cccl-dev/)
 * [Rust](features/src/rust/)
 * [sccache](features/src/sccache/)
 * [devcontainer-utils](features/src/utils/)

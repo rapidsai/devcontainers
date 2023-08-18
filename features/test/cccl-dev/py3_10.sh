@@ -3,7 +3,7 @@
 # This test can be run with the following command (from the root of this repo)
 # ```
 # npx --package=@devcontainers/cli -c 'devcontainer features test \
-#     --features python-lit \
+#     --features cccl-dev \
 #     --base-image ubuntu:22.04 .'
 # ```
 

@@ -3,11 +3,11 @@
     "image": "ubuntu:22.04",
     "features": {
       "ghcr.io/devcontainers/features/python:1": {},
-      "python-lit": {}
+      "cccl-dev": {}
     },
     "overrideFeatureInstallOrder": [
       "ghcr.io/devcontainers/features/python",
-      "./python-lit"
+      "./cccl-dev"
     ]
   }
 }
