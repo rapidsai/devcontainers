@@ -10,16 +10,25 @@ build_${PY_LIB}_python() {
 
     local verbose="1";
     local parallel="";
+    local wheel_dir="";
 
     eval "$(                                  \
         devcontainer-utils-parse-args --names '
             j|parallel                        |
             v|verbose                         |
+            w|wheel-dir                       |
+            prefer-binary                     |
+            only-binary                       |
+            no-verify                         |
+            no-build-isolation                |
+            no-deps                           |
+            no-use-pep517                     |
         ' - <<< "$@"                          \
       | xargs -r -d'\n' -I% echo -n local %\; \
     )";
 
     verbose="${v:-${verbose:-}}";
+    wheel_dir="${w:-${wheel_dir}}";
     parallel="${j:-${parallel:-${JOBS:-${PARALLEL_LEVEL:-$(nproc --ignore=2)}}}}";
 
     local cmake_args=();
@@ -50,20 +59,51 @@ build_${PY_LIB}_python() {
     if test -n "${verbose}"; then
         pip_args+=("-vv");
     fi
-    pip_args+=("--no-build-isolation");
-    pip_args+=("--no-deps");
-    pip_args+=("--editable");
+
+    if test -n "${no_build_isolation:-}"; then
+        pip_args+=("--no-build-isolation");
+    fi
+
+    if test -n "${no_deps:-}"; then
+        pip_args+=("--no-deps");
+    fi
+
+    if test -n "${wheel_dir:-}"; then
+        pip_args+=("-w" "${wheel_dir}");
+    fi
+
+    if test -n "${prefer_binary:-}"; then
+        pip_args+=("--prefer-binary");
+        if [ "${prefer_binary:-}" != "true" ]; then
+            pip_args+=("${prefer_binary:-}");
+        fi
+    fi
+
+    if test -n "${only_binary:-}"; then
+        pip_args+=("--only-binary");
+        if [ "${only_binary:-}" != "true" ]; then
+            pip_args+=("${only_binary:-}");
+        fi
+    fi
+
+    if test -n "${no_verify:-}"; then
+        pip_args+=("--no-verify");
+    fi
+
+    if test -n "${no_use_pep517:-}"; then
+        pip_args+=("--no-use-pep517");
+    fi
+
+
     pip_args+=(~/"${PY_SRC}");
-    cmake_args+=("-DCMAKE_INSTALL_RPATH_USE_LINK_PATH=ON");
 
     trap "rm -rf ~/'${PY_SRC}/${PY_LIB//-/_}.egg-info'" EXIT;
 
     time                                              \
     CMAKE_GENERATOR="Ninja"                           \
     SKBUILD_BUILD_OPTIONS="${ninja_args[@]}"          \
-    SETUPTOOLS_ENABLE_FEATURES="legacy-editable"      \
     CMAKE_ARGS="$(rapids-parse-cmake-args ${cmake_args[@]})" \
-        python -m pip install ${pip_args[@]}          \
+        python -m pip wheel ${pip_args[@]}            \
     ;
 }
 
