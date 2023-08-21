@@ -8,19 +8,31 @@ build_${CPP_LIB}_cpp() {
         exit 1;
     fi
 
-    configure-${CPP_LIB}-cpp "$@";
+    local verbose="";
 
     eval "$(                                  \
-        rapids-get-jobs-and-archs "$@"        \
+        devcontainer-utils-parse-args --names '
+            v|verbose                         |
+        ' - <<< "$@"                          \
       | xargs -r -d'\n' -I% echo -n local %\; \
     )";
 
-    time                                      \
-    JOBS="${n_jobs}"                          \
-    PARALLEL_LEVEL="${n_jobs}"                \
-    cmake --build ~/${CPP_SRC}/build/latest   \
-          --parallel ${n_jobs} \
-          --verbose;
+    verbose="${v:-${verbose:-}}";
+
+    if test -n "${verbose}"; then verbose="--log-level=VERBOSE"; fi
+
+    configure-${CPP_LIB}-cpp ${verbose} ${__rest__[@]};
+
+    eval "$(                                     \
+        rapids-get-jobs-and-archs ${__rest__[@]} \
+      | xargs -r -d'\n' -I% echo -n local %\;    \
+    )";
+
+    if test -n "${verbose}"; then verbose="--verbose"; fi
+
+    time                                        \
+    JOBS="${n_jobs}" PARALLEL_LEVEL="${n_jobs}" \
+    cmake --build ~/${CPP_SRC}/build/latest ${verbose} --parallel ${n_jobs};
 }
 
 if test -n "${rapids_build_utils_debug:-}"; then
