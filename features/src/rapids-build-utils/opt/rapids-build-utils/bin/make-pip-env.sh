@@ -14,13 +14,10 @@ make_pip_env() {
     fi
 
     local cuda_version="${CUDA_VERSION:-${CUDA_VERSION_MAJOR}.${CUDA_VERSION_MINOR}}";
-    cuda_version="$(echo "${cuda_version}" | cut -d'.' -f3 --complement)";
+    cuda_version="$(cut -d'.' -f3 --complement <<< "${cuda_version}")";
 
-    local python_version="${PYTHON_VERSION:-}";
-
-    if [ -z "${python_version}" ]; then
-        python_version="$(python3 --version 2>&1 | cut -d' ' -f2 | cut -d'.' -f3 --complement)";
-    fi
+    local python_version="${PYTHON_VERSION:-$(python3 --version 2>&1 | cut -d' ' -f2)}";
+    python_version="$(cut -d'.' -f3 --complement <<< "${python_version}")";
 
     local new_env_path="$(realpath -m /tmp/${env_file_name})";
     local old_env_path="$(realpath -m ~/.local/share/venvs/${env_file_name})";
