@@ -91,7 +91,7 @@ generate_cpp_scripts() {
 
 generate_python_scripts() {
     local script_name;
-    for script_name in "build" "clean"; do (
+    for script_name in "build" "clean" "wheel"; do (
         cat ${TMPL}/python-${script_name}.tmpl.sh        \
       | generate_script "${script_name}-${PY_LIB}-python";
     ) || true;
