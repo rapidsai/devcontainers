@@ -128,6 +128,7 @@ generate_scripts() {
         local repo_name="${repo}_name";
         local repo_path="${repo}_path";
         local cpp_length="${repo}_cpp_length";
+        local py_length="${repo}_python_length";
         local git_repo="${repo}_git_repo";
         local git_host="${repo}_git_host";
         local git_tag="${repo}_git_tag";
@@ -209,8 +210,21 @@ generate_scripts() {
                 deps+=(-D$(tr "[:lower:]" "[:upper:]" <<< "${cpp_lib}")_ROOT=\"$(realpath -m ~/${cpp_dir}/build/latest)\");
             done
 
-            local py_libs=($(rapids-python-pkg-names "${!repo_path:-}" | tr "[:upper:]" "[:lower:]"));
-            local py_dirs=($(rapids-python-pkg-roots "${!repo_path:-}"));
+            # local py_libs=($(rapids-python-pkg-names "${!repo_path:-}" | tr "[:upper:]" "[:lower:]"));
+            # local py_dirs=($(rapids-python-pkg-roots "${!repo_path:-}"));
+            py_libs=()
+            py_dirs=()
+
+            for ((j=0; j < ${!py_length:-0}; j+=1)); do
+                local py_name="${repo}_python_${j}_name";
+                local py_args="${repo}_python_${j}_args";
+                local py_sub_dir="${repo}_python_${j}_sub_dir";
+                local py_depends_length="${repo}_python_${j}_depends_length";
+                local py_path="${!repo_path:-}${!py_sub_dir:+/${!py_sub_dir}}";
+
+                py_libs+=(${!py_name})
+                py_dirs+=($py_path)
+            done;
 
             for ((k=0; k < ${#py_libs[@]}; k+=1)); do
                 local py_dir="${py_dirs[$k]}";
