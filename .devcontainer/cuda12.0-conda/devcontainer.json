@@ -49,7 +49,9 @@
     "source=${localWorkspaceFolder}/../.cache,target=/home/coder/.cache,type=bind,consistency=consistent",
     "source=${localWorkspaceFolder}/../.config,target=/home/coder/.config,type=bind,consistency=consistent",
     "source=${localWorkspaceFolder}/../.conda/pkgs,target=/home/coder/.conda/pkgs,type=bind,consistency=consistent",
-    "source=${localWorkspaceFolder}/../.conda/unified,target=/home/coder/.conda/envs,type=bind,consistency=consistent"
+    "source=${localWorkspaceFolder}/../.conda/unified,target=/home/coder/.conda/envs,type=bind,consistency=consistent",
+    "source=${localWorkspaceFolder}/.devcontainer/cuda12.0-conda/features/utils/opt/devcontainer/bin,target=/opt/devcontainer/bin,type=bind,consistency=consistent",
+    "source=${localWorkspaceFolder}/.devcontainer/cuda12.0-conda/features/rapids-build-utils/opt/rapids-build-utils,target=/opt/rapids-build-utils,type=bind,consistency=consistent"
   ],
   "customizations": {
     "vscode": {

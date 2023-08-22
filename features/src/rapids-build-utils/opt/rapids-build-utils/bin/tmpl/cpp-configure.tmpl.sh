@@ -8,7 +8,18 @@ configure_${CPP_LIB}_cpp() {
         exit 1;
     fi
 
-    local build_type="$(rapids-parse-cmake-build-type "$@" | tr '[:upper:]' '[:lower:]')";
+    local parallel="";
+
+    eval "$(                                  \
+        devcontainer-utils-parse-args --names '
+            j|parallel                        |
+        ' - <<< "$@"                          \
+      | xargs -r -d'\n' -I% echo -n local %\; \
+    )";
+
+    parallel="${j:-${parallel:-}}";
+
+    local build_type="$(rapids-parse-cmake-build-type ${__rest__[@]} | tr '[:upper:]' '[:lower:]')";
     local binary_dir=~/${CPP_SRC}/build/${build_type};
     local source_dir=~/${CPP_SRC};
 
@@ -25,11 +36,11 @@ configure_${CPP_LIB}_cpp() {
     cmake_args+=(-B ${binary_dir});
     cmake_args+=(${CPP_DEPS});
     cmake_args+=(${CPP_ARGS});
-    cmake_args+=(${@});
+    cmake_args+=(${__rest__[@]});
 
-    eval "$(                                  \
-        rapids-get-jobs-and-archs "$@"        \
-      | xargs -r -d'\n' -I% echo -n local %\; \
+    eval "$(                                    \
+        rapids-get-jobs-and-archs -j${parallel} \
+      | xargs -r -d'\n' -I% echo -n local %\;   \
     )";
 
     time                                                     \
@@ -45,5 +56,9 @@ configure_${CPP_LIB}_cpp() {
             ;
     fi
 }
+
+if test -n "${rapids_build_utils_debug:-}"; then
+    PS4="+ ${BASH_SOURCE[0]}:\${LINENO} "; set -x;
+fi
 
 (configure_${CPP_LIB}_cpp "$@");
