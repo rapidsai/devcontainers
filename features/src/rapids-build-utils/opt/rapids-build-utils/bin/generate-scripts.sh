@@ -243,7 +243,7 @@ generate_scripts() {
 
     unset cpp_name_to_path;
 
-    for script in "clone" "configure" "build"; do
+    for script in "clone" "clean" "configure" "build"; do
         # Generate a script to run a script for all repos
         (
             NAMES="${repo_name_all[@]}"       \
