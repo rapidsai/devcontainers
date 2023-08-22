@@ -50,7 +50,7 @@ ________EOF
                 fi
             done
         fi
-        echo "${nameWithOwner:-}";
+        echo -n "${nameWithOwner:-}";
     fi
 }
 
