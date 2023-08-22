@@ -40,6 +40,29 @@ generate_script() {
     fi
 }
 
+generate_all_script_impl() {
+    local bin="$SCRIPT-all";
+    if test -n "$bin" && ! test -f "/tmp/${bin}.sh"; then
+        cat - \
+      | envsubst '$NAMES
+                  $SCRIPT' \
+      | sudo tee "/tmp/${bin}.sh" >/dev/null;
+
+        sudo chmod +x "/tmp/${bin}.sh";
+
+        sudo update-alternatives --install \
+            "/usr/bin/${bin}" "${bin}" "/tmp/${bin}.sh" 0 \
+            >/dev/null 2>&1;
+    fi
+}
+
+generate_all_script() {
+    (
+        cat ${TMPL}/all.tmpl.sh      \
+      | generate_all_script_impl;
+    ) || true;
+}
+
 generate_clone_script() {
     (
         cat ${TMPL}/clone.tmpl.sh      \
@@ -97,6 +120,8 @@ generate_scripts() {
     local j;
     local k;
 
+    local repo_name_all=()
+
     for ((i=0; i < ${repos_length:-0}; i+=1)); do
 
         local repo="repos_${i}";
@@ -109,6 +134,8 @@ generate_scripts() {
         local git_upstream="${repo}_git_upstream";
 
         repo_name="$(tr "[:upper:]" "[:lower:]" <<< "${!repo_name:-}")";
+
+        repo_name_all+=($repo_name)
 
         # Generate a clone script for each repo
         (
@@ -215,6 +242,13 @@ generate_scripts() {
         -o -type f -exec chmod 0755 {} \; \);
 
     unset cpp_name_to_path;
+
+    # Generate a script to clone all repos
+    (
+        NAMES="${repo_name_all[@]}"       \
+        SCRIPT="clone"                    \
+        generate_all_script               ;
+    ) || true;
 }
 
 if test -n "${rapids_build_utils_debug:-}"; then
