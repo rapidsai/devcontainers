@@ -2,7 +2,7 @@ ${SCRIPT}_all() {
     set -euo pipefail;
 
     for name in $NAMES; do
-        $SCRIPT-$name
+        $SCRIPT-$name "$@"
     done;
 }
 
