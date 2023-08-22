@@ -32,7 +32,7 @@ parse_args() {
         # read args from stdin
         elif grep -qP '^-$' <<< "${arg:-}"; then
             shift;
-            set -- ${@} $(cat - | xargs -r echo);
+            eval set -- "$@" "$(cat -)";
             continue;
         # --
         elif grep -qP '^--$' <<< "${arg:-}"; then
