@@ -243,12 +243,14 @@ generate_scripts() {
 
     unset cpp_name_to_path;
 
-    # Generate a script to clone all repos
-    (
-        NAMES="${repo_name_all[@]}"       \
-        SCRIPT="clone"                    \
-        generate_all_script               ;
-    ) || true;
+    for script in "clone" "configure" "build"; do
+        # Generate a script to run a script for all repos
+        (
+            NAMES="${repo_name_all[@]}"       \
+            SCRIPT="${script}"                \
+            generate_all_script               ;
+        ) || true;
+    done;
 }
 
 if test -n "${rapids_build_utils_debug:-}"; then
