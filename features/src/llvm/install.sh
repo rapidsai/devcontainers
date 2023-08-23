@@ -1,5 +1,5 @@
 #! /usr/bin/env bash
-set -ex
+set -e
 
 # Ensure we're in this feature's directory during build
 cd "$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )";
@@ -84,10 +84,6 @@ append_to_etc_bashrc "$(cat .bashrc | envsubst)";
 append_to_all_bashrcs "$(cat .bashrc | envsubst)";
 # export envvars in /etc/profile.d
 add_etc_profile_d_script llvm "$(cat .bashrc | envsubst)";
-
-# Copy clangd config into etc/skel
-mkdir -p -m 0755 /etc/skel/.config/clangd/;
-cp .clangd /etc/skel/.config/clangd/config.yaml;
 
 # Clean up
 # rm -rf /tmp/*;

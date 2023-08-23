@@ -32,8 +32,7 @@ get_user_fork_name() {
     if [ "${user}" = "${owner}" ]; then
         echo "${owner}/${name}";
     else
-        gh repo list "${user}" --fork --json nameWithOwner --json parent --jq "$(cat <<________EOF | tr -s '[:space:]'
-            .
+        local query="$(cat <<________EOF | tr -s '[:space:]'
             | map(select(
                 .parent.name == "${name}"
                 and
@@ -42,6 +41,16 @@ get_user_fork_name() {
             | map(.nameWithOwner)[]
 ________EOF
         )";
+        local nameWithOwner="$(gh repo list "${user}" --fork --json nameWithOwner --json parent --jq ". ${query}" 2>/dev/null || echo "")";
+        if test -z "${nameWithOwner}"; then
+            for repo in $(gh repo list "${user}" --fork --json name --jq 'map(.name)[]'); do
+                nameWithOwner="$(gh repo view "${repo}" --json nameWithOwner --json parent --jq "[.] ${query}" 2>/dev/null || echo "")";
+                if test -n "${nameWithOwner}"; then
+                    break;
+                fi
+            done
+        fi
+        echo -n "${nameWithOwner:-}";
     fi
 }
 
@@ -51,13 +60,12 @@ clone_github_repo() {
 
     source devcontainer-utils-init-github-cli;
 
-    # PS4="+ ${BASH_SOURCE[0]}:\${LINENO}: "; set -x;
-
     local branch="";
 
     eval "$(                                  \
-        devcontainer-utils-parse-args         \
-            --names 'b|branch' "$@"           \
+        devcontainer-utils-parse-args --names '
+            b|branch                          |
+        ' - <<< "$@"                          \
       | xargs -r -d'\n' -I% echo -n local %\; \
     )";
 
@@ -110,5 +118,9 @@ clone_github_repo() {
         ${__rest__[@]}                \
         "${origin}" "${directory}"    ;
 }
+
+if test -n "${devcontainer_utils_debug:-}"; then
+    PS4="+ ${BASH_SOURCE[0]}:\${LINENO} "; set -x;
+fi
 
 clone_github_repo "$@";

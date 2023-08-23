@@ -40,6 +40,29 @@ generate_script() {
     fi
 }
 
+generate_all_script_impl() {
+    local bin="$SCRIPT-all";
+    if test -n "$bin" && ! test -f "/tmp/${bin}.sh"; then
+        cat - \
+      | envsubst '$NAMES
+                  $SCRIPT' \
+      | sudo tee "/tmp/${bin}.sh" >/dev/null;
+
+        sudo chmod +x "/tmp/${bin}.sh";
+
+        sudo update-alternatives --install \
+            "/usr/bin/${bin}" "${bin}" "/tmp/${bin}.sh" 0 \
+            >/dev/null 2>&1;
+    fi
+}
+
+generate_all_script() {
+    (
+        cat ${TMPL}/all.tmpl.sh      \
+      | generate_all_script_impl;
+    ) || true;
+}
+
 generate_clone_script() {
     (
         cat ${TMPL}/clone.tmpl.sh      \
@@ -68,7 +91,7 @@ generate_cpp_scripts() {
 
 generate_python_scripts() {
     local script_name;
-    for script_name in "build" "clean"; do (
+    for script_name in "build" "clean" "wheel"; do (
         cat ${TMPL}/python-${script_name}.tmpl.sh        \
       | generate_script "${script_name}-${PY_LIB}-python";
     ) || true;
@@ -91,12 +114,13 @@ generate_scripts() {
       | xargs -r -d'\n' -I% echo -n local %\; \
     )";
 
-    declare -A name_to_path;
-    declare -A name_to_cpp_sub_dir;
+    declare -A cpp_name_to_path;
 
     local i;
     local j;
     local k;
+
+    local repo_name_all=()
 
     for ((i=0; i < ${repos_length:-0}; i+=1)); do
 
@@ -111,6 +135,8 @@ generate_scripts() {
 
         repo_name="$(tr "[:upper:]" "[:lower:]" <<< "${!repo_name:-}")";
 
+        repo_name_all+=($repo_name)
+
         # Generate a clone script for each repo
         (
             NAME="${repo_name:-}"             \
@@ -124,8 +150,6 @@ generate_scripts() {
 
         if [[ -d ~/"${!repo_path:-}/.git" ]]; then
 
-            name_to_path["${repo_name:-}"]="${!repo_path:-}";
-
             local cpp_libs=();
             local cpp_dirs=();
 
@@ -135,25 +159,23 @@ generate_scripts() {
                 local cpp_args="${repo}_cpp_${j}_args";
                 local cpp_sub_dir="${repo}_cpp_${j}_sub_dir";
                 local cpp_depends_length="${repo}_cpp_${j}_depends_length";
+                local cpp_path="${!repo_path:-}${!cpp_sub_dir:+/${!cpp_sub_dir}}";
 
+                cpp_dirs+=("${cpp_path}");
                 cpp_libs+=("${!cpp_name:-}");
-                cpp_dirs+=("${!repo_path:-}/${!cpp_sub_dir:-}");
                 cpp_name="$(tr "[:upper:]" "[:lower:]" <<< "${!cpp_name:-}")";
 
-                name_to_cpp_sub_dir["${cpp_name:-}"]="${!cpp_sub_dir:-}";
+                cpp_name_to_path["${cpp_name:-}"]="${cpp_path}";
 
                 local deps=();
 
                 for ((k=0; k < ${!cpp_depends_length:-0}; k+=1)); do
                     local dep="${repo}_cpp_${j}_depends_${k}";
-                    local dep_name=$(tr "[:upper:]" "[:lower:]" <<< "${!dep}");
-                    if ! test -v name_to_path["${dep_name}"]       \
-                    || ! test -v name_to_cpp_sub_dir["${dep_name}"]; then
+                    local dep_cpp_name=$(tr "[:upper:]" "[:lower:]" <<< "${!dep}");
+                    if ! test -v cpp_name_to_path["${dep_cpp_name}"]; then
                         continue;
                     fi
-                    local dep_path="${name_to_path["${dep_name}"]}";
-                    local dep_sub_dir="${name_to_cpp_sub_dir["${dep_name}"]}";
-                    local dep_cpp_path="${dep_path}${dep_sub_dir:+/$dep_sub_dir}";
+                    local dep_cpp_path="${cpp_name_to_path["${dep_cpp_name}"]}";
 
                     deps+=(-D${!dep}_ROOT=\"$(realpath -m ~/${dep_cpp_path}/build/latest)\");
                     deps+=(-D$(tr "[:upper:]" "[:lower:]" <<< "${!dep}")_ROOT=\"$(realpath -m ~/${dep_cpp_path}/build/latest)\");
@@ -219,22 +241,30 @@ generate_scripts() {
         \( -type d -exec chmod 0775 {} \; \
         -o -type f -exec chmod 0755 {} \; \);
 
-    unset name_to_path;
-    unset name_to_cpp_sub_dir;
+    unset cpp_name_to_path;
+
+    for script in "clone" "clean" "configure" "build"; do
+        # Generate a script to run a script for all repos
+        (
+            NAMES="${repo_name_all[@]}"       \
+            SCRIPT="${script}"                \
+            generate_all_script               ;
+        ) || true;
+    done;
 }
 
 if test -n "${rapids_build_utils_debug:-}"; then
     PS4="+ ${BASH_SOURCE[0]}:\${LINENO} "; set -x;
 fi
 
-(remove_script_for_pattern '^clone-[\w-_]+');
-(remove_script_for_pattern '^clean-[\w-_]+');
-(remove_script_for_pattern '^build-[\w-_]+');
-(remove_script_for_pattern '^configure-[\w-_]+');
-(remove_script_for_pattern '^build-[\w-_]+-cpp');
-(remove_script_for_pattern '^clean-[\w-_]+-cpp');
-(remove_script_for_pattern '^configure-[\w-_]+-cpp');
-(remove_script_for_pattern '^build-[\w-_]+-python');
-(remove_script_for_pattern '^clean-[\w-_]+-python');
+(remove_script_for_pattern '^clone-[\w-_\.]+');
+(remove_script_for_pattern '^clean-[\w-_\.]+');
+(remove_script_for_pattern '^build-[\w-_\.]+');
+(remove_script_for_pattern '^configure-[\w-_\.]+');
+(remove_script_for_pattern '^build-[\w-_\.]+-cpp');
+(remove_script_for_pattern '^clean-[\w-_\.]+-cpp');
+(remove_script_for_pattern '^configure-[\w-_\.]+-cpp');
+(remove_script_for_pattern '^build-[\w-_\.]+-python');
+(remove_script_for_pattern '^clean-[\w-_\.]+-python');
 
 (generate_scripts "$@");

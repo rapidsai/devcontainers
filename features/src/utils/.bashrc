@@ -36,5 +36,5 @@ fi
 
 # Default python startup file to `devcontainer-utils-python-repl-startup` script.
 if test -z "${PYTHONSTARTUP:-}"; then
-    export PYTHONSTARTUP="$(which devcontainer-utils-python-repl-startup)";
+    export PYTHONSTARTUP="/usr/bin/devcontainer-utils-python-repl-startup";
 fi

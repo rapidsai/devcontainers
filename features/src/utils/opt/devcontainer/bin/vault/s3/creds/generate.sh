@@ -37,7 +37,7 @@ generate_s3_creds() {
     local user_orgs="$(                              \
         gh api user/orgs --jq '.[].login'            \
             -H "Accept: application/vnd.github+json" \
-        | grep --color=never -E "(${allowed_orgs})"  \
+        | grep --color=never -iE "(${allowed_orgs})" \
     )";
 
     if test -z "${user_orgs:-}"; then

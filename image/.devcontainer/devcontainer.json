@@ -11,8 +11,8 @@
   "workspaceFolder": "/home/coder",
   "features": {
     "ghcr.io/devcontainers/features/common-utils:2": {
-      "uid": "1000",
-      "gid": "1000",
+      "userUid": "1000",
+      "userGid": "1000",
       "username": "coder",
       "installZsh": "true",
       "upgradePackages": "true"
@@ -41,5 +41,51 @@
     "./features/ninja",
     "./features/sccache",
     "./features/utils"
-  ]
+  ],
+  "updateContentCommand": [
+    "/bin/bash",
+    "-c",
+    "mkdir -m 0755 -p ~/.config/clangd && cp -n /etc/skel/.config/clangd/config.yaml ~/.config/clangd/config.yaml"
+  ],
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "llvm-vs-code-extensions.vscode-clangd",
+        "mutantdino.resourcemonitor",
+        "ms-vscode.cpptools",
+        "seaube.clangformat",
+        "tamasfe.even-better-toml"
+      ],
+      "settings": {
+        "C_Cpp.vcpkg.enabled": false,
+        "C_Cpp.formatting": "disabled",
+        "C_Cpp.autocomplete": "disabled",
+        "C_Cpp.errorSquiggles": "disabled",
+        "C_Cpp.intelliSenseEngine": "disabled",
+        "C_Cpp.configurationWarnings": "disabled",
+        "C_Cpp.autoAddFileAssociations": false,
+        "clang-format.fallbackStyle": "none",
+        "files.associations": {
+          "*.cu": "cuda-cpp",
+          "*.cuh": "cuda-cpp",
+          "**/libcudacxx/include/**/*": "cpp",
+          "**/libcudacxx-src/include/**/*": "cpp"
+        },
+        "files.watcherExclude": {
+          "**/build/**": true,
+          "**/_skbuild/**": true,
+          "**/target/**": true
+        },
+        "[c]": {
+          "editor.defaultFormatter": "seaube.clangformat"
+        },
+        "[cpp]": {
+          "editor.defaultFormatter": "seaube.clangformat"
+        },
+        "[cuda-cpp]": {
+          "editor.defaultFormatter": "seaube.clangformat"
+        }
+      }
+    }
+  }
 }

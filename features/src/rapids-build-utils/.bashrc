@@ -1,6 +1,6 @@
 export CONDA_ALWAYS_YES="true";
-export CC="${CC:-"$(which gcc)"}";
-export CXX="${CXX:-"$(which g++)"}";
+export CC="${CC:-"/usr/bin/gcc"}";
+export CXX="${CXX:-"/usr/bin/g++"}";
 export CUDAARCHS="${CUDAARCHS:-all-major}";
 export CUDAHOSTCXX="${CUDAHOSTCXX:-"${CXX}"}";
 export CMAKE_BUILD_TYPE="${CMAKE_BUILD_TYPE:-Release}";

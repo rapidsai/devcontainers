@@ -44,7 +44,7 @@ store_s3_creds() {
     local aws_secret_access_key=;
 
     eval "$(                                  \
-        devcontainer-utils-parse-args --names "
+        devcontainer-utils-parse-args --names '
             stamp                             |
             bucket                            |
             region                            |
@@ -53,8 +53,8 @@ store_s3_creds() {
             no_credentials                    |
             aws_access_key_id                 |
             aws_session_token                 |
-            aws_secret_access_key"            \
-            - <&0                             \
+            aws_secret_access_key             |
+        ' - <&0                               \
       | xargs -r -d'\n' -I% echo -n local %\; \
     )";
 

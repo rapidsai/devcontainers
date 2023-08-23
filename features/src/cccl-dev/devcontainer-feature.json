@@ -1,10 +1,10 @@
 {
-  "name": "python-lit testing framework",
-  "id": "python-lit",
-  "version": "23.10.0",
-  "description": "A feature to install python-lit",
+  "name": "NVIDIA CCCL development utilities",
+  "id": "cccl-dev",
+  "version": "23.10.1",
+  "description": "A feature to install NVIDIA CCCL development utilities",
   "options": {
-    "version": {
+    "litVersion": {
       "type": "string",
       "proposals": [
         "latest",

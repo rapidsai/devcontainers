@@ -95,14 +95,10 @@ jobs:
           hashes=();
 
           for arch in "amd64" "arm64"; do
-            # Load and push the linux/$arch image and read its local hash
-            hash="$(docker load --input "${{ runner.temp }}/${arch}.tar" | tail -n1 | cut -d':' -f3)";
-            # Tag the loaded image with the final name
-            docker image tag ${hash} ${name};
-            # Push the local image to the registry to get its remote hash
-            hash="$(docker push ${name} | tail -n1 | cut -d' ' -f3)";
-            # Save the remote hash for use below
-            hashes+=("$hash");
+            # Load the arch-specific image with the final name
+            docker load --input "${{ runner.temp }}/${arch}.tar";
+            # Push the local image to the registry and save the remote hash
+            hashes+=("$(docker push ${name} | tail -n1 | cut -d' ' -f3)");
           done
 
           # Create and push the multiarch manifest

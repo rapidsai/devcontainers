@@ -1,5 +1,5 @@
 #! /usr/bin/env bash
-set -ex
+set -e
 
 # Intel only publishes its compilers for x86
 if [[ "$(uname -p)" != "x86_64" ]]; then

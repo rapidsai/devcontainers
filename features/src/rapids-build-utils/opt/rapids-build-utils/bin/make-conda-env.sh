@@ -13,14 +13,11 @@ make_conda_env() {
                "$HOME/.conda/envs/${env_file_name}";
     fi
 
-    local cuda_version="${CUDA_VERSION:-${CUDA_VERSION_MAJOR}.${CUDA_VERSION_MINOR}}";
-    cuda_version="$(echo "${cuda_version}" | cut -d'.' -f3 --complement)";
+    local cuda_version="${CUDA_VERSION:-${CUDA_VERSION_MAJOR:-12}.${CUDA_VERSION_MINOR:-0}}";
+    cuda_version="$(cut -d'.' -f3 --complement <<< "${cuda_version}")";
 
-    local python_version="${PYTHON_VERSION:-}";
-
-    if [ -z "${python_version}" ]; then
-        python_version="$(python3 --version 2>&1 | cut -d' ' -f2 | cut -d'.' -f3 --complement)";
-    fi
+    local python_version="${PYTHON_VERSION:-$(python3 --version 2>&1 | cut -d' ' -f2)}";
+    python_version="$(cut -d'.' -f3 --complement <<< "${python_version}")";
 
     local new_env_path="$(realpath -m /tmp/${env_file_name})";
     local old_env_path="$(realpath -m ~/.conda/envs/${env_file_name})";
@@ -31,7 +28,7 @@ make_conda_env() {
     for lib in $(find ~ -maxdepth 1 -mindepth 1 -type d ! -name '.*' -exec basename {} \;); do
         if [ -f ~/"${lib}/dependencies.yaml" ]; then
             conda_env_yamls+=("/tmp/${lib}.yaml");
-            conda_noinstall+=($(rapids-python-conda-pkg-names "${lib}"));
+            conda_noinstall+=("$(rapids-python-conda-pkg-names "${lib}")");
             /opt/conda/bin/rapids-dependency-file-generator \
                 --file_key all \
                 --output conda \
@@ -41,42 +38,48 @@ make_conda_env() {
         fi
     done
 
-    # Generate a combined conda env yaml file.
-    /opt/conda/bin/conda-merge ${conda_env_yamls[@]} \
-      | grep -v '^name:' \
-      | grep -v -P '^(.*?)\-(.*?)rapids-(.*?)$' \
-      | grep -v -P '^(.*?)\-(.*?)(\.git\@[^(main|master)])(.*?)$' \
-      | grep -v -P "^(.*?)\-(.*?)($(rapids-join-strings "|" ${conda_noinstall[@]}))(=.*|>.*|<.*)?$" \
-    > "${new_env_path}";
+    if test ${#conda_env_yamls[@]} -gt 0; then
 
-    rm ${conda_env_yamls[@]};
+        # Generate a combined conda env yaml file.
+        /opt/conda/bin/conda-merge ${conda_env_yamls[@]} \
+          | grep -v '^name:' \
+          | grep -v -P '^(.*?)\-(.*?)rapids-(.*?)$' \
+          | grep -v -P '^(.*?)\-(.*?)(\.git\@[^(main|master)])(.*?)$' \
+          | grep -v -P "^(.*?)\-(.*?)($(rapids-join-strings "|" ${conda_noinstall[@]}))(=.*|>.*|<.*)?$" \
+        > "${new_env_path}";
 
-    # If the conda env doesn't exist, make one
-    if ! conda info -e | grep -qE "^${env_name} "; then
-        echo -e "Creating '${env_name}' conda environment\n" 1>&2;
-        echo -e "Environment (${env_file_name}):\n" 1>&2;
-        cat "${new_env_path}";
-        echo "";
-
-        mamba env create -n "${env_name}" -f "${new_env_path}";
-    # If the conda env does exist but it's different from the generated one,
-    # print the diff between the envs and update it
-    elif ! diff -BNqw "${old_env_path}" "${new_env_path}" >/dev/null 2>&1; then
-        echo -e "Updating '${env_name}' conda environment\n" 1>&2;
-        echo -e "Environment (${env_file_name}):\n" 1>&2;
-
-        # Print the diff to the console for debugging
-        [ ! -f "${old_env_path}" ]                         \
-         && cat "${new_env_path}"                          \
-         || diff -BNyw "${old_env_path}" "${new_env_path}" \
-         || true                                           \
-         && echo "";
-
-        # Update the current conda env + prune libs that were removed
-        mamba env update -n "${env_name}" -f "${new_env_path}" --prune;
+        rm ${conda_env_yamls[@]};
     fi
 
-    cp -a "${new_env_path}" "${old_env_path}";
+    if test -f "${new_env_path}"; then
+
+        # If the conda env doesn't exist, make one
+        if ! conda info -e | grep -qE "^${env_name} "; then
+            echo -e "Creating '${env_name}' conda environment\n" 1>&2;
+            echo -e "Environment (${env_file_name}):\n" 1>&2;
+            cat "${new_env_path}";
+            echo "";
+
+            mamba env create -n "${env_name}" -f "${new_env_path}";
+        # If the conda env does exist but it's different from the generated one,
+        # print the diff between the envs and update it
+        elif ! diff -BNqw "${old_env_path}" "${new_env_path}" >/dev/null 2>&1; then
+            echo -e "Updating '${env_name}' conda environment\n" 1>&2;
+            echo -e "Environment (${env_file_name}):\n" 1>&2;
+
+            # Print the diff to the console for debugging
+            [ ! -f "${old_env_path}" ]                         \
+             && cat "${new_env_path}"                          \
+             || diff -BNyw "${old_env_path}" "${new_env_path}" \
+             || true                                           \
+             && echo "";
+
+            # Update the current conda env + prune libs that were removed
+            mamba env update -n "${env_name}" -f "${new_env_path}" --prune;
+        fi
+
+        cp -a "${new_env_path}" "${old_env_path}";
+    fi
 }
 
 . /opt/conda/etc/profile.d/conda.sh;
@@ -84,5 +87,4 @@ make_conda_env() {
 
 (make_conda_env "${DEFAULT_CONDA_ENV:-rapids}" "$@");
 
-conda activate "${DEFAULT_CONDA_ENV:-rapids}";
-# conda activate "${DEFAULT_CONDA_ENV:-rapids}" 2>/dev/null;
+. /etc/profile.d/*-mambaforge.sh;
