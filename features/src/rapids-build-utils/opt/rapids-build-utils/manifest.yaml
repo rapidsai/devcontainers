@@ -2,7 +2,6 @@ x-git-defaults: &git_defaults
     host: github
     tag: branch-23.10
     upstream: rapidsai
-
 - name: rmm
   path: rmm
   cpp:
@@ -16,7 +15,6 @@ x-git-defaults: &git_defaults
   git:
     repo: rmm
     <<: *git_defaults
-
 - name: kvikio
   path: kvikio
   cpp:
@@ -30,7 +28,6 @@ x-git-defaults: &git_defaults
   git:
     repo: kvikio
     <<: *git_defaults
-
 - name: cudf
   path: cudf
   cpp:
@@ -43,14 +40,19 @@ x-git-defaults: &git_defaults
   python:
     - name: cudf
       sub_dir: python/cudf
-      depends: []
+      depends: [rmm]
     - name: dask_cudf
       sub_dir: python/dask_cudf
-      depends: []
+      depends: [cudf]
+    - name: cudf_kafka
+      sub_dir: python/cudf_kafka
+      depends: [cudf]
+    - name: custreamz
+      sub_dir: python/custreamz
+      depends: [cudf, cudf_kafka]
   git:
     repo: cudf
     <<: *git_defaults
-
 - name: raft
   path: raft
   cpp:
@@ -60,14 +62,13 @@ x-git-defaults: &git_defaults
   python:
     - name: pylibraft
       sub_dir: python/pylibraft
-      depends: []
+      depends: [rmm]
     - name: raft-dask
       sub_dir: python/raft-dask
-      depends: []
+      depends: [pylibraft]
   git:
     repo: raft
     <<: *git_defaults
-
 - name: cumlprims_mg
   path: cumlprims_mg
   cpp:
@@ -77,7 +78,6 @@ x-git-defaults: &git_defaults
   git:
     repo: cumlprims_mg
     <<: *git_defaults
-
 - name: cuml
   path: cuml
   cpp:
@@ -87,11 +87,10 @@ x-git-defaults: &git_defaults
   python:
     - name: cuml
       sub_dir: python
-      depends: []
+      depends: [rmm, cudf, dask-cudf, pylibraft, raft-dask]
   git:
     repo: cuml
     <<: *git_defaults
-
 - name: cugraph-ops
   path: cugraph-ops
   cpp:
@@ -101,10 +100,16 @@ x-git-defaults: &git_defaults
     - name: cugraph-ops-internal
       sub_dir: cpp_internal
       depends: [rmm, raft, cugraph-ops]
+  python:
+    - name: pylibcugraphops
+      sub_dir: pylibcugraphops
+      depends: []
+    - name: pylibcugraphops-internal
+      sub_dir: pylibcugraphops_internal
+      depends: [pylibcugraphops]
   git:
     repo: cugraph-ops
     <<: *git_defaults
-
 - name: cugraph
   path: cugraph
   cpp:
@@ -114,7 +119,7 @@ x-git-defaults: &git_defaults
   python:
     - name: cugraph
       sub_dir: python/cugraph
-      depends: []
+      depends: [pylibraft, pylibcugraph]
     - name: cugraph-dgl
       sub_dir: python/cugraph-dgl
       depends: []
@@ -132,11 +137,10 @@ x-git-defaults: &git_defaults
       depends: []
     - name: pylibcugraph
       sub_dir: python/pylibcugraph
-      depends: []
+      depends: [rmm, pylibraft]
   git:
     repo: cugraph
     <<: *git_defaults
-
 - name: cuspatial
   path: cuspatial
   cpp:
@@ -146,10 +150,10 @@ x-git-defaults: &git_defaults
   python:
     - name: cuproj
       sub_dir: python/cuproj
-      depends: []
+      depends: [rmm]
     - name: cuspatial
       sub_dir: python/cuspatial
-      depends: []
+      depends: [rmm, cudf]
   git:
     repo: cuspatial
     <<: *git_defaults
