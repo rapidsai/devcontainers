@@ -1,5 +1,5 @@
 #! /usr/bin/env bash
-set -ex
+set -e
 
 NINJA_VERSION="${VERSION:-latest}";
 
@@ -35,8 +35,10 @@ if ! type cmake >/dev/null 2>&1; then
     CMAKE_VERSION=latest;
     find_version_from_git_tags CMAKE_VERSION https://github.com/Kitware/CMake;
 
-    wget --no-hsts -q -O /tmp/cmake_${CMAKE_VERSION}.sh \
-        https://github.com/Kitware/CMake/releases/download/v${CMAKE_VERSION}/cmake-${CMAKE_VERSION}-linux-$(uname -p).sh;
+    while ! wget --no-hsts -q -O /tmp/cmake_${CMAKE_VERSION}.sh https://github.com/Kitware/CMake/releases/download/v${CMAKE_VERSION}/cmake-${CMAKE_VERSION}-linux-$(uname -p).sh; do
+        echo "(!) cmake version ${CMAKE_VERSION} failed to download. Attempting to fall back one version to retry...";
+        find_prev_version_from_git_tags CMAKE_VERSION https://github.com/Kitware/CMake;
+    done
 
     echo "Installing CMake...";
 

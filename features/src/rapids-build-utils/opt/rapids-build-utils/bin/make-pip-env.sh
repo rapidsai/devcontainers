@@ -13,7 +13,7 @@ make_pip_env() {
                "$HOME/.local/share/venvs/${env_file_name}";
     fi
 
-    local cuda_version="${CUDA_VERSION:-${CUDA_VERSION_MAJOR}.${CUDA_VERSION_MINOR}}";
+    local cuda_version="${CUDA_VERSION:-${CUDA_VERSION_MAJOR:-12}.${CUDA_VERSION_MINOR:-0}}";
     cuda_version="$(cut -d'.' -f3 --complement <<< "${cuda_version}")";
 
     local python_version="${PYTHON_VERSION:-$(python3 --version 2>&1 | cut -d' ' -f2)}";
@@ -34,11 +34,15 @@ make_pip_env() {
         if [ -f ~/"${lib}/dependencies.yaml" ]; then
             pip_reqs_txts+=("/tmp/${lib}.requirements.txt");
 
-            for pkg in "$(rapids-python-pkg-names "${lib}")"; do
+            for pkg in $(rapids-python-pkg-names "${lib}") $(rapids-python-conda-pkg-names "${lib}"); do
                 pip_noinstall+=("${pkg}" "${pkg}-cu.*");
+                if test -z "${pkg##*"-"*}"; then
+                    pip_noinstall+=("${pkg//"-"/"_"}" "${pkg//"-"/"_"}-cu.*")
+                fi
+                if test -z "${pkg##*"_"*}"; then
+                    pip_noinstall+=("${pkg//"_"/"-"}" "${pkg//"_"/"-"}-cu.*")
+                fi
             done
-
-            pip_noinstall+=("$(rapids-python-conda-pkg-names "${lib}")");
 
             rapids-dependency-file-generator \
                 --file_key py_build_${lib}   \
@@ -59,6 +63,7 @@ make_pip_env() {
     done
 
     if test ${#pip_reqs_txts[@]} -gt 0; then
+        pip_noinstall=($(echo -n "${pip_noinstall[@]}" | xargs -r -n1 -d' ' | sort -su | tr '\n' ' '));
         # Generate a combined requirements.txt file
         cat ${pip_reqs_txts[@]} \
           | grep -v -P "^($(rapids-join-strings "|" ${pip_noinstall[@]}))==.*$" \
@@ -103,4 +108,6 @@ make_pip_env() {
 
 (make_pip_env "${DEFAULT_VIRTUAL_ENV:-rapids}" "$@");
 
-. ~/.local/share/venvs/${DEFAULT_VIRTUAL_ENV:-rapids}/bin/activate;
+if test -f ~/.local/share/venvs/${DEFAULT_VIRTUAL_ENV:-rapids}/bin/activate; then
+    . ~/.local/share/venvs/${DEFAULT_VIRTUAL_ENV:-rapids}/bin/activate;
+fi
