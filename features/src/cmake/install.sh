@@ -15,10 +15,13 @@ echo "Downloading CMake...";
 
 if [[ "${CMAKE_VERSION}" == "latest" ]]; then
     find_version_from_git_tags CMAKE_VERSION https://github.com/Kitware/CMake;
+    while ! wget --no-hsts -q -O /tmp/cmake_${CMAKE_VERSION}.sh https://github.com/Kitware/CMake/releases/download/v${CMAKE_VERSION}/cmake-${CMAKE_VERSION}-linux-$(uname -p).sh; do
+        echo "(!) cmake version ${CMAKE_VERSION} failed to download. Attempting to fall back one version to retry...";
+        find_prev_version_from_git_tags CMAKE_VERSION https://github.com/Kitware/CMake;
+    done
+else
+    wget --no-hsts -q -O /tmp/cmake_${CMAKE_VERSION}.sh https://github.com/Kitware/CMake/releases/download/v${CMAKE_VERSION}/cmake-${CMAKE_VERSION}-linux-$(uname -p).sh;
 fi
-
-wget --no-hsts -q -O /tmp/cmake_${CMAKE_VERSION}.sh \
-    https://github.com/Kitware/CMake/releases/download/v${CMAKE_VERSION}/cmake-${CMAKE_VERSION}-linux-$(uname -p).sh;
 
 echo "Installing CMake...";
 
