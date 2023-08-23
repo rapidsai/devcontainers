@@ -63,6 +63,9 @@ repos:
     - name: cudf
       sub_dir: cpp
       depends: [fmt, rmm, KvikIO]
+    - name: cudf_kafka
+      sub_dir: cpp/libcudf_kafka
+      depends: [rmm, KvikIO, cudf]
   python:
     - name: cudf
       sub_dir: python/cudf
