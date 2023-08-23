@@ -42,6 +42,11 @@
     "./features/sccache",
     "./features/utils"
   ],
+  "updateContentCommand": [
+    "/bin/bash",
+    "-c",
+    "mkdir -m 0755 -p ~/.config/clangd && cp -n /etc/skel/.config/clangd/config.yaml ~/.config/clangd/config.yaml"
+  ],
   "customizations": {
     "vscode": {
       "extensions": [
