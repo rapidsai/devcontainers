@@ -46,8 +46,6 @@ ________EOF
 )";
     fi
 
-    # yq is slow, so consider caching the json in a file (/tmp/rapids-manifest.yaml),
-    # using only if tmp file is newer than main manifest
     yq -Mo json "${manifest}" | jq -r "${query}";
 }
 
