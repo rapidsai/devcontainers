@@ -34,11 +34,11 @@ make_pip_env() {
         if [ -f ~/"${lib}/dependencies.yaml" ]; then
             pip_reqs_txts+=("/tmp/${lib}.requirements.txt");
 
-            for pkg in "$(rapids-python-pkg-names "${lib}")"; do
+            for pkg in $(rapids-python-pkg-names "${lib}"); do
                 pip_noinstall+=("${pkg}" "${pkg}-cu.*");
             done
 
-            pip_noinstall+=("$(rapids-python-conda-pkg-names "${lib}")");
+            pip_noinstall+=($(rapids-python-conda-pkg-names "${lib}"));
 
             rapids-dependency-file-generator \
                 --file_key py_build_${lib}   \
@@ -59,6 +59,7 @@ make_pip_env() {
     done
 
     if test ${#pip_reqs_txts[@]} -gt 0; then
+        echo "pip_noinstall='${pip_noinstall[@]}'";
         # Generate a combined requirements.txt file
         cat ${pip_reqs_txts[@]} \
           | grep -v -P "^($(rapids-join-strings "|" ${pip_noinstall[@]}))==.*$" \
