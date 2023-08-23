@@ -87,5 +87,4 @@ make_conda_env() {
 
 (make_conda_env "${DEFAULT_CONDA_ENV:-rapids}" "$@");
 
-conda activate "${DEFAULT_CONDA_ENV:-rapids}";
-# conda activate "${DEFAULT_CONDA_ENV:-rapids}" 2>/dev/null;
+. /etc/profile.d/*-mambaforge.sh;

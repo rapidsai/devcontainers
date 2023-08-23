@@ -103,4 +103,6 @@ make_pip_env() {
 
 (make_pip_env "${DEFAULT_VIRTUAL_ENV:-rapids}" "$@");
 
-. ~/.local/share/venvs/${DEFAULT_VIRTUAL_ENV:-rapids}/bin/activate;
+if test -f ~/.local/share/venvs/${DEFAULT_VIRTUAL_ENV:-rapids}/bin/activate; then
+    . ~/.local/share/venvs/${DEFAULT_VIRTUAL_ENV:-rapids}/bin/activate;
+fi
