@@ -16,7 +16,6 @@
     "./features/rapids-build-utils"
   ],
   "initializeCommand": ["/bin/bash", "-c", "mkdir -m 0755 -p ${localWorkspaceFolder}/../.{aws,cache,config,conda/pkgs,conda/${localWorkspaceFolderBasename}-cuda12.0-envs} ${localWorkspaceFolder}/../{rmm,kvikio,cudf,raft,cumlprims_mg,cuml,cugraph-ops,cugraph,cuspatial}"],
-  "updateContentCommand": ["/bin/bash", "-c", "mkdir -m 0755 -p ~/.config/clangd && cp -n /etc/skel/.config/clangd/config.yaml ~/.config/clangd/config.yaml"],
   "postAttachCommand": ["/bin/bash", "-c", "if [ ${CODESPACES:-false} = 'true' ]; then . devcontainer-utils-post-attach-command; . rapids-post-attach-command; fi"],
   "workspaceFolder": "/home/coder",
   "workspaceMount": "source=${localWorkspaceFolder},target=/home/coder/devcontainers,type=bind,consistency=consistent",
