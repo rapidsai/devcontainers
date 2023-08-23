@@ -1,12 +1,12 @@
 {
   "[json]": {
     "editor.tabSize": 2,
-    "editor.formatOnSave": true,
+    "editor.formatOnSave": false,
     "editor.formatOnSaveMode": "file",
   },
   "[jsonc]": {
     "editor.tabSize": 2,
-    "editor.formatOnSave": true,
+    "editor.formatOnSave": false,
     "editor.formatOnSaveMode": "file"
   },
   "files.associations": {
