@@ -3,38 +3,12 @@ x-git-defaults: &git_defaults
     tag: branch-23.10
     upstream: rapidsai
 
-repos:
-- name: cupy
-  path: cupy
-  cpp:
-  python:
-    - name: cupy
-      sub_dir: ""
-      depends: []
-  git:
-    repo: cupy
-    <<: *git_defaults
-    tag: "v12.2.0"
-    upstream: cupy
-
-- name: fmt
-  path: fmt
-  cpp:
-    - name: fmt
-      subdir: ""
-      depends: []
-  git:
-    repo: fmt
-    <<: *git_defaults
-    tag: "9.1.0"
-    upstream: fmtlib
-
 - name: rmm
   path: rmm
   cpp:
     - name: rmm
       sub_dir: ""
-      depends: [fmt]
+      depends: []
   python:
     - name: rmm
       sub_dir: python
@@ -62,10 +36,10 @@ repos:
   cpp:
     - name: cudf
       sub_dir: cpp
-      depends: [fmt, rmm, KvikIO]
+      depends: [rmm, KvikIO]
     - name: cudf_kafka
       sub_dir: cpp/libcudf_kafka
-      depends: [rmm, KvikIO, cudf]
+      depends: [KvikIO, cudf]
   python:
     - name: cudf
       sub_dir: python/cudf
@@ -109,11 +83,11 @@ repos:
   cpp:
     - name: cuml
       sub_dir: cpp
-      depends: [fmt, rmm, raft, cumlprims_mg]
+      depends: [rmm, raft, cumlprims_mg]
   python:
     - name: cuml
       sub_dir: python
-      depends: [fmt]
+      depends: []
   git:
     repo: cuml
     <<: *git_defaults
