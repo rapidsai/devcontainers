@@ -110,6 +110,18 @@ repos:
     - name: cuml
       sub_dir: cpp
       depends: [fmt, rmm, raft, cumlprims_mg]
+      args: |
+        -DSINGLEGPU=OFF
+        -DDETECT_CONDA_ENV=OFF
+        -DBUILD_CUML_C_LIBRARY=OFF
+        -DBUILD_CUML_CPP_LIBRARY=ON
+        -DBUILD_CUML_EXAMPLES=OFF
+        -DBUILD_CUML_TESTS=OFF
+        -DBUILD_PRIMS_TESTS=OFF
+        -DBUILD_CUML_BENCH=OFF
+        -DBUILD_CUML_PRIMS_BENCH=OFF
+        -DCUML_RAFT_CLONE_ON_PIN=OFF
+        -DDISABLE_DEPRECATION_WARNINGS=ON
   python:
     - name: cuml
       sub_dir: python
