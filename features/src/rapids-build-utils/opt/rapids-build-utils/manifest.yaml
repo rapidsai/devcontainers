@@ -4,11 +4,40 @@ x-git-defaults: &git_defaults
     upstream: rapidsai
 
 repos:
+- name: cupy
+  path: cupy
+  cpp:
+  python:
+    - name: cupy
+      sub_dir: ""
+      depends: []
+  git:
+    repo: cupy
+    <<: *git_defaults
+    tag: "v12.2.0"
+    upstream: cupy
+
+- name: fmt
+  path: fmt
+  cpp:
+    - name: fmt
+      subdir: ""
+      depends: []
+  git:
+    repo: fmt
+    <<: *git_defaults
+    tag: "9.1.0"
+    upstream: fmtlib
+
 - name: rmm
   path: rmm
   cpp:
     - name: rmm
       sub_dir: ""
+      depends: [fmt]
+  python:
+    - name: rmm
+      sub_dir: python
       depends: []
   git:
     repo: rmm
@@ -20,6 +49,10 @@ repos:
     - name: KvikIO
       sub_dir: cpp
       depends: []
+  python:
+    - name: kvikio
+      sub_dir: python
+      depends: []
   git:
     repo: kvikio
     <<: *git_defaults
@@ -29,10 +62,14 @@ repos:
   cpp:
     - name: cudf
       sub_dir: cpp
-      depends: [rmm, KvikIO]
-    - name: cudf_kafka
-      sub_dir: cpp/libcudf_kafka
-      depends: [rmm, KvikIO, cudf]
+      depends: [fmt, rmm, KvikIO]
+  python:
+    - name: cudf
+      sub_dir: python/cudf
+      depends: []
+    - name: dask_cudf
+      sub_dir: python/dask_cudf
+      depends: []
   git:
     repo: cudf
     <<: *git_defaults
@@ -43,6 +80,13 @@ repos:
     - name: raft
       sub_dir: cpp
       depends: [rmm]
+  python:
+    - name: pylibraft
+      sub_dir: python/pylibraft
+      depends: []
+    - name: raft-dask
+      sub_dir: python/raft-dask
+      depends: []
   git:
     repo: raft
     <<: *git_defaults
@@ -62,7 +106,12 @@ repos:
   cpp:
     - name: cuml
       sub_dir: cpp
-      depends: [rmm, raft, cumlprims_mg]
+      depends: [fmt, rmm, raft, cumlprims_mg]
+      args: "-DSINGLEGPU=OFF -DDETECT_CONDA_ENV=OFF -DBUILD_CUML_C_LIBRARY=OFF -DBUILD_CUML_CPP_LIBRARY=ON -DBUILD_CUML_EXAMPLES=OFF -DBUILD_CUML_TESTS=OFF -DBUILD_PRIMS_TESTS=OFF -DBUILD_CUML_BENCH=OFF -DBUILD_CUML_PRIMS_BENCH=OFF -DCUML_RAFT_CLONE_ON_PIN=OFF -DDISABLE_DEPRECATION_WARNINGS=ON"
+  python:
+    - name: cuml
+      sub_dir: python
+      depends: [fmt]
   git:
     repo: cuml
     <<: *git_defaults
@@ -86,6 +135,28 @@ repos:
     - name: cugraph
       sub_dir: cpp
       depends: [rmm, raft, cugraph-ops]
+  python:
+    - name: cugraph
+      sub_dir: python/cugraph
+      depends: []
+    - name: cugraph-dgl
+      sub_dir: python/cugraph-dgl
+      depends: []
+    - name: cugraph-nx
+      sub_dir: python/cugraph-nx
+      depends: []
+    - name: cugraph-pyg
+      sub_dir: python/cugraph-pyg
+      depends: []
+    - name: server
+      sub_dir: python/cugraph-service/client
+      depends: []
+    - name: client
+      sub_dir: python/cugraph-service/server
+      depends: []
+    - name: pylibcugraph
+      sub_dir: python/pylibcugraph
+      depends: []
   git:
     repo: cugraph
     <<: *git_defaults
@@ -96,6 +167,13 @@ repos:
     - name: cuspatial
       sub_dir: cpp
       depends: [rmm, cudf]
+  python:
+    - name: cuproj
+      sub_dir: python/cuproj
+      depends: []
+    - name: cuspatial
+      sub_dir: python/cuspatial
+      depends: []
   git:
     repo: cuspatial
     <<: *git_defaults
