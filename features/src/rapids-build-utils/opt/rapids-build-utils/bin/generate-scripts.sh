@@ -210,10 +210,8 @@ generate_scripts() {
                 deps+=(-D$(tr "[:lower:]" "[:upper:]" <<< "${cpp_lib}")_ROOT=\"$(realpath -m ~/${cpp_dir}/build/latest)\");
             done
 
-            # local py_libs=($(rapids-python-pkg-names "${!repo_path:-}" | tr "[:upper:]" "[:lower:]"));
-            # local py_dirs=($(rapids-python-pkg-roots "${!repo_path:-}"));
-            py_libs=()
-            py_dirs=()
+            local py_libs=()
+            local py_dirs=()
 
             for ((j=0; j < ${!py_length:-0}; j+=1)); do
                 local py_name="${repo}_python_${j}_name";
