@@ -13,7 +13,7 @@ make_conda_env() {
                "$HOME/.conda/envs/${env_file_name}";
     fi
 
-    local cuda_version="${CUDA_VERSION:-${CUDA_VERSION_MAJOR}.${CUDA_VERSION_MINOR}}";
+    local cuda_version="${CUDA_VERSION:-${CUDA_VERSION_MAJOR:-12}.${CUDA_VERSION_MINOR:-0}}";
     cuda_version="$(cut -d'.' -f3 --complement <<< "${cuda_version}")";
 
     local python_version="${PYTHON_VERSION:-$(python3 --version 2>&1 | cut -d' ' -f2)}";
