@@ -1,4 +1,4 @@
-name: Build and push devcontainer images
+name: Build and push linux devcontainer images
 
 on:
   workflow_call:
@@ -23,14 +23,14 @@ on:
 jobs:
 
   build-and-upload:
-    name: Build and upload
+    name: Build and upload (${{ matrix.arch }})
     runs-on: ${{ fromJSON(github.repository != 'rapidsai/devcontainers' && '"ubuntu-latest"' || format('"linux-{0}-cpu4"', matrix.arch)) }}
-    outputs:
-      tag: ${{ steps.json.outputs.tag }}
     strategy:
       fail-fast: false
       matrix:
         arch: [amd64, arm64]
+    outputs:
+      tag: ${{ steps.json.outputs.tag }}
     steps:
       - name: Checkout ${{ github.repository }}
         uses: actions/checkout@v3
@@ -46,8 +46,7 @@ jobs:
           features: "${{ inputs.features }}"
           container_env: "${{ inputs.container_env }}"
 
-      - id: build
-        name: Build ${{ steps.json.outputs.tag }}-${{ matrix.arch }}
+      - name: Build ${{ steps.json.outputs.tag }}-${{ matrix.arch }}
         uses: ./.github/actions/build-linux-image
         with:
           arch: "${{ matrix.arch }}"

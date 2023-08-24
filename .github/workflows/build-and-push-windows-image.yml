@@ -1,4 +1,4 @@
-name: Build and test devcontainer images
+name: Build and push windows devcontainer images
 
 on:
   workflow_call:
@@ -22,8 +22,8 @@ on:
 
 jobs:
 
-  build-and-test-windows:
-    name: Build and test (${{ matrix.edition }})
+  build-and-push:
+    name: Build and push (${{ matrix.edition }})
     runs-on: ${{ matrix.runner }}
     strategy:
       fail-fast: false
@@ -31,6 +31,8 @@ jobs:
         include:
           - { runner: windows-2019, edition: "2019" }
           - { runner: windows-2022, edition: "2022" }
+    outputs:
+      tag: ${{ steps.info.outputs.tag }}
     steps:
       - name: Checkout ${{ github.repository }}
         uses: actions/checkout@v3
@@ -73,3 +75,14 @@ jobs:
           repo: "${{ steps.info.outputs.repo }}"
           version: "${{ steps.info.outputs.version }}"
           edition: "${{ matrix.edition }}"
+
+      - name: Login to Docker Hub
+        uses: docker/login-action@v2
+        with:
+          username: ${{ secrets.GPUCIBOT_DOCKERHUB_USER }}
+          password: ${{ secrets.GPUCIBOT_DOCKERHUB_TOKEN }}
+
+      - name: Push ${{ steps.info.outputs.tag }}
+        shell: powershell
+        run: |
+          docker push ${{ steps.info.outputs.repo }}:${{ steps.info.outputs.tag }}

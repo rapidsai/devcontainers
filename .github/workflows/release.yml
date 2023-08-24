@@ -47,16 +47,16 @@ jobs:
       container_env: "${{ toJSON(matrix.env) }}"
       repo: "${{ vars.DOCKERHUB_REPOSITORY || github.repository }}"
 
-  # build-and-push-windows-images:
-  #   name: ${{ matrix.name }}
-  #   needs: image-matrix
-  #   secrets: inherit
-  #   uses: ./.github/workflows/build-and-push-windows-image.yml
-  #   strategy:
-  #     fail-fast: false
-  #     matrix: ${{ fromJSON(needs.image-matrix.outputs.windows) }}
-  #   with:
-  #     os : "${{ matrix.os }}"
-  #     features: "${{ toJSON(matrix.features) }}"
-  #     container_env: "${{ toJSON(matrix.env) }}"
-  #     repo: "${{ vars.DOCKERHUB_REPOSITORY || github.repository }}"
+  build-and-push-windows-images:
+    name: ${{ matrix.name }}
+    needs: image-matrix
+    secrets: inherit
+    uses: ./.github/workflows/build-and-push-windows-image.yml
+    strategy:
+      fail-fast: false
+      matrix: ${{ fromJSON(needs.image-matrix.outputs.windows) }}
+    with:
+      os : "${{ matrix.os }}"
+      features: "${{ toJSON(matrix.features) }}"
+      container_env: "${{ toJSON(matrix.env) }}"
+      repo: "${{ vars.DOCKERHUB_REPOSITORY || github.repository }}"
