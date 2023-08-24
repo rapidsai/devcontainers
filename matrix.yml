@@ -75,24 +75,23 @@ include:
 
 - os: "windows"
   images:
-  - {features: [*cuda_prev_min, { name: "cl", version: "14.14" }]}
-  - {features: [*cuda_prev_min, { name: "cl", version: "14.15" }]}
-  - {features: [*cuda_prev_min, { name: "cl", version: "14.16" }]}
-  - {features: [*cuda_prev_min, { name: "cl", version: "14.27" }]}
-  - {features: [*cuda_prev_min, { name: "cl", version: "14.28" }]}
-  - {features: [*cuda_prev_min, { name: "cl", version: "14.29" }]}
-  - {features: [*cuda_prev_min, { name: "cl", version: "14.34" }]}
-  - {features: [*cuda_prev_min, { name: "cl", version: "14.35" }]}
-  - {features: [*cuda_prev_min, { name: "cl", version: "14.36" }]}
-  - {features: [*cuda_curr_max, { name: "cl", version: "14.14" }]}
-  - {features: [*cuda_curr_max, { name: "cl", version: "14.15" }]}
-  - {features: [*cuda_curr_max, { name: "cl", version: "14.16" }]}
-  - {features: [*cuda_curr_max, { name: "cl", version: "14.27" }]}
-  - {features: [*cuda_curr_max, { name: "cl", version: "14.28" }]}
-  - {features: [*cuda_curr_max, { name: "cl", version: "14.29" }]}
-  - {features: [*cuda_curr_max, { name: "cl", version: "14.34" }]}
-  - {features: [*cuda_curr_max, { name: "cl", version: "14.35" }]}
-  - {features: [*cuda_curr_max, { name: "cl", version: "14.36" }]}
+  # lowest CUDA version
+  - {features: [*cuda_prev_min, { name: "cl", version: "14.14" }]} # MSVC 2017
+  - {features: [*cuda_prev_min, { name: "cl", version: "14.15" }]} # MSVC 2017
+  - {features: [*cuda_prev_min, { name: "cl", version: "14.16" }]} # MSVC 2017
+  - {features: [*cuda_prev_min, { name: "cl", version: "14.27" }]} # MSVC 2019
+  - {features: [*cuda_prev_min, { name: "cl", version: "14.28" }]} # MSVC 2019
+  - {features: [*cuda_prev_min, { name: "cl", version: "14.29" }]} # MSVC 2019
+  # highest CUDA version
+  - {features: [*cuda_curr_max, { name: "cl", version: "14.14" }]} # MSVC 2017
+  - {features: [*cuda_curr_max, { name: "cl", version: "14.15" }]} # MSVC 2017
+  - {features: [*cuda_curr_max, { name: "cl", version: "14.16" }]} # MSVC 2017
+  - {features: [*cuda_curr_max, { name: "cl", version: "14.27" }]} # MSVC 2019
+  - {features: [*cuda_curr_max, { name: "cl", version: "14.28" }]} # MSVC 2019
+  - {features: [*cuda_curr_max, { name: "cl", version: "14.29" }]} # MSVC 2019
+  - {features: [*cuda_curr_max, { name: "cl", version: "14.34" }]} # MSVC 2022
+  - {features: [*cuda_curr_max, { name: "cl", version: "14.35" }]} # MSVC 2022
+  - {features: [*cuda_curr_max, { name: "cl", version: "14.36" }]} # MSVC 2022
 
 # RAPIDS devcontainers
 
