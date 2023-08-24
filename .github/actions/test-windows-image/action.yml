@@ -45,4 +45,4 @@ runs:
           -cudaVersion ${{ inputs.cuda }} `
           -repoVersion ${{ inputs.version }} `
           -isolation ${{ inputs.isolation }} `
-          -edition windows-${{ inputs.edition }}
+          -edition windows${{ inputs.edition }}

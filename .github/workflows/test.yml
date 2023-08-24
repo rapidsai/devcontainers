@@ -125,7 +125,10 @@ jobs:
     name: ${{ matrix.name }}
     needs: image-matrix
     secrets: inherit
-    uses: ./.github/workflows/build-and-test-image.yml
+    uses: ${{
+      fromJSON(matrix.os != 'windows' &&
+        '"./.github/workflows/build-and-test-linux-image.yml"' ||
+        '"./.github/workflows/build-and-test-windows-image.yml"') }}
     strategy:
       fail-fast: false
       matrix: ${{ fromJSON(needs.image-matrix.outputs.matrix) }}

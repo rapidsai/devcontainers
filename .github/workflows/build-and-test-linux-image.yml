@@ -1,0 +1,52 @@
+name: Build and test devcontainer images
+
+on:
+  workflow_call:
+    inputs:
+      os:
+        type: string
+        required: true
+        description: Image OS
+      repo:
+        type: string
+        required: true
+        description: Image repo
+      features:
+        type: string
+        required: true
+        description: JSON list of devcontainer features
+      container_env:
+        type: string
+        required: false
+        description: JSON map of default envvars to build into the devcontainer
+
+jobs:
+
+  build-and-test-linux:
+    name: Build (${{ matrix.arch }})
+    runs-on: ${{ fromJSON(github.repository != 'rapidsai/devcontainers' && '"ubuntu-latest"' || format('"linux-{0}-cpu4"', matrix.arch)) }}
+    strategy:
+      fail-fast: false
+      matrix:
+        arch: [amd64, arm64]
+    steps:
+      - name: Checkout ${{ github.repository }}
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+
+      - id: json
+        name: Write .devcontainer.json
+        uses: ./.github/actions/devcontainer-json
+        with:
+          os: "${{ inputs.os }}"
+          features: "${{ inputs.features }}"
+          container_env: "${{ inputs.container_env }}"
+
+      - name: Build ${{ steps.json.outputs.tag }}-${{ matrix.arch }}
+        uses: ./.github/actions/build-linux-image
+        with:
+          arch: "${{ matrix.arch }}"
+          repo: "${{ inputs.repo }}"
+          tag: "${{ steps.json.outputs.tag }}"

@@ -20,41 +20,14 @@ on:
         required: false
         description: JSON map of default envvars to build into the devcontainer
 
+env:
+  cl: "${{ fromJSON(inputs.features)[1].version }}"
+  cuda: "${{ fromJSON(inputs.features)[0].version }}"
+
 jobs:
 
-  build-and-test-linux:
-    if: inputs.os != 'windows'
-    name: Build
-    runs-on: ${{ fromJSON(github.repository != 'rapidsai/devcontainers' && '"ubuntu-latest"' || format('"linux-{0}-cpu4"', matrix.arch)) }}
-    strategy:
-      fail-fast: false
-      matrix:
-        arch: [amd64, arm64]
-    steps:
-      - name: Checkout ${{ github.repository }}
-        uses: actions/checkout@v3
-        with:
-          fetch-depth: 0
-          persist-credentials: false
-
-      - id: json
-        name: Write .devcontainer.json
-        uses: ./.github/actions/devcontainer-json
-        with:
-          os: "${{ inputs.os }}"
-          features: "${{ inputs.features }}"
-          container_env: "${{ inputs.container_env }}"
-
-      - name: Build ${{ steps.json.outputs.tag }}-${{ matrix.arch }}
-        uses: ./.github/actions/build-linux-image
-        with:
-          arch: "${{ matrix.arch }}"
-          repo: "${{ inputs.repo }}"
-          tag: "${{ steps.json.outputs.tag }}"
-
   build-and-test-windows:
-    if: inputs.os == 'windows'
-    name: Build and test ${{ matrix.runner }}
+    name: Build and test (${{ matrix.edition }})
     runs-on: ${{ matrix.runner }}
     strategy:
       fail-fast: false
@@ -74,12 +47,8 @@ jobs:
         shell: bash
         run: |
           repo="${{ inputs.repo }}"
-          cl="${{ fromJSON(inputs.features)[1].version }}"
-          cuda="${{ fromJSON(inputs.features)[0].version }}"
           version="$(git describe --abbrev=0 --tags | sed 's/[a-zA-Z]//g' | cut -d '.' -f -2)"
           cat <<EOF | tee "$GITHUB_ENV"
-          cl=${cl}
-          cuda=${cuda}
           repo=${repo,,}
           version=${version}
           tag=${version}-cuda${cuda}-cl${cl}-${{ inputs.os }}${{ matrix.edition }}
