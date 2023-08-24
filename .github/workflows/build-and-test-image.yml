@@ -56,21 +56,25 @@ jobs:
         name: Get Windows container info
         shell: bash
         run: |
-          cat <<EOF | tee "$GITHUB_ENV"
-          cuda=${{ fromJSON(inputs.features)[0].version }}
           cl=${{ fromJSON(inputs.features)[1].version }}
+          cuda=${{ fromJSON(inputs.features)[0].version }}
           version=$(git describe --abbrev=0 --tags | sed 's/[a-zA-Z]//g' | cut -d '.' -f -2)
+          cat <<EOF | tee "$GITHUB_ENV"
+          cl=${cl}
+          cuda=${cuda}
+          version=${version}
+          tag=${version}-cuda${cuda}-cl${cl}-${{ inputs.os }}${{ matrix.edition }}
           EOF
 
       - if: inputs.os == 'windows'
-        name: Build and test cuda${{ env.cuda }}-${{ inputs.os }}${{ matrix.edition }}
+        name: Build and test ${{ env.tag }}-${{ matrix.arch }}
         uses: ./.github/actions/build-image
         with:
-          arch: "${{ matrix.arch }}"
-          os: "${{ inputs.os }}"
           cl: "${{ env.cl }}"
+          os: "${{ inputs.os }}"
+          tag: "${{ env.tag }}"
           cuda: "${{ env.cuda }}"
+          arch: "${{ matrix.arch }}"
           version: "${{ env.version }}"
           edition: "${{ matrix.edition }}"
           repo: "${{ vars.DOCKERHUB_REPOSITORY || github.repository }}"
-          tag: "${{ env.version }}-cuda${{ env.cuda }}-cl${{ env.cl }}-${{ inputs.os }}${{ matrix.edition }}"
