@@ -31,13 +31,18 @@ features="$(echo                        \
 || echo ''                              \
 )";
 
-if `# Include all images if full_matrix is true`         \
-   [ "${full_matrix}" == "1" ]                           \
-   `# Include all images if matrix or workflows changed` \
-|| grep -qE '^(\.github/|matrix\.yml)' <<< "${files}"    \
-   `# Include all images if cmake, ninja, sccache, `     \
-   `# gitlab-cli, or utils features changed`             \
-|| grep -qE "(${common_features})"  <<< "${features}"    \
+if `# Include all images if full_matrix is true`                       \
+   [ "${full_matrix}" == "1" ]                                         \
+   `# Include all images if matrix or workflows changed`               \
+|| grep -q 'matrix.yml'                                 <<< "${files}" \
+|| grep -q '.github/workflows/test.yml'                 <<< "${files}" \
+|| grep -q '.github/actions/build-image/action.yml'     <<< "${files}" \
+|| grep -q '.github/actions/image-matrix/action.sh'     <<< "${files}" \
+|| grep -q '.github/actions/image-matrix/action.yml'    <<< "${files}" \
+|| grep -q '.github/workflows/build-and-test-image.yml' <<< "${files}" \
+   `# Include all images if cmake, ninja, sccache, `                   \
+   `# gitlab-cli, or utils features changed`                           \
+|| grep -qE "(${common_features})"  <<< "${features}"                  \
 ; then
   features="$(                                                  \
       find features/src -mindepth 1 -maxdepth 1 -type d -print0 \
@@ -76,7 +81,7 @@ changed_images="$(\
 
 windows_images="[]";
 
-if grep -q 'windows' <<< "${files}"; then
+if grep -qE '(windows|matrix\.yml)' <<< "${files}"; then
     windows_images="$(\
       yq -eMo json matrix.yml \
     | jq -eMc '
