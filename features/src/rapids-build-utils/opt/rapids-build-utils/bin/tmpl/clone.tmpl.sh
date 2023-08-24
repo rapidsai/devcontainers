@@ -6,27 +6,34 @@ clone_${NAME}() {
     if [[ ! -d ~/"${SRC_PATH}"/.git ]]; then
 
         local branch=;
+        local upstream=;
+        local directory=;
 
         eval "$(                                  \
             devcontainer-utils-parse-args --names '
                 b|branch                          |
+                d|directory                       |
+                u|upstream                        |
             ' - <<< "$@"                          \
           | xargs -r -d'\n' -I% echo -n local %\; \
         )";
 
         branch="${b:-${branch:-"${GIT_TAG}"}}";
+        directory="${d:-${directory:-"${HOME}/${SRC_PATH}"}}";
+        upstream="${u:-${upstream:-"${GIT_UPSTREAM}/${GIT_REPO}"}}";
 
         echo 'Cloning ${NAME}' 1>&2;
 
-        __rest__+=(--tags);
-        __rest__+=(--recurse-submodules);
-        __rest__+=(-j $(nproc --ignore=2));
-        __rest__+=(-c checkout.defaultRemote=upstream);
-
         devcontainer-utils-clone-${GIT_HOST}-repo \
-            ${__rest__[@]} --branch "${branch}" \
-            "${GIT_UPSTREAM}/${GIT_REPO}" \
-            ~/"${SRC_PATH}";
+            --tags                                \
+            --branch "${branch}"                  \
+            --recurse-submodules                  \
+            -j $(nproc --ignore=2)                \
+            -c checkout.defaultRemote=upstream    \
+            ${__rest__[@]}                        \
+            "${upstream}"                         \
+            "${directory}"                        \
+        ;
 
         git -C ~/"${SRC_PATH}" config --add remote.upstream.fetch '^refs/heads/pull-request/*';
 
