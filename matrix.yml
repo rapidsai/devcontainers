@@ -76,23 +76,23 @@ include:
 - os: "windows"
   images:
   - {features: [*cuda_prev_min, { name: "cl", version: "14.14" }]}
-  # - {features: [*cuda_prev_min, { name: "cl", version: "14.15" }]}
-  # - {features: [*cuda_prev_min, { name: "cl", version: "14.16" }]}
-  # - {features: [*cuda_prev_min, { name: "cl", version: "14.27" }]}
-  # - {features: [*cuda_prev_min, { name: "cl", version: "14.28" }]}
-  # - {features: [*cuda_prev_min, { name: "cl", version: "14.29" }]}
-  # - {features: [*cuda_prev_min, { name: "cl", version: "14.34" }]}
-  # - {features: [*cuda_prev_min, { name: "cl", version: "14.35" }]}
-  # - {features: [*cuda_prev_min, { name: "cl", version: "14.36" }]}
-  # - {features: [*cuda_curr_max, { name: "cl", version: "14.14" }]}
-  # - {features: [*cuda_curr_max, { name: "cl", version: "14.15" }]}
-  # - {features: [*cuda_curr_max, { name: "cl", version: "14.16" }]}
-  # - {features: [*cuda_curr_max, { name: "cl", version: "14.27" }]}
-  # - {features: [*cuda_curr_max, { name: "cl", version: "14.28" }]}
-  # - {features: [*cuda_curr_max, { name: "cl", version: "14.29" }]}
-  # - {features: [*cuda_curr_max, { name: "cl", version: "14.34" }]}
-  # - {features: [*cuda_curr_max, { name: "cl", version: "14.35" }]}
-  # - {features: [*cuda_curr_max, { name: "cl", version: "14.36" }]}
+  - {features: [*cuda_prev_min, { name: "cl", version: "14.15" }]}
+  - {features: [*cuda_prev_min, { name: "cl", version: "14.16" }]}
+  - {features: [*cuda_prev_min, { name: "cl", version: "14.27" }]}
+  - {features: [*cuda_prev_min, { name: "cl", version: "14.28" }]}
+  - {features: [*cuda_prev_min, { name: "cl", version: "14.29" }]}
+  - {features: [*cuda_prev_min, { name: "cl", version: "14.34" }]}
+  - {features: [*cuda_prev_min, { name: "cl", version: "14.35" }]}
+  - {features: [*cuda_prev_min, { name: "cl", version: "14.36" }]}
+  - {features: [*cuda_curr_max, { name: "cl", version: "14.14" }]}
+  - {features: [*cuda_curr_max, { name: "cl", version: "14.15" }]}
+  - {features: [*cuda_curr_max, { name: "cl", version: "14.16" }]}
+  - {features: [*cuda_curr_max, { name: "cl", version: "14.27" }]}
+  - {features: [*cuda_curr_max, { name: "cl", version: "14.28" }]}
+  - {features: [*cuda_curr_max, { name: "cl", version: "14.29" }]}
+  - {features: [*cuda_curr_max, { name: "cl", version: "14.34" }]}
+  - {features: [*cuda_curr_max, { name: "cl", version: "14.35" }]}
+  - {features: [*cuda_curr_max, { name: "cl", version: "14.36" }]}
 
 # RAPIDS devcontainers
 
