@@ -36,13 +36,13 @@ runs:
         files: |
           image/*
           windows/**
+          matrix.yml
           .github/**/*windows*
-          # matrix.yml
-          # .github/workflows/test.yml
-          # .github/actions/build-linux-image/action.yml
-          # .github/actions/image-matrix/action.sh
-          # .github/actions/image-matrix/action.yml
-          # .github/workflows/build-and-test-image.yml
+          .github/workflows/test.yml
+          .github/actions/build-linux-image/action.yml
+          .github/actions/image-matrix/action.sh
+          .github/actions/image-matrix/action.yml
+          .github/workflows/build-and-test-image.yml
 
     - name: Report changes
       if: inputs.full_matrix != 'true'
