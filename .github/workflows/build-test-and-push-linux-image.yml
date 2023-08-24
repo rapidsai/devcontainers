@@ -27,7 +27,7 @@ on:
 
 jobs:
 
-  build-and-test-linux:
+  build-test-and-upload:
     name: Build (${{ matrix.arch }})
     runs-on: ${{ fromJSON(github.repository != 'rapidsai/devcontainers' && '"ubuntu-latest"' || format('"linux-{0}-cpu4"', matrix.arch)) }}
     strategy:
@@ -67,7 +67,7 @@ jobs:
   push-to-dockerhub:
     if: inputs.push == 'true'
     name: Push to Docker Hub
-    needs: build-and-upload
+    needs: build-test-and-upload
     runs-on: ubuntu-latest
     steps:
       - name: Checkout ${{ github.repository }}
@@ -80,10 +80,10 @@ jobs:
         with:
           tool_cache: "${{ runner.tool_cache }}"
 
-      - name: Download ${{ needs.build-and-upload.outputs.tag }}
+      - name: Download ${{ needs.build-test-and-upload.outputs.tag }}
         uses: actions/download-artifact@v3
         with:
-          name: ${{ needs.build-and-upload.outputs.tag }}
+          name: ${{ needs.build-test-and-upload.outputs.tag }}
           path: ${{ runner.temp }}
 
       - name: Login to Docker Hub
@@ -95,7 +95,7 @@ jobs:
       - name: Push multiarch manifest to Docker Hub
         shell: bash --noprofile --norc -x -eo pipefail {0}
         env:
-          name: "${{ inputs.repo }}:${{ needs.build-and-upload.outputs.tag }}"
+          name: "${{ inputs.repo }}:${{ needs.build-test-and-upload.outputs.tag }}"
         run: |
 
           find "${{ runner.temp }}/" -type f -name '*.tar';

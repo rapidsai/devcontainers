@@ -27,7 +27,7 @@ on:
 
 jobs:
 
-  build-and-test-windows:
+  build-test-and-push:
     name: Build and test (${{ matrix.edition }})
     runs-on: ${{ matrix.runner }}
     strategy:
