@@ -38,7 +38,7 @@ inputs:
 
 outputs:
   repo:
-    value: ${{ steps.build.outputs.repo }}
+    value: ${{ steps.linux-build.outputs.repo || '' }}
 
 runs:
   using: composite
@@ -57,7 +57,7 @@ runs:
       uses: ./.github/actions/install-devcontainers-cli
 
     - if: inputs.os != 'windows'
-      id: build
+      id: linux-build
       name: Build ${{ inputs.repo }}:${{ inputs.tag }}-${{ inputs.arch }}
       shell: bash
       env:
@@ -75,8 +75,8 @@ runs:
           ;
 
     - if: inputs.os == 'windows'
-      id: build
-      name: Build ${{ inputs.repo }}:${{ inputs.version }}-cuda${{ inputs.cuda }}-msvc${{ inputs.msvc }}-${{ inputs.os }}${{ matrix.windows.edition }}
+      id: windows-build
+      name: Build ${{ inputs.repo }}:${{ inputs.version }}-cuda${{ inputs.cuda }}-msvc${{ inputs.msvc }}-${{ inputs.os }}${{ inputs.edition }}
       shell: powershell
       run: |
         .github/actions/build-image/action.ps1 `
@@ -85,4 +85,4 @@ runs:
           -cudaVersion ${{ inputs.cuda }}      `
           -msvcVersion ${{ inputs.msvc }}      `
           -isolation ${{ inputs.isolation }}   `
-          -edition ${{ inputs.edition }}
+          -edition windows-${{ inputs.edition }}

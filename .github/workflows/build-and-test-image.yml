@@ -17,12 +17,12 @@ jobs:
 
   build-and-test:
     name: Build and test
-    runs-on: ${{ fromJSON(inputs.os == 'windows' && format('"windows-{0}"', matrix.windows.runner) || github.repository != 'rapidsai/devcontainers' && '"ubuntu-latest"' || format('"linux-{0}-cpu4"', matrix.arch)) }}
+    runs-on: ${{ fromJSON(inputs.os == 'windows' && format('"windows-{0}"', matrix.runner) || github.repository != 'rapidsai/devcontainers' && '"ubuntu-latest"' || format('"linux-{0}-cpu4"', matrix.arch)) }}
     strategy:
       fail-fast: false
       matrix:
         arch: [amd64, arm64]
-        windows: ${{ fromJSON(inputs.os == 'windows' && '[{"runner":"2019","edition":"2019"}, {"runner":"2022","edition":"2022"}]' || '[]') }}
+        include: ${{ fromJSON(inputs.os == 'windows' && '[{"runner":"2019","edition":"2019"}, {"runner":"2022","edition":"2022"}]' || '[]') }}
     steps:
       - name: Checkout ${{ github.repository }}
         uses: actions/checkout@v3
@@ -60,7 +60,7 @@ jobs:
           EOF
 
       - if: inputs.os == 'windows'
-        name: Build and test cuda${{ env.cuda }}-${{ inputs.os }}${{ matrix.windows.edition }}
+        name: Build and test cuda${{ env.cuda }}-${{ inputs.os }}${{ matrix.edition }}
         uses: ./.github/actions/build-image
         with:
           os: "${{ inputs.os }}"
@@ -68,5 +68,5 @@ jobs:
           cuda: "${{ env.cuda }}"
           msvc: "${{ env.msvc }}"
           version: "${{ env.version }}"
-          edition: "${{ matrix.windows.edition }}"
+          edition: "${{ matrix.edition }}"
           repo: "${{ vars.DOCKERHUB_REPOSITORY || github.repository }}"
