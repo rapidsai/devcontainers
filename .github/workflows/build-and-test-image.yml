@@ -58,7 +58,7 @@ jobs:
         run: |
           cat <<EOF | tee "$GITHUB_ENV"
           cuda=${{ fromJSON(inputs.features)[0].version }}
-          msvc=${{ fromJSON(inputs.features)[1].version }}
+          cl=${{ fromJSON(inputs.features)[1].version }}
           version=$(git describe --abbrev=0 --tags | sed 's/[a-zA-Z]//g' | cut -d '.' -f -2)
           EOF
 
@@ -66,10 +66,11 @@ jobs:
         name: Build and test cuda${{ env.cuda }}-${{ inputs.os }}${{ matrix.edition }}
         uses: ./.github/actions/build-image
         with:
-          os: "${{ inputs.os }}"
           arch: "${{ matrix.arch }}"
+          os: "${{ inputs.os }}"
+          cl: "${{ env.cl }}"
           cuda: "${{ env.cuda }}"
-          msvc: "${{ env.msvc }}"
           version: "${{ env.version }}"
           edition: "${{ matrix.edition }}"
           repo: "${{ vars.DOCKERHUB_REPOSITORY || github.repository }}"
+          tag: "${{ env.version }}-cuda${{ env.cuda }}-cl${{ env.cl }}-${{ inputs.os }}${{ matrix.edition }}"

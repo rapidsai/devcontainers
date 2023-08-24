@@ -22,7 +22,7 @@ inputs:
   cuda:
     type: string
     required: false
-  msvc:
+  cl:
     type: string
     required: false
   edition:
@@ -76,13 +76,13 @@ runs:
 
     - if: inputs.os == 'windows'
       id: windows-build
-      name: Build ${{ inputs.repo }}:${{ inputs.version }}-cuda${{ inputs.cuda }}-msvc${{ inputs.msvc }}-${{ inputs.os }}${{ inputs.edition }}
+      name: Build ${{ inputs.repo }}:${{ inputs.tag }}
       shell: powershell
       run: |
-        .github/actions/build-image/action.ps1 `
-          -repo ${{ inputs.repo }}             `
-          -repoVersion ${{ inputs.version }}   `
-          -cudaVersion ${{ inputs.cuda }}      `
-          -msvcVersion ${{ inputs.msvc }}      `
-          -isolation ${{ inputs.isolation }}   `
+        .\scripts\windows\build-windows-image.ps1 `
+          -repo ${{ inputs.repo }} `
+          -repoVersion ${{ inputs.version }} `
+          -cudaVersion ${{ inputs.cuda }} `
+          -clVersion ${{ inputs.cl }} `
+          -isolation ${{ inputs.isolation }} `
           -edition windows-${{ inputs.edition }}
