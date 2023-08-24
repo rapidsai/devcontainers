@@ -8,7 +8,7 @@ build_${PY_LIB}_python() {
         exit 1;
     fi
 
-    local verbose="1";
+    local verbose="";
     local parallel="";
 
     eval "$(                                  \
