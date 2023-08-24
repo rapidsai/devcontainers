@@ -34,7 +34,7 @@ runs:
         files: |
           image/*
           scripts/windows/**
-          .github/**/*windows*
+          # .github/**/*windows*
           # matrix.yml
           # .github/workflows/test.yml
           # .github/actions/build-image/action.yml
