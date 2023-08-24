@@ -1,8 +1,8 @@
 export CONDA_ALWAYS_YES="true";
 export CC="${CC:-"/usr/bin/gcc"}";
 export CXX="${CXX:-"/usr/bin/g++"}";
+export CUDAHOSTCXX="${CXX}";
 export CUDAARCHS="${CUDAARCHS:-all-major}";
-export CUDAHOSTCXX="${CUDAHOSTCXX:-"${CXX}"}";
 export CMAKE_BUILD_TYPE="${CMAKE_BUILD_TYPE:-Release}";
 export CMAKE_EXPORT_COMPILE_COMMANDS="${CMAKE_EXPORT_COMPILE_COMMANDS:-ON}";
 

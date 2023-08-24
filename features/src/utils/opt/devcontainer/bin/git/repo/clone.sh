@@ -44,35 +44,28 @@ clone_git_repo() {
     fi
 
     if [ -n "${branch:-}" ]; then
-        has_branch() {
-            local b="${branch}";
-            for x in '\\' '\/' '.' '+' '^' '$' '*' '?' '!' '|' '=' '-' '[' ']' '(' ')' '{' '}'; do
-                b="${b//"$x"/\\"$x"}";
-            done
-            # git ls-remote exits with code 141, so compare the grep output and not just the exit code
-            if [ "$(git ls-remote "${1}" | grep -P "^[0-9a-z]{40}\s+refs\/heads\/${b}$" || echo "")" = "" ];
-            then echo "";
-            else echo "1";
-            fi
-        }
 
-        local origin_has_branch="$(has_branch "${origin}")";
-        local upstream_has_branch="$(has_branch "${upstream}")";
+        local origin_has_tag="$(git -C "${directory}" ls-remote -t origin "${branch}")";
+        local origin_has_branch="$(git -C "${directory}" ls-remote -h origin "${branch}")";
+        local upstream_has_tag="$(git -C "${directory}" ls-remote -t upstream "${branch}")";
+        local upstream_has_branch="$(git -C "${directory}" ls-remote -h upstream "${branch}")";
 
         if false; then exit 1;
-        elif [ -n "${upstream_has_branch}" ]; then
-            git -C "${directory}" checkout "${branch}" \
-         || git -C "${directory}" checkout "${branch}" -t "upstream/${branch}";
-        elif [ -n "${origin_has_branch}" ]; then
-            git -C "${directory}" checkout "${branch}" \
-         || git -C "${directory}" checkout "${branch}" -t "origin/${branch}";
+        elif test -n "${upstream_has_branch}"; then
+            git -C "${directory}" checkout -b "${branch}" -t "upstream/${branch}";
+        elif test -n "${upstream_has_tag}"; then
+            git -C "${directory}" checkout -m -b "upstream/${branch}" "${branch}";
+        elif test -n "${origin_has_branch}"; then
+            git -C "${directory}" checkout -b "${branch}" -t "origin/${branch}";
+        elif test -n "${origin_has_tag}"; then
+            git -C "${directory}" checkout -f -b "origin/${branch}" "${branch}";
         fi
 
-        if [ -n "${origin_has_branch}" ]; then
+        if test -n "${origin_has_branch}"; then
             git -C "${directory}" pull origin "${branch}";
         fi
 
-        if [ -n "${upstream_has_branch}" ]; then
+        if test -n "${upstream_has_branch}"; then
             git -C "${directory}" pull upstream "${branch}";
         fi
     fi

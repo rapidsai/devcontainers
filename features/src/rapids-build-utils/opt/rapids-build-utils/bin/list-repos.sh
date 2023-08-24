@@ -32,7 +32,7 @@ list_repos() {
           }
         ]
         | map(select(.key | startswith("repos")))
-        | map(.key + "=" + (.val | @sh))[]
+        | map(.key + "=" + (.val | @sh | gsub("[\\n]"; " ")))[]
 ________EOF
 )";
 

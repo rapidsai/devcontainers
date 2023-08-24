@@ -41,8 +41,9 @@ get_user_fork_name() {
             | map(.nameWithOwner)[]
 ________EOF
         )";
-        local nameWithOwner="$(gh repo list "${user}" --fork --json nameWithOwner --json parent --jq ". ${query}" 2>/dev/null || echo "")";
-        if test -z "${nameWithOwner}"; then
+        local nameWithOwner="$(gh repo list "${user}" --fork --json nameWithOwner --json parent --jq ". ${query}" 2>/dev/null || echo "err")";
+        if [ "${nameWithOwner}" = "err" ]; then
+            nameWithOwner="";
             for repo in $(gh repo list "${user}" --fork --json name --jq 'map(.name)[]'); do
                 nameWithOwner="$(gh repo view "${repo}" --json nameWithOwner --json parent --jq "[.] ${query}" 2>/dev/null || echo "")";
                 if test -n "${nameWithOwner}"; then
