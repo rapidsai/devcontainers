@@ -26,13 +26,6 @@ jobs:
           && echo "ok=true"  | tee -a $GITHUB_OUTPUT \
           || echo "ok=false" | tee -a $GITHUB_OUTPUT;
 
-  # test-windows:
-  #   if: needs.check-event.outputs.ok == 'true'
-  #   name: Test Windows
-  #   needs: check-event
-  #   secrets: inherit
-  #   uses: ./.github/workflows/test-windows.yml
-
   validate-features-json:
     if: needs.check-event.outputs.ok == 'true'
     name: Validate features
