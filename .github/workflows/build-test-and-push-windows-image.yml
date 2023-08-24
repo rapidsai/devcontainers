@@ -28,7 +28,7 @@ on:
 jobs:
 
   build-test-and-push:
-    name: Build and test (${{ matrix.edition }})
+    name: Build (${{ matrix.edition }})
     runs-on: ${{ matrix.runner }}
     strategy:
       fail-fast: false
