@@ -6,12 +6,19 @@ on:
       os:
         type: string
         required: true
+        description: Image OS
+      repo:
+        type: string
+        required: true
+        description: Image repo
       features:
         type: string
         required: true
+        description: JSON list of devcontainer features
       container_env:
         type: string
         required: false
+        description: JSON map of default envvars to build into the devcontainer
 
 jobs:
 
@@ -20,7 +27,6 @@ jobs:
     runs-on: ${{ fromJSON(github.repository != 'rapidsai/devcontainers' && '"ubuntu-latest"' || format('"linux-{0}-cpu4"', matrix.arch)) }}
     outputs:
       tag: ${{ steps.json.outputs.tag }}
-      repo: ${{ steps.build.outputs.repo }}
     strategy:
       fail-fast: false
       matrix:
@@ -42,11 +48,11 @@ jobs:
 
       - id: build
         name: Build ${{ steps.json.outputs.tag }}-${{ matrix.arch }}
-        uses: ./.github/actions/build-image
+        uses: ./.github/actions/build-linux-image
         with:
           arch: "${{ matrix.arch }}"
+          repo: "${{ inputs.repo }}"
           tag: "${{ steps.json.outputs.tag }}"
-          repo: "${{ vars.DOCKERHUB_REPOSITORY || github.repository }}"
 
       - name: Upload ${{ steps.json.outputs.tag }}-${{ matrix.arch }}
         uses: actions/upload-artifact@v3
@@ -85,12 +91,12 @@ jobs:
       - name: Push multiarch manifest to Docker Hub
         shell: bash --noprofile --norc -x -eo pipefail {0}
         env:
-          name: "${{ needs.build-and-upload.outputs.repo }}:${{ needs.build-and-upload.outputs.tag }}"
+          name: "${{ inputs.repo }}:${{ needs.build-and-upload.outputs.tag }}"
         run: |
 
           find "${{ runner.temp }}/" -type f -name '*.tar';
 
-          docker manifest rm ${name} || true;
+          docker manifest rm ${name,,} || true;
 
           hashes=();
 
@@ -98,8 +104,8 @@ jobs:
             # Load the arch-specific image with the final name
             docker load --input "${{ runner.temp }}/${arch}.tar";
             # Push the local image to the registry and save the remote hash
-            hashes+=("$(docker push ${name} | tail -n1 | cut -d' ' -f3)");
+            hashes+=("$(docker push ${name,,} | tail -n1 | cut -d' ' -f3)");
           done
 
           # Create and push the multiarch manifest
-          docker buildx imagetools create --tag ${name} ${hashes[@]};
+          docker buildx imagetools create --tag ${name,,} ${hashes[@]};

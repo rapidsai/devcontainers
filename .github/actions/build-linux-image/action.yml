@@ -1,12 +1,8 @@
 name: build-image
 
-description: Build image
+description: Build Linux image
 
 inputs:
-  os:
-    type: string
-    required: true
-    description: Image OS
   tag:
     type: string
     required: true
@@ -19,70 +15,31 @@ inputs:
     type: string
     required: true
     description: Image repo
-  cuda:
-    type: string
-    required: false
-  cl:
-    type: string
-    required: false
-  edition:
-    type: string
-    required: false
-  isolation:
-    type: string
-    required: false
-    default: process
-  version:
-    type: string
-    required: false
-
-outputs:
-  repo:
-    value: ${{ steps.linux-build.outputs.repo || '' }}
 
 runs:
   using: composite
   steps:
 
-    - if: inputs.os != 'windows'
-      name: Setup runner environment
+    - name: Setup runner environment
       uses: ./.github/actions/setup-runner-env
 
-    - if: inputs.os != 'windows'
-      name: Copy common scripts into features
+    - name: Copy common scripts into features
       uses: ./.github/actions/copy-common-scripts
 
-    - if: inputs.os != 'windows'
-      name: Install devcontainers CLI
+    - name: Install devcontainers CLI
       uses: ./.github/actions/install-devcontainers-cli
 
-    - if: inputs.os != 'windows'
-      id: linux-build
+    - id: build
       name: Build ${{ inputs.repo }}:${{ inputs.tag }}-${{ inputs.arch }}
       shell: bash
       env:
         NODE_NO_WARNINGS: 1
+        repo: ${{ inputs.repo }}
       run: |
-        repo="$(echo "${{ inputs.repo }}" | tr '[:upper:]' '[:lower:]')";
-        echo "repo=${repo}" >> $GITHUB_OUTPUT;
-
         devcontainer build \
           --platform "linux/${{ inputs.arch }}" \
-          --cache-from "${repo}:${{ inputs.tag }}" \
-          --image-name "${repo}:${{ inputs.tag }}" \
+          --cache-from "${repo,,}:${{ inputs.tag }}" \
+          --image-name "${repo,,}:${{ inputs.tag }}" \
           --workspace-folder "$(realpath -m ./image)" \
           --output "type=docker,dest=${{ runner.temp }}/${{ inputs.arch }}.tar" \
           ;
-
-    - if: inputs.os == 'windows'
-      id: windows-build
-      name: Build ${{ inputs.repo }}:${{ inputs.tag }}
-      shell: powershell
-      run: |
-        .\scripts\windows\build-windows-image.ps1 `
-          -repo ${{ inputs.repo }} `
-          -repoVersion ${{ inputs.version }} `
-          -cudaVersion ${{ inputs.cuda }} `
-          -clVersion ${{ inputs.cl }} `
-          -isolation ${{ inputs.isolation }} `
-          -edition windows-${{ inputs.edition }}

@@ -1,44 +1,48 @@
-name: Build Windows images
+name: build-windows-image
 
-description: Builds wcow images with MSVC and CUDA
+description: Build a Windows Container on Windows image with CUDA and MSVC
 
 inputs:
+  cl:
+    type: string
+    required: false
+    description: MSVC compiler version
+  tag:
+    type: string
+    required: true
+    description: Image tag
   repo:
     type: string
     required: true
-    description: Image repository
-  repo_version:
+    description: Image repo
+  cuda:
     type: string
-    required: true
-    description: Repository version
-  win_edition:
+    required: false
+    description: CUDA Toolkit version
+  edition:
     type: string
-    required: true
+    required: false
     description: Windows edition
+  version:
+    type: string
+    required: false
+    description: Repository version
   isolation:
     type: string
-    required: true
-    description: Which Windows isolation mode to build for
-  vs_version:
-    type: string
-    required: true
-    description: MSVC version
-  cuda_version:
-    type: string
-    required: true
-    description: CUDA version
+    required: false
+    default: process
+    description: Windows isolation mode to target (hyperv or process isolation)
 
 runs:
   using: composite
   steps:
-    - name: Run action script to build images
-      id: build
+    - name: Build ${{ inputs.repo }}:${{ inputs.tag }}
       shell: powershell
       run: |
-        .github/actions/build-windows-image/action.ps1 `
-          -cudaVersion ${{ inputs.cuda_version }}      `
-          -msvcVersion ${{ inputs.vs_version }}        `
-          -edition ${{ inputs.win_edition }}           `
-          -isolation ${{ inputs.isolation }}           `
-          -repo ${{ inputs.repo }}                     `
-          -repoVersion ${{ inputs.repo_version }}
+        .\scripts\windows\build-windows-image.ps1 `
+          -repo ${{ inputs.repo }} `
+          -clVersion ${{ inputs.cl }} `
+          -cudaVersion ${{ inputs.cuda }} `
+          -repoVersion ${{ inputs.version }} `
+          -isolation ${{ inputs.isolation }} `
+          -edition windows-${{ inputs.edition }}

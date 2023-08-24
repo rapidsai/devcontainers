@@ -6,26 +6,30 @@ on:
       os:
         type: string
         required: true
+        description: Image OS
+      repo:
+        type: string
+        required: true
+        description: Image repo
       features:
         type: string
         required: true
+        description: JSON list of devcontainer features
       container_env:
         type: string
         required: false
+        description: JSON map of default envvars to build into the devcontainer
 
 jobs:
 
-  build-and-test:
-    name: Build and test
-    runs-on: ${{ fromJSON(inputs.os == 'windows' && format('"windows-{0}"', matrix.runner) || github.repository != 'rapidsai/devcontainers' && '"ubuntu-latest"' || format('"linux-{0}-cpu4"', matrix.arch)) }}
+  build-and-test-linux:
+    if: inputs.os != 'windows'
+    name: Build
+    runs-on: ${{ fromJSON(github.repository != 'rapidsai/devcontainers' && '"ubuntu-latest"' || format('"linux-{0}-cpu4"', matrix.arch)) }}
     strategy:
       fail-fast: false
       matrix:
-        include: ${{
-          fromJSON(inputs.os == 'windows' &&
-            '[{"runner":"2019","edition":"2019","arch":"amd64"},
-              {"runner":"2022","edition":"2022","arch":"amd64"}]' ||
-            '[{"arch":"amd64"},{"arch":"arm64"}]') }}
+        arch: [amd64, arm64]
     steps:
       - name: Checkout ${{ github.repository }}
         uses: actions/checkout@v3
@@ -33,8 +37,7 @@ jobs:
           fetch-depth: 0
           persist-credentials: false
 
-      - if: inputs.os != 'windows'
-        id: json
+      - id: json
         name: Write .devcontainer.json
         uses: ./.github/actions/devcontainer-json
         with:
@@ -42,39 +45,62 @@ jobs:
           features: "${{ inputs.features }}"
           container_env: "${{ inputs.container_env }}"
 
-      - if: inputs.os != 'windows'
-        name: Build and test ${{ steps.json.outputs.tag }}-${{ matrix.arch }}
-        uses: ./.github/actions/build-image
+      - name: Build ${{ steps.json.outputs.tag }}-${{ matrix.arch }}
+        uses: ./.github/actions/build-linux-image
         with:
-          os: "${{ inputs.os }}"
           arch: "${{ matrix.arch }}"
+          repo: "${{ inputs.repo }}"
           tag: "${{ steps.json.outputs.tag }}"
-          repo: "${{ vars.DOCKERHUB_REPOSITORY || github.repository }}"
 
-      - if: inputs.os == 'windows'
-        id: info
-        name: Get Windows container info
+  build-and-test-windows:
+    if: inputs.os == 'windows'
+    name: Build and test ${{ matrix.runner }}
+    runs-on: ${{ matrix.runner }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - { runner: windows-2019, edition: "2019" }
+          - { runner: windows-2022, edition: "2022" }
+    steps:
+      - name: Checkout ${{ github.repository }}
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+
+      - id: info
+        name: Get container info
         shell: bash
         run: |
-          cl=${{ fromJSON(inputs.features)[1].version }}
-          cuda=${{ fromJSON(inputs.features)[0].version }}
-          version=$(git describe --abbrev=0 --tags | sed 's/[a-zA-Z]//g' | cut -d '.' -f -2)
+          repo="${{ inputs.repo }}"
+          cl="${{ fromJSON(inputs.features)[1].version }}"
+          cuda="${{ fromJSON(inputs.features)[0].version }}"
+          version="$(git describe --abbrev=0 --tags | sed 's/[a-zA-Z]//g' | cut -d '.' -f -2)"
           cat <<EOF | tee "$GITHUB_ENV"
           cl=${cl}
           cuda=${cuda}
+          repo=${repo,,}
           version=${version}
           tag=${version}-cuda${cuda}-cl${cl}-${{ inputs.os }}${{ matrix.edition }}
           EOF
 
-      - if: inputs.os == 'windows'
-        name: Build and test ${{ env.tag }}-${{ matrix.arch }}
-        uses: ./.github/actions/build-image
+      - name: Build ${{ env.tag }}
+        uses: ./.github/actions/build-windows-image
         with:
           cl: "${{ env.cl }}"
-          os: "${{ inputs.os }}"
           tag: "${{ env.tag }}"
           cuda: "${{ env.cuda }}"
-          arch: "${{ matrix.arch }}"
+          repo: "${{ env.repo }}"
           version: "${{ env.version }}"
           edition: "${{ matrix.edition }}"
-          repo: "${{ vars.DOCKERHUB_REPOSITORY || github.repository }}"
+
+      - name: Test ${{ env.tag }}
+        uses: ./.github/actions/test-windows-image
+        with:
+          cl: "${{ env.cl }}"
+          tag: "${{ env.tag }}"
+          cuda: "${{ env.cuda }}"
+          repo: "${{ env.repo }}"
+          version: "${{ env.version }}"
+          edition: "${{ matrix.edition }}"

@@ -1,7 +1,7 @@
 Param(
     [Parameter(Mandatory=$true)]
     [string]
-    $msvcVersion,
+    $clVersion,
     [Parameter(Mandatory=$true)]
     [string]
     $cudaVersion="latest",
@@ -28,13 +28,9 @@ function TestReturnCode {
 $ErrorActionPreference = "Stop"
 
 # Assume this script is launched from repo root.
-.\scripts\windows\vs-version-matrix.ps1
-$clVerArray = ($vsVerToCompilers[$msvcVersion])
 
-foreach($cl in $clVerArray) {
-    $image=$(.\scripts\windows\generate-image-name.ps1 -clVersion $cl -cudaVersion $cudaVersion -edition $edition -repo $repo -repoVersion $repoVersion)
-    Write-Output "Testing $image"
+$image=$(.\scripts\windows\generate-image-name.ps1 -clVersion $clVersion -cudaVersion $cudaVersion -edition $edition -repo $repo -repoVersion $repoVersion)
+Write-Output "Testing $image"
 
-    docker run --mount type=bind,src="$(Get-Location)\.github\actions\test-windows-image",dst="C:\test" $image powershell "C:\test\image-test.ps1"
-    TestReturnCode
-}
+docker run --mount type=bind,src="$(Get-Location)\.github\actions\test-windows-image",dst="C:\test" $image powershell "C:\test\image-test.ps1"
+TestReturnCode
