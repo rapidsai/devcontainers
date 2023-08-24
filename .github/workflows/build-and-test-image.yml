@@ -57,8 +57,8 @@ jobs:
         shell: bash
         run: |
           cat <<EOF | tee "$GITHUB_ENV"
-          cuda=${{ fromJSON(inputs.features)[0] }}
-          msvc=${{ fromJSON(inputs.features)[1] }}
+          cuda=${{ fromJSON(inputs.features)[0].version }}
+          msvc=${{ fromJSON(inputs.features)[1].version }}
           version=$(git describe --abbrev=0 --tags | sed 's/[a-zA-Z]//g' | cut -d '.' -f -2)
           EOF
 
