@@ -29,7 +29,7 @@ $ErrorActionPreference = "Stop"
 
 # Assume this script is launched from repo root.
 
-$image=$(.\scripts\windows\generate-image-name.ps1 -clVersion $clVersion -cudaVersion $cudaVersion -edition $edition -repo $repo -repoVersion $repoVersion)
+$image=$(.\windows\generate-image-name.ps1 -clVersion $clVersion -cudaVersion $cudaVersion -edition $edition -repo $repo -repoVersion $repoVersion)
 Write-Output "Testing $image"
 
 docker run --mount type=bind,src="$(Get-Location)\.github\actions\test-windows-image",dst="C:\test" $image powershell "C:\test\image-test.ps1"

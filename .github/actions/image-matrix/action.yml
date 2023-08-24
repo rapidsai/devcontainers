@@ -35,7 +35,7 @@ runs:
         base_sha: ${{ fromJSON(steps.get-pr-info.outputs.pr-info).base.sha }}
         files: |
           image/*
-          scripts/windows/**
+          windows/**
           .github/**/*windows*
           # matrix.yml
           # .github/workflows/test.yml

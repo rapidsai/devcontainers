@@ -39,7 +39,7 @@ runs:
     - name: Build ${{ inputs.repo }}:${{ inputs.tag }}
       shell: powershell
       run: |
-        .\scripts\windows\build-windows-image.ps1 `
+        .\windows\build-windows-image.ps1 `
           -repo ${{ inputs.repo }} `
           -clVersion ${{ inputs.cl }} `
           -cudaVersion ${{ inputs.cuda }} `

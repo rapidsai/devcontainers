@@ -34,7 +34,7 @@ Docker config: `daemon.json` appropriately to include the group you belong to.
 
 Build desired configuration. Windows 2019 and Windows 2022 versions map to Windows 10 and 11 respectively.
 
-`$> .\scripts\windows\build-windows-image.ps1 -clVersion 14.36 -cudaVersion 12.1 -edition windows2019 -isolation hyperv -repo local"`
+`$> .\windows\build-windows-image.ps1 -clVersion 14.36 -cudaVersion 12.1 -edition windows2019 -isolation hyperv -repo local"`
 
 ### Step 2
 
