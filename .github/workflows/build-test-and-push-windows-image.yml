@@ -1,0 +1,93 @@
+name: Build and test devcontainer images
+
+on:
+  workflow_call:
+    inputs:
+      os:
+        type: string
+        required: true
+        description: Image OS
+      repo:
+        type: string
+        required: true
+        description: Image repo
+      push:
+        type: string
+        required: false
+        default: 'false'
+        description: Whether to push the image
+      features:
+        type: string
+        required: true
+        description: JSON list of devcontainer features
+      container_env:
+        type: string
+        required: false
+        description: JSON map of default envvars to build into the devcontainer
+
+jobs:
+
+  build-and-test-windows:
+    name: Build and test (${{ matrix.edition }})
+    runs-on: ${{ matrix.runner }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - { runner: windows-2019, edition: "2019" }
+          - { runner: windows-2022, edition: "2022" }
+    steps:
+      - name: Checkout ${{ github.repository }}
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+
+      - id: info
+        name: Get container info
+        shell: bash
+        run: |
+          repo="${{ inputs.repo }}";
+          cl="${{ fromJSON(inputs.features)[1].version }}";
+          cuda="${{ fromJSON(inputs.features)[0].version }}";
+          version="$(git describe --abbrev=0 --tags | sed 's/[a-zA-Z]//g' | cut -d '.' -f -2)";
+          cat <<EOF | tee "$GITHUB_OUTPUT"
+          cl=${cl}
+          cuda=${cuda}
+          repo=${repo,,}
+          version=${version}
+          tag=${version}-cuda${cuda}-cl${cl}-${{ inputs.os }}${{ matrix.edition }}
+          EOF
+
+      - name: Build ${{ steps.info.outputs.tag }}
+        uses: ./.github/actions/build-windows-image
+        with:
+          cl: "${{ steps.info.outputs.cl }}"
+          tag: "${{ steps.info.outputs.tag }}"
+          cuda: "${{ steps.info.outputs.cuda }}"
+          repo: "${{ steps.info.outputs.repo }}"
+          version: "${{ steps.info.outputs.version }}"
+          edition: "${{ matrix.edition }}"
+
+      - name: Test ${{ steps.info.outputs.tag }}
+        uses: ./.github/actions/test-windows-image
+        with:
+          cl: "${{ steps.info.outputs.cl }}"
+          tag: "${{ steps.info.outputs.tag }}"
+          cuda: "${{ steps.info.outputs.cuda }}"
+          repo: "${{ steps.info.outputs.repo }}"
+          version: "${{ steps.info.outputs.version }}"
+          edition: "${{ matrix.edition }}"
+
+      - if: inputs.push == 'true'
+        name: Login to Docker Hub
+        uses: docker/login-action@v2
+        with:
+          username: ${{ secrets.GPUCIBOT_DOCKERHUB_USER }}
+          password: ${{ secrets.GPUCIBOT_DOCKERHUB_TOKEN }}
+
+      - if: inputs.push == 'true'
+        name: Push ${{ steps.info.outputs.tag }}
+        shell: powershell
+        run: |
+          docker push ${{ steps.info.outputs.repo }}:${{ steps.info.outputs.tag }}

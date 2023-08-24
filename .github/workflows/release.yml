@@ -37,12 +37,13 @@ jobs:
     name: ${{ matrix.name }}
     needs: image-matrix
     secrets: inherit
-    uses: ./.github/workflows/build-and-push-linux-image.yml
+    uses: ./.github/workflows/build-test-and-push-linux-image.yml
     strategy:
       fail-fast: false
       matrix: ${{ fromJSON(needs.image-matrix.outputs.linux) }}
     with:
-      os : "${{ matrix.os }}"
+      push: 'true'
+      os: "${{ matrix.os }}"
       features: "${{ toJSON(matrix.features) }}"
       container_env: "${{ toJSON(matrix.env) }}"
       repo: "${{ vars.DOCKERHUB_REPOSITORY || github.repository }}"
@@ -51,12 +52,13 @@ jobs:
     name: ${{ matrix.name }}
     needs: image-matrix
     secrets: inherit
-    uses: ./.github/workflows/build-and-push-windows-image.yml
+    uses: ./.github/workflows/build-test-and-push-windows-image.yml
     strategy:
       fail-fast: false
       matrix: ${{ fromJSON(needs.image-matrix.outputs.windows) }}
     with:
-      os : "${{ matrix.os }}"
+      push: 'true'
+      os: "${{ matrix.os }}"
       features: "${{ toJSON(matrix.features) }}"
       container_env: "${{ toJSON(matrix.env) }}"
       repo: "${{ vars.DOCKERHUB_REPOSITORY || github.repository }}"

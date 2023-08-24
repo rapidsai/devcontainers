@@ -114,32 +114,34 @@ jobs:
           features: "${{ needs.features-matrix.outputs.features }}"
           scenarios: "${{ needs.features-matrix.outputs.scenarios }}"
 
-  test-linux-images:
+  build-and-test-linux-images:
     if: needs.image-matrix.outputs.linux != '{"include":[]}'
     name: ${{ matrix.name }}
     needs: image-matrix
     secrets: inherit
-    uses: ./.github/workflows/build-and-test-linux-image.yml
+    uses: ./.github/workflows/build-test-and-push-linux-image.yml
     strategy:
       fail-fast: false
       matrix: ${{ fromJSON(needs.image-matrix.outputs.linux) }}
     with:
-      os : "${{ matrix.os }}"
+      push: 'false'
+      os: "${{ matrix.os }}"
       features: "${{ toJSON(matrix.features) }}"
       container_env: "${{ toJSON(matrix.env) }}"
       repo: "${{ vars.DOCKERHUB_REPOSITORY || github.repository }}"
 
-  test-windows-images:
+  build-and-test-windows-images:
     if: needs.image-matrix.outputs.windows != '{"include":[]}'
     name: ${{ matrix.name }}
     needs: image-matrix
     secrets: inherit
-    uses: ./.github/workflows/build-and-test-windows-image.yml
+    uses: ./.github/workflows/build-test-and-push-windows-image.yml
     strategy:
       fail-fast: false
       matrix: ${{ fromJSON(needs.image-matrix.outputs.windows) }}
     with:
-      os : "${{ matrix.os }}"
+      push: 'false'
+      os: "${{ matrix.os }}"
       features: "${{ toJSON(matrix.features) }}"
       container_env: "${{ toJSON(matrix.env) }}"
       repo: "${{ vars.DOCKERHUB_REPOSITORY || github.repository }}"
