@@ -21,8 +21,11 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        arch: [amd64, arm64]
-        include: ${{ fromJSON(inputs.os == 'windows' && '[{"runner":"2019","edition":"2019"}, {"runner":"2022","edition":"2022"}]' || '[]') }}
+        include: ${{
+          fromJSON(inputs.os == 'windows' &&
+            '[{"runner":"2019","edition":"2019","arch":"amd64"},
+              {"runner":"2022","edition":"2022","arch":"amd64"}]' ||
+            '[{"arch":"amd64"},{"arch":"arm64"}]') }}
     steps:
       - name: Checkout ${{ github.repository }}
         uses: actions/checkout@v3
