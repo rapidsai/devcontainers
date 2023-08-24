@@ -52,7 +52,7 @@ jobs:
           username: ${{ secrets.GPUCIBOT_DOCKERHUB_USER }}
           password: ${{ secrets.GPUCIBOT_DOCKERHUB_TOKEN }}
 
-      - name: "Build image: ${{ matrix.edition }} + VS${{ matrix.version }}"
+      - name: "Build image: ${{ matrix.win_edition }} + VS${{ matrix.version }}"
         id: build_image
         uses: ./.github/actions/build-windows-image
         with:
