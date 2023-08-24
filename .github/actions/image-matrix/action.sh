@@ -53,7 +53,7 @@ fi
 
 # Select images that include at least one of the changed features
 
-changed_images="$(\
+linux_images="$(\
   yq -eMo json matrix.yml \
 | jq -eMc --argjson xs "$features" '
   .include
@@ -109,12 +109,11 @@ if grep -qE '(windows|matrix\.yml)' <<< "${files}"; then
     )";
 fi
 
-if [[ "$changed_images" == "null" ]]; then changed_images="[]"; fi
+if [[ "$linux_images" == "null" ]]; then linux_images="[]"; fi
 if [[ "$windows_images" == "null" ]]; then windows_images="[]"; fi
-
-changed_images="$(jq -eMc ". += ${windows_images}" <<< "${changed_images}")";
 
 # Concatenate changed feature/image lists and write the matrix
 cat <<EOF
-matrix={"include":${changed_images:-"[]"}}
+linux={"include":${linux_images:-"[]"}}
+windows={"include":${windows_images:-"[]"}}
 EOF
