@@ -76,10 +76,10 @@ include:
 - os: "windows"
   images:
   - {features: [*cuda_prev_min, { name: "msvc", version: "2017" }]}
-  - {features: [*cuda_prev_min, { name: "msvc", version: "2019" }]}
-  - {features: [*cuda_curr_max, { name: "msvc", version: "2017" }]}
-  - {features: [*cuda_curr_max, { name: "msvc", version: "2019" }]}
-  - {features: [*cuda_curr_max, { name: "msvc", version: "2022" }]}
+  # - {features: [*cuda_prev_min, { name: "msvc", version: "2019" }]}
+  # - {features: [*cuda_curr_max, { name: "msvc", version: "2017" }]}
+  # - {features: [*cuda_curr_max, { name: "msvc", version: "2019" }]}
+  # - {features: [*cuda_curr_max, { name: "msvc", version: "2022" }]}
 
 # RAPIDS devcontainers
 
