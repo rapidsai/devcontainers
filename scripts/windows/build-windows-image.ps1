@@ -1,4 +1,4 @@
-# msvcVersion, cudaVersion, OS edition, isolation mode
+# clVersion, cudaVersion, OS edition, isolation mode
 Param(
     [Parameter(Mandatory=$true)]
     [string]
@@ -7,7 +7,7 @@ Param(
     [string]
     $cudaVersion="latest",
     [Parameter(Mandatory=$false)]
-    [ValidateSet('windows-2019', 'windows-2022')]
+    [ValidateSet('windows2019', 'windows2022')]
     [string]
     $edition="windows",
     [Parameter(Mandatory=$false)]
@@ -31,8 +31,8 @@ function TestReturnCode {
 Push-location "$PSScriptRoot"
 
 $rootWindowsImage = @{
-    "windows-2022" = "mcr.microsoft.com/windows/servercore:ltsc2022"
-    "windows-2019" = "mcr.microsoft.com/windows/servercore:ltsc2019"
+    "windows2022" = "mcr.microsoft.com/windows/servercore:ltsc2022"
+    "windows2019" = "mcr.microsoft.com/windows/servercore:ltsc2019"
 }[$edition]
 
 try {
