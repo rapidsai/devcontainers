@@ -3,6 +3,10 @@ name: build-image
 description: Build image
 
 inputs:
+  os:
+    type: string
+    required: true
+    description: Image OS
   tag:
     type: string
     required: true
@@ -15,6 +19,22 @@ inputs:
     type: string
     required: true
     description: Image repo
+  cuda:
+    type: string
+    required: false
+  msvc:
+    type: string
+    required: false
+  edition:
+    type: string
+    required: false
+  isolation:
+    type: string
+    required: false
+    default: process
+  version:
+    type: string
+    required: false
 
 outputs:
   repo:
@@ -24,16 +44,20 @@ runs:
   using: composite
   steps:
 
-    - name: Setup runner environment
+    - if: inputs.os != 'windows'
+      name: Setup runner environment
       uses: ./.github/actions/setup-runner-env
 
-    - name: Copy common scripts into features
+    - if: inputs.os != 'windows'
+      name: Copy common scripts into features
       uses: ./.github/actions/copy-common-scripts
 
-    - name: Install devcontainers CLI
+    - if: inputs.os != 'windows'
+      name: Install devcontainers CLI
       uses: ./.github/actions/install-devcontainers-cli
 
-    - id: build
+    - if: inputs.os != 'windows'
+      id: build
       name: Build ${{ inputs.repo }}:${{ inputs.tag }}-${{ inputs.arch }}
       shell: bash
       env:
@@ -49,3 +73,16 @@ runs:
           --workspace-folder "$(realpath -m ./image)" \
           --output "type=docker,dest=${{ runner.temp }}/${{ inputs.arch }}.tar" \
           ;
+
+    - if: inputs.os == 'windows'
+      id: build
+      name: Build ${{ inputs.repo }}:${{ inputs.version }}-cuda${{ inputs.cuda }}-msvc${{ inputs.msvc }}-${{ inputs.os }}${{ matrix.windows.edition }}
+      shell: powershell
+      run: |
+        .github/actions/build-image/action.ps1 `
+          -repo ${{ inputs.repo }}             `
+          -repoVersion ${{ inputs.version }}   `
+          -cudaVersion ${{ inputs.cuda }}      `
+          -msvcVersion ${{ inputs.msvc }}      `
+          -isolation ${{ inputs.isolation }}   `
+          -edition ${{ inputs.edition }}
