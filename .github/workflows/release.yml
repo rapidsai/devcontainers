@@ -37,7 +37,7 @@ jobs:
     name: ${{ matrix.name }}
     needs: image-matrix
     secrets: inherit
-    uses: ./.github/workflows/build-and-push-image.yml
+    uses: ./.github/workflows/build-and-push-linux-image.yml
     strategy:
       fail-fast: false
       matrix: ${{ fromJSON(needs.image-matrix.outputs.linux) }}
