@@ -15,6 +15,7 @@ make_pip_env() {
 
     local cuda_version="${CUDA_VERSION:-${CUDA_VERSION_MAJOR:-12}.${CUDA_VERSION_MINOR:-0}}";
     cuda_version="$(cut -d'.' -f3 --complement <<< "${cuda_version}")";
+    cuda_version_major="$(cut -d'.' -f1 <<< "${cuda_version}")";
 
     local python_version="${PYTHON_VERSION:-$(python3 --version 2>&1 | cut -d' ' -f2)}";
     python_version="$(cut -d'.' -f3 --complement <<< "${python_version}")";
@@ -57,7 +58,7 @@ make_pip_env() {
                 --matrix "arch=$(uname -m);cuda=${cuda_version};py=${python_version}" \
                 `# --stdout` \
           | grep -v '^#' \
-          | sed -E "s/-cu([0-9]+)/-cu${CUDA_VERSION_MAJOR}/g" \
+          | sed -E "s/-cu([0-9]+)/-cu${cuda_version_major}/g" \
             > /tmp/${lib}.requirements.txt;
         fi
     done
