@@ -82,7 +82,9 @@ linux_images="$(\
 
 windows_images="[]";
 
-if grep -qE '(windows|matrix\.yml)' <<< "${files}"; then
+if `# Include all images if full_matrix is true`  \
+   [ "${full_matrix}" == "1" ]                    \
+|| grep -qE '(windows|matrix\.yml)' <<< "${files}"; then
     windows_images="$(\
       yq -eMo json matrix.yml \
     | jq -eMc '
