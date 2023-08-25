@@ -15,7 +15,7 @@ make_pip_env() {
 
     local cuda_version="${CUDA_VERSION:-${CUDA_VERSION_MAJOR:-12}.${CUDA_VERSION_MINOR:-0}}";
     cuda_version="$(cut -d'.' -f3 --complement <<< "${cuda_version}")";
-    cuda_version_major="$(cut -d'.' -f1 <<< "${cuda_version}")";
+    local cuda_version_major="$(cut -d'.' -f1 <<< "${cuda_version}")";
 
     local python_version="${PYTHON_VERSION:-$(python3 --version 2>&1 | cut -d' ' -f2)}";
     python_version="$(cut -d'.' -f3 --complement <<< "${python_version}")";
@@ -25,17 +25,27 @@ make_pip_env() {
 
     local pip_noinstall=();
     local pip_reqs_txts=();
-    local project_manifest_yml="${PROJECT_MANIFEST_YML:-"/opt/rapids-build-utils/manifest.yaml"}";
 
-    for lib in $(yq eval '.repos[].name' "${project_manifest_yml}"); do
-        pip_noinstall+=("lib${lib}" "${lib}");
-    done
+    eval "$(                                  \
+        rapids-list-repos "$@"                \
+      | xargs -r -d'\n' -I% echo -n local %\; \
+    )";
 
-    for lib in $(find ~ -maxdepth 1 -mindepth 1 -type d ! -name '.*' -exec basename {} \;); do
-        if [ -f ~/"${lib}/dependencies.yaml" ]; then
-            pip_reqs_txts+=("/tmp/${lib}.requirements.txt");
+    local i;
 
-            for pkg in $(rapids-python-pkg-names "${lib}") $(rapids-python-conda-pkg-names "${lib}"); do
+    for ((i=0; i < ${repos_length:-0}; i+=1)); do
+
+        local repo="repos_${i}";
+        local repo_name="${repo}_name";
+        local repo_path="${repo}_path";
+
+        pip_noinstall+=("lib${!repo_name}" "${!repo_name}");
+
+        if [ -f ~/"${!repo_path}/dependencies.yaml" ]; then
+            pip_reqs_txts+=("/tmp/${!repo_name}.requirements.txt");
+
+            for pkg in $(rapids-python-pkg-names --repo "${!repo_name}") \
+                       $(rapids-python-conda-pkg-names --repo "${!repo_name}"); do
                 pip_noinstall+=("${pkg}" "${pkg}-cu.*");
                 if test -z "${pkg##*"-"*}"; then
                     pip_noinstall+=("${pkg//"-"/"_"}" "${pkg//"-"/"_"}-cu.*")
@@ -45,21 +55,23 @@ make_pip_env() {
                 fi
             done
 
-            rapids-dependency-file-generator \
-                --file_key py_build_${lib}   \
-                --file_key py_run_${lib}     \
-                --file_key py_test_${lib}    \
-                --file_key py_build          \
-                --file_key py_run            \
-                --file_key py_test           \
-                --file_key all               \
-                --output requirements        \
-                --config ~/"${lib}/dependencies.yaml" \
+            echo "Generating ${!repo_name}'s requirements.txt" 1>&2;
+
+            rapids-dependency-file-generator                                          \
+                --file_key py_build_${!repo_name}                                     \
+                --file_key py_run_${!repo_name}                                       \
+                --file_key py_test_${!repo_name}                                      \
+                --file_key py_build                                                   \
+                --file_key py_run                                                     \
+                --file_key py_test                                                    \
+                --file_key all                                                        \
+                --output requirements                                                 \
+                --config ~/"${!repo_path}/dependencies.yaml"                          \
                 --matrix "arch=$(uname -m);cuda=${cuda_version};py=${python_version}" \
                 `# --stdout` \
           | grep -v '^#' \
           | sed -E "s/-cu([0-9]+)/-cu${cuda_version_major}/g" \
-            > /tmp/${lib}.requirements.txt;
+            > /tmp/${!repo_name}.requirements.txt;
         fi
     done
 

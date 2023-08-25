@@ -14,6 +14,7 @@ clone_${NAME}() {
                 b|branch                          |
                 d|directory                       |
                 u|upstream                        |
+                no-update-env                     |
             ' - <<< "$@"                          \
           | xargs -r -d'\n' -I% echo -n local %\; \
         )";
@@ -44,8 +45,10 @@ clone_${NAME}() {
 
         git -C ~/"${SRC_PATH}" remote prune upstream;
 
-        rapids-update-content-command;
-        rapids-post-attach-command;
+        if test -z "${no_update_env:-}"; then
+            rapids-update-content-command;
+            rapids-post-attach-command;
+        fi
     fi
 }
 
