@@ -69,13 +69,15 @@ write_bad_creds() {
 }
 
 expect_s3_cache_is_used() {
-    sccache --show-stats | grep "Cache location";
-    sccache --show-stats 2>&1 | grep -qE 'Cache location \s+ s3';
+    local stats="$(sccache --show-stats 2>&1)";
+    grep "Cache location" <<< "${stats}";
+    grep -qE 'Cache location \s+ s3' <<< "${stats}";
 }
 
 expect_local_disk_cache_is_used() {
-    sccache --show-stats | grep "Cache location";
-    sccache --show-stats 2>&1 | grep -qE 'Cache location \s+ Local disk';
+    local stats="$(sccache --show-stats 2>&1)";
+    grep "Cache location" <<< "${stats}";
+    grep -qE 'Cache location \s+ Local disk' <<< "${stats}";
 }
 
 if test -n "${vault_host:-}" \
