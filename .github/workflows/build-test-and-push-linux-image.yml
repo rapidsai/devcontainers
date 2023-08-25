@@ -34,6 +34,8 @@ jobs:
       fail-fast: false
       matrix:
         arch: [amd64, arm64]
+    outputs:
+      tag: ${{ steps.json.outputs.tag }}
     steps:
       - name: Checkout ${{ github.repository }}
         uses: actions/checkout@v3
