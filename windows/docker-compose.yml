@@ -1,0 +1,13 @@
+services:
+  windows:
+    isolation: "$ISOLATION"
+    image: "$IMAGE_NAME"
+    tty: true
+    build:
+      context: .\image
+      dockerfile: ..\windows.dockerfile
+      args:
+        MSVC_VER: "$MSVC_VER"
+        MSVC_COMPILER_VER: "$MSVC_COMPILER_VER"
+        CUDA_VER: "$CUDA_VER"
+        ROOT_IMAGE: "$ROOT_IMAGE"

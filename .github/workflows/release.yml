@@ -18,7 +18,8 @@ jobs:
     name: Determine image matrix
     runs-on: ubuntu-latest
     outputs:
-      matrix: ${{ steps.matrix.outputs.matrix }}
+      linux: ${{ steps.matrix.outputs.linux }}
+      windows: ${{ steps.matrix.outputs.windows }}
     steps:
       - name: Checkout ${{ github.repository }}
         uses: actions/checkout@v3
@@ -32,15 +33,32 @@ jobs:
         with:
           full_matrix: 'true'
 
-  build-and-push-images:
+  build-and-push-linux-images:
     name: ${{ matrix.name }}
     needs: image-matrix
     secrets: inherit
-    uses: ./.github/workflows/build-and-push-image.yml
+    uses: ./.github/workflows/build-test-and-push-linux-image.yml
     strategy:
       fail-fast: false
-      matrix: ${{ fromJSON(needs.image-matrix.outputs.matrix) }}
+      matrix: ${{ fromJSON(needs.image-matrix.outputs.linux) }}
     with:
-      os : "${{ matrix.os }}"
+      push: 'true'
+      os: "${{ matrix.os }}"
       features: "${{ toJSON(matrix.features) }}"
       container_env: "${{ toJSON(matrix.env) }}"
+      repo: "${{ vars.DOCKERHUB_REPOSITORY || github.repository }}"
+
+  build-and-push-windows-images:
+    name: ${{ matrix.name }}
+    needs: image-matrix
+    secrets: inherit
+    uses: ./.github/workflows/build-test-and-push-windows-image.yml
+    strategy:
+      fail-fast: false
+      matrix: ${{ fromJSON(needs.image-matrix.outputs.windows) }}
+    with:
+      push: 'true'
+      os: "${{ matrix.os }}"
+      features: "${{ toJSON(matrix.features) }}"
+      container_env: "${{ toJSON(matrix.env) }}"
+      repo: "${{ vars.DOCKERHUB_REPOSITORY || github.repository }}"

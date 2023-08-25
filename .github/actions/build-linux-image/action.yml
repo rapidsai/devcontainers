@@ -1,6 +1,6 @@
 name: build-image
 
-description: Build image
+description: Build Linux image
 
 inputs:
   tag:
@@ -15,10 +15,6 @@ inputs:
     type: string
     required: true
     description: Image repo
-
-outputs:
-  repo:
-    value: ${{ steps.build.outputs.repo }}
 
 runs:
   using: composite
@@ -38,14 +34,12 @@ runs:
       shell: bash
       env:
         NODE_NO_WARNINGS: 1
+        repo: ${{ inputs.repo }}
       run: |
-        repo="$(echo "${{ inputs.repo }}" | tr '[:upper:]' '[:lower:]')";
-        echo "repo=${repo}" >> $GITHUB_OUTPUT;
-
         devcontainer build \
           --platform "linux/${{ inputs.arch }}" \
-          --cache-from "${repo}:${{ inputs.tag }}" \
-          --image-name "${repo}:${{ inputs.tag }}" \
+          --cache-from "${repo,,}:${{ inputs.tag }}" \
+          --image-name "${repo,,}:${{ inputs.tag }}" \
           --workspace-folder "$(realpath -m ./image)" \
           --output "type=docker,dest=${{ runner.temp }}/${{ inputs.arch }}.tar" \
           ;

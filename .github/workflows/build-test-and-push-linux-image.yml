@@ -1,4 +1,4 @@
-name: Build and push devcontainer images
+name: Build and test devcontainer images
 
 on:
   workflow_call:
@@ -6,21 +6,30 @@ on:
       os:
         type: string
         required: true
+        description: Image OS
+      repo:
+        type: string
+        required: true
+        description: Image repo
+      push:
+        type: string
+        required: false
+        default: 'false'
+        description: Whether to push the image
       features:
         type: string
         required: true
+        description: JSON list of devcontainer features
       container_env:
         type: string
         required: false
+        description: JSON map of default envvars to build into the devcontainer
 
 jobs:
 
-  build-and-upload:
-    name: Build and upload
+  build-test-and-upload:
+    name: Build (${{ matrix.arch }})
     runs-on: ${{ fromJSON(github.repository != 'rapidsai/devcontainers' && '"ubuntu-latest"' || format('"linux-{0}-cpu4"', matrix.arch)) }}
-    outputs:
-      tag: ${{ steps.json.outputs.tag }}
-      repo: ${{ steps.build.outputs.repo }}
     strategy:
       fail-fast: false
       matrix:
@@ -36,19 +45,19 @@ jobs:
         name: Write .devcontainer.json
         uses: ./.github/actions/devcontainer-json
         with:
-          os : "${{ inputs.os }}"
+          os: "${{ inputs.os }}"
           features: "${{ inputs.features }}"
           container_env: "${{ inputs.container_env }}"
 
-      - id: build
-        name: Build ${{ steps.json.outputs.tag }}-${{ matrix.arch }}
-        uses: ./.github/actions/build-image
+      - name: Build ${{ steps.json.outputs.tag }}-${{ matrix.arch }}
+        uses: ./.github/actions/build-linux-image
         with:
           arch: "${{ matrix.arch }}"
+          repo: "${{ inputs.repo }}"
           tag: "${{ steps.json.outputs.tag }}"
-          repo: "${{ vars.DOCKERHUB_REPOSITORY || github.repository }}"
 
-      - name: Upload ${{ steps.json.outputs.tag }}-${{ matrix.arch }}
+      - if: inputs.push == 'true'
+        name: Upload ${{ steps.json.outputs.tag }}-${{ matrix.arch }}
         uses: actions/upload-artifact@v3
         with:
           retention-days: 1
@@ -56,8 +65,9 @@ jobs:
           path: ${{ runner.temp }}/${{ matrix.arch }}.tar
 
   push-to-dockerhub:
+    if: inputs.push == 'true'
     name: Push to Docker Hub
-    needs: build-and-upload
+    needs: build-test-and-upload
     runs-on: ubuntu-latest
     steps:
       - name: Checkout ${{ github.repository }}
@@ -70,10 +80,10 @@ jobs:
         with:
           tool_cache: "${{ runner.tool_cache }}"
 
-      - name: Download ${{ needs.build-and-upload.outputs.tag }}
+      - name: Download ${{ needs.build-test-and-upload.outputs.tag }}
         uses: actions/download-artifact@v3
         with:
-          name: ${{ needs.build-and-upload.outputs.tag }}
+          name: ${{ needs.build-test-and-upload.outputs.tag }}
           path: ${{ runner.temp }}
 
       - name: Login to Docker Hub
@@ -85,12 +95,12 @@ jobs:
       - name: Push multiarch manifest to Docker Hub
         shell: bash --noprofile --norc -x -eo pipefail {0}
         env:
-          name: "${{ needs.build-and-upload.outputs.repo }}:${{ needs.build-and-upload.outputs.tag }}"
+          name: "${{ inputs.repo }}:${{ needs.build-test-and-upload.outputs.tag }}"
         run: |
 
           find "${{ runner.temp }}/" -type f -name '*.tar';
 
-          docker manifest rm ${name} || true;
+          docker manifest rm ${name,,} || true;
 
           hashes=();
 
@@ -98,8 +108,8 @@ jobs:
             # Load the arch-specific image with the final name
             docker load --input "${{ runner.temp }}/${arch}.tar";
             # Push the local image to the registry and save the remote hash
-            hashes+=("$(docker push ${name} | tail -n1 | cut -d' ' -f3)");
+            hashes+=("$(docker push ${name,,} | tail -n1 | cut -d' ' -f3)");
           done
 
           # Create and push the multiarch manifest
-          docker buildx imagetools create --tag ${name} ${hashes[@]};
+          docker buildx imagetools create --tag ${name,,} ${hashes[@]};

@@ -31,13 +31,18 @@ features="$(echo                        \
 || echo ''                              \
 )";
 
-if `# Include all images if full_matrix is true`         \
-   [ "${full_matrix}" == "1" ]                           \
-   `# Include all images if matrix or workflows changed` \
-|| echo "${files}" | grep -qE '^(\.github/|matrix\.yml)' \
-   `# Include all images if cmake, ninja, sccache, `     \
-   `# gitlab-cli, or utils features changed`             \
-|| echo "${features}" | grep -qE "(${common_features})"  \
+if `# Include all images if full_matrix is true`                         \
+   [ "${full_matrix}" == "1" ]                                           \
+   `# Include all images if matrix or workflows changed`                 \
+|| grep -q 'matrix.yml'                                   <<< "${files}" \
+|| grep -q '.github/workflows/test.yml'                   <<< "${files}" \
+|| grep -q '.github/actions/build-linux-image/action.yml' <<< "${files}" \
+|| grep -q '.github/actions/image-matrix/action.sh'       <<< "${files}" \
+|| grep -q '.github/actions/image-matrix/action.yml'      <<< "${files}" \
+|| grep -q '.github/workflows/build-and-test-image.yml'   <<< "${files}" \
+   `# Include all images if cmake, ninja, sccache, `                     \
+   `# gitlab-cli, or utils features changed`                             \
+|| grep -qE "(${common_features})"  <<< "${features}"                    \
 ; then
   features="$(                                                  \
       find features/src -mindepth 1 -maxdepth 1 -type d -print0 \
@@ -48,12 +53,12 @@ fi
 
 # Select images that include at least one of the changed features
 
-changed_images="$(\
-  cat matrix.yml  \
-| yq -eMo json    \
+linux_images="$(\
+  yq -eMo json matrix.yml \
 | jq -eMc --argjson xs "$features" '
   .include
   | map(.os as $os
+    | select(.os != "windows")
     | .images
     | map(.env as $env | .features
       | select(any(IN(.name; $xs[])))
@@ -71,12 +76,46 @@ changed_images="$(\
       }
     )
   )
-  | flatten | unique'
+  | flatten | unique
+  '
 )";
 
-if [[ "$changed_images" == "null" ]]; then changed_images=""; fi
+windows_images="[]";
+
+if `# Include all images if full_matrix is true`  \
+   [ "${full_matrix}" == "1" ]                    \
+|| grep -qE '(windows|matrix\.yml)' <<< "${files}"; then
+    windows_images="$(\
+      yq -eMo json matrix.yml \
+    | jq -eMc '
+      .include
+      | map(.os as $os
+        | select(.os == "windows")
+        | .images
+        | map(.features
+          | {
+            os: $os,
+            features: .,
+            name: (.
+              | map(.
+                | select(.hide != true)
+                | (.name | split("/")[-1] | split(":")[0]) + (.version // "" | tostring))
+              )
+              | (. + [$os])
+              | join(" "),
+          }
+        )
+      )
+      | flatten | unique
+      '
+    )";
+fi
+
+if [[ "$linux_images" == "null" ]]; then linux_images="[]"; fi
+if [[ "$windows_images" == "null" ]]; then windows_images="[]"; fi
 
 # Concatenate changed feature/image lists and write the matrix
 cat <<EOF
-matrix={"include":${changed_images:-"[]"}}
+linux={"include":${linux_images:-"[]"}}
+windows={"include":${windows_images:-"[]"}}
 EOF

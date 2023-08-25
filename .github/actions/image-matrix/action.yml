@@ -14,8 +14,10 @@ inputs:
     default: 'true'
 
 outputs:
-  matrix:
-    value: ${{ steps.matrix.outputs.matrix }}
+  linux:
+    value: ${{ steps.matrix.outputs.linux }}
+  windows:
+    value: ${{ steps.matrix.outputs.windows }}
 
 runs:
   using: composite
@@ -33,9 +35,11 @@ runs:
         base_sha: ${{ fromJSON(steps.get-pr-info.outputs.pr-info).base.sha }}
         files: |
           image/*
+          windows/**
           matrix.yml
+          .github/**/*windows*
           .github/workflows/test.yml
-          .github/actions/build-image/action.yml
+          .github/actions/build-linux-image/action.yml
           .github/actions/image-matrix/action.sh
           .github/actions/image-matrix/action.yml
           .github/workflows/build-and-test-image.yml

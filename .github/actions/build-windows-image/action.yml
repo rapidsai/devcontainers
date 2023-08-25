@@ -1,0 +1,48 @@
+name: build-windows-image
+
+description: Build a Windows Container on Windows image with CUDA and MSVC
+
+inputs:
+  cl:
+    type: string
+    required: false
+    description: MSVC compiler version
+  tag:
+    type: string
+    required: true
+    description: Image tag
+  repo:
+    type: string
+    required: true
+    description: Image repo
+  cuda:
+    type: string
+    required: false
+    description: CUDA Toolkit version
+  edition:
+    type: string
+    required: false
+    description: Windows edition
+  version:
+    type: string
+    required: false
+    description: Repository version
+  isolation:
+    type: string
+    required: false
+    default: process
+    description: Windows isolation mode to target (hyperv or process isolation)
+
+runs:
+  using: composite
+  steps:
+    - name: Build ${{ inputs.repo }}:${{ inputs.tag }}
+      shell: powershell
+      run: |
+        .\windows\build-windows-image.ps1 `
+          -repo ${{ inputs.repo }} `
+          -clVersion ${{ inputs.cl }} `
+          -cudaVersion ${{ inputs.cuda }} `
+          -repoVersion ${{ inputs.version }} `
+          -isolation ${{ inputs.isolation }} `
+          -edition windows${{ inputs.edition }}

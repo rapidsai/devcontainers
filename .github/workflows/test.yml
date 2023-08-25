@@ -97,7 +97,8 @@ jobs:
     needs: features-matrix
     runs-on: ubuntu-latest
     outputs:
-      matrix: ${{ steps.matrix.outputs.matrix }}
+      linux: ${{ steps.matrix.outputs.linux }}
+      windows: ${{ steps.matrix.outputs.windows }}
     steps:
       - name: Checkout ${{ github.repository }}
         uses: actions/checkout@v3
@@ -113,16 +114,34 @@ jobs:
           features: "${{ needs.features-matrix.outputs.features }}"
           scenarios: "${{ needs.features-matrix.outputs.scenarios }}"
 
-  test-images:
-    if: needs.image-matrix.outputs.matrix != '{"include":[]}'
+  build-and-test-linux-images:
+    if: needs.image-matrix.outputs.linux != '{"include":[]}'
     name: ${{ matrix.name }}
     needs: image-matrix
     secrets: inherit
-    uses: ./.github/workflows/build-and-test-image.yml
+    uses: ./.github/workflows/build-test-and-push-linux-image.yml
     strategy:
       fail-fast: false
-      matrix: ${{ fromJSON(needs.image-matrix.outputs.matrix) }}
+      matrix: ${{ fromJSON(needs.image-matrix.outputs.linux) }}
     with:
-      os : "${{ matrix.os }}"
+      push: 'false'
+      os: "${{ matrix.os }}"
       features: "${{ toJSON(matrix.features) }}"
       container_env: "${{ toJSON(matrix.env) }}"
+      repo: "${{ vars.DOCKERHUB_REPOSITORY || github.repository }}"
+
+  build-and-test-windows-images:
+    if: needs.image-matrix.outputs.windows != '{"include":[]}'
+    name: ${{ matrix.name }}
+    needs: image-matrix
+    secrets: inherit
+    uses: ./.github/workflows/build-test-and-push-windows-image.yml
+    strategy:
+      fail-fast: false
+      matrix: ${{ fromJSON(needs.image-matrix.outputs.windows) }}
+    with:
+      push: 'false'
+      os: "${{ matrix.os }}"
+      features: "${{ toJSON(matrix.features) }}"
+      container_env: "${{ toJSON(matrix.env) }}"
+      repo: "${{ vars.DOCKERHUB_REPOSITORY || github.repository }}"
