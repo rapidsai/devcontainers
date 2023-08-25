@@ -97,7 +97,6 @@ jobs:
       - name: Push multiarch manifest to Docker Hub
         shell: bash --noprofile --norc -x -eo pipefail {0}
         env:
-          tag: "${{ needs.build-test-and-upload.outputs.tag }}"
           name: "${{ inputs.repo }}:${{ needs.build-test-and-upload.outputs.tag }}"
         run: |
 
@@ -109,7 +108,7 @@ jobs:
 
           for arch in "amd64" "arm64"; do
             # Load the arch-specific image with the final name
-            docker load --input "${{ runner.temp }}/${tag}/${arch}.tar";
+            docker load --input "${{ runner.temp }}/${arch}.tar";
             # Push the local image to the registry and save the remote hash
             hashes+=("$(docker push ${name,,} | tail -n1 | cut -d' ' -f3)");
           done
