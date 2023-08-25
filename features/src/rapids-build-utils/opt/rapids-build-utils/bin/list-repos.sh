@@ -49,7 +49,7 @@ ________EOF
     yq -Mo json "${manifest}" | jq -r "${query}";
 }
 
-if test -n "${devcontainer_utils_debug:-}"; then
+if test -n "${rapids_build_utils_debug:-}"; then
     PS4="+ ${BASH_SOURCE[0]}:\${LINENO} "; set -x;
 fi
 
