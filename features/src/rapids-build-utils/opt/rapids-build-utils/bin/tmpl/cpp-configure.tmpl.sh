@@ -39,7 +39,7 @@ configure_${CPP_LIB}_cpp() {
     cmake_args+=(${__rest__[@]});
 
     eval "$(                                    \
-        rapids-get-jobs-and-archs -j${parallel} \
+        rapids-get-archs-and-load -j${parallel} \
       | xargs -r -d'\n' -I% echo -n local %\;   \
     )";
 
