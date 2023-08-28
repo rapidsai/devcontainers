@@ -64,7 +64,7 @@ make_pip_env() {
         fi
     done
 
-    # add all pytohn packages to the noinstall list.
+    # add all python packages to the noinstall list.
     for pkg in $(rapids-python-pkg-names) $(rapids-python-conda-pkg-names); do
         pip_noinstall+=("${pkg}" "${pkg}-cu.*");
         if test -z "${pkg##*"-"*}"; then
