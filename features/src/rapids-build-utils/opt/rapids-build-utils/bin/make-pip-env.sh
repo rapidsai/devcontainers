@@ -44,17 +44,6 @@ make_pip_env() {
         if [ -f ~/"${!repo_path}/dependencies.yaml" ]; then
             pip_reqs_txts+=("/tmp/${!repo_name}.requirements.txt");
 
-            for pkg in $(rapids-python-pkg-names --repo "${!repo_name}") \
-                       $(rapids-python-conda-pkg-names --repo "${!repo_name}"); do
-                pip_noinstall+=("${pkg}" "${pkg}-cu.*");
-                if test -z "${pkg##*"-"*}"; then
-                    pip_noinstall+=("${pkg//"-"/"_"}" "${pkg//"-"/"_"}-cu.*")
-                fi
-                if test -z "${pkg##*"_"*}"; then
-                    pip_noinstall+=("${pkg//"_"/"-"}" "${pkg//"_"/"-"}-cu.*")
-                fi
-            done
-
             echo "Generating ${!repo_name}'s requirements.txt" 1>&2;
 
             rapids-dependency-file-generator                                          \
@@ -72,6 +61,17 @@ make_pip_env() {
           | grep -v '^#' \
           | sed -E "s/-cu([0-9]+)/-cu${cuda_version_major}/g" \
             > /tmp/${!repo_name}.requirements.txt;
+        fi
+    done
+
+    # add all python packages to the noinstall list.
+    for pkg in $(rapids-python-pkg-names) $(rapids-python-conda-pkg-names); do
+        pip_noinstall+=("${pkg}" "${pkg}-cu.*");
+        if test -z "${pkg##*"-"*}"; then
+            pip_noinstall+=("${pkg//"-"/"_"}" "${pkg//"-"/"_"}-cu.*")
+        fi
+        if test -z "${pkg##*"_"*}"; then
+            pip_noinstall+=("${pkg//"_"/"-"}" "${pkg//"_"/"-"}-cu.*")
         fi
     done
 
