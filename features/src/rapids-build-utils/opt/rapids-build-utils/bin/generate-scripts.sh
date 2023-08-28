@@ -2,21 +2,21 @@
 
 TMPL=/opt/rapids-build-utils/bin/tmpl;
 
+TMP_SCRIPT_DIR=/tmp/rapids
+mkdir -p $TMP_SCRIPT_DIR
+
 remove_script_for_pattern() {
     set -euo pipefail;
-
     local pattern="${1}";
-    for x in $(update-alternatives --get-selections | grep -oP "$pattern"); do
-        if [[ -f "$(which "$x")" ]]; then
-            (sudo rm "$(realpath -m "$(which "$x")")" >/dev/null 2>&1 || true);
-            (sudo update-alternatives --remove-all $x >/dev/null 2>&1 || true);
-        fi
+    for x in $(ls $TMP_SCRIPT_DIR); do
+        (sudo rm "$TMP_SCRIPT_DIR/$x" >/dev/null 2>&1 || true);
+        (sudo update-alternatives --remove-all $x >/dev/null 2>&1 || true);
     done
 }
 
 generate_script() {
     local bin="${1:-}";
-    if test -n "$bin" && ! test -f "/tmp/${bin}.sh"; then
+    if test -n "$bin" && ! test -f "$TMP_SCRIPT_DIR/${bin}.sh"; then
         cat - \
       | envsubst '$NAME
                   $SRC_PATH
@@ -30,12 +30,12 @@ generate_script() {
                   $GIT_REPO
                   $GIT_HOST
                   $GIT_UPSTREAM' \
-      | sudo tee "/tmp/${bin}.sh" >/dev/null;
+      | sudo tee "$TMP_SCRIPT_DIR/${bin}.sh" >/dev/null;
 
-        sudo chmod +x "/tmp/${bin}.sh";
+        sudo chmod +x "$TMP_SCRIPT_DIR/${bin}.sh";
 
         sudo update-alternatives --install \
-            "/usr/bin/${bin}" "${bin}" "/tmp/${bin}.sh" 0 \
+            "/usr/bin/${bin}" "${bin}" "$TMP_SCRIPT_DIR/${bin}.sh" 0 \
             >/dev/null 2>&1;
     fi
 }
