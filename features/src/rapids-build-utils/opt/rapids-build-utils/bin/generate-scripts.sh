@@ -275,10 +275,5 @@ fi
 (remove_script_for_pattern '^clean-[A-Za-z\-_]*$');
 (remove_script_for_pattern '^build-[A-Za-z\-_]*$');
 (remove_script_for_pattern '^configure-[A-Za-z\-_]*$');
-(remove_script_for_pattern '^build-[A-Za-z\-_]*-cpp$');
-(remove_script_for_pattern '^clean-[A-Za-z\-_]*-cpp$');
-(remove_script_for_pattern '^configure-[A-Za-z\-_]*-cpp$');
-(remove_script_for_pattern '^build-[A-Za-z\-_]*-python$');
-(remove_script_for_pattern '^clean-[A-Za-z\-_]*-python$');
 
 (generate_scripts "$@");
