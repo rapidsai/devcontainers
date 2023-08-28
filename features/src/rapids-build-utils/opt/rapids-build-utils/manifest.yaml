@@ -113,7 +113,7 @@ repos:
     - name: pylibcugraphops
       sub_dir: pylibcugraphops
       depends: []
-    - name: pylibcugraphops-internal
+    - name: pylibcugraphops_internal
       sub_dir: pylibcugraphops_internal
       depends: [pylibcugraphops]
   git:
@@ -136,13 +136,13 @@ repos:
     - name: cugraph-nx
       sub_dir: python/cugraph-nx
       depends: []
-    - name: cugraph-pyg
+    - name: cugraph_pyg
       sub_dir: python/cugraph-pyg
       depends: []
-    - name: server
+    - name: cugraph-service-server
       sub_dir: python/cugraph-service/client
       depends: []
-    - name: client
+    - name: cugraph-service-client
       sub_dir: python/cugraph-service/server
       depends: []
     - name: pylibcugraph

@@ -14,9 +14,12 @@ clean_${PY_LIB}_cpp() {
 
     local dir;
     for dir in lib temp dist; do
-        local slug="${dir}.$(uname -s)-$(uname -m)-cpython-${python_version/./}";
-        if test -d ~/"${PY_SRC}"/build/${slug,,}; then
-            rm -rf ~/"${PY_SRC}"/build/${slug,,};
+        local slug="${dir}.$(uname -s)-$(uname -m)";
+        if test -d ~/"${PY_SRC}"/build/${slug,,}-${python_version/./}; then
+            rm -rf ~/"${PY_SRC}"/build/${slug,,}-${python_version/./};
+        fi
+        if test -d ~/"${PY_SRC}"/build/${slug,,}-cpython-${python_version/./}; then
+            rm -rf ~/"${PY_SRC}"/build/${slug,,}-cpython-${python_version/./};
         fi
     done
 

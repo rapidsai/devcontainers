@@ -23,16 +23,19 @@ build_${CPP_LIB}_cpp() {
 
     configure-${CPP_LIB}-cpp ${verbose} ${__rest__[@]};
 
-    eval "$(                                     \
-        rapids-get-jobs-and-archs ${__rest__[@]} \
-      | xargs -r -d'\n' -I% echo -n local %\;    \
+    eval "$(                                              \
+        rapids-get-num-archs-jobs-and-load ${__rest__[@]} \
+      | xargs -r -d'\n' -I% echo -n local %\;             \
     )";
 
     if test -n "${verbose}"; then verbose="--verbose"; fi
 
-    time                                        \
-    JOBS="${n_jobs}" PARALLEL_LEVEL="${n_jobs}" \
-    cmake --build ~/${CPP_SRC}/build/latest ${verbose} --parallel ${n_jobs};
+    time cmake                              \
+        --build ~/${CPP_SRC}/build/latest   \
+        ${verbose}                          \
+        -j${n_jobs}                         \
+        --                                  \
+        -l${n_load};
 }
 
 if test -n "${rapids_build_utils_debug:-}"; then

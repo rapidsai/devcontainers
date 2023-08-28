@@ -25,16 +25,29 @@ make_conda_env() {
     local conda_noinstall=();
     local conda_env_yamls=();
 
-    for lib in $(find ~ -maxdepth 1 -mindepth 1 -type d ! -name '.*' -exec basename {} \;); do
-        if [ -f ~/"${lib}/dependencies.yaml" ]; then
-            conda_env_yamls+=("/tmp/${lib}.yaml");
-            conda_noinstall+=("$(rapids-python-conda-pkg-names "${lib}")");
+    eval "$(                                  \
+        rapids-list-repos "$@"                \
+      | xargs -r -d'\n' -I% echo -n local %\; \
+    )";
+
+    local i;
+
+    for ((i=0; i < ${repos_length:-0}; i+=1)); do
+
+        local repo="repos_${i}";
+        local repo_name="${repo}_name";
+        local repo_path="${repo}_path";
+
+        if [ -f ~/"${!repo_path}/dependencies.yaml" ]; then
+            conda_env_yamls+=("/tmp/${!repo_name}.yaml");
+            conda_noinstall+=("$(rapids-python-conda-pkg-names --repo "${!repo_name}")");
+            echo "Generating ${!repo_name}'s conda env yml" 1>&2;
             /opt/conda/bin/rapids-dependency-file-generator \
                 --file_key all \
                 --output conda \
-                --config ~/"${lib}/dependencies.yaml" \
+                --config ~/"${!repo_path}/dependencies.yaml" \
                 --matrix "arch=$(uname -m);cuda=${cuda_version};py=${python_version}" \
-            > /tmp/${lib}.yaml;
+            > /tmp/${!repo_name}.yaml;
         fi
     done
 

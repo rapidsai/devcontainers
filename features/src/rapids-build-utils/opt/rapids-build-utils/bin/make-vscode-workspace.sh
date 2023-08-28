@@ -65,7 +65,7 @@ EOF' % $1
 }
 
 python_lib_entries() {
-    local py_dirs=($(rapids-python-pkg-roots $1 | sort -bd));
+    local py_dirs=($(rapids-python-pkg-roots -r $1 | sort -bd));
     for i in "${!py_dirs[@]}"; do
         local py_dir="${py_dirs[$i]}";
         cat<<EOF

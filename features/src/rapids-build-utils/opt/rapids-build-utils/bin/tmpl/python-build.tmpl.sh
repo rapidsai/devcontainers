@@ -13,8 +13,10 @@ build_${PY_LIB}_python() {
 
     eval "$(                                  \
         devcontainer-utils-parse-args --names '
+            a|archs                           |
             j|parallel                        |
             v|verbose                         |
+            m|max-device-obj-memory-usage     |
         ' - <<< "$@"                          \
       | xargs -r -d'\n' -I% echo -n local %\; \
     )";
@@ -28,9 +30,7 @@ build_${PY_LIB}_python() {
         cmake_args+=("--log-level=VERBOSE");
     fi
 
-    # Define both lowercase and uppercase
-    # `-DFIND_<lib>_CPP=ON` and `-DFIND_<LIB>_CPP=ON` because the RAPIDS
-    # scikit-build CMakeLists.txt's aren't 100% consistent in the casing
+    cmake_args+=(${CMAKE_ARGS:-});
     cmake_args+=(${CPP_DEPS});
     cmake_args+=(${CPP_ARGS});
     cmake_args+=(${__rest__[@]});
@@ -58,12 +58,12 @@ build_${PY_LIB}_python() {
 
     trap "rm -rf ~/'${PY_SRC}/$(echo "${PY_LIB}" | tr '-' '_').egg-info'" EXIT;
 
-    time                                              \
-    CMAKE_GENERATOR="Ninja"                           \
-    SKBUILD_BUILD_OPTIONS="${ninja_args[@]}"          \
-    SETUPTOOLS_ENABLE_FEATURES="legacy-editable"      \
-    CMAKE_ARGS="$(rapids-parse-cmake-args ${cmake_args[@]})" \
-        python -m pip install ${pip_args[@]}          \
+    time                                         \
+    CMAKE_GENERATOR="Ninja"                      \
+    CMAKE_ARGS="${cmake_args[@]}"                \
+    SKBUILD_BUILD_OPTIONS="${ninja_args[@]}"     \
+    SETUPTOOLS_ENABLE_FEATURES="legacy-editable" \
+        python -m pip install ${pip_args[@]}     \
     ;
 }
 
