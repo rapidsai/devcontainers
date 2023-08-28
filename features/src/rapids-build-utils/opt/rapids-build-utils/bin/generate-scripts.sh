@@ -2,21 +2,21 @@
 
 TMPL=/opt/rapids-build-utils/bin/tmpl;
 
+TMP_SCRIPT_DIR=/tmp/rapids-build-utils
+mkdir -p $TMP_SCRIPT_DIR
+
 remove_script_for_pattern() {
     set -euo pipefail;
-
     local pattern="${1}";
-    for x in $(update-alternatives --get-selections | grep -oP "$pattern"); do
-        if [[ -f "$(which "$x")" ]]; then
-            (sudo rm "$(realpath -m "$(which "$x")")" >/dev/null 2>&1 || true);
-            (sudo update-alternatives --remove-all $x >/dev/null 2>&1 || true);
-        fi
+    for x in $(find $TMP_SCRIPT_DIR -printf '%f\n' | grep -oP "$pattern"); do
+        (sudo rm "$TMP_SCRIPT_DIR/$x" >/dev/null 2>&1 || true);
+        (sudo update-alternatives --remove-all $x >/dev/null 2>&1 || true);
     done
 }
 
 generate_script() {
     local bin="${1:-}";
-    if test -n "$bin" && ! test -f "/tmp/${bin}.sh"; then
+    if test -n "$bin" && ! test -f "$TMP_SCRIPT_DIR/${bin}"; then
         cat - \
       | envsubst '$NAME
                   $SRC_PATH
@@ -30,28 +30,28 @@ generate_script() {
                   $GIT_REPO
                   $GIT_HOST
                   $GIT_UPSTREAM' \
-      | sudo tee "/tmp/${bin}.sh" >/dev/null;
+      | sudo tee "$TMP_SCRIPT_DIR/${bin}" >/dev/null;
 
-        sudo chmod +x "/tmp/${bin}.sh";
+        sudo chmod +x "$TMP_SCRIPT_DIR/${bin}";
 
         sudo update-alternatives --install \
-            "/usr/bin/${bin}" "${bin}" "/tmp/${bin}.sh" 0 \
+            "/usr/bin/${bin}" "${bin}" "$TMP_SCRIPT_DIR/${bin}" 0 \
             >/dev/null 2>&1;
     fi
 }
 
 generate_all_script_impl() {
     local bin="$SCRIPT-all";
-    if test -n "$bin" && ! test -f "/tmp/${bin}.sh"; then
+    if test -n "$bin" && ! test -f "$TMP_SCRIPT_DIR/${bin}"; then
         cat - \
       | envsubst '$NAMES
                   $SCRIPT' \
-      | sudo tee "/tmp/${bin}.sh" >/dev/null;
+      | sudo tee "$TMP_SCRIPT_DIR/${bin}" >/dev/null;
 
-        sudo chmod +x "/tmp/${bin}.sh";
+        sudo chmod +x "$TMP_SCRIPT_DIR/${bin}";
 
         sudo update-alternatives --install \
-            "/usr/bin/${bin}" "${bin}" "/tmp/${bin}.sh" 0 \
+            "/usr/bin/${bin}" "${bin}" "$TMP_SCRIPT_DIR/${bin}" 0 \
             >/dev/null 2>&1;
     fi
 }
@@ -271,14 +271,9 @@ if test -n "${rapids_build_utils_debug:-}"; then
     PS4="+ ${BASH_SOURCE[0]}:\${LINENO} "; set -x;
 fi
 
-(remove_script_for_pattern '^clone-[\w-_\.]+');
-(remove_script_for_pattern '^clean-[\w-_\.]+');
-(remove_script_for_pattern '^build-[\w-_\.]+');
-(remove_script_for_pattern '^configure-[\w-_\.]+');
-(remove_script_for_pattern '^build-[\w-_\.]+-cpp');
-(remove_script_for_pattern '^clean-[\w-_\.]+-cpp');
-(remove_script_for_pattern '^configure-[\w-_\.]+-cpp');
-(remove_script_for_pattern '^build-[\w-_\.]+-python');
-(remove_script_for_pattern '^clean-[\w-_\.]+-python');
+(remove_script_for_pattern '^clone-[A-Za-z\-_]*$');
+(remove_script_for_pattern '^clean-[A-Za-z\-_]*$');
+(remove_script_for_pattern '^build-[A-Za-z\-_]*$');
+(remove_script_for_pattern '^configure-[A-Za-z\-_]*$');
 
 (generate_scripts "$@");
