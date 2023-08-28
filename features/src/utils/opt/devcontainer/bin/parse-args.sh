@@ -54,7 +54,7 @@ parse_args() {
             if test "${#vars_array}" -gt 0 \
             && grep -qP "^--?${vars}([^\s])+$" <<< "${arg:-}"; then
                 for name in ${vars_array[@]}; do
-                    if grep -qP "^--?${name}[0-9]+$" <<< "${arg:-}"; then
+                    if grep -qP "^--?${name}([0-9]|\.)+$" <<< "${arg:-}"; then
                         key="${name}";
                         val="${arg#-}";
                         val="${val#-}";

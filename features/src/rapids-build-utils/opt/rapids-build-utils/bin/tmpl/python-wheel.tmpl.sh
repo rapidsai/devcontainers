@@ -8,14 +8,16 @@ build_${PY_LIB}_python() {
         exit 1;
     fi
 
-    local verbose="1";
+    local verbose="";
     local parallel="";
     local wheel_dir="";
 
     eval "$(                                  \
         devcontainer-utils-parse-args --names '
+            a|archs                           |
             j|parallel                        |
             v|verbose                         |
+            m|max-device-obj-memory-usage     |
             w|wheel-dir                       |
             prefer-binary                     |
             only-binary                       |
@@ -28,7 +30,7 @@ build_${PY_LIB}_python() {
     )";
 
     verbose="${v:-${verbose:-}}";
-    wheel_dir="${w:-${wheel_dir}}";
+    wheel_dir="${w:-${wheel_dir:-}}";
     parallel="${j:-${parallel:-${JOBS:-${PARALLEL_LEVEL:-$(nproc --ignore=2)}}}}";
 
     local cmake_args=();
@@ -37,9 +39,7 @@ build_${PY_LIB}_python() {
         cmake_args+=("--log-level=VERBOSE");
     fi
 
-    # Define both lowercase and uppercase
-    # `-DFIND_<lib>_CPP=ON` and `-DFIND_<LIB>_CPP=ON` because the RAPIDS
-    # scikit-build CMakeLists.txt's aren't 100% consistent in the casing
+    cmake_args+=(${CMAKE_ARGS:-});
     cmake_args+=(${CPP_DEPS});
     cmake_args+=(${CPP_ARGS});
     cmake_args+=(${__rest__[@]});
@@ -94,16 +94,15 @@ build_${PY_LIB}_python() {
         pip_args+=("--no-use-pep517");
     fi
 
-
     pip_args+=(~/"${PY_SRC}");
 
     trap "rm -rf ~/'${PY_SRC}/$(echo "${PY_LIB}" | tr '-' '_').egg-info'" EXIT;
 
-    time                                              \
-    CMAKE_GENERATOR="Ninja"                           \
-    SKBUILD_BUILD_OPTIONS="${ninja_args[@]}"          \
-    CMAKE_ARGS="$(rapids-parse-cmake-args ${cmake_args[@]})" \
-        python -m pip wheel ${pip_args[@]}            \
+    time                                     \
+    CMAKE_GENERATOR="Ninja"                  \
+    CMAKE_ARGS="${cmake_args[@]}"            \
+    SKBUILD_BUILD_OPTIONS="${ninja_args[@]}" \
+        python -m pip wheel ${pip_args[@]}   \
     ;
 }
 

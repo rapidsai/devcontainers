@@ -7,7 +7,7 @@ cd "$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )";
 # install global/common scripts
 . ./common/install.sh;
 
-check_packages jq sudo wget gettext-base bash-completion ca-certificates;
+check_packages bc jq sudo wget gettext-base bash-completion ca-certificates;
 
 # Install yq if not installed
 if ! type yq >/dev/null 2>&1; then
@@ -46,7 +46,7 @@ update-alternatives --install /usr/bin/rapids-parse-cmake-vars-from-args rapids-
 update-alternatives --install /usr/bin/rapids-python-pkg-roots           rapids-python-pkg-roots           /opt/rapids-build-utils/bin/python-pkg-roots.sh           0;
 update-alternatives --install /usr/bin/rapids-python-pkg-names           rapids-python-pkg-names           /opt/rapids-build-utils/bin/python-pkg-names.sh           0;
 update-alternatives --install /usr/bin/rapids-python-conda-pkg-names     rapids-python-conda-pkg-names     /opt/rapids-build-utils/bin/python-conda-pkg-names.sh     0;
-update-alternatives --install /usr/bin/rapids-get-archs-and-load         rapids-get-archs-and-load         /opt/rapids-build-utils/bin/get-archs-and-load.sh         0;
+update-alternatives --install /usr/bin/rapids-get-num-archs-jobs-and-load         rapids-get-num-archs-jobs-and-load         /opt/rapids-build-utils/bin/get-num-archs-jobs-and-load.sh         0;
 update-alternatives --install /usr/bin/rapids-list-repos                 rapids-list-repos                 /opt/rapids-build-utils/bin/list-repos.sh                 0;
 
 find /opt/rapids-build-utils \
