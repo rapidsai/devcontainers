@@ -29,7 +29,7 @@ checkout_same_branch() {
         git -C ~/${!repo_path} fetch --no-tags upstream;
 
         for x in $(git -C ~/${!repo_path} branch -r | grep upstream); do
-            remote_branches="${remote_branches:+$remote_branches\n}${x#upstream}";
+            remote_branches="${remote_branches:+$remote_branches\n}${x#upstream\/}";
         done;
 
         if [ ${#all_repos[@]} -eq 0 ]; then
