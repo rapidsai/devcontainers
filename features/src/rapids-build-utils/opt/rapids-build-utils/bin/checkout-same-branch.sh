@@ -75,6 +75,10 @@ checkout_same_branch() {
         local repo="repos_${i}";
         local repo_path="${repo}_path";
 
+        if [[ ! -d ~/"${!repo_path:-}/.git" ]]; then
+            continue;
+        fi;
+
         git -C ~/${!repo_path} checkout --recurse-submodules "$branch_name" ;
         git -C ~/${!repo_path} submodule update --init --recursive;
 
