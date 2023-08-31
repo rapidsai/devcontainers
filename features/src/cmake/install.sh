@@ -9,7 +9,7 @@ cd "$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )";
 # install global/common scripts
 . ./common/install.sh;
 
-check_packages jq wget ca-certificates bash-completion pkg-config;
+check_packages jq wget ca-certificates bash-completion pkg-config librhash0;
 
 echo "Downloading CMake...";
 
