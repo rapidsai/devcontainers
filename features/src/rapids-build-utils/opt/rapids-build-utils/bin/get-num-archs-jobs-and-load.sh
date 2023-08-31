@@ -66,7 +66,8 @@ max_cpu=(${all_cpus} / ${n_arch} / 2 * 3)
 max_mem=((${free_mem} + ${freeswap}) / ${n_arch} / ${max_device_obj_memory_usage})
 if(max_cpu < max_mem) max_cpu else max_mem
 ____EOF
-    )"
+    )";
+    n_jobs=$((n_jobs < 1 ? 1 : n_jobs));
     local n_load="${all_cpus}";
 
     echo "n_arch=${n_arch}";
