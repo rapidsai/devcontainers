@@ -2,7 +2,10 @@
   "py3_10": {
     "image": "ubuntu:22.04",
     "features": {
-      "ghcr.io/devcontainers/features/python:1": {},
+      "ghcr.io/devcontainers/features/python:1": {
+        "version": "os-provided",
+        "installTools": "false"
+      },
       "cccl-dev": {}
     },
     "overrideFeatureInstallOrder": [
