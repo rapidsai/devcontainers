@@ -72,6 +72,8 @@ include:
   - {features: [*llvm_prev, *cuda_curr_max, *python, *cccl_dev], env: *llvm_env}
   - {features: [*llvm_curr, *cuda_curr_max, *python, *cccl_dev], env: *llvm_env}
   - {features: [*oneapi_2022, *cuda_curr_max, *python, *cccl_dev], env: *onapi_env}
+  # llvm-cuda-nvhpc (needed by stdexec devcontainers)
+  - {features: [*llvm_curr, *cuda_curr_max, *nvhpc_curr, *python]}
 
 - os: "windows"
   images:
@@ -101,9 +103,6 @@ include:
   - features: [*cuda_prev_max, *python]
   - features: [*cuda_curr_max, *python]
 
-  # cuda-mambaforge
-  - features: [*cuda_prev_max, *conda]
-
   # llvm
   - features: [*llvm_prev, *python]
   - features: [*llvm_curr, *python]
@@ -114,40 +113,28 @@ include:
   - features: [*llvm_curr, *cuda_prev_max, *python]
   - features: [*llvm_curr, *cuda_curr_min, *python]
 
-  # llvm-cuda-mambaforge
-  - features: [*llvm_prev, *cuda_prev_max, *conda]
-  - features: [*llvm_curr, *cuda_prev_max, *conda]
-
-  # llvm-cuda-nvhpc
-  - features: [*llvm_prev, *cuda_curr_min, *nvhpc_prev, *python]
-  - features: [*llvm_prev, *cuda_curr_min, *nvhpc_curr, *python]
-  - features: [*llvm_curr, *cuda_curr_min, *nvhpc_prev, *python]
-  - features: [*llvm_curr, *cuda_curr_min, *nvhpc_curr, *python]
-
-  # llvm-mambaforge
-  - features: [*llvm_prev, *conda]
-  - features: [*llvm_curr, *conda]
-
-  # llvm-nvhpc
-  - features: [*llvm_prev, *nvhpc_prev, *python]
-  - features: [*llvm_prev, *nvhpc_curr, *python]
-  - features: [*llvm_curr, *nvhpc_prev, *python]
-  - features: [*llvm_curr, *nvhpc_curr, *python]
-
   # llvm-rust
   - features: [*llvm_prev, *rust, *python]
   - features: [*llvm_curr, *rust, *python]
 
-  # llvm-rust-cuda-mambaforge
-  - features: [*llvm_prev, *rust, *cuda_prev_max, *conda]
-  - features: [*llvm_curr, *rust, *cuda_prev_max, *conda]
+  # llvm-rust-cuda
+  - features: [*llvm_prev, *rust, *cuda_prev_max, *python]
+  - features: [*llvm_prev, *rust, *cuda_curr_min, *python]
+  - features: [*llvm_curr, *rust, *cuda_prev_max, *python]
+  - features: [*llvm_curr, *rust, *cuda_curr_min, *python]
 
   # rust-cuda
   - features: [*rust, *cuda_prev_max, *python]
-  - features: [*rust, *cuda_curr_max, *python]
-
-  # rust-cuda-mambaforge
-  - features: [*rust, *cuda_prev_max, *conda]
+  - features: [*rust, *cuda_curr_min, *python]
 
   # mambaforge
   - features: [*conda]
+
+  ###
+  # Legacy CUDA 11.x + mambaforge image. Needed so the cudatoolkit 11.x
+  # conda package has access to the CUDA Toolkit headers. Remove once
+  # `cuda_prev_max` is bumped up to CUDA Toolkit 12.
+  ###
+
+  # cuda-mambaforge
+  - features: [*cuda_prev_max, *conda]
