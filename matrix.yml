@@ -137,9 +137,7 @@ include:
   # llvm-rust-cuda
   - features: [*llvm_prev, *rust, *cuda_prev_max, *python]
   - features: [*llvm_prev, *rust, *cuda_curr_min, *python]
+  - features: [*llvm_prev, *rust, *cuda_curr_max, *python]
   - features: [*llvm_curr, *rust, *cuda_prev_max, *python]
   - features: [*llvm_curr, *rust, *cuda_curr_min, *python]
-
-  # rust-cuda
-  - features: [*rust, *cuda_prev_max, *python]
-  - features: [*rust, *cuda_curr_min, *python]
+  - features: [*llvm_curr, *rust, *cuda_curr_max, *python]
