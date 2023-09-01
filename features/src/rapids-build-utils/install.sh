@@ -31,23 +31,25 @@ fi
 
 cp -ar ./opt/rapids-build-utils /opt/;
 
-update-alternatives --install /usr/bin/rapids-update-content-command     rapids-update-content-command     /opt/rapids-build-utils/bin/update-content-command.sh     0;
-update-alternatives --install /usr/bin/rapids-post-start-command         rapids-post-start-command         /opt/rapids-build-utils/bin/post-start-command.sh         0;
-update-alternatives --install /usr/bin/rapids-post-attach-command        rapids-post-attach-command        /opt/rapids-build-utils/bin/post-attach-command.sh        0;
-update-alternatives --install /usr/bin/rapids-generate-scripts           rapids-generate-scripts           /opt/rapids-build-utils/bin/generate-scripts.sh           0;
-update-alternatives --install /usr/bin/rapids-join-strings               rapids-join-strings               /opt/rapids-build-utils/bin/join-strings.sh               0;
-update-alternatives --install /usr/bin/rapids-make-conda-env             rapids-make-conda-env             /opt/rapids-build-utils/bin/make-conda-env.sh             0;
-update-alternatives --install /usr/bin/rapids-make-pip-env               rapids-make-pip-env               /opt/rapids-build-utils/bin/make-pip-env.sh               0;
-update-alternatives --install /usr/bin/rapids-make-vscode-workspace      rapids-make-vscode-workspace      /opt/rapids-build-utils/bin/make-vscode-workspace.sh      0;
-update-alternatives --install /usr/bin/rapids-parse-cmake-args           rapids-parse-cmake-args           /opt/rapids-build-utils/bin/parse-cmake-args.sh           0;
-update-alternatives --install /usr/bin/rapids-parse-cmake-build-type     rapids-parse-cmake-build-type     /opt/rapids-build-utils/bin/parse-cmake-build-type.sh     0;
-update-alternatives --install /usr/bin/rapids-parse-cmake-var-from-args  rapids-parse-cmake-var-from-args  /opt/rapids-build-utils/bin/parse-cmake-var-from-args.sh  0;
-update-alternatives --install /usr/bin/rapids-parse-cmake-vars-from-args rapids-parse-cmake-vars-from-args /opt/rapids-build-utils/bin/parse-cmake-vars-from-args.sh 0;
-update-alternatives --install /usr/bin/rapids-python-pkg-roots           rapids-python-pkg-roots           /opt/rapids-build-utils/bin/python-pkg-roots.sh           0;
-update-alternatives --install /usr/bin/rapids-python-pkg-names           rapids-python-pkg-names           /opt/rapids-build-utils/bin/python-pkg-names.sh           0;
-update-alternatives --install /usr/bin/rapids-python-conda-pkg-names     rapids-python-conda-pkg-names     /opt/rapids-build-utils/bin/python-conda-pkg-names.sh     0;
-update-alternatives --install /usr/bin/rapids-get-num-archs-jobs-and-load         rapids-get-num-archs-jobs-and-load         /opt/rapids-build-utils/bin/get-num-archs-jobs-and-load.sh         0;
-update-alternatives --install /usr/bin/rapids-list-repos                 rapids-list-repos                 /opt/rapids-build-utils/bin/list-repos.sh                 0;
+update-alternatives --install /usr/bin/rapids-update-content-command        rapids-update-content-command       /opt/rapids-build-utils/bin/update-content-command.sh       0;
+update-alternatives --install /usr/bin/rapids-post-start-command            rapids-post-start-command           /opt/rapids-build-utils/bin/post-start-command.sh           0;
+update-alternatives --install /usr/bin/rapids-post-attach-command           rapids-post-attach-command          /opt/rapids-build-utils/bin/post-attach-command.sh          0;
+update-alternatives --install /usr/bin/rapids-checkout-same-branch          rapids-checkout-same-branch         /opt/rapids-build-utils/bin/checkout-same-branch.sh         0;
+update-alternatives --install /usr/bin/rapids-pull-repositories             rapids-pull-repositories            /opt/rapids-build-utils/bin/pull-repositories.sh            0;
+update-alternatives --install /usr/bin/rapids-generate-scripts              rapids-generate-scripts             /opt/rapids-build-utils/bin/generate-scripts.sh             0;
+update-alternatives --install /usr/bin/rapids-join-strings                  rapids-join-strings                 /opt/rapids-build-utils/bin/join-strings.sh                 0;
+update-alternatives --install /usr/bin/rapids-make-conda-env                rapids-make-conda-env               /opt/rapids-build-utils/bin/make-conda-env.sh               0;
+update-alternatives --install /usr/bin/rapids-make-pip-env                  rapids-make-pip-env                 /opt/rapids-build-utils/bin/make-pip-env.sh                 0;
+update-alternatives --install /usr/bin/rapids-make-vscode-workspace         rapids-make-vscode-workspace        /opt/rapids-build-utils/bin/make-vscode-workspace.sh        0;
+update-alternatives --install /usr/bin/rapids-parse-cmake-args              rapids-parse-cmake-args             /opt/rapids-build-utils/bin/parse-cmake-args.sh             0;
+update-alternatives --install /usr/bin/rapids-parse-cmake-build-type        rapids-parse-cmake-build-type       /opt/rapids-build-utils/bin/parse-cmake-build-type.sh       0;
+update-alternatives --install /usr/bin/rapids-parse-cmake-var-from-args     rapids-parse-cmake-var-from-args    /opt/rapids-build-utils/bin/parse-cmake-var-from-args.sh    0;
+update-alternatives --install /usr/bin/rapids-parse-cmake-vars-from-args    rapids-parse-cmake-vars-from-args   /opt/rapids-build-utils/bin/parse-cmake-vars-from-args.sh   0;
+update-alternatives --install /usr/bin/rapids-python-pkg-roots              rapids-python-pkg-roots             /opt/rapids-build-utils/bin/python-pkg-roots.sh             0;
+update-alternatives --install /usr/bin/rapids-python-pkg-names              rapids-python-pkg-names             /opt/rapids-build-utils/bin/python-pkg-names.sh             0;
+update-alternatives --install /usr/bin/rapids-python-conda-pkg-names        rapids-python-conda-pkg-names       /opt/rapids-build-utils/bin/python-conda-pkg-names.sh       0;
+update-alternatives --install /usr/bin/rapids-get-num-archs-jobs-and-load   rapids-get-num-archs-jobs-and-load  /opt/rapids-build-utils/bin/get-num-archs-jobs-and-load.sh  0;
+update-alternatives --install /usr/bin/rapids-list-repos                    rapids-list-repos                   /opt/rapids-build-utils/bin/list-repos.sh                   0;
 
 find /opt/rapids-build-utils \
     \( -type d -exec chmod 0775 {} \; \
