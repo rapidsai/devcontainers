@@ -26,14 +26,14 @@ download_ucx_release() {
 
     # ucx-1.15.0-rc3-ubuntu22.04-mofed5-cuda12-x86_64.tar.bz2
     local slug="";
-    slug+="ucx-";
-    slug+="${UCX_VERSION}-";
-    slug+="$(. /etc/os-release; echo "${NAME,,}${VERSION_ID}")-";
+    slug+="ucx";
+    slug+="-${UCX_VERSION}";
+    slug+="-$(. /etc/os-release; echo "${NAME,,}${VERSION_ID}")";
 
     local cuda="$(read_cuda_version)";
 
     if test -n "${cuda}"; then
-        slug+="mofed5-cuda${cuda}-";
+        slug+="-mofed5-cuda${cuda}";
     fi
 
     if [ "$(uname -p)" = "x86_64" ]; then
