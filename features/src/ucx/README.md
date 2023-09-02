@@ -1,13 +1,13 @@
 
-# GCC (gcc)
+# UCX (ucx)
 
-A feature to install gcc
+A feature to install UCX
 
 ## Example Usage
 
 ```json
 "features": {
-    "ghcr.io/rapidsai/devcontainers/features/gcc:23": {}
+    "ghcr.io/rapidsai/devcontainers/features/ucx:23": {}
 }
 ```
 
@@ -15,10 +15,11 @@ A feature to install gcc
 
 | Options Id | Description | Type | Default Value |
 |-----|-----|-----|-----|
-| version | gcc version to install (or empty string to install OS default). | string | - |
+| version | ucx version to install (defaults to latest). | string | latest |
 
+Installs one of the UCX releases listed [here](https://github.com/openucx/ucx).
 
 
 ---
 
-_Note: This file was auto-generated from the [devcontainer-feature.json](https://github.com/rapidsai/devcontainers/blob/main/features/src/gcc/devcontainer-feature.json).  Add additional notes to a `NOTES.md`._
+_Note: This file was auto-generated from the [devcontainer-feature.json](https://github.com/rapidsai/devcontainers/blob/main/features/src/ucx/devcontainer-feature.json).  Add additional notes to a `NOTES.md`._
