@@ -59,10 +59,7 @@ build_and_install_ucx() {
     local PKG=(pkg-config libibverbs1 librdmacm1 libnuma1 numactl);
     local PKG_TO_REMOVE=(git libtool automake libnuma-dev librdmacm-dev libibverbs-dev);
 
-    PKG+=(${PKG_TO_REMOVE[@]});
-
     if ! type gcc >/dev/null 2>&1; then
-        PKG+=(build-essential);
         PKG_TO_REMOVE+=(build-essential);
     fi
 
@@ -72,9 +69,10 @@ build_and_install_ucx() {
         build_cmd="ninja";
     else
         build_cmd="make";
-        PKG+=($build_cmd);
         PKG_TO_REMOVE+=($build_cmd);
     fi
+
+    PKG+=(${PKG_TO_REMOVE[@]});
 
     check_packages ${PKG[@]};
 
