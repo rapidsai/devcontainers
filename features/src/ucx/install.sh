@@ -54,23 +54,17 @@ install_ucx_release() {
 build_and_install_ucx() {
     mkdir /tmp/ucx;
 
-    local build_cmd="";
     local cuda="$(read_cuda_version)";
-    local PKG=(pkg-config libibverbs1 librdmacm1 libnuma1 numactl);
-    local PKG_TO_REMOVE=(git libtool automake libnuma-dev librdmacm-dev libibverbs-dev);
+    local PKG=(git libibverbs1 librdmacm1 libnuma1 numactl);
+    local PKG_TO_REMOVE=();
 
-    if ! type gcc >/dev/null 2>&1; then
-        PKG_TO_REMOVE+=(build-essential);
-    fi
-
-    if type make >/dev/null 2>&1; then
-        build_cmd="make";
-    elif type ninja >/dev/null 2>&1; then
-        build_cmd="ninja";
-    else
-        build_cmd="make";
-        PKG_TO_REMOVE+=($build_cmd);
-    fi
+    if ! dpkg -s libtool > /dev/null 2>&1; then PKG_TO_REMOVE+=(libtool); fi;
+    if ! dpkg -s automake > /dev/null 2>&1; then PKG_TO_REMOVE+=(automake); fi;
+    if ! dpkg -s libnuma-dev > /dev/null 2>&1; then PKG_TO_REMOVE+=(libnuma-dev); fi;
+    if ! dpkg -s librdmacm-dev > /dev/null 2>&1; then PKG_TO_REMOVE+=(librdmacm-dev); fi;
+    if ! dpkg -s libibverbs-dev > /dev/null 2>&1; then PKG_TO_REMOVE+=(libibverbs-dev); fi;
+    if ! dpkg -s libibverbs-dev > /dev/null 2>&1; then PKG_TO_REMOVE+=(libibverbs-dev); fi;
+    if ! dpkg -s build-essential > /dev/null 2>&1; then PKG_TO_REMOVE+=(build-essential); fi;
 
     check_packages ${PKG[@]} ${PKG_TO_REMOVE[@]};
 
@@ -88,8 +82,8 @@ build_and_install_ucx() {
             --with-rdmacm           \
             ${cuda:+--with-cuda=${CUDA_HOME:-/usr/local/cuda}};
 
-        $build_cmd -j$(nproc);
-        $build_cmd install;
+        make -j$(nproc);
+        make install;
     )
 
     if test ${#PKG_TO_REMOVE[@]} -gt 0; then
