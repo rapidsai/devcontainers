@@ -72,9 +72,7 @@ build_and_install_ucx() {
         PKG_TO_REMOVE+=($build_cmd);
     fi
 
-    PKG+=(${PKG_TO_REMOVE[@]});
-
-    check_packages ${PKG[@]};
+    check_packages ${PKG[@]} ${PKG_TO_REMOVE[@]};
 
     git clone https://github.com/openucx/ucx.git /tmp/ucx --depth 1 --branch "v${UCX_VERSION}";
 
