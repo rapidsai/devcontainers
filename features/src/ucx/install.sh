@@ -9,46 +9,57 @@ cd "$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )";
 # install global/common scripts
 . ./common/install.sh;
 
-check_packages bzip2 wget ca-certificates bash-completion gettext-base pkg-config;
+read_cuda_version() {
+    local cuda="";
 
-if test -z "${UCX_VERSION:-}" || [ "${UCX_VERSION:-}" = "latest" ]; then
-    find_version_from_git_tags UCX_VERSION https://github.com/openucx/ucx;
-fi
+    if test -n "${CUDA_VERSION:-${CUDA_VERSION_MAJOR:-}}"; then
+        cuda=$(cut -d'.' -f1 <<< "${CUDA_VERSION:-${CUDA_VERSION_MAJOR:-}}");
+    elif test -f "${CUDA_HOME:-/usr/local/cuda}/include/cuda.h"; then
+        cuda=$(grep "#define CUDA_VERSION" ${CUDA_HOME:-/usr/local/cuda}/include/cuda.h | cut -d' ' -f3);
+        cuda=$((cuda / 1000));
+    fi
 
-# ucx-1.15.0-rc3-ubuntu22.04-mofed5-cuda12-x86_64.tar.bz2
-slug="";
-slug+="ucx-";
-slug+="${UCX_VERSION}-";
-slug+="$(. /etc/os-release; echo "${NAME,,}${VERSION_ID}")-";
+    echo "${cuda}";
+}
 
-cuda="";
+download_ucx_release() {
 
-if test -n "${CUDA_VERSION:-${CUDA_VERSION_MAJOR:-}}"; then
-    cuda=$(cut -d'.' -f1 <<< "${CUDA_VERSION:-${CUDA_VERSION_MAJOR:-}}");
-    slug+="mofed5-cuda${cuda}-";
-elif test -f "${CUDA_HOME:-/usr/local/cuda}/include/cuda.h"; then
-    cuda=$(grep "#define CUDA_VERSION" ${CUDA_HOME:-/usr/local/cuda}/include/cuda.h | cut -d' ' -f3);
-    cuda=$((cuda / 1000));
-    slug+="mofed5-cuda${cuda}-";
-fi
+    # ucx-1.15.0-rc3-ubuntu22.04-mofed5-cuda12-x86_64.tar.bz2
+    local slug="";
+    slug+="ucx-";
+    slug+="${UCX_VERSION}-";
+    slug+="$(. /etc/os-release; echo "${NAME,,}${VERSION_ID}")-";
 
-slug+="$(uname -p)";
+    local cuda="$(read_cuda_version)";
 
-mkdir /tmp/ucx;
+    if test -n "${cuda}"; then
+        slug+="mofed5-cuda${cuda}-";
+    fi
 
-# https://github.com/openucx/ucx/releases/download/v1.15.0-rc3/ucx-1.15.0-rc3-ubuntu22.04-mofed5-cuda12-x86_64.tar.bz2
-if wget --no-hsts -q -O /tmp/ucx.tar.bz2 "https://github.com/openucx/ucx/releases/download/v${UCX_VERSION}/${slug}.tar.bz2"; then
+    slug+="$(uname -p)";
+
+    # https://github.com/openucx/ucx/releases/download/v1.15.0-rc3/ucx-1.15.0-rc3-ubuntu22.04-mofed5-cuda12-x86_64.tar.bz2
+    wget --no-hsts -q -O /tmp/ucx.tar.bz2 "https://github.com/openucx/ucx/releases/download/v${UCX_VERSION}/${slug}.tar.bz2";
+}
+
+install_ucx_release() {
+    mkdir /tmp/ucx;
     tar -C /tmp/ucx -xvjf /tmp/ucx.tar.bz2;
     apt_get_update;
     DEBIAN_FRONTEND=noninteractive \
     apt-get -y install --no-install-recommends /tmp/ucx/*.deb || true;
     apt-get -y --fix-broken install;
-else
-    PKG=(pkg-config libibverbs1 librdmacm1 libnuma1 numactl);
-    PKG+=(git libtool automake libnuma-dev librdmacm-dev libibverbs-dev);
-    PKG_TO_REMOVE=(git libtool automake libnuma-dev librdmacm-dev libibverbs-dev);
+}
 
-    build_cmd="";
+build_and_install_ucx() {
+    mkdir /tmp/ucx;
+
+    local build_cmd="";
+    local cuda="$(read_cuda_version)";
+    local PKG=(pkg-config libibverbs1 librdmacm1 libnuma1 numactl);
+    local PKG_TO_REMOVE=(git libtool automake libnuma-dev librdmacm-dev libibverbs-dev);
+
+    PKG+=($PKG_TO_REMOVE[@]);
 
     if ! type gcc >/dev/null 2>&1; then
         PKG+=(build-essential);
@@ -73,12 +84,12 @@ else
         cd /tmp/ucx;
         ./autogen.sh;
         ./contrib/configure-release \
-            --enable-mt \
-            --enable-cma \
-            --enable-numa \
-            --with-verbs \
-            --with-rdmacm \
-            --with-gnu-ld \
+            --enable-mt             \
+            --enable-cma            \
+            --enable-numa           \
+            --with-verbs            \
+            --with-xpmem            \
+            --with-rdmacm           \
             ${cuda:+--with-cuda=${CUDA_HOME:-/usr/local/cuda}};
 
         $build_cmd -j$(nproc --ignore=2);
@@ -89,6 +100,18 @@ else
         DEBIAN_FRONTEND=noninteractive apt-get -y remove ${PKG_TO_REMOVE[@]};
         DEBIAN_FRONTEND=noninteractive apt-get -y autoremove;
     fi
+}
+
+check_packages bzip2 wget ca-certificates bash-completion gettext-base pkg-config;
+
+if test -z "${UCX_VERSION:-}" || [ "${UCX_VERSION:-}" = "latest" ]; then
+    find_version_from_git_tags UCX_VERSION https://github.com/openucx/ucx;
+fi
+
+if download_ucx_release; then
+    install_ucx_release;
+else
+    build_and_install_ucx;
 fi
 
 export UCX_VERSION;
