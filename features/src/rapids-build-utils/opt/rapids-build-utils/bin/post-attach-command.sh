@@ -25,5 +25,5 @@ if test -n "${PYTHON_PACKAGE_MANAGER:-}"; then
         unset rapids_pypi_username;
     fi
 
-    rapids-make-${PYTHON_PACKAGE_MANAGER}-env;
+    rapids-make-${PYTHON_PACKAGE_MANAGER}-env || true;
 fi
