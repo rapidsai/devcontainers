@@ -1,7 +1,7 @@
 {
   "name": "UCX",
   "id": "ucx",
-  "version": "23.10.0",
+  "version": "23.10.1",
   "description": "A feature to install UCX",
   "options": {
     "version": {

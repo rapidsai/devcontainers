@@ -26,20 +26,25 @@ download_ucx_release() {
 
     # ucx-1.15.0-rc3-ubuntu22.04-mofed5-cuda12-x86_64.tar.bz2
     local slug="";
-    slug+="ucx-";
-    slug+="${UCX_VERSION}-";
-    slug+="$(. /etc/os-release; echo "${NAME,,}${VERSION_ID}")-";
+    slug+="ucx";
+    slug+="-${UCX_VERSION}";
+    slug+="-$(. /etc/os-release; echo "${NAME,,}${VERSION_ID}")";
 
     local cuda="$(read_cuda_version)";
 
     if test -n "${cuda}"; then
-        slug+="mofed5-cuda${cuda}-";
+        slug+="-mofed5-cuda${cuda}";
     fi
 
-    slug+="$(uname -p)";
-
-    # https://github.com/openucx/ucx/releases/download/v1.15.0-rc3/ucx-1.15.0-rc3-ubuntu22.04-mofed5-cuda12-x86_64.tar.bz2
-    wget --no-hsts -q -O /tmp/ucx.tar.bz2 "https://github.com/openucx/ucx/releases/download/v${UCX_VERSION}/${slug}.tar.bz2";
+    if [ "$(uname -p)" = "x86_64" ]; then
+        # https://github.com/openucx/ucx/releases/download/v1.15.0-rc3/ucx-1.15.0-rc3-ubuntu22.04-mofed5-cuda12-x86_64.tar.bz2
+        if ! wget --no-hsts -q -O /tmp/ucx.tar.bz2 "https://github.com/openucx/ucx/releases/download/v${UCX_VERSION}/${slug}-$(uname -p).tar.bz2"; then
+            # https://github.com/openucx/ucx/releases/download/v1.14.1/ucx-1.14.1-ubuntu22.04-mofed5-cuda12.tar.bz2
+            wget --no-hsts -q -O /tmp/ucx.tar.bz2 "https://github.com/openucx/ucx/releases/download/v${UCX_VERSION}/${slug}.tar.bz2";
+        fi
+    else
+        wget --no-hsts -q -O /tmp/ucx.tar.bz2 "https://github.com/openucx/ucx/releases/download/v${UCX_VERSION}/${slug}-$(uname -p).tar.bz2";
+    fi
 }
 
 install_ucx_release() {
@@ -54,23 +59,17 @@ install_ucx_release() {
 build_and_install_ucx() {
     mkdir /tmp/ucx;
 
-    local build_cmd="";
     local cuda="$(read_cuda_version)";
-    local PKG=(pkg-config libibverbs1 librdmacm1 libnuma1 numactl);
-    local PKG_TO_REMOVE=(git libtool automake libnuma-dev librdmacm-dev libibverbs-dev);
+    local PKG=(git libibverbs1 librdmacm1 libnuma1 numactl);
+    local PKG_TO_REMOVE=();
 
-    if ! type gcc >/dev/null 2>&1; then
-        PKG_TO_REMOVE+=(build-essential);
-    fi
-
-    if type make >/dev/null 2>&1; then
-        build_cmd="make";
-    elif type ninja >/dev/null 2>&1; then
-        build_cmd="ninja";
-    else
-        build_cmd="make";
-        PKG_TO_REMOVE+=($build_cmd);
-    fi
+    if ! dpkg -s libtool > /dev/null 2>&1; then PKG_TO_REMOVE+=(libtool); fi;
+    if ! dpkg -s automake > /dev/null 2>&1; then PKG_TO_REMOVE+=(automake); fi;
+    if ! dpkg -s libnuma-dev > /dev/null 2>&1; then PKG_TO_REMOVE+=(libnuma-dev); fi;
+    if ! dpkg -s librdmacm-dev > /dev/null 2>&1; then PKG_TO_REMOVE+=(librdmacm-dev); fi;
+    if ! dpkg -s libibverbs-dev > /dev/null 2>&1; then PKG_TO_REMOVE+=(libibverbs-dev); fi;
+    if ! dpkg -s libibverbs-dev > /dev/null 2>&1; then PKG_TO_REMOVE+=(libibverbs-dev); fi;
+    if ! dpkg -s build-essential > /dev/null 2>&1; then PKG_TO_REMOVE+=(build-essential); fi;
 
     check_packages ${PKG[@]} ${PKG_TO_REMOVE[@]};
 
@@ -88,8 +87,8 @@ build_and_install_ucx() {
             --with-rdmacm           \
             ${cuda:+--with-cuda=${CUDA_HOME:-/usr/local/cuda}};
 
-        $build_cmd -j$(nproc);
-        $build_cmd install;
+        make -j$(nproc);
+        make install;
     )
 
     if test ${#PKG_TO_REMOVE[@]} -gt 0; then
