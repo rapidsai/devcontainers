@@ -18,7 +18,7 @@ jobs:
       pull-requests: write
     steps:
       - name: Checkout ${{ github.repository }}
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Copy common scripts into features
         uses: ./.github/actions/copy-common-scripts
