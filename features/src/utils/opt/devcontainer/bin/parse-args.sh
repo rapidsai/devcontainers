@@ -84,8 +84,9 @@ parse_args() {
             break;
         fi
 
-        if echo "${key}" | grep -qP "^${vars}$"; then
-            keys+=("${key//-/_}");
+        if grep -qP "^${vars}$" <<< "${key}"; then
+            key="${key//-/_}";
+            keys+=("$key");
             dict[$key]="$(printf %q "${val}")";
         else
             rest+=("${arg}");
