@@ -72,7 +72,7 @@ generate_clone_script() {
 
 generate_repo_scripts() {
     local script_name;
-    for script_name in "configure" "build" "clean"; do (
+    for script_name in "clean" "configure" "build" "build-cpp" "build-python"; do (
         cat ${TMPL}/${script_name}.tmpl.sh     \
       | generate_script "${script_name}-${NAME}";
     ) || true;
@@ -257,7 +257,7 @@ generate_scripts() {
 
     unset cpp_name_to_path;
 
-    for script in "clone" "clean" "configure" "build"; do
+    for script in "clone" "clean" "configure" "build" "build-cpp" "build-python"; do
         # Generate a script to run a script for all repos
         (
             NAMES="${repo_name_all[@]}"       \
@@ -274,6 +274,8 @@ fi
 (remove_script_for_pattern '^clone-[A-Za-z\-_]*$');
 (remove_script_for_pattern '^clean-[A-Za-z\-_]*$');
 (remove_script_for_pattern '^build-[A-Za-z\-_]*$');
+(remove_script_for_pattern '^build-cpp-[A-Za-z\-_]*$');
+(remove_script_for_pattern '^build-python-[A-Za-z\-_]*$');
 (remove_script_for_pattern '^configure-[A-Za-z\-_]*$');
 
 (generate_scripts "$@");

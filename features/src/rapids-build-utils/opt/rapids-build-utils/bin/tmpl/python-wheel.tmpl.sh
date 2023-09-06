@@ -1,6 +1,6 @@
 #! /usr/bin/env bash
 
-build_${PY_LIB}_python() {
+build_${PY_LIB}_wheel() {
 
     set -euo pipefail;
 
@@ -42,7 +42,7 @@ build_${PY_LIB}_python() {
     cmake_args+=(${CMAKE_ARGS:-});
     cmake_args+=(${CPP_DEPS});
     cmake_args+=(${CPP_ARGS});
-    cmake_args+=(${__rest__[@]});
+    # cmake_args+=(${__rest__[@]});
 
     local ninja_args=();
     if test -n "${verbose}"; then
@@ -110,4 +110,4 @@ if test -n "${rapids_build_utils_debug:-}"; then
     PS4="+ ${BASH_SOURCE[0]}:\${LINENO} "; set -x;
 fi
 
-build_${PY_LIB}_python "$@";
+build_${PY_LIB}_wheel "$@";
