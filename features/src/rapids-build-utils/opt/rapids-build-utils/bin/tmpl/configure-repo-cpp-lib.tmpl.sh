@@ -1,6 +1,6 @@
 #! /usr/bin/env bash
 
-configure_${CPP_LIB}_cpp() {
+configure_${NAME}_cpp_${CPP_LIB}() {
 
     set -euo pipefail;
 
@@ -72,4 +72,4 @@ if test -n "${rapids_build_utils_debug:-}"; then
     PS4="+ ${BASH_SOURCE[0]}:\${LINENO} "; set -x;
 fi
 
-configure_${CPP_LIB}_cpp "$@";
+(configure_${NAME}_cpp_${CPP_LIB} "$@");

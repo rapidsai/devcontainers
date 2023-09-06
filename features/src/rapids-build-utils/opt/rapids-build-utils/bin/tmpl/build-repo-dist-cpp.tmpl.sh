@@ -1,11 +1,11 @@
 #! /usr/bin/env bash
 
-configure_${NAME}() {
+build_${NAME}_dist_cpp() {
     set -euo pipefail;
+    local exe
     for lib in ${CPP_LIB}; do
-        if type configure-${lib}-cpp >/dev/null 2>&1; then
-            configure-${lib}-cpp "$@";
-        fi
+        exe="build-${NAME}-dist-cpp-${lib}"
+        if type $exe 2>&1; then $exe "$@"; fi
     done
 }
 
@@ -13,4 +13,4 @@ if test -n "${rapids_build_utils_debug:-}"; then
     PS4="+ ${BASH_SOURCE[0]}:\${LINENO} "; set -x;
 fi
 
-configure_${NAME} "$@";
+(build_${NAME}_dist_cpp "$@");

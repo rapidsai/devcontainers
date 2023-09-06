@@ -1,6 +1,6 @@
 #! /usr/bin/env bash
 
-build_${CPP_LIB}_cpp() {
+build_cpp_inplace_${CPP_LIB}() {
 
     set -euo pipefail;
 
@@ -21,7 +21,7 @@ build_${CPP_LIB}_cpp() {
 
     if test -n "${verbose}"; then verbose="--log-level=VERBOSE"; fi
 
-    configure-${CPP_LIB}-cpp ${verbose} ${__rest__[@]};
+    configure-${NAME}-cpp-${CPP_LIB} ${verbose} ${__rest__[@]};
 
     eval "$(                                              \
         rapids-get-num-archs-jobs-and-load ${__rest__[@]} \
@@ -42,4 +42,4 @@ if test -n "${rapids_build_utils_debug:-}"; then
     PS4="+ ${BASH_SOURCE[0]}:\${LINENO} "; set -x;
 fi
 
-build_${CPP_LIB}_cpp "$@";
+(build_cpp_inplace_${CPP_LIB} "$@");

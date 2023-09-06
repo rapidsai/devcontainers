@@ -1,14 +1,14 @@
 #! /usr/bin/env bash
 
-clean_${CPP_LIB}_cpp() {
+build_${NAME}_inplace_cpp_${CPP_LIB}() {
 
     set -euo pipefail;
-
-    rm -rf ~/${CPP_SRC}/build/latest/*;
+    echo "C++ dist builds not yet implemented"
+    exit 1;
 }
 
 if test -n "${rapids_build_utils_debug:-}"; then
     PS4="+ ${BASH_SOURCE[0]}:\${LINENO} "; set -x;
 fi
 
-clean_${CPP_LIB}_cpp "$@";
+(build_${NAME}_inplace_cpp_${CPP_LIB} "$@");
