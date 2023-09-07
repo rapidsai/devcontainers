@@ -3,96 +3,95 @@
 TMPL=/opt/rapids-build-utils/bin/tmpl;
 
 TMP_SCRIPT_DIR=/tmp/rapids-build-utils
-mkdir -p $TMP_SCRIPT_DIR
 
-remove_script_for_pattern() {
+clean_scripts() {
     set -euo pipefail;
-    local pattern="${1}";
-    for x in $(find $TMP_SCRIPT_DIR -printf '%f\n' | grep -oP "$pattern"); do
-        (sudo rm "$TMP_SCRIPT_DIR/$x" >/dev/null 2>&1 || true);
-        (sudo update-alternatives --remove-all $x >/dev/null 2>&1 || true);
+    for x in $(find $TMP_SCRIPT_DIR -maxdepth 1 -type f -printf '%f\n'); do
+        (sudo update-alternatives --remove-all $x > /dev/null 2>&1);
     done
+    sudo rm -rf "$TMP_SCRIPT_DIR";
+    mkdir -p $TMP_SCRIPT_DIR
 }
 
 generate_script() {
     local bin="${1:-}";
     if test -n "$bin" && ! test -f "$TMP_SCRIPT_DIR/${bin}"; then
-        cat - \
-      | envsubst '$NAME
-                  $SRC_PATH
-                  $PY_SRC
-                  $PY_LIB
-                  $CPP_LIB
-                  $CPP_SRC
-                  $CPP_ARGS
-                  $CPP_DEPS
-                  $GIT_TAG
-                  $GIT_REPO
-                  $GIT_HOST
-                  $GIT_UPSTREAM' \
-      | sudo tee "$TMP_SCRIPT_DIR/${bin}" >/dev/null;
+        (
+            cat - \
+        | envsubst '$NAME
+                    $SRC_PATH
+                    $PY_SRC
+                    $PY_LIB
+                    $CPP_LIB
+                    $CPP_SRC
+                    $CPP_ARGS
+                    $CPP_DEPS
+                    $GIT_TAG
+                    $GIT_REPO
+                    $GIT_HOST
+                    $GIT_UPSTREAM' \
+        | sudo tee "$TMP_SCRIPT_DIR/${bin}" >/dev/null;
 
-        sudo chmod +x "$TMP_SCRIPT_DIR/${bin}";
+            sudo chmod +x "$TMP_SCRIPT_DIR/${bin}";
 
-        sudo update-alternatives --install \
-            "/usr/bin/${bin}" "${bin}" "$TMP_SCRIPT_DIR/${bin}" 0 \
-            >/dev/null 2>&1;
+            sudo update-alternatives --install \
+                "/usr/bin/${bin}" "${bin}" "$TMP_SCRIPT_DIR/${bin}" 0 \
+                >/dev/null 2>&1;
+        ) & true;
+
+        echo "$!"
     fi
 }
 
 generate_multi_script() {
     local bin="${1:-}";
     if test -n "$bin" && ! test -f "$TMP_SCRIPT_DIR/${bin}"; then
-        cat - \
-      | envsubst '$NAMES
-                  $COMMAND
-                  $TYPE' \
-      | sudo tee "$TMP_SCRIPT_DIR/${bin}" >/dev/null;
+        (
+            cat - \
+        | envsubst '$NAMES
+                    $COMMAND
+                    $TYPE' \
+        | sudo tee "$TMP_SCRIPT_DIR/${bin}" >/dev/null;
 
-        sudo chmod +x "$TMP_SCRIPT_DIR/${bin}";
+            sudo chmod +x "$TMP_SCRIPT_DIR/${bin}";
 
-        sudo update-alternatives --install \
-            "/usr/bin/${bin}" "${bin}" "$TMP_SCRIPT_DIR/${bin}" 0 \
-            >/dev/null 2>&1;
+            sudo update-alternatives --install \
+                "/usr/bin/${bin}" "${bin}" "$TMP_SCRIPT_DIR/${bin}" 0 \
+                >/dev/null 2>&1;
+        ) & true;
+
+        echo "$!"
     fi
 }
 
 generate_multi_scripts() {
     # build all
     for type in "inplace" "dist"; do
-    (
         cat ${TMPL}/command-all-type.tmpl.sh    \
       | COMMAND="build"                         \
         TYPE=$type                              \
         generate_multi_script "build-all-$type" ;
-    ) || true;
     done
 
     # clone, clean
     for command in "clone" "clean"; do
-    (
-        cat ${TMPL}/command-all.tmpl.sh   \
-      | COMMAND="$command"                \
+        cat ${TMPL}/command-all.tmpl.sh      \
+      | COMMAND="$command"                   \
         generate_multi_script "$command-all" ;
-    ) || true;
     done
 
     # clean subcommands
     for type in "cpp" "python"; do
-    (
         cat ${TMPL}/command-all-type.tmpl.sh    \
       | COMMAND="clean"                         \
         TYPE=$type                              \
         generate_multi_script "clean-all-$type" ;
-    ) || true;
     done
 }
 
 generate_clone_script() {
-    (
-        cat ${TMPL}/clone-repo.tmpl.sh      \
-      | generate_script "clone-${NAME}";
-    ) || true;
+    cat ${TMPL}/clone-repo.tmpl.sh      \
+    | generate_script "clone-${NAME}";
 }
 
 generate_repo_scripts() {
@@ -105,10 +104,8 @@ generate_repo_scripts() {
                        "-dist"           \
                        "-dist-cpp"       \
                        "-dist-python"    ; do
-    (
         cat ${TMPL}/build-repo${script_name}.tmpl.sh \
       | generate_script "build-${NAME}${script_name}";
-    ) || true;
     done
 
     # configure repo cpp
@@ -117,10 +114,8 @@ generate_repo_scripts() {
 
     # clean repo
     for script_name in "" "-cpp" "-python"; do
-    (
         cat ${TMPL}/clean-repo${script_name}.tmpl.sh \
         | generate_script "clean-${NAME}${script_name}";
-    )
     done
 }
 
@@ -129,35 +124,34 @@ generate_cpp_scripts() {
     local cpp_source="${SRC_PATH:-}${CPP_SRC:+/$CPP_SRC}";
 
     # build lib
-    for script_name in "inplace" "dist"; do (
+    for script_name in "inplace" "dist"; do
         cat ${TMPL}/build-repo-${script_name}-cpp-lib.tmpl.sh \
       | CPP_SRC=$cpp_source \
         generate_script "build-${NAME}-${script_name}-cpp-${CPP_LIB}";
-    ) || true;
     done
 
     # configure lib
-    (cat ${TMPL}/configure-repo-cpp-lib.tmpl.sh \
+    cat ${TMPL}/configure-repo-cpp-lib.tmpl.sh \
     | CPP_SRC=$cpp_source \
-    generate_script "configure-${NAME}-cpp-${CPP_LIB}") || true;
+    generate_script "configure-${NAME}-cpp-${CPP_LIB}";
 
     # clean lib
-    (cat ${TMPL}/clean-repo-cpp-lib.tmpl.sh \
+    cat ${TMPL}/clean-repo-cpp-lib.tmpl.sh \
     | CPP_SRC=$cpp_source \
-    generate_script "clean-${NAME}-cpp-${CPP_LIB}") || true;
+    generate_script "clean-${NAME}-cpp-${CPP_LIB}";
 }
 
 generate_python_scripts() {
     local script_name;
-    for script_name in "inplace" "dist" ; do (
-        cat ${TMPL}/build-repo-${script_name}-python-package.tmpl.sh        \
-      | generate_script "build-${NAME}-${script_name}-python-${PY_LIB}";
-    ) || true;
+    for script_name in "inplace" "dist" ; do
+        cat ${TMPL}/build-repo-${script_name}-python-package.tmpl.sh      \
+        | generate_script "build-${NAME}-${script_name}-python-${PY_LIB}" ;
+    
     done
 
     # clean package
-    (cat ${TMPL}/clean-repo-python-package.tmpl.sh \
-    | generate_script "clean-${NAME}-python-${PY_LIB}") || true;
+    cat ${TMPL}/clean-repo-python-package.tmpl.sh \
+    | generate_script "clean-${NAME}-python-${PY_LIB}"
 }
 
 generate_scripts() {
@@ -201,15 +195,13 @@ generate_scripts() {
         repo_name_all+=($repo_name)
 
         # Generate a clone script for each repo
-        (
-            NAME="${repo_name:-}"             \
-            SRC_PATH="${!repo_path:-}"        \
-            GIT_TAG="${!git_tag:-}"           \
-            GIT_REPO="${!git_repo:-}"         \
-            GIT_HOST="${!git_host:-}"         \
-            GIT_UPSTREAM="${!git_upstream:-}" \
-            generate_clone_script             ;
-        ) || true;
+        NAME="${repo_name:-}"             \
+        SRC_PATH="${!repo_path:-}"        \
+        GIT_TAG="${!git_tag:-}"           \
+        GIT_REPO="${!git_repo:-}"         \
+        GIT_HOST="${!git_host:-}"         \
+        GIT_UPSTREAM="${!git_upstream:-}" \
+        generate_clone_script             ;
 
         if [[ -d ~/"${!repo_path:-}/.git" ]]; then
 
@@ -245,15 +237,13 @@ generate_scripts() {
                     deps+=(-D$(tr "[:lower:]" "[:upper:]" <<< "${!dep}")_ROOT=\"$(realpath -m ~/${dep_cpp_path}/build/latest)\");
                 done
 
-                (
-                    NAME="${repo_name:-}"       \
-                    SRC_PATH="${!repo_path:-}"  \
-                    CPP_LIB="${cpp_name:-}"     \
-                    CPP_SRC="${!cpp_sub_dir:-}" \
-                    CPP_ARGS="${!cpp_args:-}"   \
-                    CPP_DEPS="${deps[@]}"       \
-                    generate_cpp_scripts        ;
-                ) || true;
+                NAME="${repo_name:-}"       \
+                SRC_PATH="${!repo_path:-}"  \
+                CPP_LIB="${cpp_name:-}"     \
+                CPP_SRC="${!cpp_sub_dir:-}" \
+                CPP_ARGS="${!cpp_args:-}"   \
+                CPP_DEPS="${deps[@]}"       \
+                generate_cpp_scripts        ;
             done
 
             local args=();
@@ -290,26 +280,23 @@ generate_scripts() {
             for ((k=0; k < ${#py_libs[@]}; k+=1)); do
                 local py_dir="${py_dirs[$k]}";
                 local py_lib="${py_libs[$k]}";
-                (
-                    NAME="${repo_name:-}"  \
-                    PY_SRC="${py_dir}"     \
-                    PY_LIB="${py_lib}"     \
-                    CPP_ARGS="${args[@]}"  \
-                    CPP_DEPS="${deps[@]}"  \
-                    generate_python_scripts;
-                ) || true;
+
+                NAME="${repo_name:-}"   \
+                PY_SRC="${py_dir}"      \
+                PY_LIB="${py_lib}"      \
+                CPP_ARGS="${args[@]}"   \
+                CPP_DEPS="${deps[@]}"   \
+                generate_python_scripts ;
             done
 
             for ((k=0; k < ${#cpp_libs[@]}; k+=1)); do
                 cpp_libs[$k]="$(tr "[:upper:]" "[:lower:]" <<< "${cpp_libs[$k]}")";
             done
 
-            (
-                NAME="${repo_name:-}"    \
-                PY_LIB="${py_libs[@]}"   \
-                CPP_LIB="${cpp_libs[@]}" \
-                generate_repo_scripts    ;
-            ) || true;
+            NAME="${repo_name:-}"    \
+            PY_LIB="${py_libs[@]}"   \
+            CPP_LIB="${cpp_libs[@]}" \
+            generate_repo_scripts    ;
         fi
     done
 
@@ -319,19 +306,18 @@ generate_scripts() {
 
     unset cpp_name_to_path;
 
-    (
-        NAMES="${repo_name_all[@]}" \
-        generate_multi_scripts      ;
-    ) || true;
+    NAMES="${repo_name_all[@]}" \
+    generate_multi_scripts      ;
 }
 
 if test -n "${rapids_build_utils_debug:-}"; then
     PS4="+ ${BASH_SOURCE[0]}:\${LINENO} "; set -x;
 fi
 
-(remove_script_for_pattern '^clone-[A-Za-z\-_]*$');
-(remove_script_for_pattern '^clean-[A-Za-z\-_]*$');
-(remove_script_for_pattern '^build-[A-Za-z\-_]*$');
-(remove_script_for_pattern '^configure-[A-Za-z\-_]*$');
+(clean_scripts)
 
-(generate_scripts "$@");
+for pid in $(generate_scripts "$@"); do
+    while [[ -e "/proc/$pid" ]]; do
+        sleep 0.1
+    done
+done
