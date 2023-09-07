@@ -89,9 +89,14 @@ generate_multi_scripts() {
     done
 }
 
+generate_build_all_script() {
+    cat ${TMPL}/build-all.tmpl.sh \
+    | generate_script "build-all" ;
+}
+
 generate_clone_script() {
-    cat ${TMPL}/clone-repo.tmpl.sh      \
-    | generate_script "clone-${NAME}";
+    cat ${TMPL}/clone-repo.tmpl.sh    \
+    | generate_script "clone-${NAME}" ;
 }
 
 generate_repo_scripts() {
@@ -308,6 +313,8 @@ generate_scripts() {
 
     NAMES="${repo_name_all[@]}" \
     generate_multi_scripts      ;
+
+    generate_build_all_script;
 }
 
 if test -n "${rapids_build_utils_debug:-}"; then
