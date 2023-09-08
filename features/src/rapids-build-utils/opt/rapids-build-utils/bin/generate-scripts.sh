@@ -103,7 +103,8 @@ generate_repo_scripts() {
     local script_name;
 
     # build repo
-    for script_name in "-inplace"        \
+    for script_name in ""                \
+                       "-inplace"        \
                        "-inplace-cpp"    \
                        "-inplace-python" \
                        "-dist"           \
