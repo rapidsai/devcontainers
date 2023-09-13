@@ -52,11 +52,17 @@ clone_git_repo() {
 
         if false; then exit 1;
         elif test -n "${upstream_has_branch}"; then
-            git -C "${directory}" checkout -b "${branch}" -t "upstream/${branch}";
+            if ! git -C "${directory}" checkout -b "${branch}" -t "upstream/${branch}" 2>/dev/null; then
+                git -C "${directory}" checkout "${branch}";
+                git -C "${directory}" branch "${branch}" -u "upstream/${branch}";
+            fi
         elif test -n "${upstream_has_tag}"; then
             git -C "${directory}" checkout -m -b "upstream/${branch}" "${branch}";
         elif test -n "${origin_has_branch}"; then
-            git -C "${directory}" checkout -b "${branch}" -t "origin/${branch}";
+            if ! git -C "${directory}" checkout -b "${branch}" -t "origin/${branch}" 2>/dev/null; then
+                git -C "${directory}" checkout "${branch}";
+                git -C "${directory}" branch "${branch}" -u "origin/${branch}";
+            fi
         elif test -n "${origin_has_tag}"; then
             git -C "${directory}" checkout -f -b "origin/${branch}" "${branch}";
         fi
