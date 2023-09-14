@@ -4,7 +4,7 @@ configure_${NAME}_cpp() {
     set -euo pipefail;
     local exe
     for lib in ${CPP_LIB}; do
-        exe="configure-${NAME}-cpp-${lib}"
+        exe="configure-${lib}-cpp"
         if type $exe >/dev/null 2>&1; then $exe "$@"; fi
     done
 }

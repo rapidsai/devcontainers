@@ -2,8 +2,12 @@
 
 clean_${NAME}() {
     set -euo pipefail;
-    clean-${NAME}-cpp "$@";
-    clean-${NAME}-python "$@";
+    for lib in ${CPP_LIB}; do
+        if [[ -n "$lib" ]]; then "clean-${lib}-cpp"; fi
+    done
+    for package in ${PY_LIB}; do
+        if [[ -n "$package" ]]; then "clean-${package}-python"; fi
+    done
 }
 
 if test -n "${rapids_build_utils_debug:-}"; then

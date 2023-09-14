@@ -65,36 +65,17 @@ generate_multi_script() {
 }
 
 generate_multi_scripts() {
-    # build all
-    for type in "inplace" "dist"; do
-        cat ${TMPL}/command-all-type.tmpl.sh    \
-      | COMMAND="build"                         \
-        TYPE=$type                              \
-        generate_multi_script "build-all-$type" ;
-    done
-
-    # clone, clean
-    for command in "clone" "clean"; do
+    printf ""
+    # clone, clean, configure, build
+    for command in "clone" "clean" "configure" "build"; do
         cat ${TMPL}/command-all.tmpl.sh      \
       | COMMAND="$command"                   \
         generate_multi_script "$command-all" ;
     done
-
-    # clean subcommands
-    for type in "cpp" "python"; do
-        cat ${TMPL}/command-all-type.tmpl.sh    \
-      | COMMAND="clean"                         \
-        TYPE=$type                              \
-        generate_multi_script "clean-all-$type" ;
-    done
-}
-
-generate_build_all_script() {
-    cat ${TMPL}/build-all.tmpl.sh \
-    | generate_script "build-all" ;
 }
 
 generate_clone_script() {
+    # clone repo
     cat ${TMPL}/clone-repo.tmpl.sh    \
     | generate_script "clone-${NAME}" ;
 }
@@ -102,26 +83,12 @@ generate_clone_script() {
 generate_repo_scripts() {
     local script_name;
 
-    # build repo
-    for script_name in ""                \
-                       "-inplace"        \
-                       "-inplace-cpp"    \
-                       "-inplace-python" \
-                       "-dist"           \
-                       "-dist-cpp"       \
-                       "-dist-python"    ; do
-        cat ${TMPL}/build-repo${script_name}.tmpl.sh \
-      | generate_script "build-${NAME}${script_name}";
-    done
-
-    # configure repo cpp
-    cat ${TMPL}/configure-repo-cpp.tmpl.sh \
-      | generate_script "configure-${NAME}-cpp";
-
-    # clean repo
-    for script_name in "" "-cpp" "-python"; do
-        cat ${TMPL}/clean-repo${script_name}.tmpl.sh \
-        | generate_script "clean-${NAME}${script_name}";
+    # clean, configure, build repo
+    for script_name in "clean"           \
+                       "configure"       \
+                       "build"           ; do
+        cat ${TMPL}/${script_name}-repo.tmpl.sh \
+      | generate_script "${script_name}-${NAME}";
     done
 }
 
@@ -129,35 +96,37 @@ generate_cpp_scripts() {
     local script_name;
     local cpp_source="${SRC_PATH:-}${CPP_SRC:+/$CPP_SRC}";
 
-    # build lib
-    for script_name in "inplace" "dist"; do
-        cat ${TMPL}/build-repo-${script_name}-cpp-lib.tmpl.sh \
-      | CPP_SRC=$cpp_source \
-        generate_script "build-${NAME}-${script_name}-cpp-${CPP_LIB}";
-    done
-
-    # configure lib
-    cat ${TMPL}/configure-repo-cpp-lib.tmpl.sh \
+    # clean
+    cat ${TMPL}/clean-lib-cpp.tmpl.sh \
     | CPP_SRC=$cpp_source \
-    generate_script "configure-${NAME}-cpp-${CPP_LIB}";
+    generate_script "clean-${CPP_LIB}-cpp";
 
-    # clean lib
-    cat ${TMPL}/clean-repo-cpp-lib.tmpl.sh \
+    # configure
+    cat ${TMPL}/configure-lib-cpp.tmpl.sh \
     | CPP_SRC=$cpp_source \
-    generate_script "clean-${NAME}-cpp-${CPP_LIB}";
+    generate_script "configure-${CPP_LIB}-cpp";
+
+    # build
+    cat ${TMPL}/build-lib-cpp.tmpl.sh \
+    | CPP_SRC=$cpp_source \
+    generate_script "build-${CPP_LIB}-cpp";
 }
 
 generate_python_scripts() {
     local script_name;
+    # build [inplace|dist]
     for script_name in "inplace" "dist" ; do
-        cat ${TMPL}/build-repo-${script_name}-python-package.tmpl.sh      \
-        | generate_script "build-${NAME}-${script_name}-python-${PY_LIB}" ;
-    
+        cat ${TMPL}/build-package-python-${script_name}.tmpl.sh      \
+        | generate_script "build-${PY_LIB}-python-${script_name}" ;
     done
 
-    # clean package
-    cat ${TMPL}/clean-repo-python-package.tmpl.sh \
-    | generate_script "clean-${NAME}-python-${PY_LIB}"
+    # build
+    cat ${TMPL}/build-package-python-inplace.tmpl.sh      \
+    | generate_script "build-${PY_LIB}-python" ;
+
+    # clean
+    cat ${TMPL}/clean-package-python.tmpl.sh \
+    | generate_script "clean-${PY_LIB}-python"
 }
 
 generate_scripts() {
@@ -314,8 +283,6 @@ generate_scripts() {
 
     NAMES="${repo_name_all[@]}" \
     generate_multi_scripts      ;
-
-    generate_build_all_script;
 }
 
 if test -n "${rapids_build_utils_debug:-}"; then
