@@ -7,7 +7,17 @@ cd "$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )";
 # install global/common scripts
 . ./common/install.sh;
 
-check_packages jq cron curl sudo wget tzdata gettext-base bash-completion ca-certificates;
+check_packages      \
+    jq              \
+    cron            \
+    curl            \
+    sudo            \
+    wget            \
+    tzdata          \
+    gettext-base    \
+    openssh-client  \
+    bash-completion \
+    ca-certificates ;
 
 # Install yq if not installed
 if ! type yq >/dev/null 2>&1; then
@@ -51,6 +61,8 @@ install_utility devcontainer-utils-post-attach-command-entrypoint post-attach-co
 install_utility devcontainer-utils-python-repl-startup python-repl-startup.py;
 install_utility devcontainer-utils-init-git git/init.sh;
 install_utility devcontainer-utils-clone-git-repo git/repo/clone.sh;
+
+install_utility devcontainer-utils-init-ssh-deploy-keys ssh/init-deploy-keys.sh;
 
 install_utility devcontainer-utils-init-github-cli   github/cli/init.sh;
 install_utility devcontainer-utils-clone-github-repo github/repo/clone.sh;
