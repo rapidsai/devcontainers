@@ -1,7 +1,7 @@
 {
   "name": "NVIDIA RAPIDS devcontainer build utilities",
   "id": "rapids-build-utils",
-  "version": "23.10.10",
+  "version": "23.10.11",
   "description": "A feature to install the RAPIDS devcontainer build utilities",
   "containerEnv": {
     "BASH_ENV": "/etc/bash.bash_env"

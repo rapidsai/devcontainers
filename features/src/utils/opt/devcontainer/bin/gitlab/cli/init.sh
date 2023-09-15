@@ -16,8 +16,6 @@ init_gitlab_cli() {
 
     set -euo pipefail;
 
-    # PS4="+ ${BASH_SOURCE[0]}:\${LINENO} "; set -x;
-
     if ! type glab > /dev/null 2>&1; then
         export GITLAB_USER="";
         return;

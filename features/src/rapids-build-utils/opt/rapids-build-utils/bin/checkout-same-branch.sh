@@ -8,9 +8,10 @@ checkout_same_branch() {
       | xargs -r -d'\n' -I% echo -n local %\; \
     )";
 
-    echo "Determining available branches..."
+    echo "Determining available branches...";
 
     local all_repos=();
+    local common_branches="";
 
     for ((i=0; i < ${repos_length:-0}; i+=1)); do
 
@@ -22,15 +23,14 @@ checkout_same_branch() {
             continue;
         fi;
 
-        # echo "${!repo_name}...";
-
-        local remote_branches="";
-
-        git -C ~/${!repo_path} fetch --no-tags upstream;
-
-        for x in $(git -C ~/${!repo_path} branch -r | grep upstream); do
-            remote_branches="${remote_branches:+$remote_branches\n}${x#upstream\/}";
-        done;
+        echo "Fetching ${!repo_name} branches...";
+        local remote_branches="$(                           \
+            tr '[:space:]' '\0' <<< 'origin upstream'       \
+          | xargs -r -0 -P2 -I% sh -c "                     \
+              git -C ~/${!repo_path} ls-remote -h %         \
+            | cut -f2 | grep -Ev 'refs/heads/pull-request/' \
+            | sed 's@refs/heads@%@'"                        \
+        )";
 
         if [ ${#all_repos[@]} -eq 0 ]; then
             # start with first repo's set of branches
@@ -77,9 +77,20 @@ checkout_same_branch() {
 
         if [[ ! -d ~/"${!repo_path:-}/.git" ]]; then
             continue;
-        fi;
+        fi
 
-        git -C ~/${!repo_path} checkout --recurse-submodules "$branch_name" ;
+        if test -z "${branch_name##*"origin/"*}"; then
+            if ! git -C ~/${!repo_path} checkout --recurse-submodules -t "${branch_name}" -b "${branch_name/#origin\//}"   2>/dev/null; then
+                git -C ~/${!repo_path} checkout --recurse-submodules "${branch_name/#origin\//}";
+                git -C ~/${!repo_path} branch "${branch_name/#origin\//}" -u "${branch_name}";
+            fi
+        elif test -z "${branch_name##*"upstream/"*}"; then
+            if ! git -C ~/${!repo_path} checkout --recurse-submodules -t "${branch_name}" -b "${branch_name/#upstream\//}" 2>/dev/null; then
+                git -C ~/${!repo_path} checkout --recurse-submodules "${branch_name/#upstream\//}";
+                git -C ~/${!repo_path} branch "${branch_name/#upstream\//}" -u "${branch_name}";
+            fi
+        fi
+
         git -C ~/${!repo_path} submodule update --init --recursive;
 
     done;

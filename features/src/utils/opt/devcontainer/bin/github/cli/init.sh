@@ -4,21 +4,19 @@ init_github_cli() {
 
     set -euo pipefail;
 
-    # PS4="+ ${BASH_SOURCE[0]}:\${LINENO} "; set -x;
-
     if ! type gh > /dev/null 2>&1; then
         export GITHUB_USER="";
         return;
     fi
 
-    local git_protocol="--git-protocol https";
+    local git_protocol="https";
     local avoid_gh_cli_ssh_keygen_prompt=;
 
     if [[ "${CODESPACES:-false}" == "true" ]]; then
-        git_protocol="--git-protocol https";
+        git_protocol="https";
     else
         if grep -q "You've successfully authenticated" <<< "$(ssh -T git@${GITHUB_HOST:-github.com} 2>&1)"; then
-            git_protocol="--git-protocol ssh";
+            git_protocol="ssh";
             if type ssh-keygen > /dev/null 2>&1; then
                 avoid_gh_cli_ssh_keygen_prompt=1;
             fi
@@ -70,7 +68,7 @@ init_github_cli() {
         fi
 
         gh auth login \
-            --web ${git_protocol} \
+            --web --git-protocol ${git_protocol} \
             --hostname "${GITHUB_HOST:-github.com}" \
             $(scope_flags ${active_scopes} ${needed_scopes}) \
         || echo "Continuing without logging into GitHub";
@@ -86,6 +84,8 @@ init_github_cli() {
             $(scope_flags ${active_scopes} ${needed_scopes}) \
         || echo "Continuing without logging into GitHub";
     fi
+
+    gh config set git_protocol ${git_protocol};
 
     if gh auth status >/dev/null 2>&1; then
         gh auth setup-git --hostname "${GITHUB_HOST:-github.com}";
