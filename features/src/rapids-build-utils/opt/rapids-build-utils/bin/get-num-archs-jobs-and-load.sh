@@ -27,7 +27,8 @@ get_num_archs_jobs_and_load() {
 
     local n_arch=${archs:-1};
 
-    if test -z "${archs:-}"; then
+    if test -z "${archs:-}" \
+    && test -n "${INFER_NUM_DEVICE_ARCHITECTURES:-}"; then
         archs=$(rapids-parse-cmake-var-from-args CMAKE_CUDA_ARCHITECTURES "${__rest__[@]}");
         archs="${archs:-${CMAKE_CUDA_ARCHITECTURES:-${CUDAARCHS:-}}}";
 
@@ -60,6 +61,7 @@ get_num_archs_jobs_and_load() {
     local free_mem=$(free --giga | grep -E '^Mem:' | tr -s '[:space:]' | cut -d' ' -f7 || echo '0');
     local freeswap=$(free --giga | grep -E '^Swap:' | tr -s '[:space:]' | cut -d' ' -f4 || echo '0');
     local all_cpus="${parallel:-${JOBS:-${PARALLEL_LEVEL:-$(nproc)}}}";
+    local n_load="${all_cpus}";
     local n_jobs="$(cat<<____EOF | bc
 scale=0
 max_cpu=(${all_cpus} / ${n_arch} / 2 * 3)
@@ -68,7 +70,7 @@ if(max_cpu < max_mem) max_cpu else max_mem
 ____EOF
     )";
     n_jobs=$((n_jobs < 1 ? 1 : n_jobs));
-    local n_load="${all_cpus}";
+    n_jobs=$((n_arch > 1 ? n_jobs : n_load));
 
     echo "n_arch=${n_arch}";
     echo "n_jobs=${n_jobs}";
