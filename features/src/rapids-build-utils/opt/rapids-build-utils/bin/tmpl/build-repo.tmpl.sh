@@ -2,11 +2,11 @@
 
 build_${NAME}() {
     set -euo pipefail;
-    for lib in "${CPP_LIB}"; do
+    for lib in ${CPP_LIB}; do
         exe="build-${lib}-cpp"
         if type $exe 2>&1; then $exe "$@"; fi
     done;
-    for package in "${PY_LIB}"; do
+    for package in ${PY_LIB}; do
         exe="build-${package}-python-inplace"
         if type $exe 2>&1; then $exe "$@"; fi
     done;
