@@ -5,18 +5,19 @@ TMPL=/opt/rapids-build-utils/bin/tmpl;
 TMP_SCRIPT_DIR=/tmp/rapids-build-utils
 mkdir -p $TMP_SCRIPT_DIR
 
-remove_script_for_pattern() {
+clean_scripts() {
     set -euo pipefail;
-    local pattern="${1}";
-    for x in $(find $TMP_SCRIPT_DIR -printf '%f\n' | grep -oP "$pattern"); do
-        (sudo rm "$TMP_SCRIPT_DIR/$x" >/dev/null 2>&1 || true);
-        (sudo update-alternatives --remove-all $x >/dev/null 2>&1 || true);
+    for x in $(find $TMP_SCRIPT_DIR -maxdepth 1 -type f -printf '%f\n'); do
+        (sudo update-alternatives --remove-all $x > /dev/null 2>&1);
     done
+    sudo rm -rf "$TMP_SCRIPT_DIR";
+    mkdir -p $TMP_SCRIPT_DIR
 }
 
 generate_script() {
     local bin="${1:-}";
     if test -n "$bin" && ! test -f "$TMP_SCRIPT_DIR/${bin}"; then
+        (
         cat - \
       | envsubst '$NAME
                   $SRC_PATH
@@ -37,12 +38,16 @@ generate_script() {
         sudo update-alternatives --install \
             "/usr/bin/${bin}" "${bin}" "$TMP_SCRIPT_DIR/${bin}" 0 \
             >/dev/null 2>&1;
+        ) & true;
+
+        echo "$!"
     fi
 }
 
 generate_all_script_impl() {
     local bin="$SCRIPT-all";
     if test -n "$bin" && ! test -f "$TMP_SCRIPT_DIR/${bin}"; then
+        (
         cat - \
       | envsubst '$NAMES
                   $SCRIPT' \
@@ -53,6 +58,9 @@ generate_all_script_impl() {
         sudo update-alternatives --install \
             "/usr/bin/${bin}" "${bin}" "$TMP_SCRIPT_DIR/${bin}" 0 \
             >/dev/null 2>&1;
+        ) & true;
+
+        echo "$!"
     fi
 }
 
@@ -94,6 +102,11 @@ generate_python_scripts() {
     for script_name in "build" "clean"; do (
         cat ${TMPL}/python-${script_name}.tmpl.sh        \
       | generate_script "${script_name}-${PY_LIB}-python";
+    ) || true;
+    done
+    for script_name in "inplace" "dist"; do (
+        cat ${TMPL}/python-build-${script_name}.tmpl.sh        \
+      | generate_script "build-${PY_LIB}-python-${script_name}";
     ) || true;
     done
     cat ${TMPL}/python-wheel.tmpl.sh       \
@@ -271,9 +284,10 @@ if test -n "${rapids_build_utils_debug:-}"; then
     PS4="+ ${BASH_SOURCE[0]}:\${LINENO} "; set -x;
 fi
 
-(remove_script_for_pattern '^clone-[A-Za-z\-_]*$');
-(remove_script_for_pattern '^clean-[A-Za-z\-_]*$');
-(remove_script_for_pattern '^build-[A-Za-z\-_]*$');
-(remove_script_for_pattern '^configure-[A-Za-z\-_]*$');
+(clean_scripts);
 
-(generate_scripts "$@");
+for pid in $(generate_scripts "$@"); do
+    while [[ -e "/proc/$pid" ]]; do
+        sleep 0.1
+    done
+done
