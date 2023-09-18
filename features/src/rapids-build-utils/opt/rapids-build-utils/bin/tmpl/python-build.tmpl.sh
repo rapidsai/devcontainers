@@ -2,22 +2,19 @@
 
 build_${PY_LIB}_python_dist() {
 
-    # pull out the --rapids-dist or --rapids-inplace args (if any)
+    local mode="inplace";
+
+    # pull out the --mode dist|inplace arg (if any)
     eval "$(                                  \
         devcontainer-utils-parse-args --names '
-            rapids-dist                       |
-            rapids-inplace                    |
+            m|mode                            |
         ' - <<< "$@"                          \
       | xargs -r -d'\n' -I% echo -n local %\; \
     )";
 
-    # check if rapids_dist is set.
+    mode="${m:-${mode:-"inplace"}}";
 
-    if [[ ! -z ${rapids_dist+x} ]]; then
-        build-${PY_LIB}-python-dist ${__rest__[@]};
-    else
-        build-${PY_LIB}-python-inplace ${__rest__[@]};
-    fi
+    build-${PY_LIB}-python-${mode} ${__rest__[@]};
 }
 
 if test -n "${rapids_build_utils_debug:-}"; then
