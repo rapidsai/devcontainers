@@ -36,64 +36,75 @@ x-mambaforge: &conda { name: "mambaforge" }
 x-python: &python { name: "ghcr.io/devcontainers/features/python:1", version: "os-provided", installTools: "false", hide: true }
 x-cccl_dev: &cccl_dev { name: "cccl-dev", hide: true }
 
+# CCCL only needs a subset of the full CTK:
+x-cccl-cuda-opts: &cccl_cuda_opts {
+  installNVRTC: true,
+  installCompilers: true,
+  installCUDARuntime: true,
+  installDevPackages: true,
+  installCTKLibraries: false,
+  installcuTensor: false,
+  installcuDNN: false,
+}
+
 include:
 # CCCL devcontainers
 
 - os: "ubuntu:18.04"
   images:
-  - {features: [*gcc_6, *cuda_prev_min, *python, *cccl_dev], env: *gcc_env}
-  - {features: [*gcc_7, *cuda_prev_min, *python, *cccl_dev], env: *gcc_env}
-  - {features: [*gcc_8, *cuda_prev_min, *python, *cccl_dev], env: *gcc_env}
-  - {features: [*gcc_9, *cuda_prev_min, *python, *cccl_dev], env: *gcc_env}
-  - {features: [*llvm_9, *cuda_prev_min, *python, *cccl_dev], env: *llvm_env}
-  - {features: [*oneapi_2022, *cuda_prev_min, *python, *cccl_dev], env: *onapi_env}
+  - {features: [*gcc_6, {<<: *cuda_prev_min, <<: *cccl_cuda_opts}, *python, *cccl_dev], env: *gcc_env}
+  - {features: [*gcc_7, {<<: *cuda_prev_min, <<: *cccl_cuda_opts}, *python, *cccl_dev], env: *gcc_env}
+  - {features: [*gcc_8, {<<: *cuda_prev_min, <<: *cccl_cuda_opts}, *python, *cccl_dev], env: *gcc_env}
+  - {features: [*gcc_9, {<<: *cuda_prev_min, <<: *cccl_cuda_opts}, *python, *cccl_dev], env: *gcc_env}
+  - {features: [*llvm_9, {<<: *cuda_prev_min, <<: *cccl_cuda_opts}, *python, *cccl_dev], env: *llvm_env}
+  - {features: [*oneapi_2022, {<<: *cuda_prev_min, <<: *cccl_cuda_opts}, *python, *cccl_dev], env: *onapi_env}
 
 - os: "ubuntu:20.04"
   images:
-  - {features: [*gcc_7, *cuda_curr_max, *python, *cccl_dev], env: *gcc_env}
-  - {features: [*gcc_8, *cuda_curr_max, *python, *cccl_dev], env: *gcc_env}
-  - {features: [*gcc_9, *cuda_curr_max, *python, *cccl_dev], env: *gcc_env}
-  - {features: [*gcc_10, *cuda_curr_max, *python, *cccl_dev], env: *gcc_env}
-  - {features: [*llvm_9, *cuda_curr_max, *python, *cccl_dev], env: *llvm_env}
-  - {features: [*llvm_10, *cuda_curr_max, *python, *cccl_dev], env: *llvm_env}
-  - {features: [*llvm_11, *cuda_curr_max, *python, *cccl_dev], env: *llvm_env}
-  - {features: [*llvm_12, *cuda_curr_max, *python, *cccl_dev], env: *llvm_env}
-  - {features: [*llvm_13, *cuda_curr_max, *python, *cccl_dev], env: *llvm_env}
-  - {features: [*llvm_14, *cuda_curr_max, *python, *cccl_dev], env: *llvm_env}
-  - {features: [*oneapi_2022, *cuda_curr_max, *python, *cccl_dev], env: *onapi_env}
+  - {features: [*gcc_7, {<<: *cuda_curr_max, <<: *cccl_cuda_opts}, *python, *cccl_dev], env: *gcc_env}
+  - {features: [*gcc_8, {<<: *cuda_curr_max, <<: *cccl_cuda_opts}, *python, *cccl_dev], env: *gcc_env}
+  - {features: [*gcc_9, {<<: *cuda_curr_max, <<: *cccl_cuda_opts}, *python, *cccl_dev], env: *gcc_env}
+  - {features: [*gcc_10, {<<: *cuda_curr_max, <<: *cccl_cuda_opts}, *python, *cccl_dev], env: *gcc_env}
+  - {features: [*llvm_9, {<<: *cuda_curr_max, <<: *cccl_cuda_opts}, *python, *cccl_dev], env: *llvm_env}
+  - {features: [*llvm_10, {<<: *cuda_curr_max, <<: *cccl_cuda_opts}, *python, *cccl_dev], env: *llvm_env}
+  - {features: [*llvm_11, {<<: *cuda_curr_max, <<: *cccl_cuda_opts}, *python, *cccl_dev], env: *llvm_env}
+  - {features: [*llvm_12, {<<: *cuda_curr_max, <<: *cccl_cuda_opts}, *python, *cccl_dev], env: *llvm_env}
+  - {features: [*llvm_13, {<<: *cuda_curr_max, <<: *cccl_cuda_opts}, *python, *cccl_dev], env: *llvm_env}
+  - {features: [*llvm_14, {<<: *cuda_curr_max, <<: *cccl_cuda_opts}, *python, *cccl_dev], env: *llvm_env}
+  - {features: [*oneapi_2022, {<<: *cuda_curr_max, <<: *cccl_cuda_opts}, *python, *cccl_dev], env: *onapi_env}
 
 - os: "ubuntu:22.04"
   images:
   - {features: [*nvhpc_prev, *python, *cccl_dev], env: *nvhpc_env}
   - {features: [*nvhpc_curr, *python, *cccl_dev], env: *nvhpc_env}
-  - {features: [*gcc_11, *cuda_curr_max, *python, *cccl_dev], env: *gcc_env}
-  - {features: [*gcc_12, *cuda_curr_max, *python, *cccl_dev], env: *gcc_env}
-  - {features: [*llvm_15, *cuda_curr_max, *python, *cccl_dev], env: *llvm_env}
-  - {features: [*llvm_prev, *cuda_curr_max, *python, *cccl_dev], env: *llvm_env}
-  - {features: [*llvm_curr, *cuda_curr_max, *python, *cccl_dev], env: *llvm_env}
-  - {features: [*oneapi_2022, *cuda_curr_max, *python, *cccl_dev], env: *onapi_env}
+  - {features: [*gcc_11, {<<: *cuda_curr_max, <<: *cccl_cuda_opts}, *python, *cccl_dev], env: *gcc_env}
+  - {features: [*gcc_12, {<<: *cuda_curr_max, <<: *cccl_cuda_opts}, *python, *cccl_dev], env: *gcc_env}
+  - {features: [*llvm_15, {<<: *cuda_curr_max, <<: *cccl_cuda_opts}, *python, *cccl_dev], env: *llvm_env}
+  - {features: [*llvm_prev, {<<: *cuda_curr_max, <<: *cccl_cuda_opts}, *python, *cccl_dev], env: *llvm_env}
+  - {features: [*llvm_curr, {<<: *cuda_curr_max, <<: *cccl_cuda_opts}, *python, *cccl_dev], env: *llvm_env}
+  - {features: [*oneapi_2022, {<<: *cuda_curr_max, <<: *cccl_cuda_opts}, *python, *cccl_dev], env: *onapi_env}
   # llvm-cuda-nvhpc (needed by stdexec devcontainers)
-  - {features: [*llvm_curr, *cuda_curr_max, *nvhpc_curr, *python]}
+  - {features: [*llvm_curr, {<<: *cuda_curr_max, <<: *cccl_cuda_opts}, *nvhpc_curr, *python]}
 
 - os: "windows"
   images:
   # lowest CUDA version
-  - {features: [*cuda_prev_min, { name: "cl", version: "14.14" }]} # MSVC 2017
-  - {features: [*cuda_prev_min, { name: "cl", version: "14.15" }]} # MSVC 2017
-  - {features: [*cuda_prev_min, { name: "cl", version: "14.16" }]} # MSVC 2017
-  - {features: [*cuda_prev_min, { name: "cl", version: "14.27" }]} # MSVC 2019
-  - {features: [*cuda_prev_min, { name: "cl", version: "14.28" }]} # MSVC 2019
-  - {features: [*cuda_prev_min, { name: "cl", version: "14.29" }]} # MSVC 2019
+  - {features: [{<<: *cuda_prev_min, <<: *cccl_cuda_opts}, { name: "cl", version: "14.14" }]} # MSVC 2017
+  - {features: [{<<: *cuda_prev_min, <<: *cccl_cuda_opts}, { name: "cl", version: "14.15" }]} # MSVC 2017
+  - {features: [{<<: *cuda_prev_min, <<: *cccl_cuda_opts}, { name: "cl", version: "14.16" }]} # MSVC 2017
+  - {features: [{<<: *cuda_prev_min, <<: *cccl_cuda_opts}, { name: "cl", version: "14.27" }]} # MSVC 2019
+  - {features: [{<<: *cuda_prev_min, <<: *cccl_cuda_opts}, { name: "cl", version: "14.28" }]} # MSVC 2019
+  - {features: [{<<: *cuda_prev_min, <<: *cccl_cuda_opts}, { name: "cl", version: "14.29" }]} # MSVC 2019
   # highest CUDA version
-  - {features: [*cuda_curr_max, { name: "cl", version: "14.14" }]} # MSVC 2017
-  - {features: [*cuda_curr_max, { name: "cl", version: "14.15" }]} # MSVC 2017
-  - {features: [*cuda_curr_max, { name: "cl", version: "14.16" }]} # MSVC 2017
-  - {features: [*cuda_curr_max, { name: "cl", version: "14.27" }]} # MSVC 2019
-  - {features: [*cuda_curr_max, { name: "cl", version: "14.28" }]} # MSVC 2019
-  - {features: [*cuda_curr_max, { name: "cl", version: "14.29" }]} # MSVC 2019
-  - {features: [*cuda_curr_max, { name: "cl", version: "14.34" }]} # MSVC 2022
-  - {features: [*cuda_curr_max, { name: "cl", version: "14.35" }]} # MSVC 2022
-  - {features: [*cuda_curr_max, { name: "cl", version: "14.36" }]} # MSVC 2022
+  - {features: [{<<: *cuda_curr_max, <<: *cccl_cuda_opts}, { name: "cl", version: "14.14" }]} # MSVC 2017
+  - {features: [{<<: *cuda_curr_max, <<: *cccl_cuda_opts}, { name: "cl", version: "14.15" }]} # MSVC 2017
+  - {features: [{<<: *cuda_curr_max, <<: *cccl_cuda_opts}, { name: "cl", version: "14.16" }]} # MSVC 2017
+  - {features: [{<<: *cuda_curr_max, <<: *cccl_cuda_opts}, { name: "cl", version: "14.27" }]} # MSVC 2019
+  - {features: [{<<: *cuda_curr_max, <<: *cccl_cuda_opts}, { name: "cl", version: "14.28" }]} # MSVC 2019
+  - {features: [{<<: *cuda_curr_max, <<: *cccl_cuda_opts}, { name: "cl", version: "14.29" }]} # MSVC 2019
+  - {features: [{<<: *cuda_curr_max, <<: *cccl_cuda_opts}, { name: "cl", version: "14.34" }]} # MSVC 2022
+  - {features: [{<<: *cuda_curr_max, <<: *cccl_cuda_opts}, { name: "cl", version: "14.35" }]} # MSVC 2022
+  - {features: [{<<: *cuda_curr_max, <<: *cccl_cuda_opts}, { name: "cl", version: "14.36" }]} # MSVC 2022
 
 # RAPIDS devcontainers
 
