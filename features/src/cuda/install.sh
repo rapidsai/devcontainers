@@ -158,10 +158,14 @@ fi
 
 if [ "${INSTALLCUDNN:-false}" = true ] \
 && test -n "$(apt-cache search libcudnn8)"; then
+    set -x;
+    apt-cache search libcudnn8;
+    apt-cache policy libcudnn8;
     PKGS+=("libcudnn8=*+${cuda_tag}");
     if [ "${INSTALLDEVPACKAGES:-false}" = true ]; then
         PKGS+=("libcudnn8-dev=*+${cuda_tag}");
     fi
+    set +x;
 fi
 
 if [ "${INSTALLNCCL:-false}" = true ]; then
