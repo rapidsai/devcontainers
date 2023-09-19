@@ -81,7 +81,6 @@ PKGS=();
 if [ "${INSTALLCOMPILERS:-false}" = true ]; then
     PKGS+=("cuda-nvml-dev-${cuda_ver}");
     PKGS+=("cuda-compiler-${cuda_ver}");
-    PKGS+=("cuda-profiler-api-${cuda_ver}");
     PKGS+=("cuda-minimal-build-${cuda_ver}");
     PKGS+=("cuda-command-line-tools-${cuda_ver}");
     if [ "$NVARCH" = x86_64 ]; then
