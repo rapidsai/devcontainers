@@ -24,7 +24,7 @@
     },
     "installcuDNN": {
         "type": "boolean",
-        "default": false,
+        "default": true,
         "description": "Install CUDA Deep Neural Network Library (cuDNN)"
     },
     "installcuTensor": {
@@ -34,7 +34,7 @@
     },
     "installNCCL": {
         "type": "boolean",
-        "default": false,
+        "default": true,
         "description": "Install NVIDIA Collective Communications Library (NCCL)"
     },
     "installCUDARuntime": {
@@ -99,12 +99,12 @@
     },
     "installCompilers": {
         "type": "boolean",
-        "default": false,
+        "default": true,
         "description": "Install NVIDIA CUDA Compiler (nvcc)"
     },
     "installProfilers": {
         "type": "boolean",
-        "default": false,
+        "default": true,
         "description": "Install NVIDIA NSight Systems Profiler (nsys)"
     },
     "installCTKLibraries": {

@@ -119,7 +119,8 @@ if [ "${INSTALLNVRTC:-false}" = true ]; then
     fi
 fi
 
-if [ "${INSTALLOPENCL:-false}" = true ]; then
+if [ "${INSTALLOPENCL:-false}" = true ] \
+&& test -n "$(apt-cache search cuda-opencl${dev_tag}-${cuda_ver})"; then
     PKGS+=("cuda-opencl${dev_tag}-${cuda_ver}");
 fi
 
@@ -135,7 +136,8 @@ if [ "${INSTALLCUFFT:-false}" = true ]; then
     PKGS+=("libcufft${dev_tag}-${cuda_ver}");
 fi
 
-if [ "${INSTALLCUFILE:-false}" = true ]; then
+if [ "${INSTALLCUFILE:-false}" = true ] \
+&& test -n "$(apt-cache search libcufile${dev_tag}-${cuda_ver})"; then
     PKGS+=("libcufile${dev_tag}-${cuda_ver}");
 fi
 
