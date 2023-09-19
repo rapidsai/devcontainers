@@ -113,13 +113,13 @@ fi
 
 if [ "${INSTALLNVRTC:-false}" = true ]; then
     PKGS+=("cuda-nvrtc${dev_tag}-${cuda_ver}");
-    if test -n "$(apt-cache search libnvjitlink${dev_tag}-${cuda_ver})"; then
+    if test -n "$(apt-cache search libnvjitlink${dev_tag}-${cuda_ver})";  2>/dev/nullthen
         PKGS+=("libnvjitlink${dev_tag}-${cuda_ver}");
     fi
 fi
 
 if [ "${INSTALLOPENCL:-false}" = true ] \
-&& test -n "$(apt-cache search cuda-opencl${dev_tag}-${cuda_ver})"; then
+&& test -n "$(apt-cache search cuda-opencl${dev_tag}-${cuda_ver})";  2>/dev/nullthen
     PKGS+=("cuda-opencl${dev_tag}-${cuda_ver}");
 fi
 
@@ -136,7 +136,7 @@ if [ "${INSTALLCUFFT:-false}" = true ]; then
 fi
 
 if [ "${INSTALLCUFILE:-false}" = true ] \
-&& test -n "$(apt-cache search libcufile${dev_tag}-${cuda_ver})"; then
+&& test -n "$(apt-cache search libcufile${dev_tag}-${cuda_ver})";  2>/dev/nullthen
     PKGS+=("libcufile${dev_tag}-${cuda_ver}");
 fi
 
@@ -157,18 +157,17 @@ if [ "${INSTALLNVJPEG:-false}" = true ]; then
 fi
 
 if [ "${INSTALLCUDNN:-false}" = true ] \
-&& test -n "$(apt-cache search libcudnn8)"; then
-    set -x;
-    apt-cache search libcudnn8;
-    apt-cache policy libcudnn8;
+&& test -n "$(apt-cache search libcudnn8 2>/dev/null)" \
+&& apt-cache policy libcudnn8 2>/dev/null | grep -q "+${cuda_tag}"; then
     PKGS+=("libcudnn8=*+${cuda_tag}");
     if [ "${INSTALLDEVPACKAGES:-false}" = true ]; then
         PKGS+=("libcudnn8-dev=*+${cuda_tag}");
     fi
-    set +x;
 fi
 
-if [ "${INSTALLNCCL:-false}" = true ]; then
+if [ "${INSTALLNCCL:-false}" = true ] \
+&& test -n "$(apt-cache search libnccl2 2>/dev/null)" \
+&& apt-cache policy libnccl2 2>/dev/null | grep -q "+${cuda_tag}"; then
     PKGS+=("libnccl2=*+${cuda_tag}");
     if [ "${INSTALLDEVPACKAGES:-false}" = true ]; then
         PKGS+=("libnccl-dev=*+${cuda_tag}");
