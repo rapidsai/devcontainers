@@ -24,7 +24,7 @@
     },
     "installcuDNN": {
         "type": "boolean",
-        "default": true,
+        "default": false,
         "description": "Install CUDA Deep Neural Network Library (cuDNN)"
     },
     "installcuTensor": {

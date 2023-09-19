@@ -38,11 +38,8 @@ x-cccl_dev: &cccl_dev { name: "cccl-dev", hide: true }
 
 # CCCL only needs a subset of the full CTK:
 x-cccl-cuda-opts: &cccl_cuda_opts {
-  installCompilers: true,
-  installCUDARuntime: true,
-  installDevPackages: true,
   installCTKLibraries: false,
-  installcuDNN: false,
+  installCUDARuntime: true,
   installcuTensor: false,
   installNCCL: false,
   installNVRTC: true,
