@@ -157,7 +157,8 @@ if [ "${INSTALLNVJPEG:-false}" = true ]; then
     PKGS+=("libnvjpeg${dev_tag}-${cuda_ver}");
 fi
 
-if [ "${INSTALLCUDNN:-false}" = true ]; then
+if [ "${INSTALLCUDNN:-false}" = true ] \
+&& test -n "$(apt-cache search libcudnn8)"; then
     PKGS+=("libcudnn8=*+${cuda_tag}");
     if [ "${INSTALLDEVPACKAGES:-false}" = true ]; then
         PKGS+=("libcudnn8-dev=*+${cuda_tag}");
