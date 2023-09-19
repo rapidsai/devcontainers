@@ -1,12 +1,13 @@
 {
   "name": "CUDA Toolkit",
   "id": "cuda",
-  "version": "23.10.2",
+  "version": "23.10.3",
   "description": "A feature to install the NVIDIA CUDA Toolkit",
   "options": {
     "version": {
       "type": "string",
       "proposals": [
+        "12.2",
         "12.1",
         "12.0",
         "11.8",
@@ -15,10 +16,31 @@
         "11.5",
         "11.4",
         "11.3",
-        "11.2"
+        "11.2",
+        "11.1"
       ],
-      "default": "12.1",
+      "default": "12.2",
       "description": "Version of the CUDA Toolkit to install."
+    },
+    "installcuDNN": {
+        "type": "boolean",
+        "default": true,
+        "description": "Install CUDA Deep Neural Network Library (cuDNN)"
+    },
+    "installcuTensor": {
+        "type": "boolean",
+        "default": true,
+        "description": "Install CUDA Tensor Linear Algebra Library (cuTensor)"
+    },
+    "installNCCL": {
+        "type": "boolean",
+        "default": true,
+        "description": "Install NVIDIA Collective Communications Library (NCCL)"
+    },
+    "installDevPackages": {
+        "type": "boolean",
+        "default": true,
+        "description": "Whether to install the CUDA dev, compilers, profiler, and command line tool packages"
     },
     "pruneStaticLibs": {
       "type": "boolean",
