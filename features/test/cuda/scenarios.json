@@ -3,7 +3,7 @@
     "image": "ubuntu:18.04",
     "features": {
       "cuda": {
-        "version": "11.0",
+        "version": "11.1",
         "installcuDNN": true
       }
     }
