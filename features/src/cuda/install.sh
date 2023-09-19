@@ -113,13 +113,13 @@ fi
 
 if [ "${INSTALLNVRTC:-false}" = true ]; then
     PKGS+=("cuda-nvrtc${dev_tag}-${cuda_ver}");
-    if test -n "$(apt-cache search libnvjitlink${dev_tag}-${cuda_ver})";  2>/dev/nullthen
+    if test -n "$(apt-cache search libnvjitlink${dev_tag}-${cuda_ver} 2>/dev/null)"; then
         PKGS+=("libnvjitlink${dev_tag}-${cuda_ver}");
     fi
 fi
 
 if [ "${INSTALLOPENCL:-false}" = true ] \
-&& test -n "$(apt-cache search cuda-opencl${dev_tag}-${cuda_ver})";  2>/dev/nullthen
+&& test -n "$(apt-cache search cuda-opencl${dev_tag}-${cuda_ver} 2>/dev/null)"; then
     PKGS+=("cuda-opencl${dev_tag}-${cuda_ver}");
 fi
 
@@ -136,7 +136,7 @@ if [ "${INSTALLCUFFT:-false}" = true ]; then
 fi
 
 if [ "${INSTALLCUFILE:-false}" = true ] \
-&& test -n "$(apt-cache search libcufile${dev_tag}-${cuda_ver})";  2>/dev/nullthen
+&& test -n "$(apt-cache search libcufile${dev_tag}-${cuda_ver} 2>/dev/null)"; then
     PKGS+=("libcufile${dev_tag}-${cuda_ver}");
 fi
 
