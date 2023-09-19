@@ -70,37 +70,103 @@ cudapath="${CUDA_HOME}-${cuda_ver}";
 cuda_tag="cuda${cuda_ver}";
 cuda_ver="${cuda_ver/./-}";
 
-dev_pkgs=();
-runtime_pkgs=();
-runtime_pkgs+=("cuda-libraries-${cuda_ver}");
+dev_tag="";
+
+if [ "${INSTALLDEVPACKAGES:-false}" = true ]; then
+    dev_tag="-dev";
+fi
+
+PKGS=();
+
+if [ "${INSTALLCOMPILERS:-false}" = true ]; then
+    PKGS+=("cuda-nvml-dev-${cuda_ver}");
+    PKGS+=("cuda-compiler-${cuda_ver}");
+    PKGS+=("cuda-profiler-api-${cuda_ver}");
+    PKGS+=("cuda-minimal-build-${cuda_ver}");
+    PKGS+=("cuda-command-line-tools-${cuda_ver}");
+    if [ "$NVARCH" = x86_64 ]; then
+        PKGS+=("cuda-nvprof-${cuda_ver}");
+    fi
+fi
+
+if [ "${INSTALLPROFILERS:-false}" = true ]; then
+    PKGS+=("cuda-nsight-compute-${cuda_ver}");
+    PKGS+=("cuda-nsight-systems-${cuda_ver}");
+fi
+
+if [ "${INSTALLCTKLIBRARIES:-false}" = true ]; then
+    INSTALLCUDARUNTIME=true;
+    INSTALLNVRTC=true;
+    INSTALLNVJITLINK=true;
+    INSTALLOPENCL=true;
+    INSTALLCUBLAS=true;
+    INSTALLCUSPARSE=true;
+    INSTALLCUFFT=true;
+    INSTALLCUFILE=true;
+    INSTALLCURAND=true;
+    INSTALLCUSOLVER=true;
+    INSTALLNPP=true;
+    INSTALLNVJPEG=true;
+fi
+
+if [ "${INSTALLCUDARUNTIME:-false}" = true ]; then
+    PKGS+=("cuda-cudart${dev_tag}-${cuda_ver}");
+fi
+
+if [ "${INSTALLNVRTC:-false}" = true ]; then
+    PKGS+=("cuda-nvrtc${dev_tag}-${cuda_ver}");
+    if test -n "$(apt-cache search libnvjitlink${dev_tag}-${cuda_ver})"; then
+        PKGS+=("libnvjitlink${dev_tag}-${cuda_ver}");
+    fi
+fi
+
+if [ "${INSTALLOPENCL:-false}" = true ]; then
+    PKGS+=("cuda-opencl${dev_tag}-${cuda_ver}");
+fi
+
+if [ "${INSTALLCUBLAS:-false}" = true ]; then
+    PKGS+=("libcublas${dev_tag}-${cuda_ver}");
+fi
+
+if [ "${INSTALLCUSPARSE:-false}" = true ]; then
+    PKGS+=("libcusparse${dev_tag}-${cuda_ver}");
+fi
+
+if [ "${INSTALLCUFFT:-false}" = true ]; then
+    PKGS+=("libcufft${dev_tag}-${cuda_ver}");
+fi
+
+if [ "${INSTALLCUFILE:-false}" = true ]; then
+    PKGS+=("libcufile${dev_tag}-${cuda_ver}");
+fi
+
+if [ "${INSTALLCURAND:-false}" = true ]; then
+    PKGS+=("libcurand${dev_tag}-${cuda_ver}");
+fi
+
+if [ "${INSTALLCUSOLVER:-false}" = true ]; then
+    PKGS+=("libcusolver${dev_tag}-${cuda_ver}");
+fi
+
+if [ "${INSTALLNPP:-false}" = true ]; then
+    PKGS+=("libnpp${dev_tag}-${cuda_ver}");
+fi
+
+if [ "${INSTALLNVJPEG:-false}" = true ]; then
+    PKGS+=("libnvjpeg${dev_tag}-${cuda_ver}");
+fi
 
 if [ "${INSTALLCUDNN:-false}" = true ]; then
-    runtime_pkgs+=("libcudnn8=*+${cuda_tag}");
+    PKGS+=("libcudnn8=*+${cuda_tag}");
+    if [ "${INSTALLDEVPACKAGES:-false}" = true ]; then
+        PKGS+=("libcudnn8-dev=*+${cuda_tag}");
+    fi
 fi
 
 if [ "${INSTALLNCCL:-false}" = true ]; then
-    runtime_pkgs+=("libnccl2=*+${cuda_tag}");
-fi
-
-if [ "${INSTALLDEVPACKAGES:-false}" = true ]; then
-    dev_pkgs+=();
-    dev_pkgs+=("cuda-compiler-${cuda_ver}");
-    dev_pkgs+=("libnccl-dev=*+${cuda_tag}");
-    dev_pkgs+=("cuda-nvml-dev-${cuda_ver}");
-    dev_pkgs+=("cuda-libraries-dev-${cuda_ver}");
-    dev_pkgs+=("cuda-nsight-systems-${cuda_ver}");
-    dev_pkgs+=("cuda-command-line-tools-${cuda_ver}");
-
-    if [ "$NVARCH" = x86_64 ]; then
-        runtime_pkgs+=("cuda-nvprof-${cuda_ver}");
-    fi
-
-    if [ "${INSTALLCUDNN:-false}" = true ]; then
-        dev_pkgs+=("libcudnn8-dev=*+${cuda_tag}");
-    fi
-
-    if [ "${INSTALLNCCL:-false}" = true ]; then
-        dev_pkgs+=("libnccl2=*+${cuda_tag}");
+    PKGS+=("libnccl2=*+${cuda_tag}");
+    if [ "${INSTALLDEVPACKAGES:-false}" = true ]; then
+        PKGS+=("libnccl-dev=*+${cuda_tag}");
     fi
 fi
 
@@ -110,22 +176,22 @@ if [ "${INSTALLCUTENSOR:-false}" = true ]; then
     if ! dpkg -s libcutensor-dev > /dev/null 2>&1; then
         # If `libcutensor-deb` is available in the apt repo, install it
         if ! dpkg -p libcutensor-dev 2>&1 | grep -q "not available" >/dev/null 2>&1; then
-            runtime_pkgs+=(libcutensor1);
+            PKGS+=("libcutensor1");
             if [ "${INSTALLDEVPACKAGES:-false}" = true ]; then
-                dev_pkgs+=(libcutensor-dev);
+                PKGS+=("libcutensor-dev");
             fi
         else
             # If it's not in the apt repo for the current OS version, install it from the 20.04 repo
             focal_cuda_repo="${cuda_repo_base}/ubuntu2004/${NVARCH}";
-            runtime_pkgs+=("$(get_cuda_deb "${focal_cuda_repo}" libcutensor1)");
+            PKGS+=("$(get_cuda_deb "${focal_cuda_repo}" libcutensor1)");
             if [ "${INSTALLDEVPACKAGES:-false}" = true ]; then
-                dev_pkgs+=("$(get_cuda_deb "${focal_cuda_repo}" libcutensor-dev)");
+                PKGS+=("$(get_cuda_deb "${focal_cuda_repo}" libcutensor-dev)");
             fi
         fi
     fi
 fi
 
-check_packages ${runtime_pkgs[@]} ${dev_pkgs[@]};
+check_packages ${PKGS[@]};
 
 if ! test -L "${CUDA_HOME}"; then
     # Create /usr/local/cuda symlink

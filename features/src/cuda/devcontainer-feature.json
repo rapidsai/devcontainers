@@ -24,7 +24,7 @@
     },
     "installcuDNN": {
         "type": "boolean",
-        "default": true,
+        "default": false,
         "description": "Install CUDA Deep Neural Network Library (cuDNN)"
     },
     "installcuTensor": {
@@ -34,8 +34,83 @@
     },
     "installNCCL": {
         "type": "boolean",
-        "default": true,
+        "default": false,
         "description": "Install NVIDIA Collective Communications Library (NCCL)"
+    },
+    "installCUDARuntime": {
+        "type": "boolean",
+        "default": true,
+        "description": "Install CUDA Runtime Library (cudart)"
+    },
+    "installNVRTC": {
+        "type": "boolean",
+        "default": false,
+        "description": "Install NVIDIA Runtime Compilation Library (NVRTC)"
+    },
+    "installnvJitLink": {
+        "type": "boolean",
+        "default": false,
+        "description": "Install NVIDIA Runtime Linking Library (nvJitLink)"
+    },
+    "installOpenCL": {
+        "type": "boolean",
+        "default": false,
+        "description": "Install NVIDIA CUDA OpenCL Library"
+    },
+    "installcuBLAS": {
+        "type": "boolean",
+        "default": false,
+        "description": "Install CUDA Basic Linear Algebra Library (cuBLAS)"
+    },
+    "installcuSPARSE": {
+        "type": "boolean",
+        "default": false,
+        "description": "Install CUDA Basic Linear Algebra for Sparse Matrices Library (cuSPARSE)"
+    },
+    "installcuFFT": {
+        "type": "boolean",
+        "default": false,
+        "description": "Install CUDA Fast Fourier Transform Library (cuFFT)"
+    },
+    "installcuFile": {
+        "type": "boolean",
+        "default": false,
+        "description": "Install CUDA GPUDirect Storage API Library (cuFile)"
+    },
+    "installcuRAND": {
+        "type": "boolean",
+        "default": false,
+        "description": "Install CUDA Random Number Generation Library (cuRAND)"
+    },
+    "installcuSOLVER": {
+        "type": "boolean",
+        "default": false,
+        "description": "Install CUDA Direct Linear Solvers Library (cuSOLVER)"
+    },
+    "installNPP": {
+        "type": "boolean",
+        "default": false,
+        "description": "Install NVIDIA Performance Primitives (NPP)"
+    },
+    "installnvJPEG": {
+        "type": "boolean",
+        "default": false,
+        "description": "Install NVIDIA JPEG decoder, encoder, and transcoder library (nvJPEG)"
+    },
+    "installCompilers": {
+        "type": "boolean",
+        "default": false,
+        "description": "Install NVIDIA CUDA Compiler (nvcc)"
+    },
+    "installProfilers": {
+        "type": "boolean",
+        "default": false,
+        "description": "Install NVIDIA NSight Systems Profiler (nsys)"
+    },
+    "installCTKLibraries": {
+        "type": "boolean",
+        "default": true,
+        "description": "Shortcut to install all CUDA Toolkit Libraries"
     },
     "installDevPackages": {
         "type": "boolean",
