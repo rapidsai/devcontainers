@@ -96,7 +96,6 @@ fi
 if [ "${INSTALLCTKLIBRARIES:-false}" = true ]; then
     INSTALLCUDARUNTIME=true;
     INSTALLNVRTC=true;
-    INSTALLNVJITLINK=true;
     INSTALLOPENCL=true;
     INSTALLCUBLAS=true;
     INSTALLCUSPARSE=true;

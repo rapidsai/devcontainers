@@ -47,11 +47,6 @@
         "default": false,
         "description": "Install NVIDIA Runtime Compilation Library (NVRTC)"
     },
-    "installnvJitLink": {
-        "type": "boolean",
-        "default": false,
-        "description": "Install NVIDIA Runtime Linking Library (nvJitLink)"
-    },
     "installOpenCL": {
         "type": "boolean",
         "default": false,
