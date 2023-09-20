@@ -1,9 +1,9 @@
-if test -n "${libcutensorMg_static:-}"; then
+if test -n "${libcutensorMg_static:-}" && test -f "${libcutensorMg_static}"; then
     rm -rf "${libcutensorMg_static}";
     (update-alternatives --remove-all libcutensorMg_static.a >/dev/null 2>&1 || true);
 fi
 
-if test -n "${libcutensor_static:-}"; then
+if test -n "${libcutensor_static:-}" && test -f "${libcutensor_static}"; then
     rm -rf "${libcutensor_static}";
     (update-alternatives --remove-all libcutensor_static.a   >/dev/null 2>&1 || true);
 fi
