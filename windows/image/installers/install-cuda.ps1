@@ -39,7 +39,7 @@ $componentTag = @{
 $cudaVersionUrl = "https://developer.download.nvidia.com/compute/cuda/$cudaUri"
 
 Invoke-WebRequest -Uri "$cudaVersionUrl" -OutFile "./cuda_network.exe" -UseBasicParsing
-Start-Process -Wait -PassThru -FilePath .\cuda_network.exe -ArgumentList "-s nvcc_$componentTag curand_$componentTag curand_dev_$componentTag cudart_$componentTag"
+Start-Process -Wait -PassThru -FilePath .\cuda_network.exe -ArgumentList "-s nvcc_$componentTag curand_$componentTag curand_dev_$componentTag cudart_$componentTag nvrtc_$componentTag"
 
 $ENV:PATH="$ENV:PATH;C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v$componentTag\bin"
 $ENV:CUDA_PATH="C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v$componentTag"
