@@ -43,62 +43,161 @@ get_cuda_deb() {
 cuda_repo_base="https://developer.download.nvidia.com/compute/cuda/repos";
 cuda_repo="${cuda_repo_base}/${OSNAME}/${NVARCH}";
 
-DEBIAN_FRONTEND=noninteractive                    \
-apt install -y --no-install-recommends            \
-    "$(get_cuda_deb "${cuda_repo}" cuda-keyring)" \
-    ;
+if ! dpkg -s cuda-keyring; then
+    DEBIAN_FRONTEND=noninteractive                    \
+    apt install -y --no-install-recommends            \
+        "$(get_cuda_deb "${cuda_repo}" cuda-keyring)" \
+        ;
+fi
 
 if [[ "${OSNAME}" == "ubuntu1804" && "${NVARCH}" == "sbsa" ]]; then
     ml_repo_base="https://developer.download.nvidia.com/compute/machine-learning/repos";
     ml_repo="${ml_repo_base}/${OSNAME}/${NVARCH}";
     apt-key adv --fetch-keys "${ml_repo}/7fa2af80.pub";
-    add-apt-repository -yn "deb ${ml_repo}/ /"
+    add-apt-repository -yn "deb ${ml_repo}/ /";
 fi
 
 apt-get update;
 
-echo "Installing dev CUDA toolkit..."
+echo "Installing dev CUDA toolkit...";
 
 export CUDA_HOME="/usr/local/cuda";
-export LIBRARY_PATH="${CUDA_HOME}/lib64/stubs${LIBRARY_PATH:+:$LIBRARY_PATH}";
-export LD_LIBRARY_PATH="/usr/local/nvidia/lib:/usr/local/nvidia/lib64${LD_LIBRARY_PATH:+:$LD_LIBRARY_PATH}";
 
-cuda_ver="${VERSION:-12.1.0}";
+cuda_ver="${VERSION:-12.2.0}";
 cuda_ver=$(echo "${cuda_ver}" | cut -d'.' -f3 --complement);
 
 cudapath="${CUDA_HOME}-${cuda_ver}";
-nccl_tag="cuda${cuda_ver}";
+cuda_tag="cuda${cuda_ver}";
 cuda_ver="${cuda_ver/./-}";
 
-check_packages                          \
-    "libnccl-dev=*+${nccl_tag}"         \
-    "libnccl2=*+${nccl_tag}"            \
-    cuda-compiler-${cuda_ver}           \
-    cuda-nvml-dev-${cuda_ver}           \
-    cuda-libraries-dev-${cuda_ver}      \
-    cuda-command-line-tools-${cuda_ver} \
-    $([ "$NVARCH" == x86_64 ] && echo   \
-      cuda-nvprof-${cuda_ver} || echo ) \
-    ;
+dev_tag="";
 
-# HACK: libcutensor-dev isn't currently in the ubuntu22.04 repo,
-# but is in ubuntu20.04. Detect this and download the 20.04 deb.
-if ! dpkg -s libcutensor-dev > /dev/null 2>&1; then
-    # If `libcutensor-deb` is available in the apt repo, install it
-    if ! dpkg -p libcutensor-dev 2>&1 | grep -q "not available" >/dev/null 2>&1; then
-        check_packages libcutensor-dev;
-    else
-        # If it's not in the apt repo for the current OS version, install it from the 20.04 repo
-        focal_cuda_repo="${cuda_repo_base}/ubuntu2004/${NVARCH}";
-        DEBIAN_FRONTEND=noninteractive                             \
-        apt install -y --no-install-recommends                     \
-            "$(get_cuda_deb "${focal_cuda_repo}" libcutensor1)"    \
-            "$(get_cuda_deb "${focal_cuda_repo}" libcutensor-dev)" \
-            ;
+if [ "${INSTALLDEVPACKAGES:-false}" = true ]; then
+    dev_tag="-dev";
+fi
+
+PKGS=();
+
+if [ "${INSTALLCOMPILERS:-false}" = true ]; then
+    PKGS+=("cuda-nvml-dev-${cuda_ver}");
+    PKGS+=("cuda-compiler-${cuda_ver}");
+    PKGS+=("cuda-minimal-build-${cuda_ver}");
+    PKGS+=("cuda-command-line-tools-${cuda_ver}");
+    if [ "$NVARCH" = x86_64 ]; then
+        PKGS+=("cuda-nvprof-${cuda_ver}");
     fi
 fi
 
-if [[ ! -L "${CUDA_HOME}" ]]; then
+if [ "${INSTALLPROFILERS:-false}" = true ]; then
+    PKGS+=("cuda-nsight-compute-${cuda_ver}");
+    PKGS+=("cuda-nsight-systems-${cuda_ver}");
+fi
+
+if [ "${INSTALLCTKLIBRARIES:-false}" = true ]; then
+    INSTALLCUDARUNTIME=true;
+    INSTALLNVRTC=true;
+    INSTALLOPENCL=true;
+    INSTALLCUBLAS=true;
+    INSTALLCUSPARSE=true;
+    INSTALLCUFFT=true;
+    INSTALLCUFILE=true;
+    INSTALLCURAND=true;
+    INSTALLCUSOLVER=true;
+    INSTALLNPP=true;
+    INSTALLNVJPEG=true;
+fi
+
+if [ "${INSTALLCUDARUNTIME:-false}" = true ]; then
+    PKGS+=("cuda-cudart${dev_tag}-${cuda_ver}");
+fi
+
+if [ "${INSTALLNVRTC:-false}" = true ]; then
+    PKGS+=("cuda-nvrtc${dev_tag}-${cuda_ver}");
+    if test -n "$(apt-cache search libnvjitlink${dev_tag}-${cuda_ver} 2>/dev/null)"; then
+        PKGS+=("libnvjitlink${dev_tag}-${cuda_ver}");
+    fi
+fi
+
+if [ "${INSTALLOPENCL:-false}" = true ] \
+&& test -n "$(apt-cache search cuda-opencl${dev_tag}-${cuda_ver} 2>/dev/null)"; then
+    PKGS+=("cuda-opencl${dev_tag}-${cuda_ver}");
+fi
+
+if [ "${INSTALLCUBLAS:-false}" = true ]; then
+    PKGS+=("libcublas${dev_tag}-${cuda_ver}");
+fi
+
+if [ "${INSTALLCUSPARSE:-false}" = true ]; then
+    PKGS+=("libcusparse${dev_tag}-${cuda_ver}");
+fi
+
+if [ "${INSTALLCUFFT:-false}" = true ]; then
+    PKGS+=("libcufft${dev_tag}-${cuda_ver}");
+fi
+
+if [ "${INSTALLCUFILE:-false}" = true ] \
+&& test -n "$(apt-cache search libcufile${dev_tag}-${cuda_ver} 2>/dev/null)"; then
+    PKGS+=("libcufile${dev_tag}-${cuda_ver}");
+fi
+
+if [ "${INSTALLCURAND:-false}" = true ]; then
+    PKGS+=("libcurand${dev_tag}-${cuda_ver}");
+fi
+
+if [ "${INSTALLCUSOLVER:-false}" = true ]; then
+    PKGS+=("libcusolver${dev_tag}-${cuda_ver}");
+fi
+
+if [ "${INSTALLNPP:-false}" = true ]; then
+    PKGS+=("libnpp${dev_tag}-${cuda_ver}");
+fi
+
+if [ "${INSTALLNVJPEG:-false}" = true ]; then
+    PKGS+=("libnvjpeg${dev_tag}-${cuda_ver}");
+fi
+
+if [ "${INSTALLCUDNN:-false}" = true ] \
+&& test -n "$(apt-cache search libcudnn8 2>/dev/null)" \
+&& apt-cache policy libcudnn8 2>/dev/null | grep -q "+${cuda_tag}"; then
+    PKGS+=("libcudnn8=*+${cuda_tag}");
+    if [ "${INSTALLDEVPACKAGES:-false}" = true ]; then
+        PKGS+=("libcudnn8-dev=*+${cuda_tag}");
+    fi
+fi
+
+if [ "${INSTALLNCCL:-false}" = true ] \
+&& test -n "$(apt-cache search libnccl2 2>/dev/null)" \
+&& apt-cache policy libnccl2 2>/dev/null | grep -q "+${cuda_tag}"; then
+    PKGS+=("libnccl2=*+${cuda_tag}");
+    if [ "${INSTALLDEVPACKAGES:-false}" = true ]; then
+        PKGS+=("libnccl-dev=*+${cuda_tag}");
+    fi
+fi
+
+if [ "${INSTALLCUTENSOR:-false}" = true ]; then
+    # HACK: libcutensor-dev isn't currently in the ubuntu22.04 repo,
+    # but is in ubuntu20.04. Detect this and download the 20.04 deb.
+    if ! dpkg -s libcutensor-dev > /dev/null 2>&1; then
+        # If `libcutensor-deb` is available in the apt repo, install it
+        if ! dpkg -p libcutensor-dev 2>&1 | grep -q "not available" >/dev/null 2>&1; then
+            PKGS+=("libcutensor1");
+            if [ "${INSTALLDEVPACKAGES:-false}" = true ]; then
+                PKGS+=("libcutensor-dev");
+            fi
+        else
+            # If it's not in the apt repo for the current OS version, install it from the 20.04 repo
+            focal_cuda_repo="${cuda_repo_base}/ubuntu2004/${NVARCH}";
+            PKGS+=("$(get_cuda_deb "${focal_cuda_repo}" libcutensor1)");
+            if [ "${INSTALLDEVPACKAGES:-false}" = true ]; then
+                PKGS+=("$(get_cuda_deb "${focal_cuda_repo}" libcutensor-dev)");
+            fi
+        fi
+    fi
+fi
+
+check_packages ${PKGS[@]};
+
+if ! test -L "${CUDA_HOME}"; then
     # Create /usr/local/cuda symlink
     ln -s "${cudapath}" "${CUDA_HOME}";
 fi
@@ -109,42 +208,10 @@ export CUDA_VERSION_MINOR=$((cuda_ver / 10 % 100));
 export CUDA_VERSION_PATCH=$((cuda_ver % 10));
 export CUDA_VERSION="$CUDA_VERSION_MAJOR.$CUDA_VERSION_MINOR.$CUDA_VERSION_PATCH";
 
-# Remove extra libcutensor versions
-libcutensor_ver="$(dpkg -s libcutensor1 | grep '^Version:' | cut -d' ' -f2 | cut -d'-' -f1 | cut -d'.' -f4 --complement)";
-libcutensorMg_shared="$(find /usr/lib -type f -regex "^.*/libcutensor/${CUDA_VERSION_MAJOR}/libcutensorMg.so.${libcutensor_ver}$")";
-
-if [[ -n "${libcutensorMg_shared:-}" ]]; then
-
-    libcutensorMg_shared="$(find /usr/lib -type f -regex "^.*/libcutensor/${CUDA_VERSION_MAJOR}/libcutensorMg.so.${libcutensor_ver}$")";
-    libcutensorMg_static="$(find /usr/lib -type f -regex "^.*/libcutensor/${CUDA_VERSION_MAJOR}/libcutensorMg_static.a$")";
-    libcutensor_shared="$(find /usr/lib -type f -regex "^.*/libcutensor/${CUDA_VERSION_MAJOR}/libcutensor.so.${libcutensor_ver}$")";
-    libcutensor_static="$(find /usr/lib -type f -regex "^.*/libcutensor/${CUDA_VERSION_MAJOR}/libcutensor_static.a$")";
-
-    libcutensorMg_shared_link="$(update-alternatives --query libcutensorMg.so.${libcutensor_ver} | grep '^Link:' | cut -d' ' -f2)";
-    libcutensorMg_static_link="$(update-alternatives --query libcutensorMg_static.a              | grep '^Link:' | cut -d' ' -f2)";
-    libcutensor_shared_link="$(update-alternatives --query libcutensor.so.${libcutensor_ver}     | grep '^Link:' | cut -d' ' -f2)";
-    libcutensor_static_link="$(update-alternatives --query libcutensor_static.a                  | grep '^Link:' | cut -d' ' -f2)";
-
-    # Remove existing libcutensor lib alternatives
-    (update-alternatives --remove-all libcutensorMg.so.${libcutensor_ver} >/dev/null 2>&1 || true);
-    (update-alternatives --remove-all libcutensorMg_static.a              >/dev/null 2>&1 || true);
-    (update-alternatives --remove-all libcutensor.so.${libcutensor_ver}   >/dev/null 2>&1 || true);
-    (update-alternatives --remove-all libcutensor_static.a                >/dev/null 2>&1 || true);
-
-    # Install only the alternative for the version we keep
-    update-alternatives --install "${libcutensorMg_shared_link}" libcutensorMg.so.${libcutensor_ver} "${libcutensorMg_shared}" 0
-    update-alternatives --install "${libcutensorMg_static_link}" libcutensorMg_static.a              "${libcutensorMg_static}" 0
-    update-alternatives --install "${libcutensor_shared_link}"   libcutensor.so.${libcutensor_ver}   "${libcutensor_shared}"   0
-    update-alternatives --install "${libcutensor_static_link}"   libcutensor_static.a                "${libcutensor_static}"   0
-
-    # Set the default alternative
-    update-alternatives --set libcutensorMg.so.${libcutensor_ver} "${libcutensorMg_shared}";
-    update-alternatives --set libcutensorMg_static.a              "${libcutensorMg_static}";
-    update-alternatives --set libcutensor.so.${libcutensor_ver}   "${libcutensor_shared}";
-    update-alternatives --set libcutensor_static.a                "${libcutensor_static}";
+if [ "${INSTALLCUTENSOR:-false}" = true ]; then
+    # Remove extra libcutensor versions
+    source ./prune-extra-cutensor-libs.sh;
 fi
-
-rm -rf $(find /usr/lib -mindepth 1 -type d -regex "^.*/libcutensor/.*$" | grep -Ev "^.*/libcutensor/${CUDA_VERSION_MAJOR}$");
 
 vars_=();
 vars_+=('$NVARCH');
@@ -173,18 +240,6 @@ rm -rf /var/lib/apt/lists/*;
 
 rm -rf /tmp/*.deb;
 
-if [[ "${PRUNESTATICLIBS:-false}" == true ]]; then
-
-    if [[ -n "${libcutensorMg_static:-}" ]]; then rm -rf "${libcutensorMg_static}"; fi
-    if [[ -n "${libcutensor_static:-}" ]]; then rm -rf "${libcutensor_static}"; fi
-    find /usr/lib -type f -name 'libnccl_static.a' -delete || true;
-
-    (update-alternatives --remove-all libcutensorMg_static.a >/dev/null 2>&1 || true);
-    (update-alternatives --remove-all libcutensor_static.a   >/dev/null 2>&1 || true);
-
-    for dir in "lib" "lib64"; do
-        find "$(realpath -m "${CUDA_HOME}/${dir}")/" -type f \
-            \( -name '*.a' ! -name 'libnvptxcompiler_static.a' ! -name 'libcudart_static.a' ! -name 'libcudadevrt.a' ! -name 'libculibos.a' \) \
-            -delete || true;
-    done
+if [ "${PRUNESTATICLIBS:-false}" = true ]; then
+    source ./prune-static-libs.sh;
 fi
