@@ -21,7 +21,7 @@ check "CUDA version" bash -c "echo '$CUDA_VERSION' | grep '11.1.0'";
 check "CUDA major version" bash -c "echo '$CUDA_VERSION_MAJOR' | grep '11'";
 check "CUDA minor version" bash -c "echo '$CUDA_VERSION_MINOR' | grep '1'";
 check "CUDA patch version" bash -c "echo '$CUDA_VERSION_PATCH' | grep '0'";
-check "installed" stat /usr/local/cuda-11.0 /usr/local/cuda
+check "installed" stat /usr/local/cuda-11.1 /usr/local/cuda
 check "nvcc exists and is on path" which nvcc
 
 # Report result
