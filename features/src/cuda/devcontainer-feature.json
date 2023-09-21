@@ -1,7 +1,7 @@
 {
   "name": "CUDA Toolkit",
   "id": "cuda",
-  "version": "23.10.4",
+  "version": "23.10.5",
   "description": "A feature to install the NVIDIA CUDA Toolkit",
   "options": {
     "version": {
@@ -22,6 +22,26 @@
       "default": "12.2",
       "description": "Version of the CUDA Toolkit to install."
     },
+    "installCompilers": {
+        "type": "boolean",
+        "default": true,
+        "description": "Install NVIDIA CUDA Compiler (nvcc)"
+    },
+    "installProfilers": {
+        "type": "boolean",
+        "default": true,
+        "description": "Install NVIDIA NSight Systems Profiler (nsys)"
+    },
+    "installCTKLibraries": {
+        "type": "boolean",
+        "default": true,
+        "description": "Shortcut to install all CUDA Toolkit Libraries"
+    },
+    "installDevPackages": {
+        "type": "boolean",
+        "default": true,
+        "description": "Whether to install the CUDA dev packages (static libraries + headers)"
+    },
     "installcuDNN": {
         "type": "boolean",
         "default": false,
@@ -29,7 +49,7 @@
     },
     "installcuTensor": {
         "type": "boolean",
-        "default": true,
+        "default": false,
         "description": "Install CUDA Tensor Linear Algebra Library (cuTensor)"
     },
     "installNCCL": {
@@ -91,26 +111,6 @@
         "type": "boolean",
         "default": false,
         "description": "Install NVIDIA JPEG decoder, encoder, and transcoder library (nvJPEG)"
-    },
-    "installCompilers": {
-        "type": "boolean",
-        "default": true,
-        "description": "Install NVIDIA CUDA Compiler (nvcc)"
-    },
-    "installProfilers": {
-        "type": "boolean",
-        "default": true,
-        "description": "Install NVIDIA NSight Systems Profiler (nsys)"
-    },
-    "installCTKLibraries": {
-        "type": "boolean",
-        "default": true,
-        "description": "Shortcut to install all CUDA Toolkit Libraries"
-    },
-    "installDevPackages": {
-        "type": "boolean",
-        "default": true,
-        "description": "Whether to install the CUDA dev, compilers, profiler, and command line tool packages"
     },
     "pruneStaticLibs": {
       "type": "boolean",
