@@ -16,8 +16,12 @@ A feature to install the NVIDIA CUDA Toolkit
 | Options Id | Description | Type | Default Value |
 |-----|-----|-----|-----|
 | version | Version of the CUDA Toolkit to install. | string | 12.2 |
+| installCompilers | Install NVIDIA CUDA Compiler (nvcc) | boolean | true |
+| installProfilers | Install NVIDIA NSight Systems Profiler (nsys) | boolean | true |
+| installCTKLibraries | Shortcut to install all CUDA Toolkit Libraries | boolean | true |
+| installDevPackages | Whether to install the CUDA dev packages (static libraries + headers) | boolean | true |
 | installcuDNN | Install CUDA Deep Neural Network Library (cuDNN) | boolean | false |
-| installcuTensor | Install CUDA Tensor Linear Algebra Library (cuTensor) | boolean | true |
+| installcuTensor | Install CUDA Tensor Linear Algebra Library (cuTensor) | boolean | false |
 | installNCCL | Install NVIDIA Collective Communications Library (NCCL) | boolean | true |
 | installCUDARuntime | Install CUDA Runtime Library (cudart) | boolean | true |
 | installNVRTC | Install NVIDIA Runtime Compilation Library (NVRTC) | boolean | false |
@@ -30,10 +34,6 @@ A feature to install the NVIDIA CUDA Toolkit
 | installcuSOLVER | Install CUDA Direct Linear Solvers Library (cuSOLVER) | boolean | false |
 | installNPP | Install NVIDIA Performance Primitives (NPP) | boolean | false |
 | installnvJPEG | Install NVIDIA JPEG decoder, encoder, and transcoder library (nvJPEG) | boolean | false |
-| installCompilers | Install NVIDIA CUDA Compiler (nvcc) | boolean | true |
-| installProfilers | Install NVIDIA NSight Systems Profiler (nsys) | boolean | true |
-| installCTKLibraries | Shortcut to install all CUDA Toolkit Libraries | boolean | true |
-| installDevPackages | Whether to install the CUDA dev, compilers, profiler, and command line tool packages | boolean | true |
 | pruneStaticLibs | Whether to remove static libs from the CUDA Toolkit to save image size | boolean | true |
 
 ## Customizations
