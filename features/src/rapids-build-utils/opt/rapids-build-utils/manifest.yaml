@@ -133,21 +133,21 @@ repos:
     - name: cugraph
       sub_dir: python/cugraph
       depends: [pylibraft, pylibcugraph]
+    - name: nx-cugraph
+      sub_dir: python/nx-cugraph
+      depends: [pylibcugraph]
     - name: cugraph-dgl
       sub_dir: python/cugraph-dgl
-      depends: []
-    - name: cugraph-nx
-      sub_dir: python/cugraph-nx
-      depends: []
+      depends: [cugraph]
     - name: cugraph_pyg
       sub_dir: python/cugraph-pyg
-      depends: []
-    - name: cugraph-service-server
-      sub_dir: python/cugraph-service/client
-      depends: []
+      depends: [cugraph]
     - name: cugraph-service-client
       sub_dir: python/cugraph-service/server
       depends: []
+    - name: cugraph-service-server
+      sub_dir: python/cugraph-service/client
+      depends: [cudf, dask-cudf, cugraph, cugraph-service-client]
   git:
     repo: cugraph
     <<: *git_defaults
