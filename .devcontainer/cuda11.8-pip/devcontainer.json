@@ -10,7 +10,7 @@
   },
   "hostRequirements": {"gpu": "optional"},
   "features": {
-    "./features/cuda": {"installcuDNN": true, "installcuTensor": true},
+    "./features/cuda": {"installcuDNN": true},
     "./features/rapids-build-utils": {}
   },
   "overrideFeatureInstallOrder": [
