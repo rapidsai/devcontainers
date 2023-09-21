@@ -127,6 +127,9 @@ repos:
       sub_dir: cpp
       depends: [rmm, raft, cugraph-ops]
   python:
+    - name: pylibcugraph
+      sub_dir: python/pylibcugraph
+      depends: [rmm, pylibraft]
     - name: cugraph
       sub_dir: python/cugraph
       depends: [pylibraft, pylibcugraph]
@@ -145,9 +148,6 @@ repos:
     - name: cugraph-service-client
       sub_dir: python/cugraph-service/server
       depends: []
-    - name: pylibcugraph
-      sub_dir: python/pylibcugraph
-      depends: [rmm, pylibraft]
   git:
     repo: cugraph
     <<: *git_defaults
