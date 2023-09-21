@@ -24,6 +24,7 @@ echo "Downloading CUDA keyring...";
 
 export NVARCH="$(uname -p)";
 export OSNAME="$(. /etc/os-release; echo "$ID${VERSION_ID/./}")";
+VERSION="${CUDA_VERSION:-${VERSION:-12.2.0}}";
 
 if [[ "$NVARCH" == aarch64 ]]; then
     NVARCH="sbsa";
@@ -63,8 +64,8 @@ echo "Installing dev CUDA toolkit...";
 
 export CUDA_HOME="/usr/local/cuda";
 
-cuda_ver="${VERSION:-12.2.0}";
-cuda_ver=$(echo "${cuda_ver}" | cut -d'.' -f3 --complement);
+cuda_ver="${VERSION}";
+cuda_ver=$(cut -d'.' -f3 --complement <<< "${cuda_ver}");
 
 cudapath="${CUDA_HOME}-${cuda_ver}";
 cuda_tag="cuda${cuda_ver}";
@@ -202,11 +203,25 @@ if ! test -L "${CUDA_HOME}"; then
     ln -s "${cudapath}" "${CUDA_HOME}";
 fi
 
-cuda_ver=$(grep "#define CUDA_VERSION" ${CUDA_HOME}/include/cuda.h | cut -d' ' -f3);
-export CUDA_VERSION_MAJOR=$((cuda_ver / 1000));
-export CUDA_VERSION_MINOR=$((cuda_ver / 10 % 100));
-export CUDA_VERSION_PATCH=$((cuda_ver % 10));
-export CUDA_VERSION="$CUDA_VERSION_MAJOR.$CUDA_VERSION_MINOR.$CUDA_VERSION_PATCH";
+if test -z "${CUDA_VERSION:-}"; then
+    if test -f "${CUDA_HOME}/include/cuda.h"; then
+        cuda_ver=$(grep "#define CUDA_VERSION" "${CUDA_HOME}/include/cuda.h" | cut -d' ' -f3);
+        CUDA_VERSION_MAJOR=$((cuda_ver / 1000));
+        CUDA_VERSION_MINOR=$((cuda_ver / 10 % 100));
+        CUDA_VERSION_PATCH=$((cuda_ver % 10));
+        CUDA_VERSION="$CUDA_VERSION_MAJOR.$CUDA_VERSION_MINOR.$CUDA_VERSION_PATCH";
+    else
+        CUDA_VERSION="${VERSION}";
+        CUDA_VERSION_MAJOR=$(cut -d'.' -f1 <<< "${VERSION}");
+        CUDA_VERSION_MINOR=$(cut -d'.' -f2 <<< "${VERSION}");
+        CUDA_VERSION_PATCH=$(cut -d'.' -f3 <<< "${VERSION}");
+    fi
+fi
+
+export CUDA_VERSION;
+export CUDA_VERSION_MAJOR;
+export CUDA_VERSION_MINOR;
+export CUDA_VERSION_PATCH;
 
 if [ "${INSTALLCUTENSOR:-false}" = true ]; then
     # Remove extra libcutensor versions
@@ -229,8 +244,10 @@ append_to_all_bashrcs "$(cat .bashrc | envsubst "${vars_%,}")";
 add_etc_profile_d_script cuda "$(cat .bashrc | envsubst "${vars_%,}")";
 
 # Required for nvidia-docker v1
-echo "/usr/local/nvidia/lib" >> /etc/ld.so.conf.d/nvidia.conf;
-echo "/usr/local/nvidia/lib64" >> /etc/ld.so.conf.d/nvidia.conf;
+cat <<EOF > /etc/ld.so.conf.d/nvidia.conf
+/usr/local/nvidia/lib
+/usr/local/nvidia/lib64
+EOF
 
 # Clean up
 # rm -rf /tmp/*;
