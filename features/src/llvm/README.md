@@ -16,6 +16,7 @@ A feature to install LLVM compilers and tools
 | Options Id | Description | Type | Default Value |
 |-----|-----|-----|-----|
 | version | LLVM version to install. | string | dev |
+| packages | LLVM packages to install. | string | all |
 
 ## Customizations
 
