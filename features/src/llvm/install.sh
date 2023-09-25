@@ -10,6 +10,7 @@ cd "$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )";
 LLVM_VERSION="${VERSION:-}";
 
 check_packages                  \
+    git                         \
     gpg                         \
     wget                        \
     apt-utils                   \
@@ -35,47 +36,18 @@ if [[ -z "$LLVM_VERSION" \
     LLVM_VERSION="$(echo $LLVM_VERSION | grep -oP '[0-9]+')";
 fi
 
-echo "Installing llmv-${LLVM_VERSION} compilers and tools";
+echo "Installing llvm-${LLVM_VERSION} compilers and tools";
 
-./llvm.sh $LLVM_VERSION all;
+./llvm.sh $LLVM_VERSION ${PACKAGES:-all};
 
-# # Remove existing cc/c++ alternatives
-# (update-alternatives --remove-all cc           >/dev/null 2>&1 || true);
-# (update-alternatives --remove-all c++          >/dev/null 2>&1 || true);
-
-# # Install cc/c++ alternatives
-# update-alternatives                                                                    \
-#     --install /usr/bin/cc           cc           $(which clang-${LLVM_VERSION}) 30     \
-#     --slave   /usr/bin/c++          c++          $(which clang++-${LLVM_VERSION})      \
-#     ;
-
-# # Set default cc/c++ alternatives
-# update-alternatives --set cc $(which clang-${LLVM_VERSION});
-
-# Remove existing clang/llvm alternatives
-(update-alternatives --remove-all clang        >/dev/null 2>&1 || true);
-(update-alternatives --remove-all clangd       >/dev/null 2>&1 || true);
-(update-alternatives --remove-all clang++      >/dev/null 2>&1 || true);
-(update-alternatives --remove-all clang-format >/dev/null 2>&1 || true);
-(update-alternatives --remove-all clang-tidy   >/dev/null 2>&1 || true);
-(update-alternatives --remove-all lldb         >/dev/null 2>&1 || true);
-(update-alternatives --remove-all llvm-config  >/dev/null 2>&1 || true);
-(update-alternatives --remove-all llvm-cov     >/dev/null 2>&1 || true);
-
-# Install clang/llvm alternatives
-update-alternatives                                                                    \
-    --install /usr/bin/clang        clang        $(which clang-${LLVM_VERSION}) 30     \
-    --slave   /usr/bin/clangd       clangd       $(which clangd-${LLVM_VERSION})       \
-    --slave   /usr/bin/clang++      clang++      $(which clang++-${LLVM_VERSION})      \
-    --slave   /usr/bin/clang-format clang-format $(which clang-format-${LLVM_VERSION}) \
-    --slave   /usr/bin/clang-tidy   clang-tidy   $(which clang-tidy-${LLVM_VERSION})   \
-    --slave   /usr/bin/lldb         lldb         $(which lldb-${LLVM_VERSION})         \
-    --slave   /usr/bin/llvm-config  llvm-config  $(which llvm-config-${LLVM_VERSION})  \
-    --slave   /usr/bin/llvm-cov     llvm-cov     $(which llvm-cov-${LLVM_VERSION})     \
-    ;
-
-# Set default clang/llvm alternatives
-update-alternatives --set clang $(which clang-${LLVM_VERSION});
+# Remove existing, install, and set default clang/llvm alternatives
+for x in clang clangd clang++ clang-format clang-tidy lldb llvm-config llvm-cov; do
+    if type ${x}-${LLVM_VERSION} >/dev/null 2>&1; then
+        (update-alternatives --remove-all ${x} >/dev/null 2>&1 || true);
+        (update-alternatives --install /usr/bin/${x} ${x} $(which ${x}-${LLVM_VERSION}) 30);
+        (update-alternatives --set ${x} $(which ${x}-${LLVM_VERSION}));
+    fi
+done
 
 export LLVM_VERSION="${LLVM_VERSION}";
 

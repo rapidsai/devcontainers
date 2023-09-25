@@ -20,11 +20,10 @@ usage() {
     exit 1;
 }
 
-CURRENT_LLVM_STABLE=17
 BASE_URL="http://apt.llvm.org"
 
 # Check for required tools
-needed_binaries=(lsb_release wget add-apt-repository gpg)
+needed_binaries=(lsb_release wget add-apt-repository gpg git)
 missing_binaries=()
 for binary in "${needed_binaries[@]}"; do
     if ! which $binary >/dev/null 2>&1 ; then
@@ -38,9 +37,6 @@ if [[ ${#missing_binaries[@]} -gt 0 ]] ; then
 fi
 
 # Set default values for commandline arguments
-# We default to the current stable branch of LLVM
-LLVM_VERSION=$CURRENT_LLVM_STABLE
-ALL=0
 DISTRO=$(lsb_release -is)
 VERSION=$(lsb_release -sr)
 UBUNTU_CODENAME=""
@@ -72,23 +68,9 @@ case ${DISTRO} in
         ;;
 esac
 
-# read optional command line arguments
-if [ "$#" -ge 1 ] && [ "${1::1}" != "-" ]; then
-    if [ "$1" != "all" ]; then
-        LLVM_VERSION=$1
-    else
-        # special case for ./llvm.sh all
-        ALL=1
-    fi
-    OPTIND=2
-    if [ "$#" -ge 2 ]; then
-      if [ "$2" == "all" ]; then
-          # Install all packages
-          ALL=1
-          OPTIND=3
-      fi
-    fi
-fi
+# read command line arguments
+LLVM_VERSION=$1;
+PKG=(${*:2});
 
 while getopts ":hm:n:" arg; do
     case $arg in
@@ -116,17 +98,25 @@ if [[ $EUID -ne 0 ]]; then
    exit 1
 fi
 
+echo "pkgs: ${PKG[@]}";
+
+llvm_versions=($(git ls-remote --tags    \
+    https://github.com/llvm/llvm-project \
+    refs/tags/llvmorg-*-init             \
+  | cut -f2                              \
+  | sed 's@refs/tags/llvmorg-@@'         \
+  | sed -r 's@([0-9]+)[\.-].*?@\1@'      \
+  | sort -urV                            \
+));
+
 declare -A LLVM_VERSION_PATTERNS
-LLVM_VERSION_PATTERNS[9]="-9"
-LLVM_VERSION_PATTERNS[10]="-10"
-LLVM_VERSION_PATTERNS[11]="-11"
-LLVM_VERSION_PATTERNS[12]="-12"
-LLVM_VERSION_PATTERNS[13]="-13"
-LLVM_VERSION_PATTERNS[14]="-14"
-LLVM_VERSION_PATTERNS[15]="-15"
-LLVM_VERSION_PATTERNS[16]="-16"
-LLVM_VERSION_PATTERNS[17]="-17"
-LLVM_VERSION_PATTERNS[18]=""
+LLVM_VERSION_PATTERNS[9]="-9";
+
+for ((i=0; i < ${#llvm_versions[@]}; i+=1)); do
+    LLVM_VERSION_PATTERNS[${llvm_versions[$i]}]="-${llvm_versions[$i]}";
+done
+
+LLVM_VERSION_PATTERNS[${llvm_versions[0]}]="";
 
 if [ ! ${LLVM_VERSION_PATTERNS[$LLVM_VERSION]+_} ]; then
     echo "This script does not support LLVM version $LLVM_VERSION"
@@ -171,22 +161,47 @@ EOF
 
 add-apt-repository -n -y "${REPO_NAME}"
 
-apt-get update
-
-PKG="clang-$LLVM_VERSION lldb-$LLVM_VERSION lld-$LLVM_VERSION clangd-$LLVM_VERSION"
-if [[ $ALL -eq 1 ]]; then
+if [[ "${PKG[@]}" == "" ]]; then
+    PKG=();
+    PKG+=("clang-$LLVM_VERSION");
+    PKG+=("lldb-$LLVM_VERSION");
+    PKG+=("lld-$LLVM_VERSION");
+    PKG+=("clangd-$LLVM_VERSION");
+elif [[ "${PKG[@]}" == "all" ]]; then
     # same as in test-install.sh
     # No worries if we have dups
-    PKG="$PKG clang-tidy-$LLVM_VERSION clang-format-$LLVM_VERSION clang-tools-$LLVM_VERSION llvm-$LLVM_VERSION-dev lld-$LLVM_VERSION lldb-$LLVM_VERSION llvm-$LLVM_VERSION-tools libomp-$LLVM_VERSION-dev libc++-$LLVM_VERSION-dev libc++abi-$LLVM_VERSION-dev libclang-common-$LLVM_VERSION-dev libclang-$LLVM_VERSION-dev"
+    PKG=();
+    PKG+=("clang-tidy-$LLVM_VERSION");
+    PKG+=("clang-format-$LLVM_VERSION");
+    PKG+=("clang-tools-$LLVM_VERSION");
+    PKG+=("llvm-$LLVM_VERSION-dev");
+    PKG+=("lld-$LLVM_VERSION");
+    PKG+=("lldb-$LLVM_VERSION");
+    PKG+=("llvm-$LLVM_VERSION-tools");
+    PKG+=("libomp-$LLVM_VERSION-dev");
+    PKG+=("libc++-$LLVM_VERSION-dev");
+    PKG+=("libc++abi-$LLVM_VERSION-dev");
+    PKG+=("libclang-common-$LLVM_VERSION-dev");
+    PKG+=("libclang-$LLVM_VERSION-dev");
     if test $LLVM_VERSION -gt 9; then
-        PKG="$PKG libclang-cpp$LLVM_VERSION-dev"
+        PKG+=("libclang-cpp$LLVM_VERSION-dev");
     fi
     if test $LLVM_VERSION -gt 11; then
-        PKG="$PKG libunwind-$LLVM_VERSION-dev"
+        PKG+=("libunwind-$LLVM_VERSION-dev");
     fi
     if test $LLVM_VERSION -gt 14; then
-        PKG="$PKG libclang-rt-$LLVM_VERSION-dev libpolly-$LLVM_VERSION-dev"
+        PKG+=("libclang-rt-$LLVM_VERSION-dev");
+        PKG+=("libpolly-$LLVM_VERSION-dev");
     fi
+else
+    for ((i=0; i < ${#PKG[@]}; i+=1)); do
+        if ! grep -q ${LLVM_VERSION} <<< "${PKG[$i]}"; then
+            PKG[$i]="${PKG[$i]}-${LLVM_VERSION}";
+        fi
+    done
 fi
 
-apt-get install -y $PKG
+if test ${#PKG[@]} -gt 0; then
+    apt-get update;
+    apt-get install -y ${PKG[@]};
+fi
