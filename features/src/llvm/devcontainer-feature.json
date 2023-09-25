@@ -1,7 +1,7 @@
 {
   "name": "LLVM compilers and tools",
   "id": "llvm",
-  "version": "23.10.2",
+  "version": "23.10.3",
   "description": "A feature to install LLVM compilers and tools",
   "options": {
     "version": {
@@ -20,6 +20,11 @@
       ],
       "default": "dev",
       "description": "LLVM version to install."
+    },
+    "packages": {
+      "type": "string",
+      "default": "all",
+      "description": "LLVM packages to install."
     }
   },
   "containerEnv": {

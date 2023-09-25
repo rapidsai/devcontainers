@@ -1,4 +1,13 @@
 {
+  "clang-format": {
+    "image": "ubuntu:20.04",
+    "features": {
+      "llvm": {
+        "version": "17",
+        "packages": "clang-format"
+      }
+    }
+  },
   "llvm_9": {
     "image": "ubuntu:20.04",
     "features": {
