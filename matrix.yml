@@ -40,6 +40,7 @@ x-cccl_dev: &cccl_dev { name: "cccl-dev", hide: true }
 x-cccl-cuda-opts: &cccl_cuda_opts {
   installCTKLibraries: false,
   installCUDARuntime: true,
+  installcuRAND: true,
   installcuTensor: false,
   installNCCL: false,
   installNVRTC: true,
