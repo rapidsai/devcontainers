@@ -1,6 +1,6 @@
 x-git-defaults: &git_defaults
     host: github
-    tag: branch-23.10
+    tag: branch-23.12
     upstream: rapidsai
 
 repos:
