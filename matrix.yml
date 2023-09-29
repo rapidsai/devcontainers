@@ -35,6 +35,7 @@ x-mambaforge: &conda { name: "mambaforge" }
 
 x-python: &python { name: "ghcr.io/devcontainers/features/python:1", version: "os-provided", installTools: "false", hide: true }
 x-cccl_dev: &cccl_dev { name: "cccl-dev", hide: true }
+x-cccl-clang-format: &cccl_clang_format {name: "llvm", version: "17", packages: "clang-format", hide: true}
 
 # CCCL only needs a subset of the full CTK:
 x-cccl-cuda-opts: &cccl_cuda_opts {
@@ -51,37 +52,37 @@ include:
 
 - os: "ubuntu:18.04"
   images:
-  - {features: [*gcc_6, {<<: *cuda_prev_min, <<: *cccl_cuda_opts}, *python, *cccl_dev], env: *gcc_env}
-  - {features: [*gcc_7, {<<: *cuda_prev_min, <<: *cccl_cuda_opts}, *python, *cccl_dev], env: *gcc_env}
-  - {features: [*gcc_8, {<<: *cuda_prev_min, <<: *cccl_cuda_opts}, *python, *cccl_dev], env: *gcc_env}
-  - {features: [*gcc_9, {<<: *cuda_prev_min, <<: *cccl_cuda_opts}, *python, *cccl_dev], env: *gcc_env}
-  - {features: [*llvm_9, {<<: *cuda_prev_min, <<: *cccl_cuda_opts}, *python, *cccl_dev], env: *llvm_env}
-  - {features: [*oneapi_2022, {<<: *cuda_prev_min, <<: *cccl_cuda_opts}, *python, *cccl_dev], env: *onapi_env}
+  - {features: [*gcc_6, {<<: *cuda_prev_min, <<: *cccl_cuda_opts}, *python, *cccl_dev, *cccl_clang_format], env: *gcc_env}
+  - {features: [*gcc_7, {<<: *cuda_prev_min, <<: *cccl_cuda_opts}, *python, *cccl_dev, *cccl_clang_format], env: *gcc_env}
+  - {features: [*gcc_8, {<<: *cuda_prev_min, <<: *cccl_cuda_opts}, *python, *cccl_dev, *cccl_clang_format], env: *gcc_env}
+  - {features: [*gcc_9, {<<: *cuda_prev_min, <<: *cccl_cuda_opts}, *python, *cccl_dev, *cccl_clang_format], env: *gcc_env}
+  - {features: [*llvm_9, {<<: *cuda_prev_min, <<: *cccl_cuda_opts}, *python, *cccl_dev, *cccl_clang_format], env: *llvm_env}
+  - {features: [*oneapi_2022, {<<: *cuda_prev_min, <<: *cccl_cuda_opts}, *python, *cccl_dev, *cccl_clang_format], env: *onapi_env}
 
 - os: "ubuntu:20.04"
   images:
-  - {features: [*gcc_7, {<<: *cuda_curr_max, <<: *cccl_cuda_opts}, *python, *cccl_dev], env: *gcc_env}
-  - {features: [*gcc_8, {<<: *cuda_curr_max, <<: *cccl_cuda_opts}, *python, *cccl_dev], env: *gcc_env}
-  - {features: [*gcc_9, {<<: *cuda_curr_max, <<: *cccl_cuda_opts}, *python, *cccl_dev], env: *gcc_env}
-  - {features: [*gcc_10, {<<: *cuda_curr_max, <<: *cccl_cuda_opts}, *python, *cccl_dev], env: *gcc_env}
-  - {features: [*llvm_9, {<<: *cuda_curr_max, <<: *cccl_cuda_opts}, *python, *cccl_dev], env: *llvm_env}
-  - {features: [*llvm_10, {<<: *cuda_curr_max, <<: *cccl_cuda_opts}, *python, *cccl_dev], env: *llvm_env}
-  - {features: [*llvm_11, {<<: *cuda_curr_max, <<: *cccl_cuda_opts}, *python, *cccl_dev], env: *llvm_env}
-  - {features: [*llvm_12, {<<: *cuda_curr_max, <<: *cccl_cuda_opts}, *python, *cccl_dev], env: *llvm_env}
-  - {features: [*llvm_13, {<<: *cuda_curr_max, <<: *cccl_cuda_opts}, *python, *cccl_dev], env: *llvm_env}
-  - {features: [*llvm_14, {<<: *cuda_curr_max, <<: *cccl_cuda_opts}, *python, *cccl_dev], env: *llvm_env}
-  - {features: [*oneapi_2022, {<<: *cuda_curr_max, <<: *cccl_cuda_opts}, *python, *cccl_dev], env: *onapi_env}
+  - {features: [*gcc_7, {<<: *cuda_curr_max, <<: *cccl_cuda_opts}, *python, *cccl_dev, *cccl_clang_format], env: *gcc_env}
+  - {features: [*gcc_8, {<<: *cuda_curr_max, <<: *cccl_cuda_opts}, *python, *cccl_dev, *cccl_clang_format], env: *gcc_env}
+  - {features: [*gcc_9, {<<: *cuda_curr_max, <<: *cccl_cuda_opts}, *python, *cccl_dev, *cccl_clang_format], env: *gcc_env}
+  - {features: [*gcc_10, {<<: *cuda_curr_max, <<: *cccl_cuda_opts}, *python, *cccl_dev, *cccl_clang_format], env: *gcc_env}
+  - {features: [*llvm_9, {<<: *cuda_curr_max, <<: *cccl_cuda_opts}, *python, *cccl_dev, *cccl_clang_format], env: *llvm_env}
+  - {features: [*llvm_10, {<<: *cuda_curr_max, <<: *cccl_cuda_opts}, *python, *cccl_dev, *cccl_clang_format], env: *llvm_env}
+  - {features: [*llvm_11, {<<: *cuda_curr_max, <<: *cccl_cuda_opts}, *python, *cccl_dev, *cccl_clang_format], env: *llvm_env}
+  - {features: [*llvm_12, {<<: *cuda_curr_max, <<: *cccl_cuda_opts}, *python, *cccl_dev, *cccl_clang_format], env: *llvm_env}
+  - {features: [*llvm_13, {<<: *cuda_curr_max, <<: *cccl_cuda_opts}, *python, *cccl_dev, *cccl_clang_format], env: *llvm_env}
+  - {features: [*llvm_14, {<<: *cuda_curr_max, <<: *cccl_cuda_opts}, *python, *cccl_dev, *cccl_clang_format], env: *llvm_env}
+  - {features: [*oneapi_2022, {<<: *cuda_curr_max, <<: *cccl_cuda_opts}, *python, *cccl_dev, *cccl_clang_format], env: *onapi_env}
 
 - os: "ubuntu:22.04"
   images:
-  - {features: [*nvhpc_prev, *python, *cccl_dev], env: *nvhpc_env}
-  - {features: [*nvhpc_curr, *python, *cccl_dev], env: *nvhpc_env}
-  - {features: [*gcc_11, {<<: *cuda_curr_max, <<: *cccl_cuda_opts}, *python, *cccl_dev], env: *gcc_env}
-  - {features: [*gcc_12, {<<: *cuda_curr_max, <<: *cccl_cuda_opts}, *python, *cccl_dev], env: *gcc_env}
-  - {features: [*llvm_15, {<<: *cuda_curr_max, <<: *cccl_cuda_opts}, *python, *cccl_dev], env: *llvm_env}
-  - {features: [*llvm_prev, {<<: *cuda_curr_max, <<: *cccl_cuda_opts}, *python, *cccl_dev], env: *llvm_env}
-  - {features: [*llvm_curr, {<<: *cuda_curr_max, <<: *cccl_cuda_opts}, *python, *cccl_dev], env: *llvm_env}
-  - {features: [*oneapi_2022, {<<: *cuda_curr_max, <<: *cccl_cuda_opts}, *python, *cccl_dev], env: *onapi_env}
+  - {features: [*nvhpc_prev, *python, *cccl_dev, *cccl_clang_format], env: *nvhpc_env}
+  - {features: [*nvhpc_curr, *python, *cccl_dev, *cccl_clang_format], env: *nvhpc_env}
+  - {features: [*gcc_11, {<<: *cuda_curr_max, <<: *cccl_cuda_opts}, *python, *cccl_dev, *cccl_clang_format], env: *gcc_env}
+  - {features: [*gcc_12, {<<: *cuda_curr_max, <<: *cccl_cuda_opts}, *python, *cccl_dev, *cccl_clang_format], env: *gcc_env}
+  - {features: [*llvm_15, {<<: *cuda_curr_max, <<: *cccl_cuda_opts}, *python, *cccl_dev, *cccl_clang_format], env: *llvm_env}
+  - {features: [*llvm_prev, {<<: *cuda_curr_max, <<: *cccl_cuda_opts}, *python, *cccl_dev, *cccl_clang_format], env: *llvm_env}
+  - {features: [*llvm_curr, {<<: *cuda_curr_max, <<: *cccl_cuda_opts}, *python, *cccl_dev, *cccl_clang_format], env: *llvm_env}
+  - {features: [*oneapi_2022, {<<: *cuda_curr_max, <<: *cccl_cuda_opts}, *python, *cccl_dev, *cccl_clang_format], env: *onapi_env}
   # llvm-cuda-nvhpc (needed by stdexec devcontainers)
   - {features: [*llvm_curr, {<<: *cuda_curr_max, <<: *cccl_cuda_opts}, *nvhpc_curr, *python]}
 
