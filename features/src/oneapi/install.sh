@@ -30,7 +30,7 @@ if [ -f /etc/profile.d/lmod.sh ]; then
 fi
 
 # Add Intel repo signing key
-wget --no-hsts -q -O- https://apt.repos.intel.com/intel-gpg-keys/GPG-PUB-KEY-INTEL-SW-PRODUCTS.PUB \
+wget --no-hsts -q -O- https://apt.repos.intel.com/intel-gpg-keys/GPG-PUB-KEY-INTEL-SW-PRODUCTS-2023.PUB \
    | gpg --dearmor -o /etc/apt/trusted.gpg.d/oneapi-archive-keyring.gpg;
 
 chmod 0644 /etc/apt/trusted.gpg.d/*.gpg || true;
