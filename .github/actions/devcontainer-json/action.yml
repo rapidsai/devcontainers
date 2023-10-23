@@ -22,7 +22,7 @@ runs:
   steps:
 
     - name: Setup Node.js
-      if: contains(runner.name, 'rapidsai') == true
+      if: contains(runner.name, 'linux-') == true
       uses: actions/setup-node@v3
       with:
         node-version: '16'

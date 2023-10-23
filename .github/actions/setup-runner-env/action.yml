@@ -6,26 +6,26 @@ runs:
   using: composite
   steps:
 
-    - if: contains(runner.name, 'rapidsai') != true
+    - if: contains(runner.name, 'linux-') != true
       name: Free up disk space
       uses: ./.github/actions/free-disk-space
       with:
         tool_cache: "${{ runner.tool_cache }}"
 
-    - if: contains(runner.name, 'rapidsai') == true
+    - if: contains(runner.name, 'linux-') == true
       name: Setup self-hosted runner environment
       shell: bash -eo pipefail {0}
       run: |
         echo "HOME=${{ runner.workspace }}" >> $GITHUB_ENV;
         echo "TMPDIR=${{ runner.temp }}" >> $GITHUB_ENV;
 
-    - if: contains(runner.name, 'rapidsai') == true
+    - if: contains(runner.name, 'linux-') == true
       name: Setup Node.js
       uses: actions/setup-node@v3
       with:
         node-version: '16'
 
-    - if: contains(runner.name, 'rapidsai') != true
+    - if: contains(runner.name, 'linux-') != true
       name: Set up QEMU
       uses: docker/setup-qemu-action@v2
 
