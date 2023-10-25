@@ -17,7 +17,8 @@ $cudaUri = @{
     "12.1"   = "12.1.1/network_installers/cuda_12.1.1_windows_network.exe"
     "12.2"   = "12.2.0/network_installers/cuda_12.2.0_windows_network.exe"
     "12.2.0" = "12.2.0/network_installers/cuda_12.2.0_windows_network.exe"
-    "latest" = "12.2.0/network_installers/cuda_12.2.0_windows_network.exe"
+    "12.3.0" = "12.3.0/network_installers/cuda_12.2.0_windows_network.exe"
+    "latest" = "12.3.0/network_installers/cuda_12.2.0_windows_network.exe"
 }[$cudaVersion]
 
 # The component tags don't include patch, so we need to map input to major.minor
@@ -33,7 +34,9 @@ $componentTag = @{
     "12.1"   = "12.1"
     "12.2"   = "12.2"
     "12.2.0" = "12.2"
-    "latest" = "12.2"
+    "12.3"   = "12.3"
+    "12.3.0" = "12.3"
+    "latest" = "12.3"
 }[$cudaVersion]
 
 $cudaVersionUrl = "https://developer.download.nvidia.com/compute/cuda/$cudaUri"
