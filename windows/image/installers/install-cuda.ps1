@@ -17,7 +17,7 @@ $cudaUri = @{
     "12.1"   = "12.1.1/network_installers/cuda_12.1.1_windows_network.exe"
     "12.2"   = "12.2.0/network_installers/cuda_12.2.0_windows_network.exe"
     "12.2.0" = "12.2.0/network_installers/cuda_12.2.0_windows_network.exe"
-    "12.3.0" = "12.3.0/network_installers/cuda_12.2.0_windows_network.exe"
+    "12.3.0" = "12.3.0/network_installers/cuda_12.3.0_windows_network.exe"
     "latest" = "12.3.0/network_installers/cuda_12.2.0_windows_network.exe"
 }[$cudaVersion]
 
