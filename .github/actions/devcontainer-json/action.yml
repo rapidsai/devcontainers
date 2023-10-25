@@ -21,8 +21,8 @@ runs:
   using: composite
   steps:
 
-    - name: Setup Node.js
-      if: contains(runner.name, 'linux-') == true
+    - if: env.RUNNER_ENVIRONMENT != 'github-hosted'
+      name: Setup Node.js
       uses: actions/setup-node@v3
       with:
         node-version: '16'
