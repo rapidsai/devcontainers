@@ -11,7 +11,7 @@ x-gcc-10: &gcc_10 { name: "gcc", version: "10" }
 x-gcc-11: &gcc_11 { name: "gcc", version: "11" }
 x-gcc-12: &gcc_12 { name: "gcc", version: "12" }
 x-gcc-13: &gcc_13 { name: "gcc", version: "13" }
-x-gcc-env: &gcc_env {CC: "gcc", CXX: "g++"}
+x-gcc-env: &gcc_env {CC: "gcc", CXX: "g++", CUDAHOSTCXX: "g++"}
 
 x-oneapi: &oneapi_2022 { name: "oneapi", version: "2023.2.0" }
 x-oneapi-env: &onapi_env {CC: "icc", CXX: "icpc"}
@@ -25,7 +25,7 @@ x-llvm-14: &llvm_14 { name: "llvm", version: "14" }
 x-llvm-15: &llvm_15 { name: "llvm", version: "15" }
 x-llvm-prev: &llvm_prev { name: "llvm", version: "16" }
 x-llvm-curr: &llvm_curr { name: "llvm", version: "17" }
-x-llvm-env: &llvm_env {CC: "clang", CXX: "clang++"}
+x-llvm-env: &llvm_env {CC: "clang", CXX: "clang++", CUDAHOSTCXX: "clang++"}
 
 x-nvhpc-prev: &nvhpc_prev { name: "nvhpc", version: "23.5" }
 x-nvhpc-curr: &nvhpc_curr { name: "nvhpc", version: "23.7" }
