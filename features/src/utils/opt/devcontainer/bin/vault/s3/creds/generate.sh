@@ -8,7 +8,7 @@ generate_s3_creds() {
 
     if test -z "${VAULT_HOST:-}" \
     || test -z "${SCCACHE_BUCKET:-}"; then
-        return;
+        exit 1;
     fi
 
     SCCACHE_REGION="${SCCACHE_REGION:-${AWS_DEFAULT_REGION:-}}";
@@ -25,7 +25,7 @@ generate_s3_creds() {
     source devcontainer-utils-init-github-cli;
 
     if test -z "${GITHUB_USER:-}"; then
-        return;
+        exit 1;
     fi
 
     # Check whether the user is in one of the allowed GitHub orgs
@@ -41,7 +41,7 @@ generate_s3_creds() {
     )";
 
     if test -z "${user_orgs:-}"; then
-        return;
+        exit 1;
     fi
 
     echo ""
@@ -56,7 +56,7 @@ generate_s3_creds() {
 
     if [ "${vault_token:-null}" = "null" ]; then
         echo "Your GitHub user was not recognized by vault. Skipping." >&2;
-        return;
+        exit 1;
     fi
 
     echo "Successfully authenticated with vault!";
@@ -84,12 +84,12 @@ generate_s3_creds() {
 
     if grep -qE "^null$" <<< "${aws_access_key_id:-null}"; then
         echo "Failed to retrieve AWS S3 credentials. Skipping." >&2;
-        return;
+        exit 1;
     fi
 
     if grep -qE "^null$" <<< "${aws_secret_access_key:-null}"; then
         echo "Failed to retrieve AWS S3 credentials. Skipping." >&2;
-        return;
+        exit 1;
     fi
 
     echo "Successfully generated temporary AWS S3 credentials!";
@@ -115,6 +115,6 @@ if test -n "${devcontainer_utils_debug:-}"; then
     PS4="+ ${BASH_SOURCE[0]}:\${LINENO} "; set -x;
 fi
 
-(generate_s3_creds "$@");
+generate_s3_creds "$@";
 
 . /etc/profile.d/*-devcontainer-utils.sh;
