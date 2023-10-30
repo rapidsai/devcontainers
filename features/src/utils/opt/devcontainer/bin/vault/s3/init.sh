@@ -25,16 +25,18 @@ init_vault_s3_creds() {
             && grep -qE "^$" <<< "${AWS_SECRET_ACCESS_KEY:-}" ; then
                 if test -n "${VAULT_HOST:-}"                  ; then
                     # Generate S3 creds if they don't exist (or are expired)
-                    if ! devcontainer-utils-vault-s3-creds-test 2>&1 >/dev/null; then
-                        devcontainer-utils-vault-s3-creds-generate;
+                    if devcontainer-utils-vault-s3-creds-test 2>&1 >/dev/null\
+                    || devcontainer-utils-vault-s3-creds-generate; then
+                        # Persist creds in ~/.aws dir
+                        devcontainer-utils-vault-s3-creds-persist <<< "
+                            $(s3_bucket_args)
+                            $(s3_bucket_auth)
+                        ";
+                        # Install a crontab to refresh the credentials
+                        devcontainer-utils-vault-s3-creds-schedule;
+                    else
+                        devcontainer-utils-vault-s3-creds-persist <<< "--no_bucket --no_region";
                     fi
-                    # Persist creds in ~/.aws dir
-                    devcontainer-utils-vault-s3-creds-persist <<< "
-                        $(s3_bucket_args)
-                        $(s3_bucket_auth)
-                    ";
-                    # Install a crontab to refresh the credentials
-                    devcontainer-utils-vault-s3-creds-schedule;
                 else
                     # If credentials have been mounted in, ensure they're used
                     case $(devcontainer-utils-vault-s3-creds-test; echo $?) in
