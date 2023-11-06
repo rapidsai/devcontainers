@@ -103,9 +103,9 @@ include:
   - {features: [{<<: *cuda_curr_max, <<: *cccl_cuda_opts}, { name: "cl", version: "14.27" }]} # MSVC 2019
   - {features: [{<<: *cuda_curr_max, <<: *cccl_cuda_opts}, { name: "cl", version: "14.28" }]} # MSVC 2019
   - {features: [{<<: *cuda_curr_max, <<: *cccl_cuda_opts}, { name: "cl", version: "14.29" }]} # MSVC 2019
-  - {features: [{<<: *cuda_curr_max, <<: *cccl_cuda_opts}, { name: "cl", version: "14.34" }]} # MSVC 2022
   - {features: [{<<: *cuda_curr_max, <<: *cccl_cuda_opts}, { name: "cl", version: "14.35" }]} # MSVC 2022
   - {features: [{<<: *cuda_curr_max, <<: *cccl_cuda_opts}, { name: "cl", version: "14.36" }]} # MSVC 2022
+  - {features: [{<<: *cuda_curr_max, <<: *cccl_cuda_opts}, { name: "cl", version: "14.37" }]} # MSVC 2022
 
 # RAPIDS devcontainers
 
