@@ -1,7 +1,7 @@
 {
   "name": "CMake",
   "id": "cmake",
-  "version": "23.12.0",
+  "version": "24.2.0",
   "description": "A feature to install CMake",
   "options": {
     "version": {
