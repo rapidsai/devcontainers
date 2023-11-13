@@ -7,7 +7,7 @@ A feature to install NVIDIA CCCL development utilities
 
 ```json
 "features": {
-    "ghcr.io/rapidsai/devcontainers/features/cccl-dev:23": {}
+    "ghcr.io/rapidsai/devcontainers/features/cccl-dev:24": {}
 }
 ```
 
