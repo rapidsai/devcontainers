@@ -7,7 +7,7 @@ Installs Rust, common Rust utilities, and their required dependencies
 
 ```json
 "features": {
-    "ghcr.io/rapidsai/devcontainers/features/rust:23": {}
+    "ghcr.io/rapidsai/devcontainers/features/rust:24": {}
 }
 ```
 
