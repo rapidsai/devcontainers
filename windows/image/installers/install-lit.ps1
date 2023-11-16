@@ -6,6 +6,7 @@ $ENV:PATH = "C:\Python\Scripts;$ENV:PATH"
 
 python -m pip install --upgrade pip
 python -m pip install wheel
+python -m pip install psutil
 python -m pip install lit
 
 Remove-Item .\python_installer.exe
