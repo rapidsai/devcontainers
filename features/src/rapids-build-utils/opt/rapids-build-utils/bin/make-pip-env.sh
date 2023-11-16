@@ -96,8 +96,8 @@ make_pip_env() {
 
             python -m venv --system-site-packages ~/.local/share/venvs/${env_name};
             . ~/.local/share/venvs/${env_name}/bin/activate;
-            python -m pip install --pre -I -r "${new_env_path}";
             python -m pip install -U pip;
+            python -m pip install --pre -I -r "${new_env_path}";
         # If the venv does exist but it's different from the generated one,
         # print the diff between the envs and update it
         elif ! diff -BNqw "${old_env_path}" "${new_env_path}" >/dev/null 2>&1; then
@@ -113,8 +113,8 @@ make_pip_env() {
 
             # Update the current venv
             . ~/.local/share/venvs/${env_name}/bin/activate;
-            python -m pip install --pre -U -r "${new_env_path}";
             python -m pip install -U pip;
+            python -m pip install --pre -U -r "${new_env_path}";
         fi
 
         cp -a "${new_env_path}" "${old_env_path}";
