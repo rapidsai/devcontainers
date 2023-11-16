@@ -19,6 +19,11 @@ check_packages      \
     bash-completion \
     ca-certificates ;
 
+# upgrade pip
+if type python >/dev/null 2>&1; then
+    python -m pip install -U pip;
+fi
+
 # Install yq if not installed
 if ! type yq >/dev/null 2>&1; then
     YQ_VERSION=latest;
