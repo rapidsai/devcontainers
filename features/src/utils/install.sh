@@ -115,11 +115,11 @@ for dir in $(for_each_user_bashrc 'echo "$(dirname "$(realpath -m "$0")")"'); do
     rm -f "${dir}"/.gitconfig;
     cp .gitconfig "${dir}"/.gitconfig.default;
     # Create ~/.cache, i.e. $XDG_CACHE_HOME
-    mkdir -p -m 0775 "${dir}"/.cache;
+    mkdir -p -m 0755 "${dir}"/.cache;
     # Create ~/.cache, i.e. $XDG_CONFIG_HOME
-    mkdir -p -m 0775 "${dir}"/.config/{clangd,pip};
+    mkdir -p -m 0755 "${dir}"/.config/{clangd,pip};
     # Create ~/.local/state, i.e. $XDG_STATE_HOME
-    mkdir -p -m 0775 "${dir}"/.local/state;
+    mkdir -p -m 0755 "${dir}"/.local/state;
     # Create or update ~/.ssh/known_hosts
     mkdir -p -m 0700 "${dir}"/.ssh;
     touch "${dir}"/.ssh/known_hosts;
@@ -145,7 +145,7 @@ usermod -aG crontab "${USERNAME}";
 echo "${USERNAME}" >> /etc/cron.allow;
 
 # Create ~/.cache, i.e. $XDG_CONFIG_HOME
-mkdir -p -m 0775 "${USERHOME}"/.local/bin;
+mkdir -p -m 0755 "${USERHOME}"/.local/bin;
 
 # Ensure the user owns their homedir
 chown -R "${USERNAME}:${USERNAME}" "${USERHOME}";

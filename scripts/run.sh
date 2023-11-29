@@ -19,7 +19,7 @@ run_devcontainer() {
         --image-name "docker.io/rapidsai/devcontainers:${tag}" \
         ;
 
-    mkdir -p -m 0775 .scratch/.{aws,cache,config};
+    mkdir -p -m 0755 .scratch/.{aws,cache,config};
 
     local term="${TERM:-}";
     local lines="$(tput lines)";
