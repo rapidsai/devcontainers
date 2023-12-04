@@ -33,7 +33,7 @@ check_packages ${PKG[@]} ${PKG_TO_REMOVE[@]};
 
 source /etc/lsb-release
 
-if [[ ! "${DISTRIB_RELEASE}" > "23.04" ]]; then
+if [[ ! "23.04" > "${DISTRIB_RELEASE}" ]]; then
   BREAK_PACKAGES="--break-system-packages"
 fi
 
