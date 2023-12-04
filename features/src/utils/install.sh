@@ -19,7 +19,7 @@ check_packages      \
     bash-completion \
     ca-certificates ;
 
-if [[ ! "${DISTRIB_RELEASE}" > "23.04" ]]; then
+if [[ ! "23.04" > "${DISTRIB_RELEASE}" ]]; then
   BREAK_PACKAGES="--break-system-packages"
 fi
 
