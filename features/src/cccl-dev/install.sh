@@ -31,10 +31,16 @@ fi
 
 check_packages ${PKG[@]} ${PKG_TO_REMOVE[@]};
 
-CC=gcc CXX=g++ python -m pip install --upgrade pip
-CC=gcc CXX=g++ python -m pip install wheel setuptools;
-CC=gcc CXX=g++ python -m pip install psutil $LIT_VERSION_TO_INSTALL;
-CC=gcc CXX=g++ python -m pip install clang-format==17.*;
+source /etc/lsb-release
+
+if [[ ! "${DISTRIB_RELEASE}" > "23.04" ]]; then
+  BREAK_PACKAGES="--break-system-packages"
+fi
+
+CC=gcc CXX=g++ python -m pip install $BREAK_PACKAGES --upgrade pip
+CC=gcc CXX=g++ python -m pip install $BREAK_PACKAGES wheel setuptools;
+CC=gcc CXX=g++ python -m pip install $BREAK_PACKAGES psutil $LIT_VERSION_TO_INSTALL;
+CC=gcc CXX=g++ python -m pip install $BREAK_PACKAGES clang-format==17.*;
 
 export LIT_VERSION="$(lit --version | grep -o -e '[0-9].*')";
 

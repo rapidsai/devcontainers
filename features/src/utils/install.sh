@@ -19,9 +19,13 @@ check_packages      \
     bash-completion \
     ca-certificates ;
 
+if [[ ! "${DISTRIB_RELEASE}" > "23.04" ]]; then
+  BREAK_PACKAGES="--break-system-packages"
+fi
+
 # upgrade pip
 if type python >/dev/null 2>&1; then
-    python -m pip install -U pip;
+    python -m pip install $BREAK_PACKAGES -U pip;
 fi
 
 # Install yq if not installed
