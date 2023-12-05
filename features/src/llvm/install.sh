@@ -30,7 +30,7 @@ install_clang_grace() {
 
     echo "Installing NVIDIA Clang for Grace"
     wget -O clang-grace-toolchain.deb https://developer.nvidia.com/downloads/assets/grace/clang/16.23.08/clang-grace-toolchain_16.23.08_arm64.deb
-    apt-get install ./clang-grace-toolchain
+    apt-get -y install ./clang-grace-toolchain.deb
 
     PATH="/opt/nvidia/clang/16.23.08/bin:$PATH"
     (update-alternatives --install /usr/bin/clang clang $(which clang) 30);
