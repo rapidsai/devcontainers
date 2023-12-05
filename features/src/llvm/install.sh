@@ -35,7 +35,7 @@ install_clang_grace() {
     PATH="/opt/nvidia/clang/16.23.08/bin:$PATH"
     (update-alternatives --install /usr/bin/clang clang $(which clang) 30);
     (update-alternatives --install /usr/bin/clang-16 clang-16 $(which clang) 30);
-    (update-alternatives --install /usr/bin/clang++ clang $(which clang++) 30);
+    (update-alternatives --install /usr/bin/clang++ clang++ $(which clang++) 30);
     (update-alternatives --install /usr/bin/clang++-16 clang++-16 $(which clang++) 30);
 }
 
