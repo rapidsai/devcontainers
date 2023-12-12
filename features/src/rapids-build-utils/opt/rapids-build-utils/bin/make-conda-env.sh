@@ -88,12 +88,8 @@ make_conda_env() {
              && echo "";
 
             # Update the current conda env + prune libs that were removed
-            # conda fallback for https://github.com/mamba-org/mamba/issues/3059
-            if grep -q "pip:" ${new_env_path}; then
-                conda env update -n "${env_name}" -f "${new_env_path}" --prune --solver=libmamba
-            else
-                mamba env update -n "${env_name}" -f "${new_env_path}" --prune
-            fi
+            # Use conda instead of mamba due to https://github.com/mamba-org/mamba/issues/3059
+            conda env update -n "${env_name}" -f "${new_env_path}" --prune --solver=libmamba
         fi
 
         cp -a "${new_env_path}" "${old_env_path}";
