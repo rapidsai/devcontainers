@@ -65,7 +65,7 @@ echo "Installing dev CUDA toolkit...";
 export CUDA_HOME="/usr/local/cuda";
 
 cuda_ver="${VERSION}";
-cuda_ver=$(cut -d'.' -f3 --complement <<< "${cuda_ver}");
+cuda_ver=$(grep -o '^[0-9]*.[0-9]' <<< "${cuda_ver}");
 
 cudapath="${CUDA_HOME}-${cuda_ver}";
 cuda_tag="cuda${cuda_ver}";
