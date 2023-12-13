@@ -23,6 +23,12 @@ clean_${PY_LIB}_cpp() {
         fi
     done
 
+    if test -d ~/"${PY_SRC}"/build; then
+        for d in ~/"${PY_SRC}"/build/cp${python_version}-cp${python_version}*; do
+            rm -rf $d
+        done
+    fi
+
     if test -d ~/"${PY_SRC}/${PY_LIB}"/; then
         find ~/"${PY_SRC}/${PY_LIB}"/ -type f \
             -iname "*.cpython-*-$(uname -m)-$(uname -s)-*.so" \
