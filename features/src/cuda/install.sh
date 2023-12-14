@@ -36,6 +36,10 @@ get_cuda_deb() {
     | grep -P "^Filename: \./${2}(.*)\.deb$"      \
     | sort -Vr | head -n1 | cut -d' ' -f2         \
     )";
+    if [ -z "$deb" ]; then
+        echo "Error: No matching .deb found for '${1}' and '${2}'" >&2
+        return 1
+    fi
     wget --no-hsts -q -O "/tmp/${deb#./}" "${1}/${deb#./}";
     echo -n "/tmp/${deb#./}";
 }
