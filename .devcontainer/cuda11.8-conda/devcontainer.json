@@ -15,7 +15,7 @@
   "overrideFeatureInstallOrder": [
     "./features/rapids-build-utils"
   ],
-  "initializeCommand": ["/bin/bash", "-c", "mkdir -m 0755 -p ${localWorkspaceFolder}/../.{aws,cache,config,conda/pkgs,conda/${localWorkspaceFolderBasename}-cuda11.8-envs} ${localWorkspaceFolder}/../{rmm,kvikio,cudf,raft,cumlprims_mg,cuml,cugraph-ops,cugraph,cuspatial}"],
+  "initializeCommand": ["/bin/bash", "-c", "mkdir -m 0755 -p ${localWorkspaceFolder}/../.{aws,cache,config,conda/pkgs,conda/${localWorkspaceFolderBasename}-cuda11.8-envs} ${localWorkspaceFolder}/../{rmm,kvikio,cudf,raft,cumlprims_mg,cuml,cugraph-ops,wholegraph,cugraph,cuspatial}"],
   "postAttachCommand": ["/bin/bash", "-c", "if [ ${CODESPACES:-false} = 'true' ]; then . devcontainer-utils-post-attach-command; . rapids-post-attach-command; fi"],
   "workspaceFolder": "/home/coder",
   "workspaceMount": "source=${localWorkspaceFolder},target=/home/coder/devcontainers,type=bind,consistency=consistent",
@@ -27,6 +27,7 @@
     "source=${localWorkspaceFolder}/../cumlprims_mg,target=/home/coder/cumlprims_mg,type=bind,consistency=consistent",
     "source=${localWorkspaceFolder}/../cuml,target=/home/coder/cuml,type=bind,consistency=consistent",
     "source=${localWorkspaceFolder}/../cugraph-ops,target=/home/coder/cugraph-ops,type=bind,consistency=consistent",
+    "source=${localWorkspaceFolder}/../wholegraph,target=/home/coder/wholegraph,type=bind,consistency=consistent",
     "source=${localWorkspaceFolder}/../cugraph,target=/home/coder/cugraph,type=bind,consistency=consistent",
     "source=${localWorkspaceFolder}/../cuspatial,target=/home/coder/cuspatial,type=bind,consistency=consistent",
     "source=${localWorkspaceFolder}/../.aws,target=/home/coder/.aws,type=bind,consistency=consistent",
