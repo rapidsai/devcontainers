@@ -120,6 +120,20 @@ repos:
     repo: cugraph-ops
     <<: *git_defaults
 
+- name: wholegraph
+  path: wholegraph
+  cpp:
+    - name: wholegraph
+      sub_dir: cpp
+      depends: [rmm, raft]
+  python:
+    - name: wholegraph
+      sub_dir: python/pylibwholegraph
+      depends: [rmm, raft]
+  git:
+    repo: wholegraph
+    <<: *git_defaults
+
 - name: cugraph
   path: cugraph
   cpp:
