@@ -23,10 +23,14 @@ echo "tag=${tag}" >&3;
 
 node -e "$(cat <<EOF
 
+const fs = require('fs');
+const path = require('path');
 const json = JSON.parse(require('fs').readFileSync('image/.devcontainer/devcontainer.json'));
 
 json.build.args.BASE = '${os}';
 json.containerEnv = ${container_env} || undefined;
+
+const dups = {};
 
 ${features}.forEach(({name, ...feature}) => {
   const i = json.overrideFeatureInstallOrder.length - 1;
@@ -34,7 +38,16 @@ ${features}.forEach(({name, ...feature}) => {
     json.features[name] = feature;
     json.overrideFeatureInstallOrder.splice(i, 0, name.split(':')[0]);
   } else {
-    name = './features/' + name;
+    name = './features/src/' + name;
+    if (name in dups) {
+        fs.cpSync(
+            name,
+            name = name + "." + (++dups[name]),
+            {recursive: true}
+        );
+    } else {
+        dups[name] = 0;
+    }
     json.features[name] = feature;
     json.overrideFeatureInstallOrder.splice(i, 0, name);
   }

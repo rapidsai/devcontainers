@@ -13,6 +13,14 @@ run_devcontainer() {
     eval "$(./scripts/generate.sh "$@" | xargs -r -d'\n' -I% echo -n local %\;)";
 
     # Build and tag the devcontainer
+
+    trap "$(cat <<________
+        code=\$?;
+        find ./features/src -maxdepth 1 -type d -name '*\.[0-9]' -exec rm -r "{}" \;
+        exit \$code;
+________
+)" EXIT;
+
     devcontainer build \
         --workspace-folder "${workspace}" \
         --cache-from "docker.io/rapidsai/devcontainers:${tag}" \
@@ -57,7 +65,7 @@ run_devcontainer() {
         --mount "type=bind,source=$(pwd)/.scratch/.cache,target=/home/coder/.cache" \
         --mount "type=bind,source=$(pwd)/.scratch/.config,target=/home/coder/.config" \
         --mount "type=bind,source=$(pwd)/features/src/utils/opt/devcontainer,target=/opt/devcontainer" \
-        --additional-features '{ "./features/rapids-build-utils": {} }' \
+        --additional-features '{ "./features/src/rapids-build-utils": {} }' \
         --mount "type=bind,source=$(pwd)/features/src/rapids-build-utils/opt/rapids-build-utils,target=/opt/rapids-build-utils" \
         ;
 
@@ -71,6 +79,7 @@ run_devcontainer() {
         docker rm -f '${container_id}' >/dev/null 2>&1 || true;
         docker rmi -f '${image_tag}' >/dev/null 2>&1 || true;
         docker rmi -f '${image_tag%%-uid*}' >/dev/null 2>&1 || true;
+        find ./features/src -maxdepth 1 -type d -name '*\.[0-9]' -exec rm -r "{}" \;
         exit \$code;
 ________
 )" EXIT;
