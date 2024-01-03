@@ -19,6 +19,8 @@ check_packages      \
     bash-completion \
     ca-certificates ;
 
+source /etc/lsb-release;
+
 if [[ ! "23.04" > "${DISTRIB_RELEASE}" ]]; then
   BREAK_PACKAGES="--break-system-packages"
 fi
