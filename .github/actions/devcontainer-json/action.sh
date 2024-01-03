@@ -23,9 +23,8 @@ echo "tag=${tag}" >&3;
 
 node -e "$(cat <<EOF
 
-const fs = require('fs');
-const path = require('path');
-const json = JSON.parse(require('fs').readFileSync('image/.devcontainer/devcontainer.json'));
+const {cpSync, readFileSync} = require('fs');
+const json = JSON.parse(readFileSync('image/.devcontainer/devcontainer.json'));
 
 json.build.args.BASE = '${os}';
 json.containerEnv = ${container_env} || undefined;
@@ -40,7 +39,7 @@ ${features}.forEach(({name, ...feature}) => {
   } else {
     name = './features/src/' + name;
     if (name in dups) {
-        fs.cpSync(
+        cpSync(
             name,
             name = name + "." + (++dups[name]),
             {recursive: true}
