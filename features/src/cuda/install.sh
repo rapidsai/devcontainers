@@ -23,7 +23,13 @@ check_packages                 \
 echo "Downloading CUDA keyring...";
 
 export NVARCH="$(uname -p)";
-export OSNAME="$(. /etc/os-release; echo "$ID${VERSION_ID/./}")";
+export OSNAME="$(
+    . /etc/os-release;
+    major="$(cut -d'.' -f1 <<< "${VERSION_ID}")";
+    minor="$(cut -d'.' -f2 <<< "${VERSION_ID}")";
+    echo "$ID$((major - (major % 2)))${minor}";
+)";
+
 VERSION="${CUDA_VERSION:-${VERSION:-12.2.0}}";
 
 if [[ "$NVARCH" == aarch64 ]]; then
@@ -36,6 +42,10 @@ get_cuda_deb() {
     | grep -P "^Filename: \./${2}(.*)\.deb$"      \
     | sort -Vr | head -n1 | cut -d' ' -f2         \
     )";
+    if [ -z "$deb" ]; then
+        echo "Error: No matching .deb found for '${1}' and '${2}'" >&2
+        return 1
+    fi
     wget --no-hsts -q -O "/tmp/${deb#./}" "${1}/${deb#./}";
     echo -n "/tmp/${deb#./}";
 }

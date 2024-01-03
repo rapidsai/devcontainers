@@ -11,8 +11,8 @@
   "workspaceFolder": "/home/coder",
   "features": {
     "ghcr.io/devcontainers/features/common-utils:2": {
-      "userUid": "1000",
-      "userGid": "1000",
+      "userUid": "1001",
+      "userGid": "1001",
       "username": "coder",
       "installZsh": "true",
       "upgradePackages": "true"

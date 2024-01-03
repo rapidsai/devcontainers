@@ -88,6 +88,11 @@ include:
   # llvm-cuda-nvhpc (needed by stdexec devcontainers)
   - {features: [*llvm_curr, {<<: *cuda_curr_max, <<: *cccl_cuda_opts}, *nvhpc_curr, *python]}
 
+# Hack for getting gcc-13.2
+- os: "ubuntu:23.04"
+  images:
+  - {features: [*gcc_13, {<<: *cuda_curr_max, <<: *cccl_cuda_opts}, *python, *cccl_dev], env: *gcc_env}
+
 - os: "windows"
   images:
   # lowest CUDA version

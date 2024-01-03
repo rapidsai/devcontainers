@@ -25,6 +25,7 @@ GCC_VERSION="${VERSION:-${GCC_VERSION_DEFAULT}}";
 
 if [[ "${GCC_VERSION}" != "${GCC_VERSION_DEFAULT}" ]]; then
     apt-add-repository -y ppa:ubuntu-toolchain-r/test;
+    apt-add-repository -y ppa:ubuntu-toolchain-r/ppa;
     # Install gcc-${GCC_VERSION}
     DEBIAN_FRONTEND=noninteractive              \
     apt-get install -y --no-install-recommends  \
