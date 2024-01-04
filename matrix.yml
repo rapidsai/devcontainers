@@ -92,7 +92,7 @@ include:
 # Hack for getting gcc-13.2
 - os: "ubuntu:23.04"
   images:
-  - {features: [*gcc_13, {<<: *cuda_curr_max, <<: *cccl_cuda_opts}, *python, *cccl_dev], env: *gcc_env}
+  - {features: [*gcc_13, {<<: *cuda_curr_max, <<: *cccl_cuda_opts}, *python, *cccl_clang_format, *cccl_dev], env: *gcc_env}
 
 - os: "windows"
   images:
