@@ -64,7 +64,8 @@
         "C_Cpp.intelliSenseEngine": "disabled",
         "C_Cpp.configurationWarnings": "disabled",
         "C_Cpp.autoAddFileAssociations": false,
-        "clang-format.fallbackStyle": "none",
+        "clangFormat.fallbackStyle": "none",
+        "extensions.ignoreRecommendations": true,
         "files.associations": {
           "*.cu": "cuda-cpp",
           "*.cuh": "cuda-cpp",
