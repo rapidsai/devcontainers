@@ -1,7 +1,7 @@
 {
   "name": "Mambaforge",
   "id": "mambaforge",
-  "version": "24.2.0",
+  "version": "24.2.1",
   "description": "A feature to install mambaforge",
   "options": {
     "version": {
@@ -21,22 +21,24 @@
   "customizations": {
     "vscode": {
       "extensions": [
+        "ms-python.autopep8",
+        "ms-python.black-formatter",
+        "ms-python.flake8",
+        "ms-python.mypy-type-checker",
+        "ms-python.pylint",
         "ms-python.python",
         "ms-python.vscode-pylance"
       ],
       "settings": {
-        "python.linting.enabled": true,
+        "autopep8.path": "/tmp/.current-conda-env/bin/autopep8",
+        "black-formatter.path": "/tmp/.current-conda-env/bin/black",
+        "clangd.path": "/tmp/.current-conda-env/bin/clangd",
+        "flake8.path": "/tmp/.current-conda-env/bin/flake8",
+        "mypy-type-checker.path": "/tmp/.current-conda-env/bin/mypy",
+        "pylint.enabled": true,
+        "pylint.path": "/tmp/.current-conda-env/bin/pylint",
         "python.terminal.activateEnvironment": false,
-        "python.defaultInterpreterPath": "/tmp/.current-conda-env/bin/python",
-        "python.formatting.autopep8Path": "/tmp/.current-conda-env/bin/autopep8",
-        "python.formatting.blackPath": "/tmp/.current-conda-env/bin/black",
-        "python.formatting.yapfPath": "/tmp/.current-conda-env/bin/yapf",
-        "python.linting.banditPath": "/tmp/.current-conda-env/bin/bandit",
-        "python.linting.flake8Path": "/tmp/.current-conda-env/bin/flake8",
-        "python.linting.mypyPath": "/tmp/.current-conda-env/bin/mypy",
-        "python.linting.pycodestylePath": "/tmp/.current-conda-env/bin/pycodestyle",
-        "python.linting.pydocstylePath": "/tmp/.current-conda-env/bin/pydocstyle",
-        "python.linting.pylintPath": "/tmp/.current-conda-env/bin/pylint"
+        "python.defaultInterpreterPath": "/tmp/.current-conda-env/bin/python"
       }
     }
   }

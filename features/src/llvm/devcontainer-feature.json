@@ -1,7 +1,7 @@
 {
   "name": "LLVM compilers and tools",
   "id": "llvm",
-  "version": "24.2.1",
+  "version": "24.2.2",
   "description": "A feature to install LLVM compilers and tools",
   "options": {
     "version": {
@@ -58,8 +58,8 @@
         "C_Cpp.intelliSenseEngine": "disabled",
         "C_Cpp.configurationWarnings": "disabled",
         "C_Cpp.autoAddFileAssociations": false,
-        "clang-format.fallbackStyle": "none",
-        "clang-format.executable": "/usr/bin/clang-format",
+        "clangFormat.fallbackStyle": "none",
+        "clangFormat.executable": "/usr/bin/clang-format",
         "clangd.arguments": [
           "--log=info",
           "--clang-tidy",
