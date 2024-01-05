@@ -2,5 +2,9 @@ export NVHPC="${NVHPC}";
 export NVHPC_VERSION="${NVHPC_VERSION}";
 export NVHPC_ROOT="${NVHPC_ROOT}";
 export NVHPC_CUDA_HOME="${NVHPC_CUDA_HOME}";
-export LIBRARY_PATH="${LIBRARY_PATH:-$NVHPC_ROOT/cuda/lib64/stubs}";
 export NVHPC_MODULEFILE_DIRS=${NVHPC_MODULEFILE_DIRS};
+
+if [ -z "${LIBRARY_PATH:-}" ] \
+|| [ -n "${LIBRARY_PATH##*"${NVHPC_CUDA_HOME}/lib64/stubs"*}" ]; then
+    export LIBRARY_PATH="${NVHPC_CUDA_HOME}/lib64/stubs${LIBRARY_PATH:+:$LIBRARY_PATH}"
+fi

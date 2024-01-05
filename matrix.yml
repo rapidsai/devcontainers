@@ -29,6 +29,7 @@ x-llvm-env: &llvm_env {CC: "clang", CXX: "clang++", CUDAHOSTCXX: "clang++"}
 
 x-nvhpc-prev: &nvhpc_prev { name: "nvhpc", version: "23.9" }
 x-nvhpc-curr: &nvhpc_curr { name: "nvhpc", version: "23.11" }
+
 x-nvhpc-env: &nvhpc_env {CC: "nvc", CXX: "nvc++"}
 
 x-rust: &rust { name: "rust" }
@@ -86,8 +87,6 @@ include:
   - {features: [*llvm_prev, {<<: *cuda_curr_max, <<: *cccl_cuda_opts}, *python, *cccl_clang_tools, *cccl_dev], env: *llvm_env}
   - {features: [*llvm_curr, {<<: *cuda_curr_max, <<: *cccl_cuda_opts}, *python, *cccl_clang_tools, *cccl_dev], env: *llvm_env}
   - {features: [*oneapi_2022, {<<: *cuda_curr_max, <<: *cccl_cuda_opts}, *python, *cccl_clang_tools, *cccl_dev], env: *onapi_env}
-  # llvm-cuda-nvhpc (needed by stdexec devcontainers)
-  - {features: [*llvm_curr, {<<: *cuda_curr_max, <<: *cccl_cuda_opts}, *nvhpc_curr, *python, *cccl_clang_tools]}
 
 # Hack for getting gcc-13.2
 - os: "ubuntu:23.04"
