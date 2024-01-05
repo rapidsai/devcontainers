@@ -61,6 +61,11 @@ export NVHPC_ROOT="${NVHPC}/Linux_$(uname -p)/${NVHPC_VERSION}";
 export NVHPC_CUDA_HOME="${NVHPC_ROOT}/cuda";
 export NVHPC_MODULEFILE_DIRS="($(find "${NVHPC}/" -type d -name modulefiles -exec echo -n \"{}\"\  \;))";
 
+if ! test -L /usr/local/cuda; then
+    # Create /usr/local/cuda symlink (for clangd)
+    ln -s "${NVHPC_CUDA_HOME}" /usr/local/cuda;
+fi
+
 bash "${NVHPC_ROOT}/compilers/bin/makelocalrc" \
     -x "${NVHPC_ROOT}/compilers/bin" \
     -gcc "$(which gcc)" \
