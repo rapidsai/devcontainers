@@ -58,8 +58,7 @@ check_packages ${pkgs[@]};
 export NVHPC="/opt/nvidia/hpc_sdk";
 export NVHPC_VERSION="${NVHPC_VERSION}";
 export NVHPC_ROOT="${NVHPC}/Linux_$(uname -p)/${NVHPC_VERSION}";
-export NVHPC_CUDA_HOME="${CUDA_HOME:-$NVHPC_ROOT/cuda}";
-export LIBRARY_PATH="${LIBRARY_PATH:-$NVHPC_ROOT/cuda/lib64/stubs}";
+export NVHPC_CUDA_HOME="${NVHPC_ROOT}/cuda";
 export NVHPC_MODULEFILE_DIRS="($(find "${NVHPC}/" -type d -name modulefiles -exec echo -n \"{}\"\  \;))";
 
 bash "${NVHPC_ROOT}/compilers/bin/makelocalrc" \
