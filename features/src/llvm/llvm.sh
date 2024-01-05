@@ -174,6 +174,7 @@ elif [[ "${PKG[@]}" == "all" ]]; then
     PKG+=("clang-tidy-$LLVM_VERSION");
     PKG+=("clang-format-$LLVM_VERSION");
     PKG+=("clang-tools-$LLVM_VERSION");
+    PKG+=("clangd-$LLVM_VERSION");
     PKG+=("llvm-$LLVM_VERSION-dev");
     PKG+=("lld-$LLVM_VERSION");
     PKG+=("lldb-$LLVM_VERSION");
