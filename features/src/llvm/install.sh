@@ -40,12 +40,16 @@ echo "Installing llvm-${LLVM_VERSION} compilers and tools";
 
 ./llvm.sh $LLVM_VERSION ${PACKAGES:-all};
 
+if [[ "${PACKAGES:-all}" == "all" ]]; then
+    PACKAGES=("clang" "clangd" "clang++" "clang-format" "clang-tidy" "lldb" "llvm-config" "llvm-cov");
+else
+    PACKAGES=(${PACKAGES});
+fi
+
 # Remove existing, install, and set default clang/llvm alternatives
-for x in clang clangd clang++ clang-format clang-tidy lldb llvm-config llvm-cov; do
+for ((i=0; i < ${#PACKAGES[@]}; i+=1)); do
+    x=${PACKAGES[$i]};
     if type ${x}-${LLVM_VERSION} >/dev/null 2>&1; then
-        if ${x} != clang-format; then
-            (update-alternatives --remove-all ${x} >/dev/null 2>&1 || true);
-        fi
         (update-alternatives --install /usr/bin/${x} ${x} $(which ${x}-${LLVM_VERSION}) 30);
         (update-alternatives --set ${x} $(which ${x}-${LLVM_VERSION}));
     fi

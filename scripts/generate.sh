@@ -14,7 +14,7 @@ generate_devcontainer() {
     rm -rf "${workspace}";
     cp -ar image "${workspace}";
     rm "${workspace}/.devcontainer/features";
-    ln -s "$(realpath ./features/src)" "${workspace}/.devcontainer/features";
+    ln -s "$(realpath ./features)" "${workspace}/.devcontainer/features";
 
     # Generate tag and devcontainer.json
     .github/actions/devcontainer-json/action.sh           \
