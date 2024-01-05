@@ -60,6 +60,7 @@ export NVHPC_VERSION="${NVHPC_VERSION}";
 export NVHPC_ROOT="${NVHPC}/Linux_$(uname -p)/${NVHPC_VERSION}";
 export NVHPC_CUDA_HOME="${CUDA_HOME:-$NVHPC_ROOT/cuda}";
 export LIBRARY_PATH="${LIBRARY_PATH:-$NVHPC_ROOT/cuda/lib64/stubs}";
+export NVHPC_MODULEFILE_DIRS="($(find "${NVHPC}/" -type d -name modulefiles -exec echo -n \"{}\"\  \;))";
 
 bash "${NVHPC_ROOT}/compilers/bin/makelocalrc" \
     -x "${NVHPC_ROOT}/compilers/bin" \
@@ -72,6 +73,7 @@ vars_+=('$NVHPC');
 vars_+=('$NVHPC_VERSION');
 vars_+=('$NVHPC_ROOT');
 vars_+=('$NVHPC_CUDA_HOME');
+vars_+=('$NVHPC_MODULEFILE_DIRS');
 printf -v vars_ '%s,' "${vars_[@]}";
 
 # export envvars in bashrc files

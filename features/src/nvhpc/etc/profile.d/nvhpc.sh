@@ -3,8 +3,9 @@ if ! type module 2>&1 | grep -q function; then
 fi
 
 if [ -n "${PATH##*"${NVHPC_ROOT}/compilers/bin"*}" ]; then
-    module use "${NVHPC}/modulefiles";
-    module use "${NVHPC_ROOT}/comm_libs/hpcx/latest/modulefiles";
+    for i in ${!NVHPC_MODULEFILE_DIRS[@]}; do
+        module use "${NVHPC_MODULEFILE_DIRS[$i]}";
+    done
     module try-load "nvhpc-nompi/${NVHPC_VERSION}" >/dev/null 2>&1;
     module try-load "nvhpc-nompi" >/dev/null 2>&1;
     module try-load "hpcx-mt" >/dev/null 2>&1;
