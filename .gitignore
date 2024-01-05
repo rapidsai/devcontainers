@@ -2,3 +2,4 @@
 /.cache
 /.config
 /.scratch
+/features/src/*.[0-9]

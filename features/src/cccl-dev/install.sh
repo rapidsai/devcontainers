@@ -40,21 +40,14 @@ fi
 CC=gcc CXX=g++ python -m pip install $BREAK_PACKAGES --upgrade pip
 CC=gcc CXX=g++ python -m pip install $BREAK_PACKAGES wheel setuptools;
 CC=gcc CXX=g++ python -m pip install $BREAK_PACKAGES psutil $LIT_VERSION_TO_INSTALL;
-CC=gcc CXX=g++ python -m pip install $BREAK_PACKAGES clang-format==17.*;
 
 export LIT_VERSION="$(lit --version | grep -o -e '[0-9].*')";
 
-# there must be a cleaner way, but it works
-export CLANG_FORMAT_PATH="$(pip show clang-format | grep "^Location: " | awk '{print $2}')/clang-format";
-
 # export envvars in bashrc files
 append_to_etc_bashrc "$(cat .bashrc | envsubst '$LIT_VERSION')";
-append_to_etc_bashrc "$(cat .bashrc | envsubst '$CLANG_FORMAT_PATH')";
 append_to_all_bashrcs "$(cat .bashrc | envsubst '$LIT_VERSION')";
-append_to_all_bashrcs "$(cat .bashrc | envsubst '$CLANG_FORMAT_PATH')";
 # export envvars in /etc/profile.d
 add_etc_profile_d_script cccl-dev "$(cat .bashrc | envsubst '$LIT_VERSION')";
-add_etc_profile_d_script cccl-dev "$(cat .bashrc | envsubst '$CLANG_FORMAT_PATH')";
 
 # Clean up
 # rm -rf /tmp/*;

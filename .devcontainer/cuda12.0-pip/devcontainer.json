@@ -10,12 +10,12 @@
   },
   "hostRequirements": {"gpu": "optional"},
   "features": {
-    "./features/cuda": {"installcuDNN": true},
-    "./features/rapids-build-utils": {}
+    "./features/src/cuda": {"installcuDNN": true},
+    "./features/src/rapids-build-utils": {}
   },
   "overrideFeatureInstallOrder": [
-    "./features/cuda",
-    "./features/rapids-build-utils"
+    "./features/src/cuda",
+    "./features/src/rapids-build-utils"
   ],
   "initializeCommand": ["/bin/bash", "-c", "mkdir -m 0755 -p ${localWorkspaceFolder}/../.{aws,cache,config/pip,local/share/${localWorkspaceFolderBasename}-cuda12.0-venvs} ${localWorkspaceFolder}/../{rmm,kvikio,cudf,raft,cumlprims_mg,cuml,cugraph-ops,wholegraph,cugraph,cuspatial}"],
   "postAttachCommand": ["/bin/bash", "-c", "if [ ${CODESPACES:-false} = 'true' ]; then . devcontainer-utils-post-attach-command; . rapids-post-attach-command; fi"],

@@ -23,24 +23,24 @@
     },
     "ghcr.io/devcontainers/features/git-lfs:1": {},
     "ghcr.io/devcontainers/features/github-cli:1": {},
-    "./features/gitlab-cli": {},
-    "./features/cmake": {},
-    "./features/ninja": {},
-    "./features/sccache": {
+    "./features/src/gitlab-cli": {},
+    "./features/src/cmake": {},
+    "./features/src/ninja": {},
+    "./features/src/sccache": {
       "version": "0.7.4"
     },
-    "./features/utils": {}
+    "./features/src/utils": {}
   },
   "overrideFeatureInstallOrder": [
     "ghcr.io/devcontainers/features/common-utils",
     "ghcr.io/devcontainers/features/git",
     "ghcr.io/devcontainers/features/git-lfs",
     "ghcr.io/devcontainers/features/github-cli",
-    "./features/gitlab-cli",
-    "./features/cmake",
-    "./features/ninja",
-    "./features/sccache",
-    "./features/utils"
+    "./features/src/gitlab-cli",
+    "./features/src/cmake",
+    "./features/src/ninja",
+    "./features/src/sccache",
+    "./features/src/utils"
   ],
   "updateContentCommand": [
     "/bin/bash",
