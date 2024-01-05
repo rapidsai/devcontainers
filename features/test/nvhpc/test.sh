@@ -27,6 +27,7 @@ module list 1>&2
 check "version" bash -c "echo '$NVHPC_VERSION' | grep '23.1'"
 check "installed" stat /opt/nvidia/hpc_sdk
 check "nvc++ exists and is on path" which nvc++
+check "mpic++ exists and is on path" which mpic++
 
 # Report result
 # If any of the checks above exited with a non-zero exit code, the test will fail.
