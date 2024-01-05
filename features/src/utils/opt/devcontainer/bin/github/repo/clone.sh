@@ -61,11 +61,15 @@ clone_github_repo() {
 
     source devcontainer-utils-init-github-cli;
 
-    local branch="";
+    local branch=;
+    local no_fork=;
+    local clone_upstream=;
 
     eval "$(                                  \
         devcontainer-utils-parse-args --names '
             b|branch                          |
+            no-fork                           |
+            clone-upstream                    |
         ' - <<< "$@"                          \
       | xargs -r -d'\n' -I% echo -n local %\; \
     )";
@@ -83,14 +87,23 @@ clone_github_repo() {
     __rest__=("${__rest__[@]/"${directory}"}");
 
     local origin="${upstream}";
-    local name="$(get_repo_name "${upstream}")";
-    local owner="$(get_repo_owner "${upstream}")";
-    local user="${GITHUB_USER:-"${owner}"}";
-    local fork="$(get_user_fork_name "${owner}" "${name}" "${user}")";
+    local name=;
+    local user=;
+    local fork=;
+    local owner=;
 
-    if [ -n "${fork:-}" ]; then
+    if test -z "${clone_upstream:-}"; then
+        name="$(get_repo_name "${upstream}")";
+        owner="$(get_repo_owner "${upstream}")";
+        user="${GITHUB_USER:-"${owner}"}";
+        fork="$(get_user_fork_name "${owner}" "${name}" "${user}")";
+    fi
+
+    if test -n "${fork:-}"; then
         origin="${fork}";
-    elif devcontainer-utils-shell-is-interactive; then
+    elif test -z "${no_fork:-}" && \
+         test -z "${clone_upstream:-}" && \
+         devcontainer-utils-shell-is-interactive; then
         while true; do
             local CHOICE;
             read -p "'${GITHUB_HOST:-github.com}/${user}/${name}.git' not found.

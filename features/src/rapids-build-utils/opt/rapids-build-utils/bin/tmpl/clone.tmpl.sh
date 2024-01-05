@@ -8,6 +8,7 @@ clone_${NAME}() {
         local branch=;
         local upstream=;
         local directory=;
+        local no_update_env=;
 
         eval "$(                                  \
             devcontainer-utils-parse-args --names '
