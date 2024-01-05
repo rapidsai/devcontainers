@@ -8,6 +8,8 @@ clone_${NAME}() {
         local branch=;
         local upstream=;
         local directory=;
+        local no_fork=;
+        local clone_upstream=;
         local no_update_env=;
 
         eval "$(                                  \
@@ -15,6 +17,8 @@ clone_${NAME}() {
                 b|branch                          |
                 d|directory                       |
                 u|upstream                        |
+                no-fork                           |
+                clone-upstream                    |
                 no-update-env                     |
             ' - <<< "$@"                          \
           | xargs -r -d'\n' -I% echo -n local %\; \
@@ -32,6 +36,8 @@ clone_${NAME}() {
             --recurse-submodules                  \
             -j $(nproc --ignore=2)                \
             -c checkout.defaultRemote=upstream    \
+            ${no_fork:+--no-fork 1}               \
+            ${clone_upstream:+--clone-upstream 1} \
             ${__rest__[@]}                        \
             "${upstream}"                         \
             "${directory}"                        \
