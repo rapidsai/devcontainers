@@ -21,6 +21,11 @@ A feature to install mambaforge
 
 ### VS Code Extensions
 
+- `ms-python.autopep8`
+- `ms-python.black-formatter`
+- `ms-python.flake8`
+- `ms-python.mypy-type-checker`
+- `ms-python.pylint`
 - `ms-python.python`
 - `ms-python.vscode-pylance`
 
