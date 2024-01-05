@@ -1,9 +1,6 @@
 #! /usr/bin/env bash
 
-if test -n "${SKIP_UPDATE_CONTENT_COMMAND:-}"; then
-    exit 0;
+if test -z "${SKIP_RAPIDS_BUILD_UTILS_UPDATE_CONTENT_COMMAND:-}"; then
+    rapids-generate-scripts;
+    rapids-make-vscode-workspace --update;
 fi
-
-rapids-generate-scripts;
-
-rapids-make-vscode-workspace --update;
