@@ -2,9 +2,9 @@
 
 build_${PY_LIB}_python() {
 
-    local mode="inplace";
+    local mode="editable";
 
-    # pull out the --mode dist|inplace arg (if any)
+    # pull out the --mode editable|wheel arg (if any)
     eval "$(                                  \
         devcontainer-utils-parse-args --names '
             m|mode                            |
@@ -12,7 +12,7 @@ build_${PY_LIB}_python() {
       | xargs -r -d'\n' -I% echo -n local %\; \
     )";
 
-    mode="${m:-${mode:-"inplace"}}";
+    mode="${m:-${mode:-"editable"}}";
 
     build-${PY_LIB}-python-${mode} ${__rest__[@]};
 }
