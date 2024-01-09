@@ -36,8 +36,8 @@
     "source=${localWorkspaceFolder}/../.cache,target=/home/coder/.cache,type=bind,consistency=consistent",
     "source=${localWorkspaceFolder}/../.config,target=/home/coder/.config,type=bind,consistency=consistent",
     "source=${localWorkspaceFolder}/../.local/share/${localWorkspaceFolderBasename}-cuda12.0-venvs,target=/home/coder/.local/share/venvs,type=bind,consistency=consistent",
-    "source=${localWorkspaceFolder}/.devcontainer/cuda12.0-pip/features/utils/opt/devcontainer/bin,target=/opt/devcontainer/bin,type=bind,consistency=consistent",
-    "source=${localWorkspaceFolder}/.devcontainer/cuda12.0-pip/features/rapids-build-utils/opt/rapids-build-utils,target=/opt/rapids-build-utils,type=bind,consistency=consistent"
+    "source=${localWorkspaceFolder}/.devcontainer/cuda12.0-pip/features/src/utils/opt/devcontainer/bin,target=/opt/devcontainer/bin,type=bind,consistency=consistent",
+    "source=${localWorkspaceFolder}/.devcontainer/cuda12.0-pip/features/src/rapids-build-utils/opt/rapids-build-utils,target=/opt/rapids-build-utils,type=bind,consistency=consistent"
   ],
   "customizations": {
     "vscode": {

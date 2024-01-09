@@ -104,13 +104,11 @@ generate_python_scripts() {
       | generate_script "${script_name}-${PY_LIB}-python";
     ) || true;
     done
-    for script_name in "inplace" "dist"; do (
+    for script_name in "editable" "wheel"; do (
         cat ${TMPL}/python-build-${script_name}.tmpl.sh        \
       | generate_script "build-${PY_LIB}-python-${script_name}";
     ) || true;
     done
-    cat ${TMPL}/python-wheel.tmpl.sh       \
-  | generate_script "build-${PY_LIB}-wheel";
 }
 
 generate_scripts() {
