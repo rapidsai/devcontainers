@@ -19,6 +19,21 @@ repos:
     repo: rmm
     <<: *git_defaults
 
+- name: ucxx
+  path: ucxx
+  git:
+    repo: ucxx
+    <<: *git_defaults
+    tag: branch-0.36
+  cpp:
+    - name: ucxx
+      sub_dir: ""
+      depends: []
+  python:
+    - name: ucxx
+      sub_dir: "python"
+      depends: []
+
 - name: kvikio
   path: kvikio
   cpp:
