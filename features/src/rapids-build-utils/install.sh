@@ -39,7 +39,9 @@ update-alternatives --install /usr/bin/rapids-pull-repositories             rapi
 update-alternatives --install /usr/bin/rapids-push-repositories             rapids-push-repositories            /opt/rapids-build-utils/bin/push-repositories.sh            0;
 update-alternatives --install /usr/bin/rapids-generate-scripts              rapids-generate-scripts             /opt/rapids-build-utils/bin/generate-scripts.sh             0;
 update-alternatives --install /usr/bin/rapids-join-strings                  rapids-join-strings                 /opt/rapids-build-utils/bin/join-strings.sh                 0;
+update-alternatives --install /usr/bin/rapids-make-conda-dependencies       rapids-make-conda-dependencies      /opt/rapids-build-utils/bin/make-conda-dependencies.sh      0;
 update-alternatives --install /usr/bin/rapids-make-conda-env                rapids-make-conda-env               /opt/rapids-build-utils/bin/make-conda-env.sh               0;
+update-alternatives --install /usr/bin/rapids-make-pip-dependencies         rapids-make-pip-dependencies        /opt/rapids-build-utils/bin/make-pip-dependencies.sh        0;
 update-alternatives --install /usr/bin/rapids-make-pip-env                  rapids-make-pip-env                 /opt/rapids-build-utils/bin/make-pip-env.sh                 0;
 update-alternatives --install /usr/bin/rapids-make-vscode-workspace         rapids-make-vscode-workspace        /opt/rapids-build-utils/bin/make-vscode-workspace.sh        0;
 update-alternatives --install /usr/bin/rapids-parse-cmake-args              rapids-parse-cmake-args             /opt/rapids-build-utils/bin/parse-cmake-args.sh             0;
