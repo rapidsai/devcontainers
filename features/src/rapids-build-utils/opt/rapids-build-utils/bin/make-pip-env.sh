@@ -24,7 +24,7 @@ make_pip_env() {
     local new_env_path="$(realpath -m /tmp/${env_file_name})";
     local old_env_path="$(realpath -m ~/.local/share/venvs/${env_file_name})";
 
-    make-pip-dependencies > "${new_env_path}";
+    rapids-make-pip-dependencies > "${new_env_path}";
 
     if test -f "${new_env_path}"; then
 

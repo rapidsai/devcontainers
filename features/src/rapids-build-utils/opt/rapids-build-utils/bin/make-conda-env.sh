@@ -24,7 +24,7 @@ make_conda_env() {
     local new_env_path="$(realpath -m /tmp/${env_file_name})";
     local old_env_path="$(realpath -m ~/.conda/envs/${env_file_name})";
 
-    make-conda-dependencies > "${new_env_path}";
+    rapids-make-conda-dependencies > "${new_env_path}";
 
     if test -f "${new_env_path}"; then
 
