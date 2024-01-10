@@ -29,6 +29,9 @@ repos:
     - name: ucxx
       sub_dir: "cpp"
       depends: [rmm]
+      args: |
+        -DUCXX_ENABLE_PYTHON=ON
+        -DUCXX_ENABLE_RMM=ON
   python:
     - name: ucxx
       sub_dir: "python"
