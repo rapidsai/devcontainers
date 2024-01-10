@@ -24,7 +24,7 @@ make_conda_env() {
     local new_env_path="$(realpath -m /tmp/${env_file_name})";
     local old_env_path="$(realpath -m ~/.conda/envs/${env_file_name})";
 
-    rapids-make-conda-dependencies > "${new_env_path}";
+    rapids-make-conda-dependencies ${__rest__[@]} > "${new_env_path}";
 
     if test -f "${new_env_path}"; then
 
@@ -57,6 +57,10 @@ make_conda_env() {
         cp -a "${new_env_path}" "${old_env_path}";
     fi
 }
+
+if test -n "${rapids_build_utils_debug:-}"; then
+    PS4="+ ${BASH_SOURCE[0]}:\${LINENO} "; set -x;
+fi
 
 . /opt/conda/etc/profile.d/conda.sh;
 . /opt/conda/etc/profile.d/mamba.sh;
