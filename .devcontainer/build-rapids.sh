@@ -38,6 +38,13 @@ build_rapids() {
     ) 2>&1 | maybe_write_build_log kvikio;
 
     (
+        echo "building ucxx";
+        clean-ucxx;
+        build-ucxx --verbose;
+        sccache -s;
+    ) 2>&1 | maybe_write_build_log ucxx;
+
+    (
         echo "building cuDF";
         clean-cudf;
         build-cudf -DBUILD_BENCHMARKS=ON -DNVBench_ENABLE_CUPTI=OFF --verbose
