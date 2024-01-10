@@ -87,7 +87,15 @@ parse_args() {
         if grep -qP "^${vars}$" <<< "${key}"; then
             key="${key//-/_}";
             keys+=("$key");
-            dict[$key]="$(printf %q "${val}")";
+            if test -v dict[$key]; then
+                dict[$key]+=" $(printf %q "${val}")";
+                if ! test -v __${key}_ary; then
+                    declare __${key}_ary;
+                    eval __${key}_ary="";
+                fi
+            else
+                dict[$key]="$(printf %q "${val}")";
+            fi
         else
             rest+=("${arg}");
         fi
@@ -96,17 +104,21 @@ parse_args() {
     keys+=("__rest__");
     dict["__rest__"]="(${rest[@]})";
 
-    keys=($(echo "${keys[@]}" | xargs -r -d' ' -n1 echo -e | sort -s | uniq));
+    keys=($(echo "${keys[@]}" | xargs -r -d' ' -n1 echo -e | sort -su));
 
     { set +x; } 2>/dev/null;
 
-    local keyi=1;
+    local keyi=0;
 
-    for ((keyi=1; keyi < ${#keys[@]}; keyi+=1)); do
-        echo "${keys[$keyi]}=${dict[${keys[$keyi]}]}";
+    for ((keyi=0; keyi < ${#keys[@]}; keyi+=1)); do
+        key=${keys[$keyi]};
+        val=${dict[$key]};
+        if ! test -v __${key}_ary; then
+            echo "${key}=${val}";
+        else
+            echo "${key}=(${val})";
+        fi
     done
-
-    echo "${keys[0]}=${dict[${keys[0]}]}";
 }
 
 if test -n "${devcontainer_utils_debug:-}"; then
