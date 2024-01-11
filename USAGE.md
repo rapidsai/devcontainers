@@ -63,7 +63,10 @@ are the definitive source of information for this topic.
 
 Specifically for RAPIDS repos, we frequently have multiple folders for different
 library configurations. Pay attention to which build environment you need when
-launching your devcontainer. You can switch between them
+launching your devcontainer. You can switch between them by reopening your
+native host (e.g. CMD+SHIFT+P -> "Reopen folder in SSH"), and then re-opening in
+devcontainer (CMD+SHIFT+P -> "Reopen in container"), at which point you'll see a
+prompt to choose a different `devcontainer.json`.
 
 ### Using devcontainers from the terminal
 
