@@ -172,10 +172,10 @@ repos:
       sub_dir: python/cugraph-pyg
       depends: [cugraph]
     - name: cugraph-service-client
-      sub_dir: python/cugraph-service/server
+      sub_dir: python/cugraph-service/client
       depends: []
     - name: cugraph-service-server
-      sub_dir: python/cugraph-service/client
+      sub_dir: python/cugraph-service/server
       depends: [cudf, dask-cudf, cugraph, cugraph-service-client]
   git:
     repo: cugraph
