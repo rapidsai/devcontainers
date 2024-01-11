@@ -107,7 +107,7 @@ fi
 
 ### Generated build scripts
 
-Several scripts are generated for you based on the contents of manifest.yaml. By
+Several scripts are generated for you based on the contents of `manifest.yaml`. By
 default, `manifest.yaml` comes from [the RAPIDS/devcontainers
 repo](https://github.com/rapidsai/devcontainers/blob/branch-24.02/features/src/rapids-build-utils/opt/rapids-build-utils/manifest.yaml),
 but you can use your own local `manifest.yaml` file. Refer to the "Adding
