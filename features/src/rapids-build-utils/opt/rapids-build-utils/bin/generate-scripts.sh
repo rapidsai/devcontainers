@@ -30,7 +30,10 @@ generate_script() {
                   $GIT_TAG
                   $GIT_REPO
                   $GIT_HOST
-                  $GIT_UPSTREAM' \
+                  $GIT_UPSTREAM
+                  $PY_CMAKE_ARGS
+                  $PIP_WHEEL_ARGS
+                  $PIP_INSTALL_ARGS' \
       | sudo tee "$TMP_SCRIPT_DIR/${bin}" >/dev/null;
 
         sudo chmod +x "$TMP_SCRIPT_DIR/${bin}";
@@ -133,7 +136,7 @@ generate_scripts() {
     local j;
     local k;
 
-    local repo_name_all=()
+    local repo_names=();
 
     for ((i=0; i < ${repos_length:-0}; i+=1)); do
 
@@ -149,7 +152,7 @@ generate_scripts() {
 
         repo_name="$(tr "[:upper:]" "[:lower:]" <<< "${!repo_name:-}")";
 
-        repo_name_all+=($repo_name)
+        repo_names+=($repo_name)
 
         # Generate a clone script for each repo
         (
@@ -228,26 +231,26 @@ generate_scripts() {
 
             for ((j=0; j < ${!py_length:-0}; j+=1)); do
                 local py_name="${repo}_python_${j}_name";
-                local py_args="${repo}_python_${j}_args";
+                local py_cmake_args="${repo}_python_${j}_args_cmake";
+                local pip_wheel_args="${repo}_python_${j}_args_wheel";
+                local pip_install_args="${repo}_python_${j}_args_install";
                 local py_sub_dir="${repo}_python_${j}_sub_dir";
                 local py_depends_length="${repo}_python_${j}_depends_length";
                 local py_path="${!repo_path:-}${!py_sub_dir:+/${!py_sub_dir}}";
 
-                py_libs+=(${!py_name})
-                py_dirs+=($py_path)
-            done;
+                py_libs+=(${!py_name});
 
-            for ((k=0; k < ${#py_libs[@]}; k+=1)); do
-                local py_dir="${py_dirs[$k]}";
-                local py_lib="${py_libs[$k]}";
                 (
-                    PY_SRC="${py_dir}"     \
-                    PY_LIB="${py_lib}"     \
-                    CPP_ARGS="${args[@]}"  \
-                    CPP_DEPS="${deps[@]}"  \
-                    generate_python_scripts;
+                    PY_SRC="${py_path}"                       \
+                    PY_LIB="${!py_name}"                      \
+                    CPP_ARGS="${args[@]}"                     \
+                    CPP_DEPS="${deps[@]}"                     \
+                    PY_CMAKE_ARGS="${!py_cmake_args:-}"       \
+                    PIP_WHEEL_ARGS="${!pip_wheel_args:-}"     \
+                    PIP_INSTALL_ARGS="${!pip_install_args:-}" \
+                    generate_python_scripts                   ;
                 ) || true;
-            done
+            done;
 
             for ((k=0; k < ${#cpp_libs[@]}; k+=1)); do
                 cpp_libs[$k]="$(tr "[:upper:]" "[:lower:]" <<< "${cpp_libs[$k]}")";
@@ -271,9 +274,9 @@ generate_scripts() {
     for script in "clone" "clean" "configure" "build"; do
         # Generate a script to run a script for all repos
         (
-            NAMES="${repo_name_all[@]}"       \
-            SCRIPT="${script}"                \
-            generate_all_script               ;
+            NAMES="${repo_names[@]}" \
+            SCRIPT="${script}"       \
+            generate_all_script      ;
         ) || true;
     done;
 }
