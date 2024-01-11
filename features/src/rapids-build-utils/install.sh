@@ -53,6 +53,7 @@ update-alternatives --install /usr/bin/rapids-python-pkg-names              rapi
 update-alternatives --install /usr/bin/rapids-python-conda-pkg-names        rapids-python-conda-pkg-names       /opt/rapids-build-utils/bin/python-conda-pkg-names.sh       0;
 update-alternatives --install /usr/bin/rapids-get-num-archs-jobs-and-load   rapids-get-num-archs-jobs-and-load  /opt/rapids-build-utils/bin/get-num-archs-jobs-and-load.sh  0;
 update-alternatives --install /usr/bin/rapids-list-repos                    rapids-list-repos                   /opt/rapids-build-utils/bin/list-repos.sh                   0;
+update-alternatives --install /usr/bin/rapids-query-manifest                rapids-query-manifest               /opt/rapids-build-utils/bin/query-manifest.sh               0;
 
 find /opt/rapids-build-utils \
     \( -type d -exec chmod 0775 {} \; \
