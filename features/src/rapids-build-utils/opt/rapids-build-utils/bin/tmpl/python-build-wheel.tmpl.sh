@@ -58,6 +58,7 @@ build_${PY_LIB}_python_wheel() {
     cmake_args+=(${CMAKE_ARGS:-});
     cmake_args+=(${CPP_DEPS});
     cmake_args+=(${CPP_ARGS});
+    cmake_args+=(${verbose:+--log-level=VERBOSE});
     cmake_args+=(${__rest__[@]});
 
     local ninja_args=();

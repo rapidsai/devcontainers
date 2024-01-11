@@ -4,7 +4,7 @@ configure_${CPP_LIB}_cpp() {
 
     set -euo pipefail;
 
-    if [[ ! -d ~/${CPP_SRC} ]]; then
+    if [[ ! -d ~/"${CPP_SRC}" ]]; then
         exit 1;
     fi
 
@@ -12,24 +12,35 @@ configure_${CPP_LIB}_cpp() {
     local parallel="";
     local max_device_obj_memory_usage="";
 
+    local verbose="";
+
     eval "$(                                  \
         devcontainer-utils-parse-args --names '
             a|archs                           |
             j|parallel                        |
             m|max-device-obj-memory-usage     |
+            v|verbose                         |
         ' - <<< "$@"                          \
       | xargs -r -d'\n' -I% echo -n local %\; \
     )";
 
+    verbose="${v:-${verbose:-}}";
+
     archs="${a:-${archs:-}}";
-    archs="${a:-${archs:+-a${archs}}}";
-    parallel="${j:-${parallel:+-j${parallel}}}";
+    parallel="${j:-${parallel:-}}";
     max_device_obj_memory_usage="${m:-${max_device_obj_memory_usage:-}}";
-    max_device_obj_memory_usage="${max_device_obj_memory_usage:+-m${max_device_obj_memory_usage}}";
+
+    eval "$(                                                                    \
+        rapids-get-num-archs-jobs-and-load                                      \
+            ${archs:+-a ${archs}}                                               \
+            ${parallel:+-j ${parallel}}                                         \
+            ${max_device_obj_memory_usage:+-m ${max_device_obj_memory_usage}}   \
+      | xargs -r -d'\n' -I% echo -n local %\;                                   \
+    )";
 
     local build_type="$(rapids-parse-cmake-build-type ${__rest__[@]} | tr '[:upper:]' '[:lower:]')";
-    local binary_dir=~/${CPP_SRC}/build/${build_type};
-    local source_dir=~/${CPP_SRC};
+    local binary_dir=~/"${CPP_SRC}/build/${build_type}";
+    local source_dir=~/"${CPP_SRC}";
 
     # Reconfigure if previous configure failed
     if [[ ! -f ${binary_dir}/build.ninja ]]; then
@@ -45,15 +56,8 @@ configure_${CPP_LIB}_cpp() {
     cmake_args+=(${CMAKE_ARGS:-});
     cmake_args+=(${CPP_DEPS});
     cmake_args+=(${CPP_ARGS});
+    cmake_args+=(${verbose:+--log-level=VERBOSE});
     cmake_args+=(${__rest__[@]});
-
-    eval "$(                                    \
-        rapids-get-num-archs-jobs-and-load      \
-            ${archs}                            \
-            ${parallel}                         \
-            ${max_device_obj_memory_usage}      \
-      | xargs -r -d'\n' -I% echo -n local %\;   \
-    )";
 
     time CUDAFLAGS="${CUDAFLAGS:+$CUDAFLAGS }-t=${n_arch}" \
          cmake ${cmake_args[@]};

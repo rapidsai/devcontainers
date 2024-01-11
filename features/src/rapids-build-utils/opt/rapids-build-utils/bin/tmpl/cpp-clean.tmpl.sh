@@ -4,7 +4,7 @@ clean_${CPP_LIB}_cpp() {
 
     set -euo pipefail;
 
-    rm -rf ~/${CPP_SRC}/build/latest/*;
+    rm -rf ~/"${CPP_SRC}/build/latest"/*;
 }
 
 if test -n "${rapids_build_utils_debug:-}"; then

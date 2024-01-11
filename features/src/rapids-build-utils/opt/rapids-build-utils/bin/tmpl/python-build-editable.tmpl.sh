@@ -41,13 +41,10 @@ build_${PY_LIB}_python_inplace() {
 
     local cmake_args=(${PY_CMAKE_ARGS});
 
-    if test -n "${verbose}"; then
-        cmake_args+=("--log-level=VERBOSE");
-    fi
-
     cmake_args+=(${CMAKE_ARGS:-});
     cmake_args+=(${CPP_DEPS});
     cmake_args+=(${CPP_ARGS});
+    cmake_args+=(${verbose:+--log-level=VERBOSE});
     cmake_args+=(${__rest__[@]});
 
     local ninja_args=();

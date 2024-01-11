@@ -4,7 +4,7 @@ build_${CPP_LIB}_cpp() {
 
     set -euo pipefail;
 
-    if [[ ! -d ~/${CPP_SRC} ]]; then
+    if [[ ! -d ~/"${CPP_SRC}" ]]; then
         exit 1;
     fi
 
@@ -19,23 +19,19 @@ build_${CPP_LIB}_cpp() {
 
     verbose="${v:-${verbose:-}}";
 
-    if test -n "${verbose}"; then verbose="--log-level=VERBOSE"; fi
-
-    configure-${CPP_LIB}-cpp ${verbose} ${__rest__[@]};
+    configure-${CPP_LIB}-cpp ${verbose:+-v} ${__rest__[@]};
 
     eval "$(                                              \
         rapids-get-num-archs-jobs-and-load ${__rest__[@]} \
       | xargs -r -d'\n' -I% echo -n local %\;             \
     )";
 
-    if test -n "${verbose}"; then verbose="--verbose"; fi
-
     time cmake                              \
-        --build ~/${CPP_SRC}/build/latest   \
-        ${verbose}                          \
+        --build ~/"${CPP_SRC}/build/latest" \
+        ${verbose:+--verbose}               \
         -j${n_jobs}                         \
         --                                  \
-        -l${n_load};
+        -l${n_load}                         ;
 }
 
 if test -n "${rapids_build_utils_debug:-}"; then
