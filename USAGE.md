@@ -2,13 +2,14 @@
 
 - [Using the RAPIDS devcontainers](#using-the-rapids-devcontainers)
   - [Quick start](#quick-start)
+  - [Detailed start](#detailed-start)
     - [Using devcontainers in VS Code](#using-devcontainers-in-vs-code)
     - [Using devcontainers from the terminal](#using-devcontainers-from-the-terminal)
-  - [Available tools in the devcontainer](#available-tools-in-the-devcontainer)
     - [Generated build scripts](#generated-build-scripts)
     - [rapids-build-utils](#rapids-build-utils)
     - [Native build tools - CMake, python builds](#native-build-tools---cmake-python-builds)
-  - [Adding projects: manifest.yaml file](#adding-projects-manifestyaml-file)
+    - [Exiting the devcontainer](#exiting-the-devcontainer)
+  - [Adding projects: `manifest.yaml` file](#adding-projects-manifestyaml-file)
   - [Using the pre-built images](#using-the-pre-built-images)
     - [Using in `devcontainer.json`](#using-in-devcontainerjson)
     - [Custom devcontainers](#custom-devcontainers)
@@ -17,6 +18,32 @@
     - [Using GitHub OAuth to issue S3 credentials via Hashicorp Vault](#using-github-oauth-to-issue-s3-credentials-via-hashicorp-vault)
 
 ## Quick start
+
+If you really want to get started right away and ignore all the details of how
+devcontainers work, the easiest way is to treat the devcontainer
+like a docker container that you use interactively. Brad Dice wrote [a script
+that wraps the devcontainer
+CLI](https://gist.github.com/bdice/a92d224b3e3b1b387fc18b8095b3bdbd) to do this.
+
+To obtain this script:
+```
+curl -LO https://gist.githubusercontent.com/bdice/a92d224b3e3b1b387fc18b8095b3bdbd/raw/28eb8edc856ae04d4cd83571fea5b894f714f01c/rapids-dev
+chmod +x rapids-dev
+./rapids-dev
+```
+
+This script expects you to have your current directory set to the
+root of a repo that has a .devcontainer folder. You may want to move
+this script to a folder that you place on PATH, such as `~/bin`
+
+Running that command will build the devcontainer and drop you at
+an interactive prompt. You can immediately build your project
+with one of the devcontainers scripts. Type `build-` and hit `<TAB>` to see your options.
+
+Skip ahead to [Available tools in the devcontainer](#available-tools-in-the-devcontainer) to see more options
+for interaction at this prompt.
+
+## Detailed start
 
 So, you have cloned a repo that you've heard has a devcontainer. You can see the file(s) for yourself by looking
 in your repo's `.devcontainer` folder. You may find a `devcontainer.json` file, or you may find some number of folders, such as `cuda12.0-conda` and `cuda12.0-pip`. If you find folders, these each contain a `devcontainer.json`
@@ -44,37 +71,60 @@ The [devcontainer-cli](https://code.visualstudio.com/docs/devcontainers/devconta
 allows you to run and interact with devcontainers from the terminal. It uses NodeJS, so you need
 to install that in order to run it.
 
-You need to specify the devcontainer.json file and workspace folder to use when starting the devcontainer:
+There are wrappers to facilitate working with this CLI. Refer back to the
+[Quick-start section](#quick-start). If you need more flexibility, you can call
+the devcontainer CLI directly.
+
+You need to specify the `devcontainer.json` file and workspace folder to use when starting the devcontainer. Also note that you must manage the 3 steps of the lifecycle yourself:
+
+* bring up the devcontainer
+* run your command (or run bash for interactive prompt)
+* stop and remove the docker container
 
 ```
-devcontainer up --config .devcontainer/cuda12.0-pip/devcontainer.json --workspace-folder=.
+CONTAINER_JSON=.devcontainer/cuda12.0-pip/devcontainer.json
+devcontainer up --config ${CONTAINER_JSON} --workspace-folder=$(pwd)
+devcontainer exec --config ${CONTAINER_JSON} --workspace-folder=$(pwd) bash
 ```
 
-## Available tools in the devcontainer
+Stopping and removing the docker container is manual. The devcontainer CLI does
+not currently facilitate this in any way. One possible workflow (copied from [aforementioned wrapper](https://gist.github.com/bdice/a92d224b3e3b1b387fc18b8095b3bdbd)):
+
+```
+CONTAINER_ID=$(docker ps --quiet \
+      --filter label=devcontainer.local_folder=$(pwd) \
+      --filter label=devcontainer.config_file=${CONTAINER_JSON})
+num_active_shells=$(docker exec "${container_id}" ps aux | grep -c "/bin/sh")
+if [[ ${num_active_shells} -le 1 ]]; then
+    echo "All devcontainers are closed. Stopping and removing container ${container_id}."
+    docker stop "${container_id}"
+    docker rm "${container_id}"
+fi
+```
 
 ### Generated build scripts
 
 Several scripts are generated for you based on the contents of manifest.yaml. By
-default, manifest.yaml comes from [the RAPIDS/devcontainers
+default, `manifest.yaml` comes from [the RAPIDS/devcontainers
 repo](https://github.com/rapidsai/devcontainers/blob/branch-24.02/features/src/rapids-build-utils/opt/rapids-build-utils/manifest.yaml),
-but you can use your own local manifest.yaml file. Refer to the "Adding
+but you can use your own local `manifest.yaml` file. Refer to the "Adding
 projects" section.
 
 The generated scripts are:
-* /usr/bin/build-*
-* /usr/bin/clean-*
-* /usr/bin/clone-*
-* /usr/bin/configure-*
+* `/usr/bin/build-*`
+* `/usr/bin/clean-*`
+* `/usr/bin/clone-*`
+* `/usr/bin/configure-*`
 
-Here the * is a placeholder for the project name and the kind of
-build. For example, a project with a python component in manifest.yaml
-will have `build-ucxx-python`.
+Here the `*` is a placeholder for the project name and the kind of
+build. For example, a project with a python component in `manifest.yaml`
+will have `build-cudf-python`.
 
-These scripts may trigger side-effects. For example, build-* scripts are only
-generated for projects that exist in the workspace. If you are working on UCXX,
-which depends on RMM, the default workspace only mounts UCXX and generates
-build-ucxx scripts. If you want RMM build scripts also, you can run `clone-rmm`,
-which will clone RMM into your workspace and generate build scripts for it.
+These scripts may trigger side-effects. For example, `build-*` scripts are only
+generated for projects that exist in the workspace. If you are working on `cudf`,
+which depends on `rmm`, the default workspace only mounts `cudf` and generates
+`build-cudf` scripts. If you want `rmm` build scripts also, you can run `clone-rmm`,
+which will clone `rmm` into your workspace and generate build scripts for it.
 
 ### rapids-build-utils
 
@@ -89,13 +139,18 @@ build tools for you. However, if you need to run the build tools
 manually, you can `cd` into your source code folder, which is
 mounted as a subfolder in `/home/coder`.
 
-## Adding projects: manifest.yaml file
+### Exiting the devcontainer
 
-The build script generation is controlled with a manifest.yaml file, which by default comes from [the rapidsai/devcontainers
+If you are in VS Code and you need to return to your host machine (local or SSH),
+you can run `Dev Containers: Reopen in SSH`.
+
+## Adding projects: `manifest.yaml` file
+
+The build script generation is controlled with a `manifest.yaml` file, which by default comes from [the rapidsai/devcontainers
 repo](https://github.com/rapidsai/devcontainers/blob/branch-24.02/features/src/rapids-build-utils/opt/rapids-build-utils/manifest.yaml)
 
 If you would like to add your project, you can submit a PR to the rapidsai/devcontainers repo. Before you do that, though, you can
-test it locally. Start by copying manifest.yaml from the rapidsai/devcontainers repo. You can put it anywhere, but let's say we put it in .devcontainer/manifest.yaml.
+test it locally. Start by copying `manifest.yaml` from the rapidsai/devcontainers repo. You can put it anywhere, but let's say we put it in .devcontainer/manifest.yaml.
 
 Now open a devcontainer.json file that you want to work with. These
 will likely live in a .devcontainer subfolder, such as cuda12.0-pip. In this file, add a top-level key with this:
@@ -111,11 +166,12 @@ generated scripts.
 
 ## Using the pre-built images
 
-The choice of using a pre-built image refers to the build/args/BASE entry in devcontainer.json. The pre-built
+The choice of using a pre-built image refers to the build/args/BASE entry in `devcontainer.json`. The pre-built
 images are not meant to be used directly. The rapids-build-utils scripts are installed with a "feature," so
 they won't be present if you directly run a pre-built image with Docker instead of with a devcontainer tool (VS Code or devcontainer-cli)
 
-We publish a [matrix](matrix.yml) of pre-built images to DockerHub to accelerate initializing local devcontainers, GitHub Codespaces, and CI jobs.
+We publish a [matrix](matrix.yml) of pre-built images to DockerHub to accelerate initializing local devcontainers, GitHub Codespaces, and CI jobs. These use the "feature" scripts to install their components,
+so you can think of them as caching those steps.
 
 The features that comprise the image are noted in the image tags. If no version is defined for a tool or SDK, the image includes the latest available version at image build time.
 
@@ -135,7 +191,7 @@ You can also build a custom devcontainer by composing individual features:
 
 <details><summary>devcontainer.json using individual features</summary><pre>{<br/>  "image": "ubuntu:22.04",<br/>  "features": {<br/>    "ghcr.io/rapidsai/devcontainers/features/cmake:24.02": {},<br/>    "ghcr.io/rapidsai/devcontainers/features/ninja:24.02": {},<br/>    "ghcr.io/rapidsai/devcontainers/features/sccache:24.02": {<br/>      "version": "0.5.4"<br/>    }<br/>  },<br/>  "overrideFeatureInstallOrder": [<br/>    "ghcr.io/rapidsai/devcontainers/features/cmake",<br/>    "ghcr.io/rapidsai/devcontainers/features/ninja",<br/>    "ghcr.io/rapidsai/devcontainers/features/sccache"<br/>  ],<br/>  "workspaceFolder": "/home/coder/${localWorkspaceFolderBasename}",<br/>  "workspaceMount": "source=${localWorkspaceFolder},target=/home/coder/${localWorkspaceFolderBasename},type=bind"<br/>}</pre></details>
 
-You can also add libraries or programs on top of a pre-built image using this
+You can add libraries or programs on top of a pre-built image using this
 same mechanism. These are not baked into the image, but cached as a docker
 layer.
 
