@@ -37,7 +37,7 @@ parse_args() {
         # --
         elif grep -qP '^--$' <<< "${arg:-}"; then
             shift;
-            rest+=("${@}");
+            rest+=("${@@Q}");
             break;
         # -foo=bar | --foo=bar
         elif grep -qP '^--?[^\s]+=.*$' <<< "${arg:-}"; then
@@ -80,7 +80,7 @@ parse_args() {
                 fi
             fi
         else
-            rest+=("${@}");
+            rest+=("${@@Q}");
             break;
         fi
 
@@ -88,13 +88,13 @@ parse_args() {
             key="${key//-/_}";
             keys+=("$key");
             if test -v dict[$key]; then
-                dict[$key]+=" $(printf %q "${val}")";
+                dict[$key]+=" ${val@Q}";
                 if ! test -v __${key}_ary; then
                     declare __${key}_ary;
                     eval __${key}_ary="";
                 fi
             else
-                dict[$key]="$(printf %q "${val}")";
+                dict[$key]="${val@Q}";
             fi
         else
             rest+=("${arg}");
