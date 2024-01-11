@@ -12,6 +12,8 @@ src="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 # shellcheck disable=SC1091
 source "$src/utilities.sh";
 
+rm -f /etc/profile.d/00-restore-env.sh;
+
 # install /etc/skel
 cp -r "$src/etc/skel" /etc/;
 # install /etc/bash.bash_env
