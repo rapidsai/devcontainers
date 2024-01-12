@@ -1,6 +1,7 @@
 # Using the RAPIDS devcontainers
 
 - [Using the RAPIDS devcontainers](#using-the-rapids-devcontainers)
+  - [System requirements](#system-requirements)
   - [Quick start](#quick-start)
   - [Detailed start](#detailed-start)
     - [Using devcontainers in VS Code](#using-devcontainers-in-vs-code)
@@ -16,6 +17,14 @@
   - [Build caching with `sccache`](#build-caching-with-sccache)
     - [Build caching with private S3 buckets](#build-caching-with-private-s3-buckets)
     - [Using GitHub OAuth to issue S3 credentials via Hashicorp Vault](#using-github-oauth-to-issue-s3-credentials-via-hashicorp-vault)
+
+## System requirements
+
+Devcontainers can be used on Linux, Mac and Windows. They use Docker, so the
+system requirements and limitations associated with Docker apply here also. On
+Mac and Windows, where a Linux VM must run to support Docker, you may need to be
+aware of memory limitations of that Linux VM. Otherwise, devcontainers do not add
+system requirements beyond the needs of the individual projects we're building.
 
 ## Quick start
 
@@ -60,6 +69,13 @@ application will build the devcontainer and allow you to interact with it.
 [The VS Code
 docs](https://code.visualstudio.com/docs/devcontainers/containers#_quick-start-open-an-existing-folder-in-a-container)
 are the definitive source of information for this topic.
+
+You can use devcontainers in VS Code either locally (docker running on your
+local machine) or with VS Code's remote-ssh or remote-tunnel connections. To use
+the devcontainers on a remote machine, connect normally using SSH or tunnel, and
+then follow the VS Code docs for using the dev containers. There is no special
+way to connect directly to a devcontainer on a remote host. You must go via
+SSH/tunnel first.
 
 Specifically for RAPIDS repos, we frequently have multiple folders for different
 library configurations. Pay attention to which build environment you need when
