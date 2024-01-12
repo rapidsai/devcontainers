@@ -87,12 +87,12 @@ make_pip_dependencies() {
         done
 
         # Generate a combined requirements.txt file
-        cat ${pip_reqs_txts[@]}                                                                                   \
-          | grep -v '^#'                                                                                          \
-          | grep -v -P "^($(tr -d '[:blank:]' <<< "${pip_noinstall[@]/%/|}"))(=.*|>.*|<.*)?$"                     \
-          | sed -E "s/-cu([0-9]+)/-cu${cuda_version_major}/g"                                                     \
-          | sed -E "s/cuda-python.*/cuda-python>=${cuda_version},<$((cuda_version_major+1)).0a0/g"                \
-          | sed -E "s/cupy-cuda[0-9]+x(==|>=|<=|>|<)?.*/cupy-cuda${cuda_version_major}x\1${cuda_version_major}/g" \
+        cat ${pip_reqs_txts[@]}                                                                    \
+          | grep -v '^#'                                                                           \
+          | grep -v -P "^($(tr -d '[:blank:]' <<< "${pip_noinstall[@]/%/|}"))(=.*|>.*|<.*)?$"      \
+          | sed -E "s/-cu([0-9]+)/-cu${cuda_version_major}/g"                                      \
+          | sed -E "s/cupy-cuda[0-9]+x/cupy-cuda${cuda_version_major}x/g"                          \
+          | sed -E "s/cuda-python.*/cuda-python>=${cuda_version},<$((cuda_version_major+1)).0a0/g" \
         ;
 
         rm ${pip_reqs_txts[@]};
