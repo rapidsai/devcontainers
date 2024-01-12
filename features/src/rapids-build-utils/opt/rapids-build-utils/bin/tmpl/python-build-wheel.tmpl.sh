@@ -130,15 +130,18 @@ build_${PY_LIB}_python_wheel() {
     local cudaflags="${CUDAFLAGS:+$CUDAFLAGS }-t=${n_arch}";
     local nvcc_append_flags="${NVCC_APPEND_FLAGS:+$NVCC_APPEND_FLAGS }-t=${n_arch}";
 
-    time                                     \
-    CUDAFLAGS="${cudaflags}"                 \
-    CMAKE_GENERATOR="Ninja"                  \
-    PARALLEL_LEVEL="${n_jobs}"               \
-    CMAKE_ARGS="${cmake_args[@]}"            \
-    SKBUILD_BUILD_OPTIONS="${ninja_args[@]}" \
-    NVCC_APPEND_FLAGS="${nvcc_append_flags}" \
-        python -m pip wheel ${pip_args[@]}   \
-    ;
+    time (
+        CUDAFLAGS="${cudaflags}"                 \
+        CMAKE_GENERATOR="Ninja"                  \
+        PARALLEL_LEVEL="${n_jobs}"               \
+        CMAKE_ARGS="${cmake_args[@]}"            \
+        SKBUILD_BUILD_OPTIONS="${ninja_args[@]}" \
+        NVCC_APPEND_FLAGS="${nvcc_append_flags}" \
+        ${PY_ENV} \
+            python -m pip wheel ${pip_args[@]}   \
+        ;
+        { set +x; } 2>/dev/null; echo -n "${PY_LIB} wheel build time:";
+    ) 2>&1;
 }
 
 if test -n "${rapids_build_utils_debug:-}"; then

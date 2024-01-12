@@ -21,6 +21,7 @@ generate_script() {
         cat - \
       | envsubst '$NAME
                   $SRC_PATH
+                  $PY_ENV
                   $PY_SRC
                   $PY_LIB
                   $CPP_LIB
@@ -152,7 +153,7 @@ generate_scripts() {
 
         repo_name="$(tr "[:upper:]" "[:lower:]" <<< "${!repo_name:-}")";
 
-        repo_names+=($repo_name)
+        repo_names+=($repo_name);
 
         # Generate a clone script for each repo
         (
@@ -230,6 +231,7 @@ generate_scripts() {
             local py_dirs=()
 
             for ((j=0; j < ${!py_length:-0}; j+=1)); do
+                local py_env="${repo}_python_${j}_env";
                 local py_name="${repo}_python_${j}_name";
                 local py_cmake_args="${repo}_python_${j}_args_cmake";
                 local pip_wheel_args="${repo}_python_${j}_args_wheel";
@@ -243,6 +245,7 @@ generate_scripts() {
                 (
                     PY_SRC="${py_path}"                       \
                     PY_LIB="${!py_name}"                      \
+                    PY_ENV="${!py_env:-}"                     \
                     CPP_ARGS="${args[@]}"                     \
                     CPP_DEPS="${deps[@]}"                     \
                     PY_CMAKE_ARGS="${!py_cmake_args:-}"       \

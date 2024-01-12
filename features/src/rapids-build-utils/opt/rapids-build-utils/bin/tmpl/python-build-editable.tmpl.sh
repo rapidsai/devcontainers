@@ -78,15 +78,18 @@ build_${PY_LIB}_python_inplace() {
     local cudaflags="${CUDAFLAGS:+$CUDAFLAGS }-t=${n_arch}";
     local nvcc_append_flags="${NVCC_APPEND_FLAGS:+$NVCC_APPEND_FLAGS }-t=${n_arch}";
 
-    time                                         \
-    CUDAFLAGS="${cudaflags}"                     \
-    CMAKE_GENERATOR="Ninja"                      \
-    CMAKE_ARGS="${cmake_args[@]}"                \
-    SKBUILD_BUILD_OPTIONS="${ninja_args[@]}"     \
-    NVCC_APPEND_FLAGS="${nvcc_append_flags}"     \
-    SETUPTOOLS_ENABLE_FEATURES="legacy-editable" \
-        python -m pip install ${pip_args[@]}     \
-    ;
+    time (
+        CUDAFLAGS="${cudaflags}"                     \
+        CMAKE_GENERATOR="Ninja"                      \
+        CMAKE_ARGS="${cmake_args[@]}"                \
+        SKBUILD_BUILD_OPTIONS="${ninja_args[@]}"     \
+        NVCC_APPEND_FLAGS="${nvcc_append_flags}"     \
+        SETUPTOOLS_ENABLE_FEATURES="legacy-editable" \
+        ${PY_ENV} \
+            python -m pip install ${pip_args[@]}     \
+        ;
+        { set +x; } 2>/dev/null; echo -n "${PY_LIB} install time:";
+    ) 2>&1;
 }
 
 if test -n "${rapids_build_utils_debug:-}"; then
