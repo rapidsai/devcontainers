@@ -1,8 +1,16 @@
 #! /usr/bin/env bash
 
+generate_requirements() {
+    (
+        (rapids-dependency-file-generator ${@:2} 2>/dev/null || echo "") \
+      | (grep -v '^#' || [ "$?" == "1" ]) \
+      | tee "${1}" 1>/dev/null;
+    ) & true
+}
+
 make_pip_dependencies() {
 
-    set -euo pipefail;
+    set -Eeuo pipefail;
 
     local keys=();
 
@@ -19,12 +27,8 @@ make_pip_dependencies() {
     fi
 
     local cuda_version="${CUDA_VERSION:-${CUDA_VERSION_MAJOR:-12}.${CUDA_VERSION_MINOR:-0}}";
-    cuda_version="$(grep -o '^[0-9]*.[0-9]*.[0-9]' <<< "${cuda_version}")";
+    cuda_version="$(grep -o '^[0-9]*.[0-9]*' <<< "${cuda_version}")";
     local cuda_version_major="$(cut -d'.' -f1 <<< "${cuda_version}")";
-    local cuda_version_minor="$(cut -d'.' -f2 <<< "${cuda_version}")";
-    local cuda_version_patch="$(cut -d'.' -f3 <<< "${cuda_version}")";
-    local cuda_version_mm="${cuda_version_major}.${cuda_version_minor:-0}";
-    cuda_version="${cuda_version_mm}.${cuda_version_patch:-0}";
 
     local python_version="${PYTHON_VERSION:-$(python3 --version 2>&1 | cut -d' ' -f2)}";
     python_version="$(cut -d'.' -f3 --complement <<< "${python_version}")";
@@ -57,21 +61,27 @@ make_pip_dependencies() {
                 local keyi;
 
                 for ((keyi=0; keyi < ${#repo_keys[@]}; keyi+=1)); do
-                    if rapids-dependency-file-generator                                          \
-                        --file_key ${repo_keys[$keyi]}                                           \
-                        --output requirements                                                    \
-                        --config ~/"${!repo_path}/dependencies.yaml"                             \
-                        --matrix "arch=$(uname -m);cuda=${cuda_version_mm};py=${python_version}" \
-                        `# --stdout` \
-                    >> /tmp/${!repo_name}.${!py_name}.${keyi}.requirements.txt 2>/dev/null; then
-                        pip_reqs_txts+=("/tmp/${!repo_name}.${!py_name}.${keyi}.requirements.txt");
-                    fi
+                    local file="/tmp/${!repo_name}.${!py_name}.${repo_keys[$keyi]}.requirements.txt";
+                    pip_reqs_txts+=("${file}");
+                    generate_requirements                                                     \
+                        "${file}"                                                             \
+                        --file_key ${repo_keys[$keyi]}                                        \
+                        --output requirements                                                 \
+                        --config ~/"${!repo_path}/dependencies.yaml"                          \
+                        --matrix "arch=$(uname -m);cuda=${cuda_version};py=${python_version}" \
+                        ;
                 done
             done
         fi
     done
 
     if test ${#pip_reqs_txts[@]} -gt 0; then
+
+        for ((i=0; i < ${#pip_reqs_txts[@]}; i+=1)); do
+            while ! test -f "${pip_reqs_txts[$i]}"; do
+                sleep 0.1;
+            done
+        done
 
         local pip_noinstall=();
 
@@ -87,15 +97,14 @@ make_pip_dependencies() {
         done
 
         # Generate a combined requirements.txt file
-        cat ${pip_reqs_txts[@]}                                                                    \
-          | grep -v '^#'                                                                           \
-          | grep -v -P "^($(tr -d '[:blank:]' <<< "${pip_noinstall[@]/%/|}"))(=.*|>.*|<.*)?$"      \
-          | sed -E "s/-cu([0-9]+)/-cu${cuda_version_major}/g"                                      \
-          | sed -E "s/cupy-cuda[0-9]+x/cupy-cuda${cuda_version_major}x/g"                          \
-          | sed -E "s/cuda-python.*/cuda-python>=${cuda_version},<$((cuda_version_major+1)).0a0/g" \
+        cat "${pip_reqs_txts[@]}"                                                                                   \
+          | (grep -v -P "^($(tr -d '[:blank:]' <<< "${pip_noinstall[@]/%/|}"))(=.*|>.*|<.*)?$" || [ "$?" == "1" ])  \
+          | sed -E "s/-cu([0-9]+)/-cu${cuda_version_major}/g"                                                       \
+          | sed -E "s/cupy-cuda[0-9]+x/cupy-cuda${cuda_version_major}x/g"                                           \
+          | sed -E "s/cuda-python.*/cuda-python>=${cuda_version}.0,<$((cuda_version_major+1)).0a0/g"                \
         ;
 
-        rm ${pip_reqs_txts[@]};
+        rm -f "${pip_reqs_txts[@]}";
     fi
 }
 

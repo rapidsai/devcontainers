@@ -25,7 +25,7 @@ make_pip_env() {
     local old_env_path="$(realpath -m ~/.local/share/venvs/${env_file_name})";
 
     rapids-make-pip-dependencies ${__rest__[@]} \
-  | grep -v -e '^$' || true                     \
+  | (grep -v -E '^$' || [ "$?" == "1" ])        \
   | tr -s "[:blank:]"                           \
   | LC_ALL=C sort -u                            \
   > "${new_env_path}"
