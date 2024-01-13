@@ -5,6 +5,14 @@ ARG PYTHON_PACKAGE_MANAGER=conda
 
 FROM ${BASE} as pip-base
 
+RUN apt update -y \
+ && DEBIAN_FRONTEND=noninteractive apt install -y --no-install-recommends \
+    # needed by libcudf_kafka
+    librdkafka-dev \
+    # needed by libcuspatial
+    sqlite3 libsqlite3-dev libtiff-dev libcurl4-openssl-dev \
+ && rm -rf /tmp/* /var/tmp/* /var/cache/apt/* /var/lib/apt/lists/*;
+
 ENV DEFAULT_VIRTUAL_ENV=rapids
 
 FROM ${BASE} as conda-base
