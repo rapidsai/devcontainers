@@ -127,17 +127,18 @@ build_${PY_LIB}_python_wheel() {
 
     trap "rm -rf ~/'${PY_SRC}/$(echo "${PY_LIB}" | tr '-' '_').egg-info'" EXIT;
 
-    local cudaflags="${CUDAFLAGS:+$CUDAFLAGS }-t=${n_arch}";
-    local nvcc_append_flags="${NVCC_APPEND_FLAGS:+$NVCC_APPEND_FLAGS }-t=${n_arch}";
-
     time (
+        export ${PY_ENV} PATH="$PATH";
+
+        local cudaflags="${CUDAFLAGS:+$CUDAFLAGS }-t=${n_arch}";
+        local nvcc_append_flags="${NVCC_APPEND_FLAGS:+$NVCC_APPEND_FLAGS }-t=${n_arch}";
+
         CUDAFLAGS="${cudaflags}"                 \
         CMAKE_GENERATOR="Ninja"                  \
         PARALLEL_LEVEL="${n_jobs}"               \
         CMAKE_ARGS="${cmake_args[@]}"            \
         SKBUILD_BUILD_OPTIONS="${ninja_args[@]}" \
         NVCC_APPEND_FLAGS="${nvcc_append_flags}" \
-        ${PY_ENV} \
             python -m pip wheel ${pip_args[@]}   \
         ;
         { set +x; } 2>/dev/null; echo -n "${PY_LIB} wheel build time:";

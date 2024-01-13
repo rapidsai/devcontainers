@@ -4,41 +4,30 @@ clean_${PY_LIB}_cpp() {
 
     set -euo pipefail;
 
-    local py_lib="$(tr '-' '_' <<< "${PY_LIB}")";
+    local py_lib="${PY_LIB}";
 
-    rm -rf ~/"${PY_SRC}"/{_skbuild,${py_lib}.egg-info};
+    rm -rf ~/"${PY_SRC}"/_skbuild \
+        ~/"${PY_SRC}"/{${py_lib},${py_lib//"-"/"_"}}.egg-info;
 
-    local python_version="${PYTHON_VERSION:-$(python3 --version 2>&1 | cut -d' ' -f2)}";
-    python_version="$(cut -d'.' -f3 --complement <<< "${python_version}")";
-    python_version="${python_version/./}";
-
-    local dir;
-    for dir in lib temp dist; do
-        local slug="${dir}.$(uname -s)-$(uname -m)";
-        if test -d ~/"${PY_SRC}"/build/${slug,,}-${python_version/./}; then
-            rm -rf ~/"${PY_SRC}"/build/${slug,,}-${python_version/./};
-        fi
-        if test -d ~/"${PY_SRC}"/build/${slug,,}-cpython-${python_version/./}; then
-            rm -rf ~/"${PY_SRC}"/build/${slug,,}-cpython-${python_version/./};
+    for lib in ${py_lib} ${py_lib//"-"/"_"}; do
+        if test -d ~/"${PY_SRC}"/${lib}/; then
+            find ~/"${PY_SRC}"/${lib}/ -type f \
+                -iname "*.cpython-*-$(uname -m)-$(uname -s)-*.so" \
+                -delete;
         fi
     done
 
+    local py_ver="${PYTHON_VERSION:-$(python3 --version 2>&1 | cut -d' ' -f2)}";
+    py_ver="$(grep -o '^[0-9]*.[0-9]*' <<< "${py_ver}")";
+
     if test -d ~/"${PY_SRC}"/build; then
-        for d in ~/"${PY_SRC}"/build/cp${python_version}-cp${python_version}*; do
-            rm -rf $d
-        done
-    fi
-
-    if test -d ~/"${PY_SRC}/${PY_LIB}"/; then
-        find ~/"${PY_SRC}/${PY_LIB}"/ -type f \
-            -iname "*.cpython-*-$(uname -m)-$(uname -s)-*.so" \
-            -delete;
-    fi
-
-    if test -d ~/"${PY_SRC}/${py_lib}"/; then
-        find ~/"${PY_SRC}/${py_lib}"/ -type f \
-            -iname "*.cpython-*-$(uname -m)-$(uname -s)-*.so" \
-            -delete;
+        local slug="$(uname -s)-$(uname -m)";
+        rm -rf                                                                                        \
+            `# scikit-buld-core build dirs`                                                           \
+            ~/"${PY_SRC}"/build/cp{${py_ver},${py_ver/./}}-cp{${py_ver},${py_ver/./}}*                \
+            `# setuptools/distutils build dirs`                                                       \
+            ~/"${PY_SRC}"/build/{lib,temp,dist,bdist}.${slug,,}                                       \
+            ~/"${PY_SRC}"/build/{lib,temp,dist,bdist}.${slug,,}-{,cpython}{,-}{${py_ver},${py_ver/./}};
     fi
 }
 
