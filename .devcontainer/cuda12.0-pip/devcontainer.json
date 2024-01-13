@@ -10,10 +10,12 @@
   },
   "hostRequirements": {"gpu": "optional"},
   "features": {
+    "./features/src/ucx": {"version": "1.14.1"},
     "./features/src/cuda": {"installcuDNN": true},
     "./features/src/rapids-build-utils": {}
   },
   "overrideFeatureInstallOrder": [
+    "./features/src/ucx",
     "./features/src/cuda",
     "./features/src/rapids-build-utils"
   ],
