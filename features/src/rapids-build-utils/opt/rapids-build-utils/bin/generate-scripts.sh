@@ -93,7 +93,7 @@ generate_repo_scripts() {
 
 generate_cpp_scripts() {
     local script_name;
-    for script_name in "configure" "build" "clean"; do (
+    for script_name in "configure" "build" "clean" "install" "cpack"; do (
         cat ${TMPL}/cpp-${script_name}.tmpl.sh         \
       | CPP_SRC="${SRC_PATH:-}${CPP_SRC:+/$CPP_SRC}"   \
         generate_script "${script_name}-${CPP_LIB}-cpp";
