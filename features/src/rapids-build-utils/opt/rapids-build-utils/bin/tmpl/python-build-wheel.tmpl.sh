@@ -2,9 +2,9 @@
 
 build_${PY_LIB}_python_wheel() {
 
-    set -euo pipefail;
+    set -Eeuo pipefail;
 
-    if [[ ! -d ~/"${PY_SRC}" ]]; then
+    if [[ ! -d "${PY_SRC}" ]]; then
         exit 1;
     fi
 
@@ -123,9 +123,9 @@ build_${PY_LIB}_python_wheel() {
         pip_args+=("--no-build-isolation");
     fi
 
-    pip_args+=(~/"${PY_SRC}");
+    pip_args+=("${PY_SRC}");
 
-    trap "rm -rf ~/'${PY_SRC}/$(echo "${PY_LIB}" | tr '-' '_').egg-info'" EXIT;
+    trap "rm -rf '${PY_SRC}/$(echo "${PY_LIB}" | tr '-' '_').egg-info'" EXIT;
 
     time (
         export ${PY_ENV} PATH="$PATH";

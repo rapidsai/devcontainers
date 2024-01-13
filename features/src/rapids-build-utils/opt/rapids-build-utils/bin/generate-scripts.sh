@@ -158,7 +158,7 @@ generate_scripts() {
         # Generate a clone script for each repo
         (
             NAME="${repo_name:-}"             \
-            SRC_PATH="${!repo_path:-}"        \
+            SRC_PATH=~/"${!repo_path:-}"      \
             GIT_TAG="${!git_tag:-}"           \
             GIT_REPO="${!git_repo:-}"         \
             GIT_HOST="${!git_host:-}"         \
@@ -177,7 +177,7 @@ generate_scripts() {
                 local cpp_args="${repo}_cpp_${j}_args";
                 local cpp_sub_dir="${repo}_cpp_${j}_sub_dir";
                 local cpp_depends_length="${repo}_cpp_${j}_depends_length";
-                local cpp_path="${!repo_path:-}${!cpp_sub_dir:+/${!cpp_sub_dir}}";
+                local cpp_path=~/"${!repo_path:-}${!cpp_sub_dir:+/${!cpp_sub_dir}}";
 
                 cpp_dirs+=("${cpp_path}");
                 cpp_libs+=("${!cpp_name:-}");
@@ -201,12 +201,12 @@ generate_scripts() {
                 done
 
                 (
-                    SRC_PATH="${!repo_path:-}"  \
-                    CPP_LIB="${cpp_name:-}"     \
-                    CPP_SRC="${!cpp_sub_dir:-}" \
-                    CPP_ARGS="${!cpp_args:-}"   \
-                    CPP_DEPS="${deps[@]}"       \
-                    generate_cpp_scripts        ;
+                    SRC_PATH=~/"${!repo_path:-}" \
+                    CPP_LIB="${cpp_name:-}"      \
+                    CPP_SRC="${!cpp_sub_dir:-}"  \
+                    CPP_ARGS="${!cpp_args:-}"    \
+                    CPP_DEPS="${deps[@]}"        \
+                    generate_cpp_scripts         ;
                 ) || true;
             done
 
@@ -238,7 +238,7 @@ generate_scripts() {
                 local pip_install_args="${repo}_python_${j}_args_install";
                 local py_sub_dir="${repo}_python_${j}_sub_dir";
                 local py_depends_length="${repo}_python_${j}_depends_length";
-                local py_path="${!repo_path:-}${!py_sub_dir:+/${!py_sub_dir}}";
+                local py_path=~/"${!repo_path:-}${!py_sub_dir:+/${!py_sub_dir}}";
 
                 py_libs+=(${!py_name});
 

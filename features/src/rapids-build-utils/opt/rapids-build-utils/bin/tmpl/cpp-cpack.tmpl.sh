@@ -1,7 +1,8 @@
 #! /usr/bin/env bash
 
 install_${CPP_LIB}_cpp() {
-    set -euo pipefail;
+
+    set -Eeuo pipefail;
 
     local verbose="";
 
@@ -18,12 +19,12 @@ install_${CPP_LIB}_cpp() {
 
     time (
         (
-            cd ~/"${CPP_SRC}"/build/latest/;
+            cd "${CPP_SRC}"/build/latest/;
             cpack -G TGZ ${verbose:+-V};
         ) || true;
 
         if test -d "${out_dir}"/; then
-            find ~/"${CPP_SRC}"/build/latest/ \
+            find "${CPP_SRC}"/build/latest/ \
                 -iname "${CPP_LIB}-*.tar.gz"  \
                 -exec cp -a "{}" "${out_dir}"/;
         fi

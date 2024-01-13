@@ -3,7 +3,7 @@
 clone_${NAME}() {
     set -euo pipefail;
 
-    if [[ ! -d ~/"${SRC_PATH}"/.git ]]; then
+    if [[ ! -d "${SRC_PATH}"/.git ]]; then
 
         local branch=;
         local upstream=;
@@ -25,7 +25,7 @@ clone_${NAME}() {
         )";
 
         branch="${b:-${branch:-"${GIT_TAG}"}}";
-        directory="${d:-${directory:-"${HOME}/${SRC_PATH}"}}";
+        directory="${d:-${directory:-"${SRC_PATH}"}}";
         upstream="${u:-${upstream:-"${GIT_UPSTREAM}/${GIT_REPO}"}}";
 
         echo 'Cloning ${NAME}' 1>&2;
@@ -43,14 +43,14 @@ clone_${NAME}() {
             "${directory}"                        \
         ;
 
-        git -C ~/"${SRC_PATH}" config --add remote.upstream.fetch '^refs/heads/pull-request/*';
+        git -C "${SRC_PATH}" config --add remote.upstream.fetch '^refs/heads/pull-request/*';
 
-        local upstream_branches="$(git -C ~/"${SRC_PATH}" branch --remotes --list 'upstream/pull-request/*')";
+        local upstream_branches="$(git -C "${SRC_PATH}" branch --remotes --list 'upstream/pull-request/*')";
         if test -n "${upstream_branches:-}"; then
-            git -C ~/"${SRC_PATH}" branch --remotes -d ${upstream_branches};
+            git -C "${SRC_PATH}" branch --remotes -d ${upstream_branches};
         fi
 
-        git -C ~/"${SRC_PATH}" remote prune upstream;
+        git -C "${SRC_PATH}" remote prune upstream;
 
         if test -z "${no_update_env:-}"; then
             rapids-update-content-command;

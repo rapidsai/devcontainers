@@ -2,9 +2,9 @@
 
 configure_${CPP_LIB}_cpp() {
 
-    set -euo pipefail;
+    set -Eeuo pipefail;
 
-    if [[ ! -d ~/"${CPP_SRC}" ]]; then
+    if [[ ! -d "${CPP_SRC}" ]]; then
         exit 1;
     fi
 
@@ -39,8 +39,8 @@ configure_${CPP_LIB}_cpp() {
     )";
 
     local build_type="$(rapids-parse-cmake-build-type ${__rest__[@]} | tr '[:upper:]' '[:lower:]')";
-    local binary_dir=~/"${CPP_SRC}/build/${build_type}";
-    local source_dir=~/"${CPP_SRC}";
+    local binary_dir="${CPP_SRC}/build/${build_type}";
+    local source_dir="${CPP_SRC}";
 
     # Reconfigure if previous configure failed
     if [[ ! -f ${binary_dir}/build.ninja ]]; then

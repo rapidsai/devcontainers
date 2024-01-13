@@ -2,9 +2,9 @@
 
 build_${PY_LIB}_python_inplace() {
 
-    set -euo pipefail;
+    set -Eeuo pipefail;
 
-    if [[ ! -d ~/"${PY_SRC}" ]]; then
+    if [[ ! -d "${PY_SRC}" ]]; then
         exit 1;
     fi
 
@@ -69,11 +69,11 @@ build_${PY_LIB}_python_inplace() {
     pip_args+=("--no-build-isolation");
     pip_args+=("--no-deps");
     pip_args+=("--editable");
-    pip_args+=(~/"${PY_SRC}");
+    pip_args+=("${PY_SRC}");
 
     cmake_args+=("-DCMAKE_INSTALL_RPATH_USE_LINK_PATH=ON");
 
-    trap "rm -rf ~/'${PY_SRC}/$(echo "${PY_LIB}" | tr '-' '_').egg-info'" EXIT;
+    trap "rm -rf '${PY_SRC}/$(echo "${PY_LIB}" | tr '-' '_').egg-info'" EXIT;
 
     time (
         export ${PY_ENV} PATH="$PATH";
