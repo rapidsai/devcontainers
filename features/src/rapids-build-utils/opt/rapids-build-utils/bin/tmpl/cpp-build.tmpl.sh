@@ -26,12 +26,17 @@ build_${CPP_LIB}_cpp() {
       | xargs -r -d'\n' -I% echo -n local %\;             \
     )";
 
-    time cmake                              \
+    # Build C++ lib
+    time (
+        cmake                               \
         --build ~/"${CPP_SRC}/build/latest" \
         ${verbose:+--verbose}               \
         -j${n_jobs}                         \
         --                                  \
         -l${n_load}                         ;
+        { set +x; } 2>/dev/null; echo -n "lib${CPP_LIB} build time:";
+    ) 2>&1;
+
 }
 
 if test -n "${rapids_build_utils_debug:-}"; then

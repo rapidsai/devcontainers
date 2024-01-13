@@ -59,8 +59,11 @@ configure_${CPP_LIB}_cpp() {
     cmake_args+=(${verbose:+--log-level=VERBOSE});
     cmake_args+=(${__rest__[@]});
 
-    time CUDAFLAGS="${CUDAFLAGS:+$CUDAFLAGS }-t=${n_arch}" \
-         cmake ${cmake_args[@]};
+    time (
+        CUDAFLAGS="${CUDAFLAGS:+$CUDAFLAGS }-t=${n_arch}" \
+            cmake ${cmake_args[@]};
+        { set +x; } 2>/dev/null; echo -n "lib${CPP_LIB} configure time:";
+    ) 2>&1;
 
     if [[ ! -L ${source_dir}/compile_commands.json \
             || "$(readlink "${source_dir}/compile_commands.json")" \
