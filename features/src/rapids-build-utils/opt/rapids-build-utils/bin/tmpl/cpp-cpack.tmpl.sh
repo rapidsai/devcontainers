@@ -1,6 +1,6 @@
 #! /usr/bin/env bash
 
-install_${CPP_LIB}_cpp() {
+cpack_${CPP_LIB}_cpp() {
 
     set -Eeuo pipefail;
 
@@ -24,9 +24,9 @@ install_${CPP_LIB}_cpp() {
         ) || true;
 
         if test -d "${out_dir}"/; then
-            find "${CPP_SRC}"/build/latest/ \
-                -iname "${CPP_LIB}-*.tar.gz"  \
-                -exec cp -a "{}" "${out_dir}"/;
+            find "${CPP_SRC}"/build/latest/     \
+                -iname "${CPP_LIB}-*.tar.gz"    \
+                -exec cp -a "{}" "${out_dir}"/ \;
         fi
 
         { set +x; } 2>/dev/null; echo -n "lib${CPP_LIB} CPack time:";
@@ -37,4 +37,4 @@ if test -n "${rapids_build_utils_debug:-}"; then
     PS4="+ ${BASH_SOURCE[0]}:\${LINENO} "; set -x;
 fi
 
-install_${CPP_LIB}_cpp "$@";
+cpack_${CPP_LIB}_cpp "$@";
