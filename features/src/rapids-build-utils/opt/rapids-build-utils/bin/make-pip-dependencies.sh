@@ -13,10 +13,12 @@ make_pip_dependencies() {
     set -Eeuo pipefail;
 
     local keys=();
+    local requirements=();
 
     eval "$(                                  \
         devcontainer-utils-parse-args --names '
             k|keys                            |
+            r|requirement                     |
         ' - <<< "$@"                          \
       | xargs -r -d'\n' -I% echo -n local %\; \
     )";
@@ -25,6 +27,9 @@ make_pip_dependencies() {
     if test ${#keys[@]} -eq 0; then
         keys=(py_build py_run py_test all);
     fi
+
+    if test -v r; then requirements+=(${r[@]}); fi
+    if test -v requirement; then requirements+=(${requirement[@]}); fi
 
     local cuda_version="${CUDA_VERSION:-${CUDA_VERSION_MAJOR:-12}.${CUDA_VERSION_MINOR:-0}}";
     cuda_version="$(grep -o '^[0-9]*.[0-9]*' <<< "${cuda_version}")";
@@ -97,7 +102,7 @@ make_pip_dependencies() {
         done
 
         # Generate a combined requirements.txt file
-        cat "${pip_reqs_txts[@]}"                                                                                   \
+        cat "${requirements[@]}" "${pip_reqs_txts[@]}"                                                              \
           | (grep -v -P "^($(tr -d '[:blank:]' <<< "${pip_noinstall[@]/%/|}"))(=.*|>.*|<.*)?$" || [ "$?" == "1" ])  \
           | sed -E "s/-cu([0-9]+)/-cu${cuda_version_major}/g"                                                       \
           | sed -E "s/cupy-cuda[0-9]+x/cupy-cuda${cuda_version_major}x/g"                                           \
