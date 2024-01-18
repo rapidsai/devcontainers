@@ -7,7 +7,7 @@
     "BASH_ENV": "/etc/bash.bash_env"
   },
   "postCreateCommand": [
-    "cron"
+    "/bin/bash", "-c", "if ! test -f /var/run/crond.pid; then cron 2>/dev/null || true; fi"
   ],
   "postAttachCommand": [
     "/bin/bash",
