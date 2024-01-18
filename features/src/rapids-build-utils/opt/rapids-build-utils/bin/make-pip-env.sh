@@ -11,9 +11,12 @@
 #
 # Options that require values:
 #  -k,--key <key>          Only include the key(s)
-#  --repo <repo>           Only include dependencies for repo(s).
 #  -m,--manifest <file>    Use a specific manifest.json
 #                          (default: ${PROJECT_MANIFEST_YML:-"/opt/rapids-build-utils/manifest.yaml"})
+#  -o,--omit <repo>        Omit dependencies for repo(s).
+#                          (default: none)
+#  --repo <repo>           Only include dependencies for repo(s).
+#                          (default: all repositories)
 #  -r,--requirement <file> Path(s) to additional requirement files to include.
 
 . devcontainer-utils-parse-args-from-docstring;

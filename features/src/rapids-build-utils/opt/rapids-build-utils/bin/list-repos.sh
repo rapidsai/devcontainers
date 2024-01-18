@@ -11,7 +11,9 @@
 # Options that require values:
 #  -m,--manifest <file>  Use a specific manifest.json
 #                        (default: ${PROJECT_MANIFEST_YML:-"/opt/rapids-build-utils/manifest.yaml"})
-#  -r,--repo <repo>      Filter the results to only include <repo> entries.
+#  -o,--omit <repo>      Filter the results to exclude <repo> entries.
+#                        (default: none)
+#  -r,--repo <repo>      Filter the results to include <repo> entries.
 #                        (default: all repositories)
 
 . devcontainer-utils-parse-args-from-docstring;
@@ -26,19 +28,32 @@ list_repos() {
     repos+=(${repo[@]:-}); unset repo;
     repos=(${repos[@]:-});
 
+    local omits=();
+    omits+=(${o[@]:-}); unset o;
+    omits+=(${omit[@]:-}); unset omit;
+    omits=(${omits[@]:-});
+
     local query=".repos | {repos: .}";
+    local filters=();
 
     if test ${#repos[@]} -gt 0; then
         # prefix each element
         repos=("${repos[@]/#/'.name == "'}");
         # suffix each element
         repos=("${repos[@]/%/'" or'}");
-        query="$(cat <<________EOF | tr -s '[:space:]'
-        .repos
-        | map(select(${repos[@]} false))
-        | {repos: .}
-________EOF
-)";
+        filters+=("| map(select(${repos[@]} false))");
+    fi
+
+    if test ${#omits[@]} -gt 0; then
+        # prefix each element
+        omits=("${omits[@]/#/'.name != "'}");
+        # suffix each element
+        omits=("${omits[@]/%/'" and'}");
+        filters+=("| map(select(${omits[@]} true))");
+    fi
+
+    if test -n "${filters:-}"; then
+        query=".repos ${filters[@]} | {repos: .}";
     fi
 
     rapids-query-manifest "$@" "${query}";
