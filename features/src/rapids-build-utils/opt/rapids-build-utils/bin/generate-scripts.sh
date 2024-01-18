@@ -208,9 +208,9 @@ generate_scripts() {
                 fi
                 local dep_cpp_path="${cpp_name_to_path["${dep_cpp_name}"]}";
 
-                deps+=(-D${!dep}_ROOT=\"$(realpath -m ~/${dep_cpp_path}/build/latest)\");
-                deps+=(-D${!dep,,}_ROOT=\"$(realpath -m ~/${dep_cpp_path}/build/latest)\");
-                deps+=(-D${!dep^^}_ROOT=\"$(realpath -m ~/${dep_cpp_path}/build/latest)\");
+                deps+=(-D${!dep}_ROOT=\"${dep_cpp_path}/build/latest\");
+                deps+=(-D${!dep,,}_ROOT=\"${dep_cpp_path}/build/latest\");
+                deps+=(-D${!dep^^}_ROOT=\"${dep_cpp_path}/build/latest\");
             done
 
             if [[ -d ~/"${!repo_path:-}/.git" ]]; then
@@ -237,9 +237,9 @@ generate_scripts() {
             args+=(-DFIND_${cpp_lib}_CPP=ON);
             args+=(-DFIND_${cpp_lib,,}_CPP=ON);
             args+=(-DFIND_${cpp_lib^^}_CPP=ON);
-            deps+=(-D${cpp_lib}_ROOT=\"$(realpath -m ~/${cpp_dir}/build/latest)\");
-            deps+=(-D${cpp_lib,,}_ROOT=\"$(realpath -m ~/${cpp_dir}/build/latest)\");
-            deps+=(-D${cpp_lib^^}_ROOT=\"$(realpath -m ~/${cpp_dir}/build/latest)\");
+            deps+=(-D${cpp_lib}_ROOT=\"${cpp_dir}/build/latest\");
+            deps+=(-D${cpp_lib,,}_ROOT=\"${cpp_dir}/build/latest\");
+            deps+=(-D${cpp_lib^^}_ROOT=\"${cpp_dir}/build/latest\");
         done
 
         for ((j=0; j < ${!py_length:-0}; j+=1)); do
