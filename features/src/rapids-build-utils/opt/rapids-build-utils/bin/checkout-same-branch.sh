@@ -1,7 +1,21 @@
 #!/usr/bin/env bash
 
+# Usage:
+#  rapids-checkout-same-branch [OPTION]...
+#
+# Fetch all branches from the origin and upstream remotes,
+# prompts the user to select a branch they all have in common.
+# then checks out all repositories to this common branch.
+#
+# Boolean options:
+#  -h,--help,--usage  print this text
+
+. devcontainer-utils-parse-args-from-docstring;
+
 checkout_same_branch() {
-    set -euo pipefail;
+    set -Eeuo pipefail;
+
+    parse_args_or_show_help - <<< "$@";
 
     eval "$(                                  \
         rapids-list-repos "$@"                \
@@ -96,7 +110,9 @@ checkout_same_branch() {
     done;
 }
 
-if test -n "${rapids_build_utils_debug:-}"; then
+if test -n "${rapids_build_utils_debug:-}" \
+&& ( test -z "${rapids_build_utils_debug##*"all"*}" \
+  || test -z "${rapids_build_utils_debug##*"checkout-same-branch"*}" ); then
     PS4="+ ${BASH_SOURCE[0]}:\${LINENO} "; set -x;
 fi
 

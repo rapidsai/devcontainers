@@ -1,11 +1,28 @@
-#! /usr/bin/env bash
+#!/usr/bin/env bash
 
+# Usage:
+#  rapids-python-conda-pkg-names [OPTION]...
+#
 # Read the `name="<pkg>"` fields from the meta.yaml files in each repository,
 # as determined by manifest.yaml. This seems to be the most reliable way to
 # determine the actual list of package names to exclude from the combined
 # conda env.
+#
+# Boolean options:
+#  -h,--help,--usage     print this text
+#
+# Options that require values:
+#  -m,--manifest <file>  Use a specific manifest.json
+#                        (default: ${PROJECT_MANIFEST_YML:-"/opt/rapids-build-utils/manifest.yaml"})
+#  -r,--repo <repo>      Filter the results to only include <repo> entries.
+#                        (default: all repositories)
+
+. devcontainer-utils-parse-args-from-docstring;
+
 python_conda_pkg_names() {
-    set -euo pipefail;
+    set -Eeuo pipefail;
+
+    parse_args_or_show_help - <<< "$@";
 
     eval "$(                                  \
         rapids-list-repos "$@"                \
@@ -34,5 +51,11 @@ python_conda_pkg_names() {
         fi
     done
 }
+
+if test -n "${rapids_build_utils_debug:-}" \
+&& ( test -z "${rapids_build_utils_debug##*"all"*}" \
+  || test -z "${rapids_build_utils_debug##*"python-conda-pkg-names"*}" ); then
+    PS4="+ ${BASH_SOURCE[0]}:\${LINENO} "; set -x;
+fi
 
 (python_conda_pkg_names "$@");

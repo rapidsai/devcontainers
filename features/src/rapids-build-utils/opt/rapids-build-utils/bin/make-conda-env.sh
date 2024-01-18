@@ -1,19 +1,29 @@
-#! /usr/bin/env bash
+#!/usr/bin/env bash
+
+# Usage:
+#  rapids-make-conda-env [OPTION]...
+#
+# Make a combined conda environment for all repos.
+#
+# Boolean options:
+#  -h,--help,--usage     print this text
+#  -f,--force            Delete the existing conda env and recreate it from scratch.
+#
+# Options that require values:
+#  -k,--key <key>        Only include the key(s)
+#  -m,--manifest <file>  Use a specific manifest.json
+#                        (default: ${PROJECT_MANIFEST_YML:-"/opt/rapids-build-utils/manifest.yaml"})
+#  --repo <repo>         Only include dependencies for repo(s).
+
+. devcontainer-utils-parse-args-from-docstring;
 
 make_conda_env() {
+    set -Eeuo pipefail;
 
-    set -euo pipefail;
+    parse_args_or_show_help - <<< "$@";
 
-    local force=;
     local env_name="${1}";
     local env_file_name="${env_name}.yml";
-
-    eval "$(                                  \
-        devcontainer-utils-parse-args --names '
-            f|force                           |
-        ' - <<< "${@:2}"                      \
-      | xargs -r -d'\n' -I% echo -n local %\; \
-    )";
 
     # Remove the current conda env if called with `-f|--force`
     if test -n "${f:-${force:-}}"; then
@@ -24,7 +34,7 @@ make_conda_env() {
     local new_env_path="$(realpath -m /tmp/${env_file_name})";
     local old_env_path="$(realpath -m ~/.conda/envs/${env_file_name})";
 
-    rapids-make-conda-dependencies ${__rest__[@]} > "${new_env_path}";
+    rapids-make-conda-dependencies "$@" > "${new_env_path}";
 
     if test -f "${new_env_path}"; then
 
@@ -58,7 +68,9 @@ make_conda_env() {
     fi
 }
 
-if test -n "${rapids_build_utils_debug:-}"; then
+if test -n "${rapids_build_utils_debug:-}" \
+&& ( test -z "${rapids_build_utils_debug##*"all"*}" \
+  || test -z "${rapids_build_utils_debug##*"make-conda-env"*}" ); then
     PS4="+ ${BASH_SOURCE[0]}:\${LINENO} "; set -x;
 fi
 

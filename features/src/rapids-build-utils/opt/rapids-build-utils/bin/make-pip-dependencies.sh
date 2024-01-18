@@ -1,4 +1,21 @@
-#! /usr/bin/env bash
+#!/usr/bin/env bash
+
+# Usage:
+#  rapids-make-conda-dependencies [OPTION]...
+#
+# Generate a combined pip requirements file for all repos.
+#
+# Boolean options:
+#  -h,--help,--usage       print this text
+#
+# Options that require values:
+#  -k,--key <key>          Only include the key(s)
+#  -m,--manifest <file>    Use a specific manifest.json
+#                          (default: ${PROJECT_MANIFEST_YML:-"/opt/rapids-build-utils/manifest.yaml"})
+#  --repo <repo>           Only include dependencies for repo(s).
+#  -r,--requirement <file> Path(s) to additional requirement files to include.
+
+. devcontainer-utils-parse-args-from-docstring;
 
 generate_requirements() {
     (
@@ -9,27 +26,22 @@ generate_requirements() {
 }
 
 make_pip_dependencies() {
-
     set -Eeuo pipefail;
 
+    parse_args_or_show_help - <<< "$@";
+
     local keys=();
+    keys+=(${k[@]:-}); unset k;
+    keys+=(${key[@]:-}); unset key;
+    keys=(${keys[@]:-py_build py_run py_test all});
+
+    local repos=();
+    repos+=(${repo[@]:-}); unset repo;
+    repos=(${repos[@]:-});
+
     local requirements=();
-
-    eval "$(                                  \
-        devcontainer-utils-parse-args --names '
-            k|keys                            |
-            r|requirement                     |
-        ' - <<< "$@"                          \
-      | xargs -r -d'\n' -I% echo -n local %\; \
-    )";
-
-    if test -v k; then keys=(${k[@]}); fi
-    if test ${#keys[@]} -eq 0; then
-        keys=(py_build py_run py_test all);
-    fi
-
-    if test -v r; then requirements+=(${r[@]}); fi
-    if test -v requirement; then requirements+=(${requirement[@]}); fi
+    requirements+=(${r[@]:-}); unset r;
+    requirements+=(${requirement[@]:-}); unset requirement;
 
     local cuda_version="${CUDA_VERSION:-${CUDA_VERSION_MAJOR:-12}.${CUDA_VERSION_MINOR:-0}}";
     cuda_version="$(grep -o '^[0-9]*.[0-9]*' <<< "${cuda_version}")";
@@ -41,7 +53,7 @@ make_pip_dependencies() {
     local pip_reqs_txts=();
 
     eval "$(                                  \
-        rapids-list-repos ${__rest__[@]}      \
+        rapids-list-repos ${repos[@]/#/-r }   \
       | xargs -r -d'\n' -I% echo -n local %\; \
     )";
 
@@ -113,7 +125,9 @@ make_pip_dependencies() {
     fi
 }
 
-if test -n "${rapids_build_utils_debug:-}"; then
+if test -n "${rapids_build_utils_debug:-}" \
+&& ( test -z "${rapids_build_utils_debug##*"all"*}" \
+  || test -z "${rapids_build_utils_debug##*"make-pip-dependencies"*}" ); then
     PS4="+ ${BASH_SOURCE[0]}:\${LINENO} "; set -x;
 fi
 

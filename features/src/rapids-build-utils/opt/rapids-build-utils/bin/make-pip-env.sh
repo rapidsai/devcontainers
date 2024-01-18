@@ -1,19 +1,30 @@
-#! /usr/bin/env bash
+#!/usr/bin/env bash
+
+# Usage:
+#  rapids-make-pip-env [OPTION]...
+#
+# Make a combined pip virtual environment for all repos.
+#
+# Boolean options:
+#  -h,--help,--usage       print this text
+#  -f,--force              Delete the existing pip venv and recreate it from scratch.
+#
+# Options that require values:
+#  -k,--key <key>          Only include the key(s)
+#  --repo <repo>           Only include dependencies for repo(s).
+#  -m,--manifest <file>    Use a specific manifest.json
+#                          (default: ${PROJECT_MANIFEST_YML:-"/opt/rapids-build-utils/manifest.yaml"})
+#  -r,--requirement <file> Path(s) to additional requirement files to include.
+
+. devcontainer-utils-parse-args-from-docstring;
 
 make_pip_env() {
+    set -Eeuo pipefail;
 
-    set -euo pipefail;
+    parse_args_or_show_help - <<< "$@";
 
-    local force=;
     local env_name="${1}";
     local env_file_name="${env_name}.requirements.txt";
-
-    eval "$(                                  \
-        devcontainer-utils-parse-args --names '
-            f|force                           |
-        ' - <<< "${@:2}"                      \
-      | xargs -r -d'\n' -I% echo -n local %\; \
-    )";
 
     # Remove the current virtual env if called with `-f|--force`
     if test -n "${f:-${force:-}}"; then
@@ -24,10 +35,10 @@ make_pip_env() {
     local new_env_path="$(realpath -m /tmp/${env_file_name})";
     local old_env_path="$(realpath -m ~/.local/share/venvs/${env_file_name})";
 
-    rapids-make-pip-dependencies ${__rest__[@]} \
-  | (grep -v -E '^$' || [ "$?" == "1" ])        \
-  | tr -s "[:blank:]"                           \
-  | LC_ALL=C sort -u                            \
+    rapids-make-pip-dependencies "$@"    \
+  | (grep -v -E '^$' || [ "$?" == "1" ]) \
+  | tr -s "[:blank:]"                    \
+  | LC_ALL=C sort -u                     \
   > "${new_env_path}"
 
     if test -f "${new_env_path}"; then
@@ -66,7 +77,9 @@ make_pip_env() {
     fi
 }
 
-if test -n "${rapids_build_utils_debug:-}"; then
+if test -n "${rapids_build_utils_debug:-}" \
+&& ( test -z "${rapids_build_utils_debug##*"all"*}" \
+  || test -z "${rapids_build_utils_debug##*"make-pip-env"*}" ); then
     PS4="+ ${BASH_SOURCE[0]}:\${LINENO} "; set -x;
 fi
 

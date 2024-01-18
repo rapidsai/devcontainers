@@ -1,27 +1,42 @@
-#! /usr/bin/env bash
+#!/usr/bin/env bash
+
+# Usage:
+#  rapids-get-num-archs-jobs-and-load [OPTION]...
+#
+# Compute an appropriate total number of jobs, load, and CUDA archs to build in parallel.
+# This routine scales the input `-j` with respect to the `-a` and `-m` values, taking into account the
+# amount of available system memory (free mem + swap), in order to balance the job and arch parallelism.
+#
+# note: This wouldn't be necessary if `nvcc` interacted with the POSIX jobserver.
+#
+# Boolean options:
+#  -h,--help,--usage            print this text
+#
+# Options that require values:
+#  -a,--archs <num>                       Build <num> CUDA archs in parallel
+#                                         (default: 1)
+#  -j,--parallel <num>                    Run <num> parallel compilation jobs
+#  -m,--max-device-obj-memory-usage <num> An upper-bound on the amount of memory each CUDA device object compilation
+#                                         is expected to take. This is used to estimate the number of parallel device
+#                                         object compilations that can be launched without hitting the system memory
+#                                         limit.
+#                                         Higher values yield fewer parallel CUDA device object compilations.
+#                                         (default: 1)
+
+. devcontainer-utils-parse-args-from-docstring;
 
 get_num_archs_jobs_and_load() {
     set -euo pipefail
 
-    local archs="";
-    local parallel="";
-    local max_device_obj_memory_usage="";
+    parse_args_or_show_help - <<< "$@";
 
-    eval "$(                                  \
-        devcontainer-utils-parse-args --names '
-            a|archs                           |
-            j|parallel                        |
-            m|max-device-obj-memory-usage     |
-        ' - <<< "$@"                          \
-      | xargs -r -d'\n' -I% echo -n local %\; \
-    )";
-
-    archs="${a:-${archs:-}}";
+    local archs="${a:-${archs:-}}";
     archs="${archs//"true"/}";
-    parallel="${j:-${parallel:-}}";
+
+    local parallel="${j:-${parallel:-}}";
     parallel="${parallel//"true"/}";
 
-    max_device_obj_memory_usage="${m:-${max_device_obj_memory_usage:-${MAX_DEVICE_OBJ_MEMORY_USAGE:-}}}";
+    local max_device_obj_memory_usage="${m:-${max_device_obj_memory_usage:-${MAX_DEVICE_OBJ_MEMORY_USAGE:-}}}";
     max_device_obj_memory_usage="${max_device_obj_memory_usage//"true"/}";
     max_device_obj_memory_usage="${max_device_obj_memory_usage:-1}";
 
@@ -77,7 +92,9 @@ ____EOF
     echo "n_load=${n_load}";
 }
 
-if test -n "${rapids_build_utils_debug:-}"; then
+if test -n "${rapids_build_utils_debug:-}" \
+&& ( test -z "${rapids_build_utils_debug##*"all"*}" \
+  || test -z "${rapids_build_utils_debug##*"get-num-archs-jobs-and-load"*}" ); then
     PS4="+ ${BASH_SOURCE[0]}:\${LINENO} "; set -x;
 fi
 

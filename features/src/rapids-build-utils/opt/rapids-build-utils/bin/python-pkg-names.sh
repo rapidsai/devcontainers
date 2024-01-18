@@ -1,8 +1,25 @@
-#! /usr/bin/env bash
+#!/usr/bin/env bash
 
+# Usage:
+#  rapids-python-pkg-names [OPTION]...
+#
 # List python package names as determined by manifest.yaml
+#
+# Boolean options:
+#  -h,--help,--usage     print this text
+#
+# Options that require values:
+#  -m,--manifest <file>  Use a specific manifest.json
+#                        (default: ${PROJECT_MANIFEST_YML:-"/opt/rapids-build-utils/manifest.yaml"})
+#  -r,--repo <repo>      Filter the results to only include <repo> entries.
+#                        (default: all repositories)
+
+. devcontainer-utils-parse-args-from-docstring;
+
 python_pkg_names() {
-    set -euo pipefail;
+    set -Eeuo pipefail;
+
+    parse_args_or_show_help - <<< "$@";
 
     eval "$(                                  \
         rapids-list-repos "$@"                \

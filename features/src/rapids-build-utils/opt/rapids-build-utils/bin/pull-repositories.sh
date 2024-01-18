@@ -1,7 +1,25 @@
 #!/usr/bin/env bash
 
-checkout_same_branch() {
-    set -euo pipefail;
+# Usage:
+#  rapids-pull-repositories [OPTION]...
+#
+# Pull the latest commits from each repository's upstream remote.
+#
+# Boolean options:
+#  -h,--help,--usage     print this text
+#
+# Options that require values:
+#  -m,--manifest <file>  Use a specific manifest.json
+#                        (default: ${PROJECT_MANIFEST_YML:-"/opt/rapids-build-utils/manifest.yaml"})
+#  -r,--repo <repo>      Filter the results to only include <repo> entries.
+#                        (default: all repositories)
+
+. devcontainer-utils-parse-args-from-docstring;
+
+pull_repositories() {
+    set -Eeuo pipefail;
+
+    parse_args_or_show_help - <<< "$@";
 
     eval "$(                                  \
         rapids-list-repos "$@"                \
@@ -47,8 +65,10 @@ Please enter a branch name to pull (or leave empty to skip): " branch_name </dev
     done;
 }
 
-if test -n "${rapids_build_utils_debug:-}"; then
+if test -n "${rapids_build_utils_debug:-}" \
+&& ( test -z "${rapids_build_utils_debug##*"all"*}" \
+  || test -z "${rapids_build_utils_debug##*"pull-repositories"*}" ); then
     PS4="+ ${BASH_SOURCE[0]}:\${LINENO} "; set -x;
 fi
 
-(checkout_same_branch "$@");
+(pull_repositories "$@");

@@ -1,4 +1,20 @@
-#! /usr/bin/env bash
+#!/usr/bin/env bash
+
+# Usage:
+#  rapids-make-conda-dependencies [OPTION]...
+#
+# Generate a combined conda environment YAML file for all repos.
+#
+# Boolean options:
+#  -h,--help,--usage     print this text
+#
+# Options that require values:
+#  -k,--key <key>        Only include the key(s)
+#  -m,--manifest <file>  Use a specific manifest.json
+#                        (default: ${PROJECT_MANIFEST_YML:-"/opt/rapids-build-utils/manifest.yaml"})
+#  --repo <repo>         Only include dependencies for repo(s).
+
+. devcontainer-utils-parse-args-from-docstring;
 
 generate_env_yaml() {
     (
@@ -9,22 +25,19 @@ generate_env_yaml() {
 }
 
 make_conda_dependencies() {
+    set -Eeuo pipefail;
 
-    set -euo pipefail;
+    parse_args_or_show_help - <<< "$@";
 
     local keys=();
+    keys+=(${k[@]:-}); unset k;
+    keys+=(${key[@]:-}); unset key;
+    keys=(${keys[@]:-all});
 
-    eval "$(                                  \
-        devcontainer-utils-parse-args --names '
-            k|keys                            |
-        ' - <<< "$@"                          \
-      | xargs -r -d'\n' -I% echo -n local %\; \
-    )";
-
-    if test -v k; then keys=(${k[@]}); fi
-    if test ${#keys[@]} -eq 0; then
-        keys=(all);
-    fi
+    local repos=();
+    repos+=(${r[@]:-}); unset r;
+    repos+=(${repo[@]:-}); unset repo;
+    repos=(${repos[@]:-});
 
     local cuda_version="${CUDA_VERSION:-${CUDA_VERSION_MAJOR:-12}.${CUDA_VERSION_MINOR:-0}}";
     cuda_version="$(grep -o '^[0-9]*.[0-9]' <<< "${cuda_version}")";
@@ -35,7 +48,7 @@ make_conda_dependencies() {
     local conda_env_yamls=();
 
     eval "$(                                  \
-        rapids-list-repos ${__rest__[@]}      \
+        rapids-list-repos ${repos[@]/#/-r }   \
       | xargs -r -d'\n' -I% echo -n local %\; \
     )";
 
@@ -94,7 +107,9 @@ make_conda_dependencies() {
     fi
 }
 
-if test -n "${rapids_build_utils_debug:-}"; then
+if test -n "${rapids_build_utils_debug:-}" \
+&& ( test -z "${rapids_build_utils_debug##*"all"*}" \
+  || test -z "${rapids_build_utils_debug##*"make-conda-dependencies"*}" ); then
     PS4="+ ${BASH_SOURCE[0]}:\${LINENO} "; set -x;
 fi
 
