@@ -1,4 +1,4 @@
-#! /usr/bin/env bash
+#!/usr/bin/env bash
 
 get_repos_ordered() {
     local project_manifest_yml="${PROJECT_MANIFEST_YML:-"/opt/rapids-build-utils/manifest.yaml"}";
@@ -92,6 +92,12 @@ $(get_repos | with_git_dirs \
 }
 EOF
 }
+
+if test -n "${rapids_build_utils_debug:-}" \
+&& ( test -z "${rapids_build_utils_debug##*"all"*}" \
+  || test -z "${rapids_build_utils_debug##*"make-vscode-workspace"*}" ); then
+    PS4="+ ${BASH_SOURCE[0]}:\${LINENO} "; set -x;
+fi
 
 if echo "$@" | grep -qE '(\-u|\-\-update)'; then
     (make_vscode_workspace "$@" > /tmp/workspace.code-workspace);
