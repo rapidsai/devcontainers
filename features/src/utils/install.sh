@@ -62,34 +62,54 @@ find /opt/devcontainer \
     -o -type f -exec chmod 0755 {} \; \);
 
 install_utility() {
-    update-alternatives --install "/usr/bin/$1" "$1" "/opt/devcontainer/bin/$2" 0;
+    local cmd="devcontainer-utils-${1}";
+    local src="${2:-"${1}.sh"}";
+    # Install alternative
+    update-alternatives --install /usr/bin/${cmd} ${cmd} /opt/devcontainer/bin/${src} 0;
+
+    # Install bash_completion script
+    cat "$(which devcontainer-utils-bash-completion.tmpl)" \
+  | SCRIPT="${cmd}"                                        \
+    NAME="${cmd//-/_}"                                     \
+    envsubst '$SCRIPT $NAME'                               \
+  | tee "/etc/bash_completion.d/${cmd}" >/dev/null         \
+  ;
 }
 
-install_utility devcontainer-utils-parse-args parse-args.sh;
-install_utility devcontainer-utils-shell-is-interactive shell-is-interactive.sh;
-install_utility devcontainer-utils-post-attach-command post-attach-command.sh;
-install_utility devcontainer-utils-post-attach-command-entrypoint post-attach-command-entrypoint.sh;
-install_utility devcontainer-utils-python-repl-startup python-repl-startup.py;
-install_utility devcontainer-utils-init-git git/init.sh;
-install_utility devcontainer-utils-clone-git-repo git/repo/clone.sh;
+# Install alternatives
 
-install_utility devcontainer-utils-init-ssh-deploy-keys ssh/init-deploy-keys.sh;
+# Install this first since we use it in `install_utility`
+update-alternatives --install \
+    /usr/bin/devcontainer-utils-bash-completion.tmpl \
+             devcontainer-utils-bash-completion.tmpl \
+    /opt/devcontainer/bin/bash/completion.tmpl.sh   0;
 
-install_utility devcontainer-utils-init-github-cli   github/cli/init.sh;
-install_utility devcontainer-utils-clone-github-repo github/repo/clone.sh;
+install_utility parse-args parse-args.sh;
+install_utility parse-args-from-docstring parse-args-from-docstring.sh;
+install_utility shell-is-interactive shell-is-interactive.sh;
+install_utility post-attach-command post-attach-command.sh;
+install_utility post-attach-command-entrypoint post-attach-command-entrypoint.sh;
+install_utility python-repl-startup python-repl-startup.py;
+install_utility init-git git/init.sh;
+install_utility clone-git-repo git/repo/clone.sh;
 
-install_utility devcontainer-utils-init-gitlab-cli                    gitlab/cli/init.sh;
-install_utility devcontainer-utils-clone-gitlab-repo                  gitlab/repo/clone.sh;
-install_utility devcontainer-utils-print-missing-gitlab-token-warning gitlab/print-missing-token-warning.sh;
+install_utility init-ssh-deploy-keys ssh/init-deploy-keys.sh;
 
-install_utility devcontainer-utils-vault-auth-github vault/auth/github.sh;
+install_utility init-github-cli   github/cli/init.sh;
+install_utility clone-github-repo github/repo/clone.sh;
 
-install_utility devcontainer-utils-vault-s3-init            vault/s3/init.sh;
-install_utility devcontainer-utils-vault-s3-creds-generate  vault/s3/creds/generate.sh;
-install_utility devcontainer-utils-vault-s3-creds-persist   vault/s3/creds/persist.sh;
-install_utility devcontainer-utils-vault-s3-creds-propagate vault/s3/creds/propagate.sh;
-install_utility devcontainer-utils-vault-s3-creds-schedule  vault/s3/creds/schedule.sh;
-install_utility devcontainer-utils-vault-s3-creds-test      vault/s3/creds/test.sh;
+install_utility init-gitlab-cli                    gitlab/cli/init.sh;
+install_utility clone-gitlab-repo                  gitlab/repo/clone.sh;
+install_utility print-missing-gitlab-token-warning gitlab/print-missing-token-warning.sh;
+
+install_utility vault-auth-github vault/auth/github.sh;
+
+install_utility vault-s3-init            vault/s3/init.sh;
+install_utility vault-s3-creds-generate  vault/s3/creds/generate.sh;
+install_utility vault-s3-creds-persist   vault/s3/creds/persist.sh;
+install_utility vault-s3-creds-propagate vault/s3/creds/propagate.sh;
+install_utility vault-s3-creds-schedule  vault/s3/creds/schedule.sh;
+install_utility vault-s3-creds-test      vault/s3/creds/test.sh;
 
 # Enable GCC colors
 for_each_user_bashrc 'sed -i -re "s/^#(export GCC_COLORS)/\1/g" "$0"';
