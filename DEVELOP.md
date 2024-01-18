@@ -50,22 +50,22 @@ A few of the features install custom tools for the devcontainer ecosystem here,
 rather than just installation scripts of external tools and libraries. A brief
 overview of responsibilities for these features follows.
 
-#### Rapids-build-utils
+#### `rapids-build-utils`
 
-Most of the scripts here serve to prepare the devcontainer prior to use, but you may use them to update
+Most of the `rapids-build-utils` scripts serve to prepare the devcontainer prior to use, but you may use them to update
 the devcontainer after adding to your container's /opt/rapids-build-utils/manifest.yml file to add new projects.
 
 If you are wondering where a command or behavior in a devcontainer is coming
 from, this is a good place to start.
 
-These scripts are installed by
+`rapids-build-utils` scripts are installed by
 [`install.sh`](./features/src/rapids-build-utils/install.sh), which creates
 aliases for the .sh scripts. if you see `rapids-*` for a script or command name
 in the devcontainer, look in
 [`install.sh`](./features/src/rapids-build-utils/install.sh) to see how it is
 mapped back to one of these scripts.
 
-* [manifest.yaml](./features/src/rapids-build-utils/opt/rapids-build-utils/manifest.yaml): This enumerates where projects should be cloned from and how they depend on each other. It is used to generate build scripts. If you project is not in manifest.yaml, you will not get build scripts generated in your devcontainer. Refer to [docs on manifest.yaml](./USAGE.md#generated-build-scripts)
+* [manifest.yaml](./features/src/rapids-build-utils/opt/rapids-build-utils/manifest.yaml): This enumerates where projects should be cloned from and how they depend on each other. It is used to generate build scripts. If your project is not in manifest.yaml, it will not get build scripts generated in the devcontainer. Refer to [docs on manifest.yaml](./USAGE.md#generated-build-scripts)
 * [generate-scripts.sh](./features/src/rapids-build-utils/opt/rapids-build-utils/bin/generate-scripts.sh): generate `build-*`, `clone-*`, etc. scripts
 * [make-pip-env.sh](./features/src/rapids-build-utils/opt/rapids-build-utils/bin/make-pip-env.sh) and [make-conda-env.sh](./features/src/rapids-build-utils/opt/rapids-build-utils/bin/make-conda-env.sh):
 creating pip and conda python virtual environments
