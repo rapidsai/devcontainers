@@ -51,7 +51,7 @@ parse_args() {
             shift;
             # -fooval
             local found="";
-            if test "${#vars_array}" -gt 0 \
+            if test "${#vars_array[@]}" -gt 0 \
             && grep -qP "^--?${vars}([^\s])+$" <<< "${arg:-}"; then
                 for name in ${vars_array[@]}; do
                     if grep -qP "^--?${name}([0-9]|\.)+$" <<< "${arg:-}"; then
@@ -78,8 +78,6 @@ parse_args() {
                 else
                     val="true";
                 fi
-            else
-                rest+=("${arg@Q}");
             fi
         else
             rest+=("${@@Q}");
