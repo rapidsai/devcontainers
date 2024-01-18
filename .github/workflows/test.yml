@@ -153,6 +153,7 @@ jobs:
     uses: rapidsai/shared-action-workflows/.github/workflows/build-in-devcontainer.yaml@fix/devcontainer-json-location
     with:
       node_type: cpu32
+      gh_token: "${{ secrets.PERSONAL_ACCESS_TOKEN || env.GITHUB_TOKEN }}"
       build_command: |
         sccache -z;
         clone-all --verbose;
