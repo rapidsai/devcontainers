@@ -19,7 +19,7 @@
     "./features/src/cuda",
     "./features/src/rapids-build-utils"
   ],
-  "initializeCommand": ["/bin/bash", "-c", "ln -sf ../../features ${localWorkspaceFolder}/.devcontainer/cuda12.0-pip/ && mkdir -m 0755 -p ${localWorkspaceFolder}/../.{aws,cache,config/pip,local/share/${localWorkspaceFolderBasename}-cuda12.0-venvs} ${localWorkspaceFolder}/../{rmm,kvikio,ucxx,cudf,raft,cumlprims_mg,cuml,cugraph-ops,wholegraph,cugraph,cuspatial}"],
+  "initializeCommand": ["/bin/bash", "-c", "mkdir -m 0755 -p ${localWorkspaceFolder}/../.{aws,cache,config/pip,local/share/${localWorkspaceFolderBasename}-cuda12.0-venvs} ${localWorkspaceFolder}/../{rmm,kvikio,ucxx,cudf,raft,cumlprims_mg,cuml,cugraph-ops,wholegraph,cugraph,cuspatial}"],
   "postAttachCommand": ["/bin/bash", "-c", "if [ ${CODESPACES:-false} = 'true' ]; then . devcontainer-utils-post-attach-command; . rapids-post-attach-command; fi"],
   "workspaceFolder": "/home/coder",
   "workspaceMount": "source=${localWorkspaceFolder},target=/home/coder/devcontainers,type=bind,consistency=consistent",
