@@ -1,52 +1,64 @@
-#! /usr/bin/env bash
+#!/usr/bin/env bash
+
+# Usage:
+#  build-${PY_LIB}-python-wheel [OPTION]...
+#
+# Build a ${PY_LIB} wheel.
+#
+# Boolean options:
+#  -h,--help,--usage                      print this text
+#  -v,--verbose                           verbose output
+#  --no-clean                             Don't clean up build directories.
+#  --no-deps                              Don't install package dependencies.
+#  --no-verify                            Don't verify if built wheel is valid.
+#  --no-cache-dir                         Disable the pip cache.
+#  --use-pep517                           Use PEP 517 for building source distributions.
+#  --no-use-pep517                        Don't use PEP 517 for building source distributions
+#  --no-build-isolation                   Disable isolation when building a modern source distribution. Build
+#                                         dependencies specified by PEP 518 must be already installed if this option is
+#                                         used.
+#  --pre                                  Include pre-release and development versions. By default, pip only finds
+#                                         stable versions.
+#  --prefer-binary                        Prefer binary packages over source packages, even if the source packages are
+#                                         newer.
+#
+# Options that require values:
+#  -a,--archs <num>                       Build <num> CUDA archs in parallel
+#                                         (default: 1)
+#  -j,--parallel <num>                    Run <num> parallel compilation jobs
+#  -m,--max-device-obj-memory-usage <num> An upper-bound on the amount of memory each CUDA device object compilation
+#                                         is expected to take. This is used to estimate the number of parallel device
+#                                         object compilations that can be launched without hitting the system memory
+#                                         limit.
+#                                         Higher values yield fewer parallel CUDA device object compilations.
+#                                         (default: 1)
+#  --cache-dir <dir>                      Store the cache data in <dir>.
+#  --ignore-requires-python               Ignore the Requires-Python information.
+#  --only-binary <format_control>         Do not use source packages. Can be supplied multiple times, and each time
+#                                         adds to the existing value. Accepts either ":all:" to disable all source
+#                                         packages, ":none:" to empty the set, or one or more package names with commas
+#                                         between them. Packages without binary distributions will fail to install when
+#                                         this option is used on them.
+#  -w,--wheel-dir <dir>                   copy built wheel into <dir>
+#                                         (default: none)
+
+. devcontainer-utils-parse-args-from-docstring;
 
 build_${PY_LIB}_python_wheel() {
-
     set -Eeuo pipefail;
+
+    parse_args_or_show_help - <<< "$@";
 
     if [[ ! -d "${PY_SRC}" ]]; then
         exit 1;
     fi
 
-    local archs="";
-    local parallel="";
-    local max_device_obj_memory_usage="";
+    local verbose="${v:-${verbose:-}}";
+    local wheel_dir="${w:-${wheel_dir:-}}";
 
-    local verbose="";
-    local wheel_dir="";
-
-    eval "$(                                  \
-        devcontainer-utils-parse-args --names '
-            a|archs                           |
-            j|parallel                        |
-            m|max-device-obj-memory-usage     |
-            v|verbose                         |
-            w|wheel-dir                       |
-            prefer-binary                     |
-            only-binary                       |
-            no-deps                           |
-            no-clean                          |
-            no-verify                         |
-            no-cache-dir                      |
-            no-use-pep517                     |
-            no-build-isolation                |
-        ' - <<< "$@"                          \
-      | xargs -r -d'\n' -I% echo -n local %\; \
-    )";
-
-    verbose="${v:-${verbose:-}}";
-    wheel_dir="${w:-${wheel_dir:-}}";
-
-    archs="${a:-${archs:-}}";
-    parallel="${j:-${parallel:-}}";
-    max_device_obj_memory_usage="${m:-${max_device_obj_memory_usage:-}}";
-
-    eval "$(                                                                    \
-        rapids-get-num-archs-jobs-and-load                                      \
-            ${archs:+-a ${archs}}                                               \
-            ${parallel:+-j ${parallel}}                                         \
-            ${max_device_obj_memory_usage:+-m ${max_device_obj_memory_usage}}   \
-      | xargs -r -d'\n' -I% echo -n local %\;                                   \
+    eval "$(                                    \
+        rapids-get-num-archs-jobs-and-load "$@" \
+      | xargs -r -d'\n' -I% echo -n local %\;   \
     )";
 
     local cmake_args=(${PY_CMAKE_ARGS});
@@ -62,9 +74,11 @@ build_${PY_LIB}_python_wheel() {
     cmake_args+=(${__rest__[@]});
 
     local ninja_args=();
+    local pip_args=(${PIP_WHEEL_ARGS});
 
     if test -n "${verbose}"; then
         ninja_args+=("-v");
+        pip_args+=("-vv");
     fi
 
     if test -n "${n_jobs}"; then
@@ -75,27 +89,22 @@ build_${PY_LIB}_python_wheel() {
         ninja_args+=("-l${n_load}");
     fi
 
-    local pip_args=(${PIP_WHEEL_ARGS});
-
-    if test -n "${verbose}"; then
-        pip_args+=("-vv");
+    if test -n "${pre:-}"; then
+        pip_args+=("--pre");
     fi
 
     if test -n "${wheel_dir:-}"; then
-        pip_args+=("-w" "${wheel_dir}");
+        pip_args+=("--wheel-dir" "${wheel_dir}");
     fi
 
     if test -n "${prefer_binary:-}"; then
         pip_args+=("--prefer-binary");
-        if [ "${prefer_binary:-}" != "true" ]; then
-            pip_args+=("${prefer_binary:-}");
-        fi
     fi
 
-    if test -n "${only_binary:-}"; then
+    if test -n "${only_binary[@]:-}"; then
         pip_args+=("--only-binary");
-        if [ "${only_binary:-}" != "true" ]; then
-            pip_args+=("${only_binary:-}");
+        if [ "${only_binary[@]}" != "true" ]; then
+            pip_args+=("${only_binary[@]}");
         fi
     fi
 
@@ -111,16 +120,24 @@ build_${PY_LIB}_python_wheel() {
         pip_args+=("--no-verify");
     fi
 
-    if test -n "${no_cache_dir:-}"; then
+    if test -n "${cache_dir:-}"; then
+        pip_args+=("--cache-dir" "${cache_dir:-}");
+    elif test -n "${no_cache_dir:-}"; then
         pip_args+=("--no-cache-dir");
     fi
 
-    if test -n "${no_use_pep517:-}"; then
+    if test -n "${use_pep517:-}"; then
+        pip_args+=("--use-pep517");
+    elif test -n "${no_use_pep517:-}"; then
         pip_args+=("--no-use-pep517");
     fi
 
     if test -n "${no_build_isolation:-}"; then
         pip_args+=("--no-build-isolation");
+    fi
+
+    if test -n "${ignore_requires_python:-}"; then
+        pip_args+=("--ignore-requires-python");
     fi
 
     pip_args+=("${PY_SRC}");
@@ -130,8 +147,8 @@ build_${PY_LIB}_python_wheel() {
     time (
         export ${PY_ENV} PATH="$PATH";
 
-        local cudaflags="${CUDAFLAGS:+$CUDAFLAGS }-t=${n_arch}";
-        local nvcc_append_flags="${NVCC_APPEND_FLAGS:+$NVCC_APPEND_FLAGS }-t=${n_arch}";
+        local cudaflags="${CUDAFLAGS:+$CUDAFLAGS }-t${n_arch}";
+        local nvcc_append_flags="${NVCC_APPEND_FLAGS:+$NVCC_APPEND_FLAGS }-t${n_arch}";
 
         CUDAFLAGS="${cudaflags}"                 \
         CMAKE_GENERATOR="Ninja"                  \
@@ -145,7 +162,10 @@ build_${PY_LIB}_python_wheel() {
     ) 2>&1;
 }
 
-if test -n "${rapids_build_utils_debug:-}"; then
+if test -n "${rapids_build_utils_debug:-}" \
+&& ( test -z "${rapids_build_utils_debug##*"all"*}" \
+  || test -z "${rapids_build_utils_debug##*"build-${PY_LIB}-python"*}" \
+  || test -z "${rapids_build_utils_debug##*"build-${PY_LIB}-python-wheel"*}" ); then
     PS4="+ ${BASH_SOURCE[0]}:\${LINENO} "; set -x;
 fi
 

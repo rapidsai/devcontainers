@@ -1,42 +1,41 @@
-#! /usr/bin/env bash
+#!/usr/bin/env bash
 
-build_${PY_LIB}_python_inplace() {
+# Usage:
+#  build-${PY_LIB}-python-editable [OPTION]...
+#
+# Build ${PY_LIB} in editable mode.
+#
+# Boolean options:
+#  -h,--help,--usage                      print this text
+#  -v,--verbose                           verbose output
+#
+# Options that require values:
+#  -a,--archs <num>                       Build <num> CUDA archs in parallel
+#                                         (default: 1)
+#  -j,--parallel <num>                    Run <num> parallel compilation jobs
+#  -m,--max-device-obj-memory-usage <num> An upper-bound on the amount of memory each CUDA device object compilation
+#                                         is expected to take. This is used to estimate the number of parallel device
+#                                         object compilations that can be launched without hitting the system memory
+#                                         limit.
+#                                         Higher values yield fewer parallel CUDA device object compilations.
+#                                         (default: 1)
 
+. devcontainer-utils-parse-args-from-docstring;
+
+build_${PY_LIB}_python_editable() {
     set -Eeuo pipefail;
+
+    parse_args_or_show_help - <<< "$@";
 
     if [[ ! -d "${PY_SRC}" ]]; then
         exit 1;
     fi
 
-    local archs="";
-    local parallel="";
-    local max_device_obj_memory_usage="";
+    local verbose="${v:-${verbose:-}}";
 
-    local verbose="";
-
-    eval "$(                                  \
-        devcontainer-utils-parse-args --names '
-            a|archs                           |
-            j|parallel                        |
-            m|max-device-obj-memory-usage     |
-            v|verbose                         |
-        ' - <<< "$@"                          \
-      | xargs -r -d'\n' -I% echo -n local %\; \
-    )";
-
-    verbose="${v:-${verbose:-}}";
-    config_settings="${C:-${config_settings:-}}";
-
-    archs="${a:-${archs:-}}";
-    parallel="${j:-${parallel:-}}";
-    max_device_obj_memory_usage="${m:-${max_device_obj_memory_usage:-}}";
-
-    eval "$(                                                                    \
-        rapids-get-num-archs-jobs-and-load                                      \
-            ${archs:+-a ${archs}}                                               \
-            ${parallel:+-j ${parallel}}                                         \
-            ${max_device_obj_memory_usage:+-m ${max_device_obj_memory_usage}}   \
-      | xargs -r -d'\n' -I% echo -n local %\;                                   \
+    eval "$(                                    \
+        rapids-get-num-archs-jobs-and-load "$@" \
+      | xargs -r -d'\n' -I% echo -n local %\;   \
     )";
 
     local cmake_args=(${PY_CMAKE_ARGS});
@@ -48,8 +47,11 @@ build_${PY_LIB}_python_inplace() {
     cmake_args+=(${__rest__[@]});
 
     local ninja_args=();
+    local pip_args=(${PIP_INSTALL_ARGS});
+
     if test -n "${verbose}"; then
         ninja_args+=("-v");
+        pip_args+=("-vv");
     fi
 
     if test -n "${n_jobs}"; then
@@ -58,12 +60,6 @@ build_${PY_LIB}_python_inplace() {
 
     if test -n "${n_load}"; then
         ninja_args+=("-l${n_load}");
-    fi
-
-    local pip_args=(${PIP_INSTALL_ARGS});
-
-    if test -n "${verbose}"; then
-        pip_args+=("-vv");
     fi
 
     pip_args+=("--no-build-isolation");
@@ -78,11 +74,12 @@ build_${PY_LIB}_python_inplace() {
     time (
         export ${PY_ENV} PATH="$PATH";
 
-        local cudaflags="${CUDAFLAGS:+$CUDAFLAGS }-t=${n_arch}";
-        local nvcc_append_flags="${NVCC_APPEND_FLAGS:+$NVCC_APPEND_FLAGS }-t=${n_arch}";
+        local cudaflags="${CUDAFLAGS:+$CUDAFLAGS }-t${n_arch}";
+        local nvcc_append_flags="${NVCC_APPEND_FLAGS:+$NVCC_APPEND_FLAGS }-t${n_arch}";
 
         CUDAFLAGS="${cudaflags}"                     \
         CMAKE_GENERATOR="Ninja"                      \
+        PARALLEL_LEVEL="${n_jobs}"                   \
         CMAKE_ARGS="${cmake_args[@]}"                \
         SKBUILD_BUILD_OPTIONS="${ninja_args[@]}"     \
         NVCC_APPEND_FLAGS="${nvcc_append_flags}"     \
@@ -93,8 +90,11 @@ build_${PY_LIB}_python_inplace() {
     ) 2>&1;
 }
 
-if test -n "${rapids_build_utils_debug:-}"; then
+if test -n "${rapids_build_utils_debug:-}" \
+&& ( test -z "${rapids_build_utils_debug##*"all"*}" \
+  || test -z "${rapids_build_utils_debug##*"build-${PY_LIB}-python"*}" \
+  || test -z "${rapids_build_utils_debug##*"build-${PY_LIB}-python-editable"*}" ); then
     PS4="+ ${BASH_SOURCE[0]}:\${LINENO} "; set -x;
 fi
 
-build_${PY_LIB}_python_inplace "$@";
+build_${PY_LIB}_python_editable "$@";
