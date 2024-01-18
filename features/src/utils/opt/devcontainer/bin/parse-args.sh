@@ -11,8 +11,8 @@ parse_args() {
     local vars_array=();
     if [ "${1:-}" = "--names" ]; then
         shift;
-        vars="$(tr -d '[:space:]' <<< "${1}")";
-        vars_array=($(tr '|' ' ' <<< "${vars}"));
+        vars="$(tr -d '[:space:]' <<< "${1}"  | rev | cut -d'|' -f1 --complement | rev)";
+        vars_array=("${vars//|/ }");
         readarray -t vars_array < <(
             for str in "${vars_array[@]}"; do
                 printf '%d\t%s\n' "${#str}" "$str"
@@ -78,6 +78,8 @@ parse_args() {
                 else
                     val="true";
                 fi
+            else
+                rest+=("${arg@Q}");
             fi
         else
             rest+=("${@@Q}");
@@ -121,7 +123,9 @@ parse_args() {
     done
 }
 
-if test -n "${devcontainer_utils_debug:-}"; then
+if test -n "${devcontainer_utils_debug:-}" \
+&& ( test -z "${devcontainer_utils_debug##*"all"*}" \
+  || test -z "${devcontainer_utils_debug##*"parse-args"*}" ); then
     PS4="+ ${BASH_SOURCE[0]}:\${LINENO} "; set -x;
 fi
 
