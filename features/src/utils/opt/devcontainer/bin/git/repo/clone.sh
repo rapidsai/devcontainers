@@ -1,22 +1,38 @@
-#! /usr/bin/env bash
+#!/usr/bin/env bash
+
+# Usage:
+#  devcontainer-utils-clone-git-repo [OPTION]... <directory>
+#
+# Clone a GitLab repository for the logged in user (as reported by `glab auth status`).
+#
+# If the user doesn't have a fork of the repository, notify the user and ask whether they would like to fork it.
+#
+# Boolean options:
+#  -h,--help,--usage            print this text
+#  --no-fork                    don't prompt the user to fork the repo if a user fork isn't found
+#                               (default: false)
+#  --no-update-env              don't update the Python env with the repo's dependencies after cloning
+#                               (default: false)
+#  --clone-upstream             always clone the upstream, not the user's fork
+#                               (default: false)
+#
+# Options that require values:
+#  -b,--branch <branch_or_tag>  check the repo out to <branch_or_tag>
+#                               (default: `${NAME}.git.tag` in manifest.yaml)
+#  -u,--upstream <upstream>     set <upstream> as the `upstream` remote
+#
+# Positional arguments:
+#  directory                    clone the repo into <directory>
+
+. devcontainer-utils-parse-args-from-docstring;
 
 clone_git_repo() {
+    set -Eeuo pipefail;
 
-    set -euo pipefail;
+    parse_args_or_show_help - <<< "$@";
 
-    local branch="";
-    local upstream="";
-
-    eval "$(                                  \
-        devcontainer-utils-parse-args --names '
-            b|branch                          |
-            u|upstream                        |
-        ' - <<< "$@"                          \
-      | xargs -r -d'\n' -I% echo -n local %\; \
-    )";
-
-    branch="${b:-"${branch:-}"}";
-    upstream="${u:-"${upstream:-}"}";
+    local branch="${b:-"${branch:-}"}";
+    local upstream="${u:-"${upstream:-}"}";
 
     local nargs="${#__rest__[@]}";
     local origin="${__rest__[$((nargs - 2))]}";
@@ -79,7 +95,10 @@ clone_git_repo() {
     git -C "${directory}" submodule update --init --recursive;
 }
 
-if test -n "${devcontainer_utils_debug:-}"; then
+if test -n "${devcontainer_utils_debug:-}" \
+&& ( test -z "${devcontainer_utils_debug##*"all"*}" \
+  || test -z "${devcontainer_utils_debug##*"clone"*}" \
+  || test -z "${devcontainer_utils_debug##*"clone-git-repo"*}" ); then
     PS4="+ ${BASH_SOURCE[0]}:\${LINENO} "; set -x;
 fi
 

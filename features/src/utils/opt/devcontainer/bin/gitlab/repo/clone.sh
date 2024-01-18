@@ -1,4 +1,29 @@
-#! /usr/bin/env bash
+#!/usr/bin/env bash
+
+# Usage:
+#  devcontainer-utils-clone-gitlab-repo [OPTION]... <upstream> <directory>
+#
+# Clone a GitLab repository for the logged in user (as reported by `glab auth status`).
+#
+# If the user doesn't have a fork of the repository, notify the user and ask whether they would like to fork it.
+#
+# Boolean options:
+#  -h,--help,--usage            print this text
+#  --no-fork                    don't prompt the user to fork the repo if a user fork isn't found
+#                               (default: false)
+#  --no-update-env              don't update the Python env with the repo's dependencies after cloning
+#                               (default: false)
+#  --clone-upstream             always clone the upstream, not the user's fork
+#                               (default: false)
+#
+# Options that require values:
+#  -b,--branch <branch_or_tag>  check the repo out to <branch_or_tag>
+#
+# Positional arguments:
+#  upstream                     set <upstream> as the `upstream` remote
+#  directory                    clone the repo into <directory>
+
+. devcontainer-utils-parse-args-from-docstring;
 
 get_default_branch() {
     local repo="${1}";
@@ -82,29 +107,17 @@ get_user_fork_name() {
 }
 
 clone_gitlab_repo() {
+    set -Eeuo pipefail;
 
-    set -euo pipefail;
-
-    source devcontainer-utils-init-gitlab-cli;
-
-    local branch=;
-    local no_fork=;
-    local clone_upstream=;
-
-    eval "$(                                  \
-        devcontainer-utils-parse-args --names '
-            b|branch                          |
-            no-fork                           |
-            clone-upstream                    |
-        ' - <<< "$@"                          \
-      | xargs -r -d'\n' -I% echo -n local %\; \
-    )";
+    parse_args_or_show_help - <<< "$@";
 
     local nargs="${#__rest__[@]}";
     local upstream="${__rest__[$((nargs - 2))]}";
     upstream="${upstream:?upstream is required}";
 
-    branch="${b:-"${branch:-"$(get_default_branch "${upstream}")"}"}";
+    local no_fork="${no_fork:-}";
+    local clone_upstream="${clone_upstream:-}";
+    local branch="${b:-"${branch:-"$(get_default_branch "${upstream}")"}"}";
 
     local directory="${__rest__[$((nargs - 1))]}";
     directory="${directory:?directory is required}";
@@ -117,6 +130,12 @@ clone_gitlab_repo() {
     local name=;
     local user=;
     local owner=;
+
+    if test -z "${clone_upstream:-}" || \
+      (test -z "${no_fork:-}" && devcontainer-utils-shell-is-interactive); then
+        source devcontainer-utils-init-gitlab-cli;
+        user="${GITLAB_USER:-}";
+    fi
 
     if test -z "${clone_upstream:-}"; then
         name="$(get_repo_name "${upstream}")";
@@ -159,7 +178,10 @@ clone_gitlab_repo() {
         "${origin}" "${directory}"    ;
 }
 
-if test -n "${devcontainer_utils_debug:-}"; then
+if test -n "${devcontainer_utils_debug:-}" \
+&& ( test -z "${devcontainer_utils_debug##*"all"*}" \
+  || test -z "${devcontainer_utils_debug##*"clone"*}" \
+  || test -z "${devcontainer_utils_debug##*"clone-gitlab-repo"*}" ); then
     PS4="+ ${BASH_SOURCE[0]}:\${LINENO} "; set -x;
 fi
 
