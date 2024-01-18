@@ -1,4 +1,4 @@
-#! /usr/bin/env bash
+#!/usr/bin/env bash
 
 parse_cmake_var_from_args() {
     set -euo pipefail;
