@@ -24,7 +24,7 @@
 make_pip_env() {
     set -Eeuo pipefail;
 
-    parse_args_or_show_help - <<< "$@";
+    parse_args_or_show_help - <<< "${@:2}";
 
     local env_name="${1}";
     local env_file_name="${env_name}.requirements.txt";
