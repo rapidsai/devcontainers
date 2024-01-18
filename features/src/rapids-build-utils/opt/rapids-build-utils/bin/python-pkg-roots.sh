@@ -11,6 +11,8 @@
 # Options that require values:
 #  -m,--manifest <file>  Use a specific manifest.json
 #                        (default: ${PROJECT_MANIFEST_YML:-"/opt/rapids-build-utils/manifest.yaml"})
+#  -o,--omit <repo>      Filter the results to exclude <repo> entries.
+#                        (default: none)
 #  -r,--repo <repo>      Filter the results to only include <repo> entries.
 #                        (default: all repositories)
 
