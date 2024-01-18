@@ -150,7 +150,7 @@ jobs:
     if: needs.check-event.outputs.ok == 'true'
     needs: check-event
     secrets: inherit
-    uses: rapidsai/shared-action-workflows/.github/workflows/build-in-devcontainer.yaml@branch-24.02
+    uses: rapidsai/shared-action-workflows/.github/workflows/build-in-devcontainer.yaml@fix/devcontainer-json-location
     with:
       build_command: |
         sccache -z;
