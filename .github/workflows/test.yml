@@ -156,7 +156,9 @@ jobs:
       gh_token: GIST_REPO_READ_ORG_GITHUB_TOKEN
       build_command: |
         sccache -z;
-        clone-all --verbose;
+        clone-all --verbose --no-update-env;
+        rapids-update-content-command;
+        rapids-post-attach-command;
         build-all --verbose \
           -DBUILD_TESTS=ON \
           -DBUILD_BENCHMARKS=ON \
