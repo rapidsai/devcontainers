@@ -158,8 +158,7 @@ jobs:
         build-all --verbose \
           -DBUILD_TESTS=ON \
           -DBUILD_BENCHMARKS=ON \
-           -DBUILD_ANN_BENCH=ON \
-           -DBUILD_PRIMS_BENCH=ON \
-          -DNVBench_ENABLE_CUPTI=OFF \
-           -j$(nproc --ignore=1);
+          -DBUILD_ANN_BENCH=ON \
+          -DBUILD_PRIMS_BENCH=ON \
+          -j$(nproc --ignore=1);
         sccache -s;
