@@ -14,11 +14,13 @@ are shared among projects, see [DEVELOP.md](./DEVELOP.md).
 
 Devcontainers can be used on Linux, Mac and Windows. They use Docker, so the
 system requirements and limitations associated with Docker apply here also. On
-Mac and Windows, where a Linux VM must run to support Docker, you may need to be
-aware of memory limitations of that Linux VM. Otherwise, devcontainers do not add
-system requirements beyond the needs of the individual projects we're building, but
-they also don't emulate hardware. If your project needs an NVIDIA GPU, then you
-need to run your devcontainer on a machine with an NVIDIA GPU.
+Mac and Windows, where a Linux VM must run to support Docker, memory limitations
+of that Linux VM may present problems. Otherwise, devcontainers do not add
+system requirements beyond the needs of the individual projects being built.
+Devcontainers also don't emulate hardware. If a project needs an NVIDIA GPU to
+run, then the devcontainer needs to run on a machine with an NVIDIA GPU.
+Building is different from running, though, and devcontainers can often be used
+to build software that may need a GPU to run.
 
 Devcontainers require Docker. To set that up:
 * [Linux - docker engine](https://docs.docker.com/engine/install/)
@@ -31,11 +33,12 @@ license](https://confluence.nvidia.com/pages/viewpage.action?spaceKey=SWDOCS&tit
 ## Quickstart
 
 At this point, you have cloned a repo that you've heard has a devcontainer. You
-can see the file(s) for yourself by looking in your repo's `.devcontainer`
-folder. You may find a `devcontainer.json` file, or you may find some number of
-folders, such as `cuda12.0-conda` and `cuda12.0-pip`. If you find folders, these
-each contain a `devcontainer.json` file. These files specify how to create and
-run a container that leaves you with a good setup to do development.
+can see the file(s) for yourself by inspecting the repo's `.devcontainer`
+folder. The .devcontainer folder will have either a `devcontainer.json` file, or
+some number of folders, such as `cuda12.0-conda` and `cuda12.0-pip`. Where
+folders are present, each contain a `devcontainer.json` file. These files
+specify how to create and run a container with a known-good development
+environment.
 
 ### VS Code (Recommended)
 
@@ -50,7 +53,7 @@ doesn't, you'll need to manually install the extension another way.
 
 1. Open the cloned directory in VSCode
 
-1. Launch a Dev Container by clicking the pop-up prompt in the lower right of
+2. Launch a Dev Container by clicking the pop-up prompt in the lower right of
 the VS Code window that suggests to "Reopen in Container"
 
    ![Shows "Reopen in Container" prompt when opening the cccl directory in VScode.](./docs-img/reopen_in_container.png)
@@ -59,7 +62,7 @@ the VS Code window that suggests to "Reopen in Container"
 
      ![Shows "Reopen in Container" in command pallete.](./docs-img/open_in_container_manual.png)
 
-1. Select an environment with the desired build tools from the list:
+3. Select an environment with the desired build tools from the list:
 
    ![Shows list of available container environments.](./docs-img/container_list.png)
 
@@ -67,20 +70,20 @@ the VS Code window that suggests to "Reopen in Container"
    generating the matrix of base images. See [the docs on adapting devcontainers](./USAGE.md#custom-devcontainers)
    for more info.
 
-1. VSCode will initialize the selected Dev Container. This can take a few
+4. VSCode will initialize the selected Dev Container. This can take a few
 minutes the first time, as it downloads the base docker image and runs any
 specified feature installations. These steps are cached, so subsequent runs are
 faster.
 
-1. Once initialized, the local project directory is mounted into the container
+5. Once initialized, the local project directory is mounted into the container
 to ensure any changes are persistent.
 
-1. You project should now look like any other VS Code project, except that the
+6. You project should now look like any other VS Code project, except that the
 blue box in the lower left of the VS Code window should now read `Dev Container
 @ <hostname>`. You're done! Any terminal you open will have the build
 environment activated appropriately.
 
-1. Check the contributing guide in your repo for further instructions. The
+7. Check the contributing guide in your repo for further instructions. The
 devcontainers adds build scripts that fit general usage. Type `build-` and hit
 `TAB` to see options for your project.
 
@@ -101,14 +104,14 @@ devcontainers, but the repo-specific scripts will probably work better.
 
 **Steps**
 
-1. Download the [launch-devcontainer.sh script](./launch-devcontainer.sh) and
+1. Download the [launch-devcontainer.sh script](./scripts/launch-devcontainer.sh) and
   put it somewhere on PATH. If your project has its own launch script, use it
   here instead.
 
-1. Set your current working directory to the root of your repo containing the
+2. Set your current working directory to the root of your repo containing the
 .devcontainer folder
 
-1. Run the launch-container.sh script. Called without arguments, you'll get a menu of containers to choose from:
+3. Run the launch-container.sh script. Called without arguments, you'll get a menu of containers to choose from:
 
 ```
 $ ./launch-devcontainer.sh
@@ -128,12 +131,12 @@ You can also provide devcontainer label (folder name) directly:
 ./launch-devcontainer.sh cuda12.0-conda
 ```
 
-1. The devcontainer will be built, and you'll be dropped at a shell prompt
+4. The devcontainer will be built, and you'll be dropped at a shell prompt
 inside the container. You're done!
 
-1. Check the contributing guide in your repo for further instructions. The
+5. Check the contributing guide in your repo for further instructions. The
 devcontainers adds build scripts that fit general usage. Type `build-` and hit
-`TAB` to see options for your project.
+`TAB` to see options for the project.
 
 
 ## (Optional) Native build tools - CMake, python builds
