@@ -13,10 +13,10 @@ and change .devcontainer.json to suit your project, see [USAGE.md](USAGE.md)
 
 The code in this repository fits into a few main categories:
 1. Features
-1. GitHub Actions automations
-1. Scripts
-1. matrix.yml
-1. Dockerfiles
+2. GitHub Actions automations
+3. Scripts
+4. matrix.yml
+5. Dockerfiles
 
 ## Features
 
