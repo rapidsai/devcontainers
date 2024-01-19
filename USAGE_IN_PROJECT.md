@@ -1,11 +1,11 @@
 # Using devcontainers in projects to provide development environments
 
-This document describes usage of devcontainers as development environments. It
-is intended as a general overview that any project employing devcontainers can
-link to and avoid duplicating.
+This document is aimed at developers who want to use devcontainers to set up
+development environments for themselves. It is intended as a general overview
+that any project employing devcontainers can link to and avoid duplicating.
 
 For how to add devcontainers to a project, or how to change existing devcontainer
-configuration, see [USAGE.md](./USAGE.md).
+configuration in a project, see [USAGE.md](./USAGE.md).
 
 For how to change the centralized installation and configuration scripts that
 are shared among projects, see [DEVELOP.md](./DEVELOP.md).
@@ -15,7 +15,7 @@ are shared among projects, see [DEVELOP.md](./DEVELOP.md).
 Devcontainers can be used on Linux, Mac and Windows. They use Docker, so the
 system requirements and limitations associated with Docker apply here also. On
 Mac and Windows, where a Linux VM must run to support Docker, memory limitations
-of that Linux VM may present problems. Otherwise, devcontainers do not add
+of that VM may present problems. Otherwise, devcontainers do not add
 system requirements beyond the needs of the individual projects being built.
 Devcontainers also don't emulate hardware. If a project needs an NVIDIA GPU to
 run, then the devcontainer needs to run on a machine with an NVIDIA GPU.
@@ -23,6 +23,7 @@ Building is different from running, though, and devcontainers can often be used
 to build software that may need a GPU to run.
 
 Devcontainers require Docker. To set that up:
+
 * [Linux - docker engine](https://docs.docker.com/engine/install/)
 * [Mac - docker desktop](https://docs.docker.com/desktop/install/mac-install/)
 * [Windows](https://docs.docker.com/desktop/install/windows-install/)
@@ -30,15 +31,20 @@ Devcontainers require Docker. To set that up:
 Docker Desktop has licensing requirements. NVIDIA employees may [request a
 license](https://confluence.nvidia.com/pages/viewpage.action?spaceKey=SWDOCS&title=Requesting+a+Docker+Desktop+License).
 
+### Local vs. Remote Usage
+
+Devcontainers can be used similarly on local machines and on remote machines.
+There are no special steps required, but menu options may differ slightly.
+
 ## Quickstart
 
-At this point, you have cloned a repo that you've heard has a devcontainer. You
-can see the file(s) for yourself by inspecting the repo's `.devcontainer`
-folder. The .devcontainer folder will have either a `devcontainer.json` file, or
-some number of folders, such as `cuda12.0-conda` and `cuda12.0-pip`. Where
-folders are present, each contain a `devcontainer.json` file. These files
-specify how to create and run a container with a known-good development
-environment.
+At this point, you have cloned a repo that nominally has some devcontainer
+configuration. Devcontainer configuration is stored in a `.devcontainer` folder
+in the repository root. The .devcontainer folder will have either a
+`devcontainer.json` file, or some number of folders, such as `cuda12.0-conda`
+and `cuda12.0-pip`. Where folders are present, each will contain a
+`devcontainer.json` file. These files specify how to create and run a container
+with a known-good development environment.
 
 ### VS Code (Recommended)
 
@@ -83,20 +89,22 @@ blue box in the lower left of the VS Code window should now read `Dev Container
 @ <hostname>`. You're done! Any terminal you open will have the build
 environment activated appropriately.
 
-7. Check the contributing guide in your repo for further instructions. The
-devcontainers adds build scripts that fit general usage. Type `build-` and hit
-`TAB` to see options for your project.
+7. The devcontainers adds build scripts that fit general usage. Type `build-` and hit
+`TAB` to see options for your project. Check the contributing guide in your repo
+for further instructions.
 
 **Exiting the devcontainer**
 
-If you are in VS Code and you need to return to your host machine (local or SSH),
-you can run `Dev Containers: Reopen in SSH`.
+If you are in a VS Code devcontainer on a remote (SSH) machine, you can run
+`CTRL|CMD + SHIFT + P` and select `Dev Containers: Reopen in SSH` to return to
+your host machine.
 
 ### Docker (Manual Approach)
 
 Your project may have its own launch scripts that account for options in
 libraries and/or tools. The steps here should work with any repo that uses
-devcontainers, but the repo-specific scripts will probably work better.
+devcontainers, but any repo-specific scripts and instructions will probably work
+better.
 
 **Prerequisites**
 
@@ -134,9 +142,9 @@ You can also provide devcontainer label (folder name) directly:
 4. The devcontainer will be built, and you'll be dropped at a shell prompt
 inside the container. You're done!
 
-5. Check the contributing guide in your repo for further instructions. The
-devcontainers adds build scripts that fit general usage. Type `build-` and hit
-`TAB` to see options for the project.
+5. The devcontainers adds build scripts that fit general usage. Type `build-`
+and hit `TAB` to see options for the project. Check the contributing guide in
+your repo for further instructions.
 
 
 ## (Optional) Native build tools - CMake, python builds
@@ -149,9 +157,11 @@ mounted as a subfolder in `/home/coder`.
 ## (Optional) Working with upstream projects
 
 Build scripts are generated only for the main project - the one you have
-mounted. If you would like to work with other projects, you can run their
-`clone-*` scripts. After they have been cloned, appropriate `build-*` scripts
-will be generated. See [the project maintainer docs on this
+mounted. Dependencies are automatically downloaded, but these dependencies are
+not built locally by default. If you would like to develop other projects in
+tandem, you can run their `clone-*` scripts. After they have been cloned,
+appropriate `build-*` scripts will be generated. See [the project maintainer
+docs on this
 topic](./USAGE.md#generating-scripts-for-other-projects-manifestyaml-file).
 
 ## (Optional) Authenticate with GitHub for `sccache`
@@ -172,4 +182,4 @@ Follow the instructions in the prompt as below and enter the one-time code at ht
 
 To manually trigger this authentication, execute the `devcontainer-utils-vault-s3-init` script within the container.
 
-For more information about the sccache configuration and authentication, see the documentation at [`rapidsai/devcontainers`](https://github.com/rapidsai/devcontainers/blob/branch-23.10/USAGE.md#build-caching-with-sccache).
+For more information about the sccache configuration and authentication, see [the developer documentation](./DEVELOP.md#build-caching-with-sccache).

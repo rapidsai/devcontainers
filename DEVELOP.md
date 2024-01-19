@@ -8,23 +8,16 @@ For the user-level overview providing instructions on how to use the
 devcontainer as a development environment, see
 [USAGE_IN_PROJECT.md](USAGE_IN_PROJECT.md)
 
-For the project maintainer-level overview providing instructions on how to add
+For a project maintainer-level overview providing instructions on how to add
 and change .devcontainer.json to suit your project, see [USAGE.md](USAGE.md)
 
 The code in this repository fits into a few main categories:
-<<<<<<< HEAD
-1. Features
-2. GitHub Actions automations
-3. Scripts
-4. matrix.yml
-5. Dockerfiles
-=======
+
 * Features
 * GitHub Actions automations
 * Scripts
 * matrix.yml
 * Dockerfiles
->>>>>>> 884030c (make language less ambiguous)
 
 ## Features
 
@@ -32,8 +25,9 @@ From the official devcontainer [documentation on Features](https://containers.de
 > Development container "Features" are self-contained, shareable units of installation code and development container configuration.
 
 Each "feature" specified becomes a `RUN` statement in a temporary Dockerfile,
-and as such each "feature" results in an image layer. This repository defines
-`features` to install the following dev tools, compilers, and SDKs:
+and as such each "feature" results in an image layer. The
+[rapidsai/devcontainers repository](https://github.com/rapidsai/devcontainers)
+defines `features` to install the following dev tools, compilers, and SDKs:
 
 * [CMake](features/src/cmake/)
 * [CUDA Toolkit](features/src/cuda/)
@@ -50,8 +44,8 @@ and as such each "feature" results in an image layer. This repository defines
 * [devcontainer-utils](features/src/utils/)
 * [rapids-build-utils](features/src/rapids-build-utils/)
 
-These feature scripts assume that apt utilities are available, and thus generally only
-run on debian-based images.
+Many of these feature scripts use apt utilities and thus only run on debian-based
+images.
 
 ### Utility features
 
@@ -61,64 +55,39 @@ overview of responsibilities for these features follows.
 
 #### `rapids-build-utils`
 
-<<<<<<< HEAD
-Most of the `rapids-build-utils` scripts serve to prepare the devcontainer prior to use, but you may use them to update
-the devcontainer after adding to your container's /opt/rapids-build-utils/manifest.yml file to add new projects.
+The `rapids-build-utils` feature is a good place to start when investigating an
+unknown command or behavior in a devcontainer. Most of the scripts in the this
+feature prepare the devcontainer prior to use. The scripts from this project are
+installed by [`install.sh`](./features/src/rapids-build-utils/install.sh). `install.sh`
+creates aliases that begin with a `rapids-` prefix for the .sh scripts in the
+[`rapids-build-utils` bin
+folder](features/src/rapids-build-utils/opt/rapids-build-utils/bin).
 
-If you are wondering where a command or behavior in a devcontainer is coming
-from, this is a good place to start.
+The `rapids-build-utils` scripts can also be run manually to force an update the
+devcontainer scripts after modifying a project's manifest.yml file to add new
+projects or change dependencies. See
+[USAGE.md](./USAGE.md#generating-scripts-for-other-projects-manifestyaml-file)
+for more information on customizing manifest.yml.
 
-`rapids-build-utils` scripts are installed by
-[`install.sh`](./features/src/rapids-build-utils/install.sh), which creates
-aliases for the .sh scripts. if you see `rapids-*` for a script or command name
-in the devcontainer, look in
-[`install.sh`](./features/src/rapids-build-utils/install.sh) to see how it is
-mapped back to one of these scripts.
-
-* [manifest.yaml](./features/src/rapids-build-utils/opt/rapids-build-utils/manifest.yaml): This enumerates where projects should be cloned from and how they depend on each other. It is used to generate build scripts. If your project is not in manifest.yaml, it will not get build scripts generated in the devcontainer. Refer to [docs on manifest.yaml](./USAGE.md#generated-build-scripts)
-=======
-Most of the scripts in [`rapids-build-utils`](./features/src/rapids-build-utils)
-serve to prepare the devcontainer prior to use, but you may use them to update
-the devcontainer after adding to your container's
-/opt/rapids-build-utils/manifest.yml file to add new projects. See [USAGE.md](./USAGE.md#generating-scripts-for-other-projects-manifestyaml-file)
-for more information on customizing manifest.yml
-
-`rapids-build-utils` is a good place to start when investigating an unknown
-command or behavior in a devcontainer. The scripts from this project are
-installed by [`install.sh`](./features/src/rapids-build-utils/install.sh), which
-creates aliases for the .sh scripts. if you see `rapids-*` for a script or
-command name in the devcontainer, look in
-[`install.sh`](./features/src/rapids-build-utils/install.sh) to see how it is
-mapped back to one of these scripts.
-
-Some scripts in downstream projects, especially those called in `./ci/` folders,
-call scripts from the
-[gha-tools](https://github.com/rapidsai/gha-tools/tree/main/tools) repository,
-which also start with a `rapids-` prefix. These scripts are not currently
-compatible with devcontainer images. If you need to run these scripts, check the
-images at [rapidsai/ci-imgs](https://github.com/rapidsai/ci-imgs) instead of the
+> **NOTE:** Some scripts in downstream projects, especially those in `ci/`
+folders, call scripts that start with the `rapids-` prefix but are not provided
+by the `rapids-build-utils` feature. These `rapids-` prefixed scripts come from
+the [gha-tools](https://github.com/rapidsai/gha-tools/tree/main/tools)
+repository, which is part of the older RAPIDS unified CI configuration and not
+currently part of the devcontainer features. To run the scripts in a project's
+`ci` folder, use the images at
+[rapidsai/ci-imgs](https://github.com/rapidsai/ci-imgs) instead of the
 devcontainers.
-
-* [manifest.yaml](./features/src/rapids-build-utils/opt/rapids-build-utils/manifest.yaml): This enumerates where projects should be cloned from and how they depend on each other. It is used to generate build scripts. If a project is not in manifest.yaml, it will not get build scripts generated in the devcontainer. Refer to [docs on manifest.yaml](./USAGE.md#generated-build-scripts)
->>>>>>> 884030c (make language less ambiguous)
-* [generate-scripts.sh](./features/src/rapids-build-utils/opt/rapids-build-utils/bin/generate-scripts.sh): generate `build-*`, `clone-*`, etc. scripts
-* [make-pip-env.sh](./features/src/rapids-build-utils/opt/rapids-build-utils/bin/make-pip-env.sh) and [make-conda-env.sh](./features/src/rapids-build-utils/opt/rapids-build-utils/bin/make-conda-env.sh):
-creating pip and conda python virtual environments
-* [pull-repositories.sh](./features/src/rapids-build-utils/opt/rapids-build-utils/bin/pull-repositories.sh) and [push-repositories.sh](./features/src/rapids-build-utils/opt/rapids-build-utils/bin/push-repositories.sh) helps manage git operations on multiple repos that have been cloned
-* [update-content-command.sh](./features/src/rapids-build-utils/opt/rapids-build-utils/bin/update-content-command.sh): calls `rapids-generate-script` and `rapids-make-vscode-workspace`. Called by VS Code in the [`postAttachCommand`](https://containers.dev/implementors/json_reference/#lifecycle-scripts), which is a reliable hook when the project is reopened or its configuration is changed.
-
-There are more scripts here, dealing with CMake variable parsing and
-pass-through, python package dependency installation, and more.
 
 #### devcontainers-utils
 
-These scripts handle mostly git-related configuration, setting up SSH deploy
+These scripts handle git-related configuration, setting up SSH deploy
 keys, GitHub authorization, and the vault setup for S3. The commands here are
 prefixed with `devcontainer-` during installation.
 
 ## Github Actions automations
 
-Github Actions runs the build matrix of the many base images define in [matrix.yml](./matrix.yml).
+Github Actions runs the build matrix of the many base images defined in [matrix.yml](./matrix.yml).
 These actions are broken up into many reusable pieces. The image build jobs start in
 [release.yml](./.github/workflows/release.yml).
 
@@ -142,26 +111,30 @@ flowchart TD
     end
 ```
 
-These are divided into 3 categories:
+These are divided into 3 categories in the diagram:
 * Workflows are `.yml` files in `.github/workflows`
-* Actions are folders in `.github/actions`. One folder per action. Actions must have a `action.yml` file, but may also have accompanying shell scripts.
-* Scripts are the shell scripts that are in some of the actions folders. They are broken out in this diagram to help show where the functionality actually lives.
+* Actions are folders in `.github/actions`. One folder per action. Actions must have a `action.yml` file, but may
+also have accompanying shell scripts.
+* Scripts are the shell scripts that are in some of the actions folders. They are broken out in this diagram to help
+show that functionality can be defined outside of action.yml files.
 
 ## Base images (matrix.yml)
 
 Base images are composed from individual features in [matrix.yml](./matrix.yml)
-using [YAML anchors](https://support.atlassian.com/bitbucket-cloud/docs/yaml-anchors/).
-These get built on Github Actions as described [above](#github-actions-automations)
-The devcontainers repo does not contain scripts to facilitate building one particular
-image. Some downstream repos, such as CCCL, have such scripts for their reduced subspace
-of the matrix. CCCL's example is their [make_devcontainers.sh](https://github.com/NVIDIA/cccl/blob/main/.devcontainer/make_devcontainers.sh)
+using [YAML
+anchors](https://support.atlassian.com/bitbucket-cloud/docs/yaml-anchors/).
+These get built on Github Actions as described
+[above](#github-actions-automations) The devcontainers repo does not contain
+scripts to facilitate building one particular image. Some downstream repos have
+such scripts for their reduced subspace of the matrix. An example is CCCL's
+[make_devcontainers.sh](https://github.com/NVIDIA/cccl/blob/main/.devcontainer/make_devcontainers.sh)
 script.
 
 ## Dockerfiles
 
 Dockerfiles do not play much role in this scheme. They serve to [set a few global
 variables and extend from the base image](./.devcontainer/rapids.Dockerfile).
-Dockerfile changes are usually better achieved by adding or changing a feature
+Changes made to a Dockerfile are usually better achieved by adding or changing a feature
 script instead.
 
 ## Build caching with `sccache`
