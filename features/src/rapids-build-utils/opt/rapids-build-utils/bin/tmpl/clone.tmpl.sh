@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 # Usage:
-#  clone-${NAME}-cpp [OPTION]...
+#  clone-${NAME} [OPTION]...
 #
 # Clone the ${NAME} repository.
 #
