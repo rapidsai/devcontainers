@@ -94,11 +94,13 @@ checkout_same_branch() {
         fi
 
         if test -z "${branch_name##*"origin/"*}"; then
+            git -C ~/${!repo_path} fetch origin "refs/heads/${branch_name/#origin\//}";
             if ! git -C ~/${!repo_path} checkout --recurse-submodules -t "${branch_name}" -b "${branch_name/#origin\//}"   2>/dev/null; then
                 git -C ~/${!repo_path} checkout --recurse-submodules "${branch_name/#origin\//}";
                 git -C ~/${!repo_path} branch "${branch_name/#origin\//}" -u "${branch_name}";
             fi
         elif test -z "${branch_name##*"upstream/"*}"; then
+            git -C ~/${!repo_path} fetch upstream "refs/heads/${branch_name/#upstream\//}";
             if ! git -C ~/${!repo_path} checkout --recurse-submodules -t "${branch_name}" -b "${branch_name/#upstream\//}" 2>/dev/null; then
                 git -C ~/${!repo_path} checkout --recurse-submodules "${branch_name/#upstream\//}";
                 git -C ~/${!repo_path} branch "${branch_name/#upstream\//}" -u "${branch_name}";
