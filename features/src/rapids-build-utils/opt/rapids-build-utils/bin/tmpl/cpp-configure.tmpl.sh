@@ -35,6 +35,7 @@ configure_${CPP_LIB}_cpp() {
     local verbose="${v:-${verbose:-}}";
 
     eval "$(                                    \
+    PARALLEL_LEVEL=${PARALLEL_LEVEL:-$(nproc)}  \
         rapids-get-num-archs-jobs-and-load "$@" \
       | xargs -r -d'\n' -I% echo -n local %\;   \
     )";

@@ -26,15 +26,16 @@
 . devcontainer-utils-parse-args-from-docstring;
 
 get_num_archs_jobs_and_load() {
-    set -euo pipefail
+    set -Eeuo pipefail
 
     parse_args_or_show_help - <<< "$@";
 
-    local archs="${a:-${archs:-}}";
+    local archs="${a:-${archs:-1}}";
     archs="${archs//"true"/}";
 
-    local parallel="${j:-${parallel:-}}";
+    local parallel="${j:-${parallel:-${JOBS:-${PARALLEL_LEVEL:-1}}}}";
     parallel="${parallel//"true"/}";
+    parallel="${parallel:-$(nproc)}";
 
     local max_device_obj_memory_usage="${m:-${max_device_obj_memory_usage:-${MAX_DEVICE_OBJ_MEMORY_USAGE:-}}}";
     max_device_obj_memory_usage="${max_device_obj_memory_usage//"true"/}";
@@ -75,7 +76,7 @@ get_num_archs_jobs_and_load() {
 
     local free_mem=$(free --giga | grep -E '^Mem:' | tr -s '[:space:]' | cut -d' ' -f7 || echo '0');
     local freeswap=$(free --giga | grep -E '^Swap:' | tr -s '[:space:]' | cut -d' ' -f4 || echo '0');
-    local all_cpus="${parallel:-${JOBS:-${PARALLEL_LEVEL:-$(nproc)}}}";
+    local all_cpus="${parallel}";
     local n_load="${all_cpus}";
     local n_jobs="$(cat<<____EOF | bc
 scale=0

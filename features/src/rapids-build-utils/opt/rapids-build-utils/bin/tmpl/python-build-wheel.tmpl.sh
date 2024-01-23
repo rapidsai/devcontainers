@@ -57,6 +57,7 @@ build_${PY_LIB}_python_wheel() {
     local wheel_dir="${w:-${wheel_dir:-}}";
 
     eval "$(                                    \
+    PARALLEL_LEVEL=${PARALLEL_LEVEL:-$(nproc)}  \
         rapids-get-num-archs-jobs-and-load "$@" \
       | xargs -r -d'\n' -I% echo -n local %\;   \
     )";

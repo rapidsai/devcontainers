@@ -19,7 +19,7 @@
 #                                         limit.
 #                                         Higher values yield fewer parallel CUDA device object compilations.
 #                                         (default: 1)
-#  -D* <var>[:<type>]=<value>   Create or update a cmake cache entry.
+#  -D* <var>[:<type>]=<value>             Create or update a cmake cache entry.
 
 . devcontainer-utils-parse-args-from-docstring;
 
@@ -37,6 +37,7 @@ build_${CPP_LIB}_cpp() {
     configure-${CPP_LIB}-cpp ${verbose:+-v} ${__rest__[@]};
 
     eval "$(                                    \
+    PARALLEL_LEVEL=${PARALLEL_LEVEL:-$(nproc)}  \
         rapids-get-num-archs-jobs-and-load "$@" \
       | xargs -r -d'\n' -I% echo -n local %\;   \
     )";
