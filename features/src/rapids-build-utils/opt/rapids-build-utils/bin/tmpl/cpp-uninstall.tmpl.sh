@@ -21,7 +21,7 @@ uninstall_${CPP_LIB}_cpp() {
 
     if test -f "${CPP_SRC}"/build/latest/install_manifest.txt; then
         time (
-            xargs ${verbose:+-t} -rd "\n" --arg-file=<(<"${CPP_SRC}"/build/latest/install_manifest.txt tr -d "\r") rm --;
+            xargs ${verbose:+-t} -rd "\n" --arg-file=<(<"${CPP_SRC}"/build/latest/install_manifest.txt tr -d "\r") rm ${verbose:+-v} --;
         { set +x; } 2>/dev/null; echo -n "lib${CPP_LIB} uninstall time:";
     ) 2>&1;
     fi
