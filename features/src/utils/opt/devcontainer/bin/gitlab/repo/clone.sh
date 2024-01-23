@@ -116,8 +116,9 @@ clone_gitlab_repo() {
     upstream="${upstream:?upstream is required}";
 
     local no_fork="${no_fork:-}";
+    local branch="${b:-"${branch:-}"}";
+    local parallel="${j:-${parallel:-1}}";
     local clone_upstream="${clone_upstream:-}";
-    local branch="${b:-"${branch:-"$(get_default_branch "${upstream}")"}"}";
 
     local directory="${__rest__[$((nargs - 1))]}";
     directory="${directory:?directory is required}";
@@ -144,6 +145,7 @@ clone_gitlab_repo() {
         name="$(get_repo_name "${upstream}")";
         owner="$(get_repo_owner "${upstream}")";
         user="${GITLAB_USER:-"${owner}"}";
+        branch="${branch:-"$(get_default_branch "${upstream}")"}";
         fork="$(get_user_fork_name "${owner}" "${name}" "${user}")";
     fi
 
@@ -166,19 +168,26 @@ clone_gitlab_repo() {
         done
     fi
 
-    if [ "$(glab config get git_protocol)" = "ssh" ]; then
-        origin="$(get_repo_ssh_url "${origin}")";
-        upstream="$(get_repo_ssh_url "${upstream}")";
+    if test -n "${GITLAB_USER:-}"; then
+        if [ "$(glab config get git_protocol)" = "ssh" ]; then
+            origin="$(get_repo_ssh_url "${origin}")";
+            upstream="$(get_repo_ssh_url "${upstream}")";
+        else
+            origin="$(get_repo_git_url "${origin}")";
+            upstream="$(get_repo_git_url "${upstream}")";
+        fi
     else
-        origin="$(get_repo_git_url "${origin}")";
-        upstream="$(get_repo_git_url "${upstream}")";
+        origin="https://${GITLAB_HOST:-gitlab.com}/${origin}.git";
+        upstream="https://${GITLAB_HOST:-gitlab.com}/${upstream}.git";
     fi
 
-    devcontainer-utils-clone-git-repo \
-        --upstream "${upstream}"      \
-        --branch "${branch}"          \
-        ${__rest__[@]}                \
-        "${origin}" "${directory}"    ;
+    devcontainer-utils-clone-git-repo         \
+        ${branch:+--branch "${branch}"}       \
+        ${upstream:+--upstream "${upstream}"} \
+        -j ${parallel}                        \
+        ${__rest__[@]}                        \
+        "${origin}" "${directory}"            \
+        ;
 }
 
 if test -n "${devcontainer_utils_debug:-}" \

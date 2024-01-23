@@ -19,6 +19,7 @@
 #                               (default: `${NAME}.git.tag` in manifest.yaml)
 #  -d,--directory <dir>         clone the repo into <dir>
 #                               (default: `${NAME}.path` in manifest.yaml)
+#  -j,--parallel <num>          Clone <num> submodules in parallel
 #  -u,--upstream <upstream>     set <upstream> as the `upstream` remote
 #                               (default: `${NAME}.git.upstream` in manifest.yaml)
 
@@ -30,6 +31,11 @@ clone_${NAME}() {
     parse_args_or_show_help - <<< "$@";
 
     if [[ ! -d "${SRC_PATH}"/.git ]]; then
+
+        eval "$(                                    \
+            rapids-get-num-archs-jobs-and-load "$@" \
+          | xargs -r -d'\n' -I% echo -n local %\;   \
+        )";
 
         local no_fork="${no_fork:-}";
         local no_update_env="${no_update_env:-}";
@@ -44,7 +50,7 @@ clone_${NAME}() {
             --tags                                \
             --branch "${branch}"                  \
             --recurse-submodules                  \
-            -j $(nproc --ignore=2)                \
+            -j ${n_jobs:-$(nproc --ignore=1)}     \
             -c checkout.defaultRemote=upstream    \
             ${no_fork:+--no-fork 1}               \
             ${clone_upstream:+--clone-upstream 1} \

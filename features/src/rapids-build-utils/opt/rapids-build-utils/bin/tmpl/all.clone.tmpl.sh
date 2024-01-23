@@ -29,13 +29,21 @@ clone_all() {
       | xargs -r -d'\n' -I% echo -n local %\;   \
     )";
 
+    local all_cpus=$(nproc);
+    local n_repos=$(wc -w <<< "${NAMES}");
+    n_jobs=$((n_repos < n_jobs ? n_repos : n_jobs));
+
+    local n_modules=$((all_cpus / n_jobs));
+    n_modules=$((n_modules < 1 ? 1 : n_modules));
+
     local clone_args=();
+    clone_args+=(-j ${n_modules});
     clone_args+=(${no_fork:+"--no-fork"});
     clone_args+=(${no_update_env:+"--no-update-env"});
     clone_args+=(${clone_upstream:+"--clone-upstream"});
 
-    echo "${NAMES}" \
-  | tr '[:space:]' '\0' \
+    echo "${NAMES}"                     \
+  | tr '[:space:]' '\0'                 \
   | xargs -r -0 -P${n_jobs} -I% bash -c "
     if type clone-% >/dev/null 2>&1; then
         clone-% ${clone_args[*]};
