@@ -9,6 +9,14 @@
 #
 # Boolean options:
 #  -h,--help,--usage  print this text
+#
+# Options that require values:
+#  -m,--manifest <file>  Use a specific manifest.json
+#                        (default: ${PROJECT_MANIFEST_YML:-"/opt/rapids-build-utils/manifest.yaml"})
+#  -o,--omit <repo>      Filter the results to exclude <repo> entries.
+#                        (default: none)
+#  -r,--repo <repo>      Filter the results to include <repo> entries.
+#                        (default: all repositories)
 
 . devcontainer-utils-parse-args-from-docstring;
 
@@ -93,22 +101,17 @@ checkout_same_branch() {
             continue;
         fi
 
-        if test -z "${branch_name##*"origin/"*}"; then
-            git -C ~/${!repo_path} fetch origin "refs/heads/${branch_name/#origin\//}";
-            if ! git -C ~/${!repo_path} checkout --recurse-submodules -t "${branch_name}" -b "${branch_name/#origin\//}"   2>/dev/null; then
-                git -C ~/${!repo_path} checkout --recurse-submodules "${branch_name/#origin\//}";
-                git -C ~/${!repo_path} branch "${branch_name/#origin\//}" -u "${branch_name}";
-            fi
-        elif test -z "${branch_name##*"upstream/"*}"; then
-            git -C ~/${!repo_path} fetch upstream "refs/heads/${branch_name/#upstream\//}";
-            if ! git -C ~/${!repo_path} checkout --recurse-submodules -t "${branch_name}" -b "${branch_name/#upstream\//}" 2>/dev/null; then
-                git -C ~/${!repo_path} checkout --recurse-submodules "${branch_name/#upstream\//}";
-                git -C ~/${!repo_path} branch "${branch_name/#upstream\//}" -u "${branch_name}";
-            fi
+        local remote="${branch_name/\/*}";
+        local branch="${branch_name/*\/}";
+
+        git -C ~/${!repo_path} fetch ${remote} "refs/heads/${branch}";
+
+        if ! git -C ~/${!repo_path} checkout -b "${branch}" -t "${remote}/${branch}" 2>/dev/null; then
+            git -C ~/${!repo_path} checkout "${branch}";
+            git -C ~/${!repo_path} branch "${branch}" -u "${remote}/${branch}";
         fi
 
-        git -C ~/${!repo_path} submodule update --init --recursive;
-
+        git -C ~/${!repo_path} submodule update --init --recursive -j $(nproc --ignore=2);
     done;
 }
 
