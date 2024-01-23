@@ -147,6 +147,7 @@ jobs:
       repo: "${{ vars.DOCKERHUB_REPOSITORY || github.repository }}"
 
   build-rapids:
+    name: Build all RAPIDS repos
     if: needs.check-event.outputs.ok == 'true'
     needs: check-event
     secrets: inherit
