@@ -24,10 +24,10 @@
 make_pip_env() {
     set -Eeuo pipefail;
 
-    parse_args_or_show_help - <<< "${@:2}";
-
-    local env_name="${1}";
+    local env_name="${1}"; shift;
     local env_file_name="${env_name}.requirements.txt";
+
+    parse_args_or_show_help - <<< "$@";
 
     # Remove the current virtual env if called with `-f|--force`
     if test -n "${f:-${force:-}}"; then
@@ -38,10 +38,10 @@ make_pip_env() {
     local new_env_path="$(realpath -m /tmp/${env_file_name})";
     local old_env_path="$(realpath -m ~/.local/share/venvs/${env_file_name})";
 
-    rapids-make-pip-dependencies "$@"    \
-  | (grep -v -E '^$' || [ "$?" == "1" ]) \
-  | tr -s "[:blank:]"                    \
-  | LC_ALL=C sort -u                     \
+    rapids-make-pip-dependencies "$@"     \
+  | (grep -v -E '^$' || [ "$?" == "1" ])  \
+  | tr -s "[:blank:]"                     \
+  | LC_ALL=C sort -u                      \
   > "${new_env_path}"
 
     if test -f "${new_env_path}"; then
@@ -86,7 +86,7 @@ if test -n "${rapids_build_utils_debug:-}" \
     PS4="+ ${BASH_SOURCE[0]}:\${LINENO} "; set -x;
 fi
 
-(make_pip_env "${DEFAULT_VIRTUAL_ENV:-rapids}" "$@");
+make_pip_env "${DEFAULT_VIRTUAL_ENV:-rapids}" "$@";
 
 if test -f ~/.local/share/venvs/${DEFAULT_VIRTUAL_ENV:-rapids}/bin/activate; then
     . ~/.local/share/venvs/${DEFAULT_VIRTUAL_ENV:-rapids}/bin/activate;
