@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 # Usage:
-#  build-${PY_LIB} [OPTION]...
+#  build-${NAME} [OPTION]...
 #
 # Configure and build ${CPP_LIB}, then build an editable install or wheel of ${PY_LIB}.
 #

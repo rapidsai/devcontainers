@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 # Usage:
-#  configure-${CPP_LIB} [OPTION]...
+#  configure-${NAME} [OPTION]...
 #
 # Runs the configure script in each ${CPP_LIB}.
 #
