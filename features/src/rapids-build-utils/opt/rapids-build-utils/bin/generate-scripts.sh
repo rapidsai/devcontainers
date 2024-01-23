@@ -106,7 +106,7 @@ generate_clone_script() {
 
 generate_repo_scripts() {
     local script_name;
-    for script_name in "configure" "build" "clean"; do
+    for script_name in "configure" "build" "clean" "uninstall"; do
         if test -f "${TEMPLATES}/${script_name}.tmpl.sh"; then (
             cat "${TEMPLATES}/${script_name}.tmpl.sh" \
           | generate_script "${script_name}-${NAME}"  ;
@@ -117,7 +117,7 @@ generate_repo_scripts() {
 
 generate_cpp_scripts() {
     local script_name;
-    for script_name in "clean" "configure" "build" "cpack" "install"; do
+    for script_name in "clean" "configure" "build" "cpack" "install" "uninstall"; do
         if test -f "${TEMPLATES}/cpp-${script_name}.tmpl.sh"; then (
             cat "${TEMPLATES}/cpp-${script_name}.tmpl.sh"  \
           | CPP_SRC="${SRC_PATH:-}${CPP_SRC:+/$CPP_SRC}"   \
@@ -129,7 +129,7 @@ generate_cpp_scripts() {
 
 generate_python_scripts() {
     local script_name;
-    for script_name in "build" "clean"; do
+    for script_name in "build" "clean" "uninstall"; do
         if test -f "${TEMPLATES}/python-${script_name}.tmpl.sh"; then (
             cat "${TEMPLATES}/python-${script_name}.tmpl.sh" \
           | generate_script "${script_name}-${PY_LIB}-python";
@@ -307,7 +307,7 @@ generate_scripts() {
 
     unset cpp_name_to_path;
 
-    for script in "clone" "clean" "configure" "build" "cpack" "install"; do
+    for script in "clone" "clean" "configure" "build" "cpack" "install" "uninstall"; do
         # Generate a script to run a script for all repos
         (
             NAMES="${repo_names[@]}" \
