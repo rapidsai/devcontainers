@@ -158,8 +158,8 @@ jobs:
         set -Eeuxo pipefail;
         sccache -z;
         clone-all --verbose --no-update-env;
+        rapids-generate-scripts;
         rapids-make-${PYTHON_PACKAGE_MANAGER}-env;
-        rapids_build_utils_debug=all \
         build-all \
           --verbose \
           -j$(nproc --ignore=1) \
