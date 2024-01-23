@@ -19,6 +19,7 @@
 # Options that require values:
 #  -b,--branch <branch_or_tag>  check the repo out to <branch_or_tag>
 #                               (default: `${NAME}.git.tag` in manifest.yaml)
+#  -j,--parallel <num>          Clone <num> submodules in parallel
 #  -u,--upstream <upstream>     set <upstream> as the `upstream` remote
 #
 # Positional arguments:
@@ -32,6 +33,7 @@ clone_git_repo() {
     parse_args_or_show_help - <<< "$@";
 
     local branch="${b:-"${branch:-}"}";
+    local parallel="${j:-${parallel:-1}}";
     local upstream="${u:-"${upstream:-}"}";
 
     local nargs="${#__rest__[@]}";
@@ -92,7 +94,7 @@ clone_git_repo() {
         fi
     fi
 
-    git -C "${directory}" submodule update --init --recursive;
+    git -C "${directory}" submodule update --init --recursive -j ${parallel};
 }
 
 if test -n "${devcontainer_utils_debug:-}" \
