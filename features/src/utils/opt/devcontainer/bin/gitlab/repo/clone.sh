@@ -131,13 +131,16 @@ clone_gitlab_repo() {
     local user=;
     local owner=;
 
-    if test -z "${clone_upstream:-}" || \
-      (test -z "${no_fork:-}" && devcontainer-utils-shell-is-interactive); then
+    if test -z "${no_fork:-}" && \
+       test -z "${clone_upstream:-}" && \
+       devcontainer-utils-shell-is-interactive; then
         source devcontainer-utils-init-gitlab-cli;
         user="${GITLAB_USER:-}";
     fi
 
-    if test -z "${clone_upstream:-}"; then
+    if test -n "${clone_upstream:-}"; then
+        fork="${upstream}";
+    else
         name="$(get_repo_name "${upstream}")";
         owner="$(get_repo_owner "${upstream}")";
         user="${GITLAB_USER:-"${owner}"}";

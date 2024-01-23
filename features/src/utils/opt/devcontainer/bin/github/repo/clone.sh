@@ -105,13 +105,16 @@ clone_github_repo() {
     local fork=;
     local owner=;
 
-    if test -z "${clone_upstream:-}" || \
-      (test -z "${no_fork:-}" && devcontainer-utils-shell-is-interactive); then
+    if test -z "${no_fork:-}" && \
+       test -z "${clone_upstream:-}" && \
+       devcontainer-utils-shell-is-interactive; then
         source devcontainer-utils-init-github-cli;
         user="${GITHUB_USER:-}";
     fi
 
-    if test -z "${clone_upstream:-}"; then
+    if test -n "${clone_upstream:-}"; then
+        fork="${upstream}";
+    else
         name="$(get_repo_name "${upstream}")";
         owner="$(get_repo_owner "${upstream}")";
         user="${GITHUB_USER:-"${owner}"}";
