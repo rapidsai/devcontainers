@@ -159,11 +159,14 @@ jobs:
         sccache -z;
         clone-all --verbose --no-update-env;
         rapids-make-${PYTHON_PACKAGE_MANAGER}-env;
-        build-all --verbose \
+        rapids_build_utils_debug=all \
+        build-all \
+          --verbose \
+          -j$(nproc --ignore=1) \
           -DBUILD_TESTS=ON \
           -DBUILD_BENCHMARKS=ON \
           -DBUILD_ANN_BENCH=ON \
           -DBUILD_PRIMS_BENCH=ON \
-          $([ "pip" = $PYTHON_PACKAGE_MANAGER ] && echo -DUSE_LIBARROW_FROM_PYARROW=ON || echo) \
-          -j$(nproc --ignore=1);
+          $([ "pip" = ${PYTHON_PACKAGE_MANAGER} ] && echo -DUSE_LIBARROW_FROM_PYARROW=ON || echo) \
+          ;
         sccache -s;
