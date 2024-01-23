@@ -17,7 +17,8 @@ generate_script() {
     if test -n "${bin}"; then
         (
             cat - \
-          | envsubst '$NAME
+          | envsubst '$HOME
+                      $NAME
                       $SRC_PATH
                       $PY_ENV
                       $PY_SRC
@@ -84,7 +85,11 @@ generate_all_script_impl() {
 }
 
 generate_all_script() {
-    if test -f "${TEMPLATES}/all.tmpl.sh"; then (
+    if test -f "${TEMPLATES}/all.${SCRIPT}.tmpl.sh"; then (
+        cat "${TEMPLATES}/all.${SCRIPT}.tmpl.sh" \
+      | generate_all_script_impl       ;
+    ) || true;
+    elif test -f "${TEMPLATES}/all.tmpl.sh"; then (
         cat "${TEMPLATES}/all.tmpl.sh" \
       | generate_all_script_impl       ;
     ) || true;
