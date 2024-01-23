@@ -23,10 +23,10 @@
 make_conda_env() {
     set -Eeuo pipefail;
 
-    parse_args_or_show_help - <<< "${@:2}";
-
-    local env_name="${1}";
+    local env_name="${1}"; shift;
     local env_file_name="${env_name}.yml";
+
+    parse_args_or_show_help - <<< "$@";
 
     # Remove the current conda env if called with `-f|--force`
     if test -n "${f:-${force:-}}"; then
@@ -80,6 +80,6 @@ fi
 . /opt/conda/etc/profile.d/conda.sh;
 . /opt/conda/etc/profile.d/mamba.sh;
 
-(make_conda_env "${DEFAULT_CONDA_ENV:-rapids}" "$@");
+make_conda_env "${DEFAULT_CONDA_ENV:-rapids}" "$@";
 
 . /etc/profile.d/*-mambaforge.sh;
