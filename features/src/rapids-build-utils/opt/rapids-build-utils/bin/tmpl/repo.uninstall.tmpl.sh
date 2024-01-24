@@ -6,8 +6,8 @@
 # Uninstall ${CPP_LIB} and ${PY_LIB}.
 #
 # Boolean options:
-#  -h,--help,--usage                      print this text
-#  -v,--verbose                           verbose output
+#  -h,--help,--usage  print this text
+#  -v,--verbose       verbose output
 
 . devcontainer-utils-parse-args-from-docstring;
 
@@ -18,13 +18,13 @@ uninstall_${NAME}() {
 
     for lib in ${CPP_LIB}; do
         if type uninstall-${lib}-cpp >/dev/null 2>&1; then
-            uninstall-${lib}-cpp ${__rest__[@]};
+            uninstall-${lib}-cpp "$@";
         fi
     done
 
     for lib in ${PY_LIB}; do
         if type uninstall-${lib}-python >/dev/null 2>&1; then
-            uninstall-${lib}-python --type ${t:-${type:-"editable"}} ${__rest__[@]};
+            uninstall-${lib}-python "$@";
         fi
     done
 }

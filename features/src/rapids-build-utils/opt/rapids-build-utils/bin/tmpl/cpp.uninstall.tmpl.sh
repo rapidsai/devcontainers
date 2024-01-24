@@ -6,9 +6,8 @@
 # Uninstall ${CPP_LIB}.
 #
 # Boolean options:
-#  -h,--help,--usage            print this text
-#  -v,--verbose                 verbose output
-#
+#  -h,--help,--usage  print this text
+#  -v,--verbose       verbose output
 
 . devcontainer-utils-parse-args-from-docstring;
 
