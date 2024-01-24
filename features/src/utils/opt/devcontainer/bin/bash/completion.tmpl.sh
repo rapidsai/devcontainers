@@ -31,7 +31,7 @@ _${NAME}_completions() {
     COMPREPLY=();
 
     if test -z "${${NAME}_script}"; then
-        ${NAME}_script="$(which ${SCRIPT})";
+        ${NAME}_script="$(which ${CMD})";
         if test -z "${${NAME}_script}"; then return; fi
     fi
     if test -z "${${NAME}_usage}"; then
@@ -105,4 +105,4 @@ _${NAME}_completions() {
     done
 }
 
-complete -F _${NAME}_completions ${SCRIPT};
+complete -F _${NAME}_completions ${CMD};
