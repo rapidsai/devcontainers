@@ -68,24 +68,20 @@ install_utility() {
     update-alternatives --install /usr/bin/${cmd} ${cmd} /opt/devcontainer/bin/${src} 0;
 
     # Install bash_completion script
-    cat "$(which devcontainer-utils-bash-completion.tmpl)" \
-  | SCRIPT="${cmd}"                                        \
-    NAME="${cmd//-/_}"                                     \
-    envsubst '$SCRIPT $NAME'                               \
-  | tee "/etc/bash_completion.d/${cmd}" >/dev/null         \
-  ;
+    devcontainer-utils-generate-bash-completion --command "${cmd}" --out-dir /etc/bash_completion.d;
 }
 
 # Install alternatives
 
-# Install this first since we use it in `install_utility`
-update-alternatives --install \
-    /usr/bin/devcontainer-utils-bash-completion.tmpl \
-             devcontainer-utils-bash-completion.tmpl \
-    /opt/devcontainer/bin/bash/completion.tmpl.sh   0;
+# Install these first since we use it in `install_utility`
+update-alternatives --install /usr/bin/devcontainer-utils-parse-args                devcontainer-utils-parse-args                /opt/devcontainer/bin/parse-args.sh                    0;
+update-alternatives --install /usr/bin/devcontainer-utils-parse-args-from-docstring devcontainer-utils-parse-args-from-docstring /opt/devcontainer/bin/parse-args-from-docstring.sh     0;
+update-alternatives --install /usr/bin/devcontainer-utils-bash-completion.tmpl      devcontainer-utils-bash-completion.tmpl      /opt/devcontainer/bin/bash/completion.tmpl.sh          0;
+update-alternatives --install /usr/bin/devcontainer-utils-generate-bash-completion  devcontainer-utils-generate-bash-completion  /opt/devcontainer/bin/bash/generate-bash-completion.sh 0;
 
-install_utility parse-args parse-args.sh;
-install_utility parse-args-from-docstring parse-args-from-docstring.sh;
+# Generate a bash completion for bash-completion generating command
+devcontainer-utils-generate-bash-completion --command devcontainer-utils-generate-bash-completion --out-dir /etc/bash_completion.d;
+
 install_utility shell-is-interactive shell-is-interactive.sh;
 install_utility post-attach-command post-attach-command.sh;
 install_utility post-attach-command-entrypoint post-attach-command-entrypoint.sh;
@@ -139,6 +135,8 @@ for dir in $(for_each_user_bashrc 'echo "$(dirname "$(realpath -m "$0")")"'); do
     # Copy in default git config
     rm -f "${dir}"/.gitconfig;
     cp .gitconfig "${dir}"/.gitconfig.default;
+    # Copy in default .bash_completion
+    cp .bash_completion "${dir}"/.bash_completion;
     # Create ~/.cache, i.e. $XDG_CACHE_HOME
     mkdir -p -m 0755 "${dir}"/.cache;
     # Create ~/.cache, i.e. $XDG_CONFIG_HOME

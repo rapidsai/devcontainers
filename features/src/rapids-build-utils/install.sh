@@ -38,12 +38,7 @@ install_utility() {
     update-alternatives --install /usr/bin/${cmd} ${cmd} /opt/rapids-build-utils/bin/${src} 0;
 
     # Install bash_completion script
-    cat "$(which devcontainer-utils-bash-completion.tmpl)" \
-  | SCRIPT="${cmd}"                                        \
-    NAME="${cmd//-/_}"                                     \
-    envsubst '$SCRIPT $NAME'                               \
-  | tee "/etc/bash_completion.d/${cmd}" >/dev/null         \
-  ;
+    devcontainer-utils-generate-bash-completion --command "${cmd}" --out-dir /etc/bash_completion.d;
 }
 
 install_utility update-content-command;
@@ -74,9 +69,8 @@ find /opt/rapids-build-utils \
     \( -type d -exec chmod 0775 {} \; \
     -o -type f -exec chmod 0755 {} \; \);
 
-# Copy in bash completions
+# Create bash completions
 mkdir -p /etc/bash_completion.d/;
-cp -ar ./etc/bash_completion.d/* /etc/bash_completion.d/;
 
 yq shell-completion bash | tee /etc/bash_completion.d/yq >/dev/null;
 
