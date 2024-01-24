@@ -148,8 +148,8 @@ build_${PY_LIB}_python_wheel() {
     time (
         export ${PY_ENV} PATH="$PATH";
 
-        local cudaflags="${CUDAFLAGS:+$CUDAFLAGS }-t${n_arch}";
-        local nvcc_append_flags="${NVCC_APPEND_FLAGS:+$NVCC_APPEND_FLAGS }-t${n_arch}";
+        local cudaflags="${CUDAFLAGS:+$CUDAFLAGS }-t=${n_arch}";
+        local nvcc_append_flags="${NVCC_APPEND_FLAGS:+$NVCC_APPEND_FLAGS }-t=${n_arch}";
 
         CUDAFLAGS="${cudaflags}"                 \
         CMAKE_GENERATOR="Ninja"                  \

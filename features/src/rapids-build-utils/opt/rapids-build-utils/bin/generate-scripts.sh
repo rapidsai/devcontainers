@@ -3,13 +3,12 @@
 ALT_SCRIPT_DIR="${ALT_SCRIPT_DIR:-/usr/bin}";
 TEMPLATES="${TEMPLATES:-/opt/rapids-build-utils/bin/tmpl}";
 TMP_SCRIPT_DIR="${TMP_SCRIPT_DIR:-/tmp/rapids-build-utils}";
-COMPLETION_TMPL="${COMPLETION_TMPL:-"$(which devcontainer-utils-bash-completion.tmpl)"}";
 
 clean_scripts() {
     set -euo pipefail;
-    mkdir -p "${TMP_SCRIPT_DIR}";
+    mkdir -p "${TMP_SCRIPT_DIR}" ~/.bash_completion.d;
     find "${TMP_SCRIPT_DIR}"/ -maxdepth 1 -type f -exec basename {} \; \
-  | xargs -r -I% sudo rm -f "${TMP_SCRIPT_DIR}"/% /etc/bash_completion.d/%;
+  | xargs -r -I% rm -f "${TMP_SCRIPT_DIR}"/% ~/.bash_completion.d/%;
 }
 
 generate_script() {
@@ -44,14 +43,7 @@ generate_script() {
                 sudo ln -sf "${TMP_SCRIPT_DIR}/${bin,,}" "${ALT_SCRIPT_DIR}/${bin,,}";
             fi
 
-            if test -f "${COMPLETION_TMPL}"; then
-                cat "${COMPLETION_TMPL}"                \
-              | SCRIPT="${bin}"                         \
-                NAME="${bin//-/_}"                      \
-                envsubst '$SCRIPT $NAME'                \
-              | sudo tee "/etc/bash_completion.d/${bin}" >/dev/null;
-            fi
-
+            devcontainer-utils-generate-bash-completion --command "${bin}" --out-dir ~/.bash_completion.d;
         ) & true;
 
         echo "$!"
@@ -71,13 +63,7 @@ generate_all_script_impl() {
 
             sudo ln -sf "${TMP_SCRIPT_DIR}/${bin}" "${ALT_SCRIPT_DIR}/${bin}";
 
-            if test -f "${COMPLETION_TMPL}"; then
-                cat "${COMPLETION_TMPL}"                \
-              | SCRIPT="${bin}"                         \
-                NAME="${bin//-/_}"                      \
-                envsubst '$SCRIPT $NAME'                \
-              | sudo tee "/etc/bash_completion.d/${bin}" >/dev/null;
-            fi
+            devcontainer-utils-generate-bash-completion --command "${bin}" --out-dir ~/.bash_completion.d;
         ) & true;
 
         echo "$!"
@@ -97,8 +83,8 @@ generate_all_script() {
 }
 
 generate_clone_script() {
-    if test -f "${TEMPLATES}/clone.tmpl.sh"; then (
-        cat "${TEMPLATES}/clone.tmpl.sh" \
+    if test -f "${TEMPLATES}/repo.clone.tmpl.sh"; then (
+        cat "${TEMPLATES}/repo.clone.tmpl.sh" \
       | generate_script "clone-${NAME}"  ;
     ) || true;
     fi
@@ -106,9 +92,9 @@ generate_clone_script() {
 
 generate_repo_scripts() {
     local script_name;
-    for script_name in "configure" "build" "clean" "uninstall"; do
-        if test -f "${TEMPLATES}/${script_name}.tmpl.sh"; then (
-            cat "${TEMPLATES}/${script_name}.tmpl.sh" \
+    for script_name in "configure" "build" "clean" "install" "uninstall"; do
+        if test -f "${TEMPLATES}/repo.${script_name}.tmpl.sh"; then (
+            cat "${TEMPLATES}/repo.${script_name}.tmpl.sh" \
           | generate_script "${script_name}-${NAME}"  ;
         ) || true;
         fi
@@ -118,8 +104,8 @@ generate_repo_scripts() {
 generate_cpp_scripts() {
     local script_name;
     for script_name in "clean" "configure" "build" "cpack" "install" "uninstall"; do
-        if test -f "${TEMPLATES}/cpp-${script_name}.tmpl.sh"; then (
-            cat "${TEMPLATES}/cpp-${script_name}.tmpl.sh"  \
+        if test -f "${TEMPLATES}/cpp.${script_name}.tmpl.sh"; then (
+            cat "${TEMPLATES}/cpp.${script_name}.tmpl.sh"  \
           | CPP_SRC="${SRC_PATH:-}${CPP_SRC:+/$CPP_SRC}"   \
             generate_script "${script_name}-${CPP_LIB}-cpp";
         ) || true;
@@ -130,15 +116,15 @@ generate_cpp_scripts() {
 generate_python_scripts() {
     local script_name;
     for script_name in "build" "clean" "uninstall"; do
-        if test -f "${TEMPLATES}/python-${script_name}.tmpl.sh"; then (
-            cat "${TEMPLATES}/python-${script_name}.tmpl.sh" \
+        if test -f "${TEMPLATES}/python.${script_name}.tmpl.sh"; then (
+            cat "${TEMPLATES}/python.${script_name}.tmpl.sh" \
           | generate_script "${script_name}-${PY_LIB}-python";
         ) || true;
         fi
     done
     for script_name in "editable" "wheel"; do
-        if test -f "${TEMPLATES}/python-build-${script_name}.tmpl.sh"; then (
-            cat "${TEMPLATES}/python-build-${script_name}.tmpl.sh" \
+        if test -f "${TEMPLATES}/python.build.${script_name}.tmpl.sh"; then (
+            cat "${TEMPLATES}/python.build.${script_name}.tmpl.sh" \
           | generate_script "build-${PY_LIB}-python-${script_name}";
         ) || true;
         fi
