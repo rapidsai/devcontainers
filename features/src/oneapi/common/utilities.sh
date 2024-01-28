@@ -16,7 +16,7 @@ export -f apt_get_update;
 check_packages() {
     if ! dpkg -s "$@" > /dev/null 2>&1; then
         apt_get_update;
-        echo "Installing packages: $@";
+        echo "Installing packages: $*";
         DEBIAN_FRONTEND=noninteractive \
         apt-get -y install --no-install-recommends "$@";
     fi
@@ -26,15 +26,23 @@ export -f check_packages;
 
 for_each_user_bashrc() {
     # Update all bashrc files
-    find / /etc /home ${_REMOTE_USER_HOME} ${_CONTAINER_USER_HOME} -maxdepth 2 -type f -name .bashrc \
+    find / /etc /home "${_REMOTE_USER_HOME}" "${_CONTAINER_USER_HOME}" -maxdepth 2 -type f -name .bashrc \
   | sort | uniq | xargs -r -d'\n' -n1 bash -c "${@}";
 }
 
 export -f for_each_user_bashrc;
 
+for_each_user_profile() {
+    # Update all .profile files
+    find / /etc /home "${_REMOTE_USER_HOME}" "${_CONTAINER_USER_HOME}" -maxdepth 2 -type f -name .profile \
+  | sort | uniq | xargs -r -d'\n' -n1 bash -c "${@}";
+}
+
+export -f for_each_user_profile;
+
 append_to_all_bashrcs() {
     # Update all bashrc files
-    for bashrc in $(find / /etc /home ${_REMOTE_USER_HOME} ${_CONTAINER_USER_HOME} -maxdepth 2 -type f -name .bashrc | sort | uniq); do
+    for bashrc in $(find / /etc /home "${_REMOTE_USER_HOME}" "${_CONTAINER_USER_HOME}" -maxdepth 2 -type f -name .bashrc | sort | uniq); do
         if [[ "$(cat "$bashrc")" != *"$1"* ]]; then
             echo "Appending to $bashrc...";
             echo -e "$1" >> "$bashrc";
@@ -46,7 +54,7 @@ export -f append_to_all_bashrcs;
 
 prepend_to_all_bashrcs() {
     # Update all bashrc files
-    for bashrc in $(find / /etc /home ${_REMOTE_USER_HOME} ${_CONTAINER_USER_HOME} -maxdepth 2 -type f -name .bashrc | sort | uniq); do
+    for bashrc in $(find / /etc /home "${_REMOTE_USER_HOME}" "${_CONTAINER_USER_HOME}" -maxdepth 2 -type f -name .bashrc | sort | uniq); do
         if [[ "$(cat "$bashrc")" != *"$1"* ]]; then
             echo "Prepending to $bashrc...";
             echo -e "$1\n$(cat "$bashrc")" > "$bashrc";
@@ -112,7 +120,7 @@ export -f prepend_to_etc_zshrc;
 
 add_etc_profile_d_script() {
     local name="$(($(ls -1q /etc/profile.d/*.sh | wc -l) + 20))-${1}.sh";
-    echo -e "#! /usr/bin/env bash\n${@:2}" > "/etc/profile.d/${name}";
+    echo -e "#! /usr/bin/env bash\n${*:2}" > "/etc/profile.d/${name}";
     chmod +x "/etc/profile.d/${name}";
 }
 
@@ -146,12 +154,12 @@ find_version_from_git_tags() {
             fi
         fi
         local regex="${prefix}\\K[0-9]+${last_part}$"
-        local version_list="$(git ls-remote --tags ${repository} | grep -oP "${regex}" | tr -d ' ' | tr "${separator}" "." | sort -rV)"
+        local -r version_list="$(git ls-remote --tags "${repository}" | grep -oP "${regex}" | tr -d ' ' | tr "${separator}" "." | sort -rV)"
         if [ "${requested_version}" = "latest" ] || [ "${requested_version}" = "current" ] || [ "${requested_version}" = "lts" ]; then
-            declare -g ${variable_name}="$(echo "${version_list}" | head -n 1)"
+            declare -g "${variable_name}"="$(echo "${version_list}" | head -n 1)"
         else
             set +e
-            declare -g ${variable_name}="$(echo "${version_list}" | grep -E -m 1 "^${requested_version//./\\.}([\\.\\s]|$)")"
+            declare -g "${variable_name}"="$(echo "${version_list}" | grep -E -m 1 "^${requested_version//./\\.}([\\.\\s]|$)")"
             set -e
         fi
     fi
@@ -185,21 +193,21 @@ find_prev_version_from_git_tags() {
 
         if [ "${minor}" = "0" ] && [ "${breakfix}" = "0" ]; then
             ((major=major-1))
-            declare -g ${variable_name}="${major}"
+            declare -g "${variable_name}"="${major}"
             # Look for latest version from previous major release
             find_version_from_git_tags "${variable_name}" "${repository}" "${prefix}" "${separator}" "${version_suffix_regex}" "${last_part_optional}"
         # Handle situations like Go's odd version pattern where "0" releases omit the last part
         elif [ "${breakfix}" = "" ] || [ "${breakfix}" = "0" ]; then
             ((minor=minor-1))
-            declare -g ${variable_name}="${major}.${minor}"
+            declare -g "${variable_name}"="${major}.${minor}"
             # Look for latest version from previous minor release
             find_version_from_git_tags "${variable_name}" "${repository}" "${prefix}" "${separator}" "${version_suffix_regex}" "${last_part_optional}"
         else
             ((breakfix=breakfix-1))
             if [ "${breakfix}" = "0" ] && [ "${last_part_optional}" = "true" ]; then
-                declare -g ${variable_name}="${major}.${minor}"
+                declare -g "${variable_name}"="${major}.${minor}"
             else
-                declare -g ${variable_name}="${major}.${minor}.${breakfix}"
+                declare -g "${variable_name}"="${major}.${minor}.${breakfix}"
             fi
         fi
     set -e
@@ -214,7 +222,7 @@ find_non_root_user() {
         USERNAME=""
         POSSIBLE_USERS=("vscode" "node" "codespace" "coder" "$(awk -v val=1001 -F ":" '$3==val{print $1}' /etc/passwd)")
         for CURRENT_USER in "${POSSIBLE_USERS[@]}"; do
-            if id -u ${CURRENT_USER} > /dev/null 2>&1; then
+            if id -u "${CURRENT_USER}" > /dev/null 2>&1; then
                 USERNAME=${CURRENT_USER}
                 break
             fi

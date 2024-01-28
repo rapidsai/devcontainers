@@ -4,7 +4,7 @@ fi
 
 if [ -n "${PATH##*"/opt/intel/oneapi/compiler/${ICC_VERSION}/linux/bin"*}" ]; then
     if test -f /opt/intel/oneapi/setvars.sh; then
-        . /opt/intel/oneapi/setvars.sh --force 2>&1 >/dev/null;
+        . /opt/intel/oneapi/setvars.sh --force >/dev/null 2>&1;
     else
         module use "/opt/intel/oneapi/compiler/${ICC_VERSION}/modulefiles";
         module use "/opt/intel/oneapi/compiler/${ICC_VERSION}/linux/lib/oclfpga/modulefiles";
