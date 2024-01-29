@@ -21,7 +21,15 @@
 #  -r,--requirement <file> Path(s) to additional requirement files to include.
 
 make_pip_env() {
+    local -;
     set -Eeuo pipefail;
+
+    # shellcheck disable=SC2154
+    if test -n "${rapids_build_utils_debug:-}" \
+    && { test -z "${rapids_build_utils_debug##*"*"*}" \
+          || test -z "${rapids_build_utils_debug##*"make-pip-env"*}"; }; then
+        PS4="+ ${BASH_SOURCE[0]}:\${LINENO} "; set -x;
+    fi
 
     local env_name="${1}"; shift;
     local env_file_name="${env_name}.requirements.txt";
@@ -36,7 +44,7 @@ make_pip_env() {
     ' - <<< "${@@Q}")";
 
     # Remove the current virtual env if called with `-f|--force`
-    if test -n "${f:-${force:-}}"; then
+    if test -n "${force:-}"; then
         rm -rf "${HOME}/.local/share/venvs/${env_name}" \
                "${HOME}/.local/share/venvs/${env_file_name}";
     fi
@@ -83,12 +91,6 @@ make_pip_env() {
         cp -a "${new_env_path}" "${old_env_path}";
     fi
 }
-
-if test -n "${rapids_build_utils_debug:-}" \
-&& { test -z "${rapids_build_utils_debug##*"*"*}" \
-    || test -z "${rapids_build_utils_debug##*"make-pip-env"*}"; }; then
-    PS4="+ ${BASH_SOURCE[0]}:\${LINENO} "; set -x;
-fi
 
 make_pip_env "${DEFAULT_VIRTUAL_ENV:-rapids}" "$@";
 

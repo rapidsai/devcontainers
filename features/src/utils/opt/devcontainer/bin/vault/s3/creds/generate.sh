@@ -3,8 +3,15 @@
 # Attempt to retrieve temporary AWS credentials from a vault instance using GitHub OAuth.
 
 generate_s3_creds() {
+    local -;
+    set -Eeuo pipefail;
 
-    set -euo pipefail;
+    # shellcheck disable=SC2154
+    if test -n "${devcontainer_utils_debug:-}" \
+    && { test -z "${devcontainer_utils_debug##*"*"*}" \
+      || test -z "${rapids_build_utils_debug##*"vault-s3-creds-generate"*}"; }; then
+        PS4="+ ${BASH_SOURCE[0]}:\${LINENO} "; set -x;
+    fi
 
     if test -z "${VAULT_HOST:-}" \
     || test -z "${SCCACHE_BUCKET:-}"; then
@@ -49,12 +56,12 @@ generate_s3_creds() {
     echo "with vault at '${VAULT_HOST}'.";
     echo ""
 
-    local vault_token="";
+    local vault_token="null";
 
     # Attempt to authenticate with GitHub
     eval "$(devcontainer-utils-vault-auth-github "${VAULT_HOST}" "${user_orgs}")";
 
-    if test ${#vault_token} -eq 0; then
+    if [ "${vault_token:-null}" = "null" ]; then
         echo "Your GitHub user was not recognized by vault. Skipping." >&2;
         exit 1;
     fi
@@ -82,12 +89,12 @@ generate_s3_creds() {
     local -r aws_access_key_id="$(jq -r '.access_key' <<< "${aws_creds}" || echo)";
     local -r aws_secret_access_key="$(jq -r '.secret_key' <<< "${aws_creds}" || echo)";
 
-    if test ${#aws_access_key_id} -eq 0; then
+    if grep -qE "^null$" <<< "${aws_access_key_id:-null}"; then
         echo "Failed to retrieve AWS S3 credentials. Skipping." >&2;
         exit 1;
     fi
 
-    if test ${#aws_secret_access_key} -eq 0; then
+    if grep -qE "^null$" <<< "${aws_secret_access_key:-null}"; then
         echo "Failed to retrieve AWS S3 credentials. Skipping." >&2;
         exit 1;
     fi
@@ -109,10 +116,6 @@ generate_s3_creds() {
             --aws-secret-access-key="${aws_secret_access_key:-}";
     fi
 }
-
-if test -n "${devcontainer_utils_debug:-}"; then
-    PS4="+ ${BASH_SOURCE[0]}:\${LINENO} "; set -x;
-fi
 
 generate_s3_creds "$@";
 

@@ -18,8 +18,14 @@
 
 generate_bash_completion() {
     local -;
-
     set -Eeuo pipefail;
+
+    # shellcheck disable=SC2154
+    if test -n "${devcontainer_utils_debug:-}" \
+    && { test -z "${devcontainer_utils_debug##*"*"*}" \
+      || test -z "${devcontainer_utils_debug##*"generate-bash-completion"*}"; }; then
+        PS4="+ ${BASH_SOURCE[0]}:\${LINENO} "; set -x;
+    fi
 
     eval "$(devcontainer-utils-parse-args "$0" - <<< "${@@Q}")";
 
@@ -40,11 +46,5 @@ generate_bash_completion() {
         fi
     fi
 }
-
-if test -n "${devcontainer_utils_debug:-}" \
-&& { test -z "${devcontainer_utils_debug##*"*"*}" \
-  || test -z "${devcontainer_utils_debug##*"generate-bash-completion"*}"; }; then
-    PS4="+ ${BASH_SOURCE[0]}:\${LINENO} "; set -x;
-fi
 
 generate_bash_completion "$@";

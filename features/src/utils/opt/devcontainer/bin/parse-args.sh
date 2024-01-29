@@ -5,8 +5,14 @@
 
 parse_args() {
     local -;
-
     set -Eeuo pipefail;
+
+    # shellcheck disable=SC2154
+    if test -n "${devcontainer_utils_debug:-}" \
+    && { test -z "${devcontainer_utils_debug##*"*"*}" \
+      || test -z "${rapids_build_utils_debug##*"parse-args"*}"; }; then
+        PS4="+ ${BASH_SOURCE[0]}:\${LINENO} "; set -x;
+    fi
 
     local -r usage="$(print_usage "${1:-}")";
     shift;
@@ -291,12 +297,5 @@ parse_args() {
 }
 
 if [ "$(basename "${BASH_SOURCE[${#BASH_SOURCE[@]}-1]}")" = devcontainer-utils-parse-args ]; then
-
-    if test -n "${devcontainer_utils_debug:-}" \
-    && { test -z "${devcontainer_utils_debug##*"*"*}" \
-      || test -z "${devcontainer_utils_debug##*"parse-args"*}"; }; then
-        PS4="+ ${BASH_SOURCE[0]}:\${LINENO} "; set -x;
-    fi
-
     parse_args "$@" <&0;
 fi

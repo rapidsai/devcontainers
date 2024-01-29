@@ -7,7 +7,14 @@ s3_cred() {
 init_vault_s3_creds() {
 
     local -
-    set -euo pipefail;
+    set -Eeuo pipefail;
+
+    # shellcheck disable=SC2154
+    if test -n "${devcontainer_utils_debug:-}" \
+    && { test -z "${devcontainer_utils_debug##*"*"*}" \
+      || test -z "${rapids_build_utils_debug##*"vault-s3-init"*}"; }; then
+        PS4="+ ${BASH_SOURCE[0]}:\${LINENO} "; set -x;
+    fi
 
     if type sccache >/dev/null; then
         if test -n "${SCCACHE_BUCKET:-}"; then
@@ -64,10 +71,6 @@ init_vault_s3_creds() {
         sccache --start-server >/dev/null 2>&1 || true;
     fi
 }
-
-if test -n "${devcontainer_utils_debug:-}"; then
-    PS4="+ ${BASH_SOURCE[0]}:\${LINENO} "; set -x;
-fi
 
 init_vault_s3_creds "$@";
 

@@ -1,8 +1,15 @@
 #! /usr/bin/env bash
 
 init_ssh_deploy_keys() {
+    local -;
+    set -Eeuo pipefail;
 
-    set -euo pipefail;
+    # shellcheck disable=SC2154
+    if test -n "${devcontainer_utils_debug:-}" \
+    && { test -z "${devcontainer_utils_debug##*"*"*}" \
+      || test -z "${rapids_build_utils_debug##*"init-deploy-keys"*}"; }; then
+        PS4="+ ${BASH_SOURCE[0]}:\${LINENO} "; set -x;
+    fi
 
     local re="(ssh:\/\/|https:\/\/)?(git@)?(.*\.com)[:\/](.*)";
     local line;
@@ -44,9 +51,5 @@ ____________EOF
     chmod 0700 ~/.ssh;
     chmod 0600 ~/.ssh/*;
 }
-
-if test -n "${devcontainer_utils_debug:-}"; then
-    PS4="+ ${BASH_SOURCE[0]}:\${LINENO} "; set -x;
-fi
 
 init_ssh_deploy_keys "$@";

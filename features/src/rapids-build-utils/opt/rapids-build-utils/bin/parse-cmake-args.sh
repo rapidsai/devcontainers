@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
 
 parse_cmake_args() {
-
-    set -euo pipefail;
+    local -;
+    set -Eeuo pipefail;
 
     local ARG="";
     local args=(-GNinja);

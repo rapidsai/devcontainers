@@ -2,8 +2,15 @@
 
 
 get_vault_token() {
+    local -;
+    set -Eeuo pipefail;
 
-    set -euo pipefail;
+    # shellcheck disable=SC2154
+    if test -n "${devcontainer_utils_debug:-}" \
+    && { test -z "${devcontainer_utils_debug##*"*"*}" \
+      || test -z "${rapids_build_utils_debug##*"vault-auth-github"*}"; }; then
+        PS4="+ ${BASH_SOURCE[0]}:\${LINENO} "; set -x;
+    fi
 
     local -r VAULT_HOST="$1";
     local -r user_orgs=("${@:2}");
@@ -22,20 +29,16 @@ get_vault_token() {
                     "${VAULT_HOST}/v1/auth/github-${org}/login" \
               | jq -r '.auth.client_token'                      \
             )";
-            if test ${#vault_token} -gt 0; then
+            if test "${vault_token:-null}" != null; then
                 break;
             fi
         done
-        if test ${#vault_token} -gt 0; then
+        if test "${vault_token:-null}" != null; then
             break;
         fi
     done
 
     echo "vault_token='$vault_token'";
 }
-
-if test -n "${devcontainer_utils_debug:-}"; then
-    PS4="+ ${BASH_SOURCE[0]}:\${LINENO} "; set -x;
-fi
 
 get_vault_token "$@";

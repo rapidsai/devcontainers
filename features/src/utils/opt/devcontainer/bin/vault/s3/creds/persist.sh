@@ -58,8 +58,15 @@ reset_envvar() {
 }
 
 persist_s3_creds() {
+    local -;
+    set -Eeuo pipefail;
 
-    set -euo pipefail;
+    # shellcheck disable=SC2154
+    if test -n "${devcontainer_utils_debug:-}" \
+    && { test -z "${devcontainer_utils_debug##*"*"*}" \
+      || test -z "${rapids_build_utils_debug##*"vault-s3-creds-persist"*}"; }; then
+        PS4="+ ${BASH_SOURCE[0]}:\${LINENO} "; set -x;
+    fi
 
     eval "$(devcontainer-utils-parse-args devcontainer-utils-vault-s3-creds-persist "$@" <&0)";
 
@@ -134,9 +141,5 @@ ____________EOF
         fi
     fi
 }
-
-if test -n "${devcontainer_utils_debug:-}"; then
-    PS4="+ ${BASH_SOURCE[0]}:\${LINENO} "; set -x;
-fi
 
 persist_s3_creds "$@";

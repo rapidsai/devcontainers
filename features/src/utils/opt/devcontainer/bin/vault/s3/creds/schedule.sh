@@ -1,8 +1,15 @@
 #! /usr/bin/env bash
 
 schedule_s3_creds_refresh() {
+    local -;
+    set -Eeuo pipefail;
 
-    set -euo pipefail;
+    # shellcheck disable=SC2154
+    if test -n "${devcontainer_utils_debug:-}" \
+    && { test -z "${devcontainer_utils_debug##*"*"*}" \
+      || test -z "${rapids_build_utils_debug##*"vault-s3-creds-schedule"*}"; }; then
+        PS4="+ ${BASH_SOURCE[0]}:\${LINENO} "; set -x;
+    fi
 
     local -r now="$(date '+%s')";
     local ttl="${VAULT_S3_TTL:-"43200"}";
@@ -32,9 +39,5 @@ ____EOF
 
     sudo /etc/init.d/cron restart >/dev/null 2>&1;
 }
-
-if test -n "${devcontainer_utils_debug:-}"; then
-    PS4="+ ${BASH_SOURCE[0]}:\${LINENO} "; set -x;
-fi
 
 schedule_s3_creds_refresh "$@";

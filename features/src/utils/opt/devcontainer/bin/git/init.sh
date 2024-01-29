@@ -1,8 +1,8 @@
 #! /usr/bin/env bash
 
 init_git_cli_config() {
-
-    set -euo pipefail;
+    local -;
+    set -Eeuo pipefail;
 
     # PS4="+ ${BASH_SOURCE[0]}:\${LINENO} "; set -x;
 

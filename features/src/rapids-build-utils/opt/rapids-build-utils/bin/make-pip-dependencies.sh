@@ -28,7 +28,15 @@ generate_requirements() {
 }
 
 make_pip_dependencies() {
+    local -;
     set -Eeuo pipefail;
+
+    # shellcheck disable=SC2154
+    if test -n "${rapids_build_utils_debug:-}" \
+    && { test -z "${rapids_build_utils_debug##*"*"*}" \
+          || test -z "${rapids_build_utils_debug##*"make-pip-dependencies"*}"; }; then
+        PS4="+ ${BASH_SOURCE[0]}:\${LINENO} "; set -x;
+    fi
 
     eval "$(devcontainer-utils-parse-args "$0" --passthrough '
         -m,--manifest
@@ -120,11 +128,5 @@ make_pip_dependencies() {
         rm -f "${pip_reqs_txts[@]}";
     fi
 }
-
-if test -n "${rapids_build_utils_debug:-}" \
-&& { test -z "${rapids_build_utils_debug##*"*"*}" \
-    || test -z "${rapids_build_utils_debug##*"make-pip-dependencies"*}"; }; then
-    PS4="+ ${BASH_SOURCE[0]}:\${LINENO} "; set -x;
-fi
 
 make_pip_dependencies "$@";

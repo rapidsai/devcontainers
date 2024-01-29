@@ -17,6 +17,7 @@
 #                        (default: all repositories)
 
 python_pkg_roots() {
+    local -;
     set -Eeuo pipefail;
 
     eval "$(devcontainer-utils-parse-args "$0" - <<< "${@@Q}")";

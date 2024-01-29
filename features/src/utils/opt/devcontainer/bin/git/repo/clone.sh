@@ -27,7 +27,16 @@
 #  directory                    clone the repo into <directory>
 
 clone_git_repo() {
+    local -;
     set -Eeuo pipefail;
+
+    # shellcheck disable=SC2154
+    if test -n "${devcontainer_utils_debug:-}" \
+    && { test -z "${devcontainer_utils_debug##*"*"*}" \
+      || test -z "${devcontainer_utils_debug##*"clone"*}" \
+      || test -z "${devcontainer_utils_debug##*"clone-git-repo"*}"; }; then
+        PS4="+ ${BASH_SOURCE[0]}:\${LINENO} "; set -x;
+    fi
 
     eval "$(devcontainer-utils-parse-args "$0" --passthrough '
         -q,--quiet
@@ -105,12 +114,5 @@ clone_git_repo() {
     # shellcheck disable=SC2086
     git -C "${directory}" submodule update --init --recursive ${parallel} ${quiet};
 }
-
-if test -n "${devcontainer_utils_debug:-}" \
-&& { test -z "${devcontainer_utils_debug##*"*"*}" \
-  || test -z "${devcontainer_utils_debug##*"clone"*}" \
-  || test -z "${devcontainer_utils_debug##*"clone-git-repo"*}"; }; then
-    PS4="+ ${BASH_SOURCE[0]}:\${LINENO} "; set -x;
-fi
 
 clone_git_repo "$@";

@@ -25,7 +25,16 @@
 #                               (default: `${NAME}.git.upstream` in manifest.yaml)
 
 clone_${NAME}() {
+    local -;
     set -Eeuo pipefail;
+
+    # shellcheck disable=SC2154
+    if test -n "${rapids_build_utils_debug:-}" \
+    && { test -z "${rapids_build_utils_debug##*"*"*}" \
+      || test -z "${rapids_build_utils_debug##*"clone-all"*}" \
+      || test -z "${rapids_build_utils_debug##*"clone-${NAME}"*}"; }; then
+        PS4="+ ${BASH_SOURCE[0]}:\${LINENO} "; set -x;
+    fi
 
     eval "$(devcontainer-utils-parse-args "$0" --passthrough '
         --no-fork
@@ -69,12 +78,5 @@ clone_${NAME}() {
         fi
     fi
 }
-
-if test -n "${rapids_build_utils_debug:-}" \
-&& { test -z "${rapids_build_utils_debug##*"*"*}" \
-  || test -z "${rapids_build_utils_debug##*"clone-all"*}" \
-  || test -z "${rapids_build_utils_debug##*"clone-${NAME}"*}"; }; then
-    PS4="+ ${BASH_SOURCE[0]}:\${LINENO} "; set -x;
-fi
 
 clone_${NAME} "$@";

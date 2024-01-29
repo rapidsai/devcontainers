@@ -13,8 +13,8 @@ _remove_warning_from_bashrc() {
 }
 
 init_gitlab_cli() {
-
-    set -euo pipefail;
+    local -;
+    set -Eeuo pipefail;
 
     if ! type glab > /dev/null 2>&1; then
         export GITLAB_USER="";

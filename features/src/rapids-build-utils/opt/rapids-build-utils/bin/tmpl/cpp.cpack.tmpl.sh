@@ -14,7 +14,16 @@
 #                               (default: none)
 
 cpack_${CPP_LIB}_cpp() {
+    local -;
     set -Eeuo pipefail;
+
+    # shellcheck disable=SC2154
+    if test -n "${rapids_build_utils_debug:-}" \
+    && { test -z "${rapids_build_utils_debug##*"*"*}" \
+      || test -z "${rapids_build_utils_debug##*"cpack-all"*}" \
+      || test -z "${rapids_build_utils_debug##*"cpack-${CPP_LIB}-cpp"*}"; }; then
+        PS4="+ ${BASH_SOURCE[0]}:\${LINENO} "; set -x;
+    fi
 
     eval "$(devcontainer-utils-parse-args "$0" - <<< "${@@Q}")";
 
@@ -34,12 +43,5 @@ cpack_${CPP_LIB}_cpp() {
         { set +x; } 2>/dev/null; echo -n "lib${CPP_LIB} CPack time:";
     ) 2>&1;
 }
-
-if test -n "${rapids_build_utils_debug:-}" \
-&& { test -z "${rapids_build_utils_debug##*"*"*}" \
-  || test -z "${rapids_build_utils_debug##*"cpack-all"*}" \
-  || test -z "${rapids_build_utils_debug##*"cpack-${CPP_LIB}-cpp"*}"; }; then
-    PS4="+ ${BASH_SOURCE[0]}:\${LINENO} "; set -x;
-fi
 
 cpack_${CPP_LIB}_cpp "$@";

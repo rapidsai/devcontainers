@@ -1,7 +1,8 @@
 #!/usr/bin/env bash
 
 join_with_delimiter() {
-    set -euo pipefail
+    local -;
+    set -Eeuo pipefail
     local IFS='' delim=${1:-};
     shift;
     echo -n "${1:-}";
@@ -10,12 +11,11 @@ join_with_delimiter() {
 }
 
 parse_cmake_vars_from_args() {
-    set -euo pipefail;
+    local -;
+    set -Eeuo pipefail;
 
-    local args="";
-    args="$(rapids-parse-cmake-args "$@")";
-    args="$(join_with_delimiter "\n" "${args}")";
-    echo -e "$args" \
+    # shellcheck disable=SC2046
+    echo -e "$(join_with_delimiter "\n" $(rapids-parse-cmake-args "$@"))" \
   | grep '\-D' \
   | sed -r 's/^-D//';
 }
