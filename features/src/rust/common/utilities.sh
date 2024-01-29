@@ -26,7 +26,8 @@ export -f check_packages;
 
 for_each_user_bashrc() {
     # Update all bashrc files
-    find / /etc /home "${_REMOTE_USER_HOME}" "${_CONTAINER_USER_HOME}" -maxdepth 2 -type f -name .bashrc \
+    # shellcheck disable=SC2086
+    find / /etc /home ${_REMOTE_USER_HOME} ${_CONTAINER_USER_HOME} -maxdepth 2 -type f -name .bashrc \
   | sort | uniq | xargs -r -d'\n' -n1 bash -c "${@}";
 }
 
@@ -34,7 +35,8 @@ export -f for_each_user_bashrc;
 
 for_each_user_profile() {
     # Update all .profile files
-    find / /etc /home "${_REMOTE_USER_HOME}" "${_CONTAINER_USER_HOME}" -maxdepth 2 -type f -name .profile \
+    # shellcheck disable=SC2086
+    find / /etc /home ${_REMOTE_USER_HOME} ${_CONTAINER_USER_HOME} -maxdepth 2 -type f -name .profile \
   | sort | uniq | xargs -r -d'\n' -n1 bash -c "${@}";
 }
 
@@ -42,7 +44,8 @@ export -f for_each_user_profile;
 
 append_to_all_bashrcs() {
     # Update all bashrc files
-    for bashrc in $(find / /etc /home "${_REMOTE_USER_HOME}" "${_CONTAINER_USER_HOME}" -maxdepth 2 -type f -name .bashrc | sort | uniq); do
+    # shellcheck disable=SC2086
+    for bashrc in $(find / /etc /home ${_REMOTE_USER_HOME} ${_CONTAINER_USER_HOME} -maxdepth 2 -type f -name .bashrc | sort | uniq); do
         if [[ "$(cat "$bashrc")" != *"$1"* ]]; then
             echo "Appending to $bashrc...";
             echo -e "$1" >> "$bashrc";
@@ -54,7 +57,8 @@ export -f append_to_all_bashrcs;
 
 prepend_to_all_bashrcs() {
     # Update all bashrc files
-    for bashrc in $(find / /etc /home "${_REMOTE_USER_HOME}" "${_CONTAINER_USER_HOME}" -maxdepth 2 -type f -name .bashrc | sort | uniq); do
+    # shellcheck disable=SC2086
+    for bashrc in $(find / /etc /home ${_REMOTE_USER_HOME} ${_CONTAINER_USER_HOME} -maxdepth 2 -type f -name .bashrc | sort | uniq); do
         if [[ "$(cat "$bashrc")" != *"$1"* ]]; then
             echo "Prepending to $bashrc...";
             echo -e "$1\n$(cat "$bashrc")" > "$bashrc";
