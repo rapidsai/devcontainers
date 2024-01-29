@@ -96,6 +96,10 @@ make_conda_env() {
     fi
 }
 
+if test -n "${rapids_build_utils_debug:-}"; then
+    PS4="+ ${BASH_SOURCE[0]}:\${LINENO} "; set -x;
+fi
+
 . /opt/conda/etc/profile.d/conda.sh;
 . /opt/conda/etc/profile.d/mamba.sh;
 
