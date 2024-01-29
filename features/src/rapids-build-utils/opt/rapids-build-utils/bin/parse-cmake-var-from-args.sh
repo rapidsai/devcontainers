@@ -11,4 +11,4 @@ parse_cmake_var_from_args() {
     envsubst "\$$1" <<< "\$$1";
 }
 
-(parse_cmake_var_from_args "$@");
+parse_cmake_var_from_args "$@";

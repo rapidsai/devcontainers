@@ -12,7 +12,7 @@ get_repos() {
     local repos="$(get_repos_ordered)";
 
     join \
-      <(echo "${repos}" | sort -k 1b,1)                                          \
+      <(echo "${repos}" | sort -k 1b,1)                           \
       <(find ~ -maxdepth 1 -mindepth 1 -type d ! -name '.*' -exec \
         bash -c "echo '${repos}' | grep \$(basename {})" \; \
       | sort -k 1b,1 | uniq) \
@@ -35,10 +35,7 @@ EOF
 }
 
 cpp_lib_dirs() {
-    eval "$(                                  \
-        rapids-list-repos --repo "${1}"       \
-      | xargs -r -d'\n' -I% echo -n local %\; \
-    )";
+    eval "$(rapids-list-repos --repo "${1}")";
 
     local i=0;
     for ((i=0; i < ${repos_length:-0}; i+=1)); do
@@ -94,8 +91,8 @@ EOF
 }
 
 if test -n "${rapids_build_utils_debug:-}" \
-&& ( test -z "${rapids_build_utils_debug##*"all"*}" \
-  || test -z "${rapids_build_utils_debug##*"make-vscode-workspace"*}" ); then
+&& { test -z "${rapids_build_utils_debug##*"*"*}" \
+  || test -z "${rapids_build_utils_debug##*"make-vscode-workspace"*}"; }; then
     PS4="+ ${BASH_SOURCE[0]}:\${LINENO} "; set -x;
 fi
 
@@ -106,5 +103,5 @@ if echo "$@" | grep -qE '(\-u|\-\-update)'; then
     fi
     rm /tmp/workspace.code-workspace;
 else
-    (make_vscode_workspace "$@");
+    make_vscode_workspace "$@";
 fi

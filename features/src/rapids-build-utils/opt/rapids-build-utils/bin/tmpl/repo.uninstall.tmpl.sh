@@ -9,12 +9,10 @@
 #  -h,--help,--usage  print this text
 #  -v,--verbose       verbose output
 
-. devcontainer-utils-parse-args-from-docstring;
-
 uninstall_${NAME}() {
     set -Eeuo pipefail;
 
-    parse_args_or_show_help - <<< "$@";
+    eval "$(devcontainer-utils-parse-args "$0" - <<< "${@@Q}")";
 
     for lib in ${CPP_LIB}; do
         if type uninstall-${lib}-cpp >/dev/null 2>&1; then
@@ -30,8 +28,9 @@ uninstall_${NAME}() {
 }
 
 if test -n "${rapids_build_utils_debug:-}" \
-&& ( test -z "${rapids_build_utils_debug##*"all"*}" \
-  || test -z "${rapids_build_utils_debug##*"uninstall-${NAME}"*}" ); then
+&& { test -z "${rapids_build_utils_debug##*"*"*}" \
+  || test -z "${rapids_build_utils_debug##*"uninstall-all"*}" \
+  || test -z "${rapids_build_utils_debug##*"uninstall-${NAME}"*}"; }; then
     PS4="+ ${BASH_SOURCE[0]}:\${LINENO} "; set -x;
 fi
 

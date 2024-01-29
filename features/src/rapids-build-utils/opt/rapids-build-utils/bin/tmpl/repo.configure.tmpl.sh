@@ -23,12 +23,10 @@
 #                                         (default: 1)
 #  -D* <var>[:<type>]=<value>             Create or update a cmake cache entry.
 
-. devcontainer-utils-parse-args-from-docstring;
-
 configure_${NAME}() {
     set -Eeuo pipefail;
 
-    parse_args_or_show_help - <<< "$@";
+    eval "$(devcontainer-utils-parse-args "$0" - <<< "${@@Q}")";
 
     for lib in ${CPP_LIB}; do
         if type configure-${lib}-cpp >/dev/null 2>&1; then
@@ -38,8 +36,9 @@ configure_${NAME}() {
 }
 
 if test -n "${rapids_build_utils_debug:-}" \
-&& ( test -z "${rapids_build_utils_debug##*"all"*}" \
-  || test -z "${rapids_build_utils_debug##*"configure-${NAME}"*}" ); then
+&& { test -z "${rapids_build_utils_debug##*"*"*}" \
+  || test -z "${rapids_build_utils_debug##*"configure-all"*}" \
+  || test -z "${rapids_build_utils_debug##*"configure-${NAME}"*}"; }; then
     PS4="+ ${BASH_SOURCE[0]}:\${LINENO} "; set -x;
 fi
 

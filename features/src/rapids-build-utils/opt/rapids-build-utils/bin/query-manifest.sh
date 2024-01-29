@@ -12,12 +12,10 @@
 #  -m,--manifest <file>  Use a specific manifest.json
 #                        (default: ${PROJECT_MANIFEST_YML:-"/opt/rapids-build-utils/manifest.yaml"})
 
-. devcontainer-utils-parse-args-from-docstring;
-
 query_manifest() {
     set -Eeuo pipefail;
 
-    parse_args_or_show_help - <<< "${@@Q}";
+    eval "$(devcontainer-utils-parse-args "$0" - <<< "${@@Q}")";
 
     local manifest="${m:-${manifest:-"${PROJECT_MANIFEST_YML:-"/opt/rapids-build-utils/manifest.yaml"}"}}";
 
@@ -36,12 +34,12 @@ query_manifest() {
           }
         ]
         | map(select(.key))
-        | map(.key + "=" + (.val | @sh | gsub("[\\n]"; " ")))[]
+        | map("declare " + .key + "; " + .key + "=" + (.val | @sh | gsub("[\\n]"; " ")))[]
 ________EOF
 )";
 
     query="$(cat <<________EOF | tr -s '[:space:]'
-        ${__rest__[-1]}
+        ${REST[@]}
         | ${query}
 ________EOF
 )";
@@ -50,9 +48,9 @@ ________EOF
 }
 
 if test -n "${rapids_build_utils_debug:-}" \
-&& ( test -z "${rapids_build_utils_debug##*"all"*}" \
-  || test -z "${rapids_build_utils_debug##*"query-manifest"*}" ); then
+&& { test -z "${rapids_build_utils_debug##*"*"*}" \
+    || test -z "${rapids_build_utils_debug##*"query-manifest"*}"; }; then
     PS4="+ ${BASH_SOURCE[0]}:\${LINENO} "; set -x;
 fi
 
-(query_manifest "$@");
+query_manifest "$@";

@@ -40,4 +40,4 @@ if test -n "${devcontainer_utils_debug:-}"; then
     PS4="+ ${BASH_SOURCE[0]}:\${LINENO} "; set -x;
 fi
 
-(ensure_s3_creds_have_propagated "$@");
+ensure_s3_creds_have_propagated "$@";

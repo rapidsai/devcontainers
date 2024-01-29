@@ -19,33 +19,37 @@
 #                                         limit.
 #                                         Higher values yield fewer parallel CUDA device object compilations.
 #                                         (default: 1)
-#  -t,--type editable|wheel               The type of Python build to run (editable or wheel)
+#  -t,--type (editable|wheel)             The type of Python build to run (editable or wheel)
 #                                         (default: editable)
 #  -D* <var>[:<type>]=<value>             Create or update a cmake cache entry.
-
-. devcontainer-utils-parse-args-from-docstring;
 
 build_${NAME}() {
     set -Eeuo pipefail;
 
-    parse_args_or_show_help - <<< "$@";
+    eval "$(devcontainer-utils-parse-args "$0" --passthrough '
+        -v,--verbose
+        -a,--archs
+        -j,--parallel
+        -m,--max-device-obj-memory-usage
+    ' - <<< "${@@Q}")";
 
     for lib in ${CPP_LIB}; do
         if type build-${lib}-cpp >/dev/null 2>&1; then
-            build-${lib}-cpp ${__rest__[@]};
+            build-${lib}-cpp "${OPTS[@]}";
         fi
     done
 
     for lib in ${PY_LIB}; do
         if type build-${lib}-python >/dev/null 2>&1; then
-            build-${lib}-python --type ${t:-${type:-"editable"}} ${__rest__[@]};
+            build-${lib}-python-${t:-${type:-"editable"}} "${OPTS[@]}";
         fi
     done
 }
 
 if test -n "${rapids_build_utils_debug:-}" \
-&& ( test -z "${rapids_build_utils_debug##*"all"*}" \
-  || test -z "${rapids_build_utils_debug##*"build-${NAME}"*}" ); then
+&& { test -z "${rapids_build_utils_debug##*"*"*}" \
+  || test -z "${rapids_build_utils_debug##*"build-all"*}" \
+  || test -z "${rapids_build_utils_debug##*"build-${NAME}"*}"; }; then
     PS4="+ ${BASH_SOURCE[0]}:\${LINENO} "; set -x;
 fi
 

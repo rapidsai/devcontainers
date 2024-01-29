@@ -17,11 +17,9 @@
 #  --repo <repo>         Only include dependencies for repo(s).
 #                        (default: all repositories)
 
-. devcontainer-utils-parse-args-from-docstring;
-
 generate_env_yaml() {
     (
-        (rapids-dependency-file-generator ${@:2} 2>/dev/null || echo "name: none") \
+        (rapids-dependency-file-generator "${@:2}" 2>/dev/null || echo "name: none") \
       | (grep -v '^#' || [ "$?" == "1" ]) \
       | tee "${1}" 1>/dev/null;
     ) & true
@@ -30,17 +28,14 @@ generate_env_yaml() {
 make_conda_dependencies() {
     set -Eeuo pipefail;
 
-    parse_args_or_show_help - <<< "$@";
+    eval "$(devcontainer-utils-parse-args "$0" --passthrough '
+        -m,--manifest
+        -o,--omit
+        --repo
+    ' - <<< "${@@Q}")";
 
-    local keys=();
-    keys+=(${k[@]:-}); unset k;
-    keys+=(${key[@]:-}); unset key;
-    keys=(${keys[@]:-all});
-
-    local repos=();
-    repos+=(${r[@]:-}); unset r;
-    repos+=(${repo[@]:-}); unset repo;
-    repos=(${repos[@]:-});
+    # shellcheck disable=SC2206
+    key=(${key[@]:-all});
 
     local cuda_version="${CUDA_VERSION:-${CUDA_VERSION_MAJOR:-12}.${CUDA_VERSION_MINOR:-0}}";
     cuda_version="$(grep -o '^[0-9]*.[0-9]' <<< "${cuda_version}")";
@@ -50,10 +45,7 @@ make_conda_dependencies() {
 
     local conda_env_yamls=();
 
-    eval "$(                                  \
-        rapids-list-repos ${repos[@]/#/-r }   \
-      | xargs -r -d'\n' -I% echo -n local %\; \
-    )";
+    eval "$(rapids-list-repos "${OPTS[@]}")";
 
     local i;
 
@@ -72,7 +64,7 @@ make_conda_dependencies() {
 
                 echo "Generating ${!py_name}'s conda env yml" 1>&2;
 
-                local repo_keys=(${keys[@]} ${keys[@]/%/_${!py_name//"-"/"_"}});
+                local repo_keys=("${key[@]}" "${key[@]/%/_${!py_name//"-"/"_"}}");
                 local keyi;
 
                 for ((keyi=0; keyi < ${#repo_keys[@]}; keyi+=1)); do
@@ -80,7 +72,7 @@ make_conda_dependencies() {
                     conda_env_yamls+=("${file}");
                     generate_env_yaml                                                         \
                         "${file}"                                                             \
-                        --file_key ${repo_keys[$keyi]}                                        \
+                        --file_key "${repo_keys[$keyi]}"                                      \
                         --output conda                                                        \
                         --config ~/"${!repo_path}/dependencies.yaml"                          \
                         --matrix "arch=$(uname -m);cuda=${cuda_version};py=${python_version}" \
@@ -98,6 +90,7 @@ make_conda_dependencies() {
             done
         done
 
+        # shellcheck disable=SC2207
         local conda_noinstall=($(rapids-python-pkg-names) $(rapids-python-conda-pkg-names));
         # Generate a combined conda env yaml file.
         conda-merge "${conda_env_yamls[@]}"                                                              \
@@ -111,9 +104,9 @@ make_conda_dependencies() {
 }
 
 if test -n "${rapids_build_utils_debug:-}" \
-&& ( test -z "${rapids_build_utils_debug##*"all"*}" \
-  || test -z "${rapids_build_utils_debug##*"make-conda-dependencies"*}" ); then
+&& { test -z "${rapids_build_utils_debug##*"*"*}" \
+  || test -z "${rapids_build_utils_debug##*"make-conda-dependencies"*}"; }; then
     PS4="+ ${BASH_SOURCE[0]}:\${LINENO} "; set -x;
 fi
 
-(make_conda_dependencies "$@");
+make_conda_dependencies "$@";

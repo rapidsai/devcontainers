@@ -8,6 +8,7 @@
 # Boolean options:
 #  -h,--help,--usage                      print this text
 #  -v,--verbose                           verbose output
+#  --ignore-requires-python               Ignore the Requires-Python information.
 #  --no-clean                             Don't clean up build directories.
 #  --no-deps                              Don't install package dependencies.
 #  --no-verify                            Don't verify if built wheel is valid.
@@ -26,6 +27,7 @@
 #  -a,--archs <num>                       Build <num> CUDA archs in parallel
 #                                         (default: 1)
 #  -j,--parallel <num>                    Run <num> parallel compilation jobs
+#                                         (default: $(nproc))
 #  -m,--max-device-obj-memory-usage <num> An upper-bound on the amount of memory each CUDA device object compilation
 #                                         is expected to take. This is used to estimate the number of parallel device
 #                                         object compilations that can be launched without hitting the system memory
@@ -33,7 +35,6 @@
 #                                         Higher values yield fewer parallel CUDA device object compilations.
 #                                         (default: 1)
 #  --cache-dir <dir>                      Store the cache data in <dir>.
-#  --ignore-requires-python               Ignore the Requires-Python information.
 #  --only-binary <format_control>         Do not use source packages. Can be supplied multiple times, and each time
 #                                         adds to the existing value. Accepts either ":all:" to disable all source
 #                                         packages, ":none:" to empty the set, or one or more package names with commas
@@ -42,42 +43,36 @@
 #  -w,--wheel-dir <dir>                   copy built wheel into <dir>
 #                                         (default: none)
 
-. devcontainer-utils-parse-args-from-docstring;
-
 build_${PY_LIB}_python_wheel() {
     set -Eeuo pipefail;
 
-    parse_args_or_show_help - <<< "$@";
+    eval "$(devcontainer-utils-parse-args "$0" - <<< "${@@Q}")";
 
     if [[ ! -d "${PY_SRC}" ]]; then
         exit 1;
     fi
 
-    local verbose="${v:-${verbose:-}}";
-    local wheel_dir="${w:-${wheel_dir:-}}";
-
     eval "$(                                    \
     PARALLEL_LEVEL=${PARALLEL_LEVEL:-$(nproc)}  \
         rapids-get-num-archs-jobs-and-load "$@" \
-      | xargs -r -d'\n' -I% echo -n local %\;   \
     )";
 
     local cmake_args=(${PY_CMAKE_ARGS});
 
-    if test -n "${verbose}"; then
+    if test -n "${v}"; then
         cmake_args+=("--log-level=VERBOSE");
     fi
 
     cmake_args+=(${CMAKE_ARGS:-});
     cmake_args+=(${CPP_DEPS});
     cmake_args+=(${CPP_ARGS});
-    cmake_args+=(${verbose:+--log-level=VERBOSE});
-    cmake_args+=(${__rest__[@]});
+    cmake_args+=(${v:+--log-level=VERBOSE});
+    cmake_args+=("${OPTS[@]}");
 
     local ninja_args=();
     local pip_args=(${PIP_WHEEL_ARGS});
 
-    if test -n "${verbose}"; then
+    if test -n "${v}"; then
         ninja_args+=("-v");
         pip_args+=("-vv");
     fi
@@ -164,9 +159,10 @@ build_${PY_LIB}_python_wheel() {
 }
 
 if test -n "${rapids_build_utils_debug:-}" \
-&& ( test -z "${rapids_build_utils_debug##*"all"*}" \
+&& { test -z "${rapids_build_utils_debug##*"*"*}" \
+  || test -z "${rapids_build_utils_debug##*"build-all"*}" \
   || test -z "${rapids_build_utils_debug##*"build-${PY_LIB}-python"*}" \
-  || test -z "${rapids_build_utils_debug##*"build-${PY_LIB}-python-wheel"*}" ); then
+  || test -z "${rapids_build_utils_debug##*"build-${PY_LIB}-python-wheel"*}"; }; then
     PS4="+ ${BASH_SOURCE[0]}:\${LINENO} "; set -x;
 fi
 

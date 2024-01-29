@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 # Usage:
-#  cpack-${CPP_LIB}-cpp [OPTION]...
+#  cpack-${NAME} [OPTION]...
 #
 # CPack ${CPP_LIB}.
 #
@@ -13,33 +13,23 @@
 #  -o,--out-dir <dir>           copy cpack'd TGZ file into <dir>
 #                               (default: none)
 
-cpack_${CPP_LIB}_cpp() {
+cpack_${NAME}() {
     set -Eeuo pipefail;
 
     eval "$(devcontainer-utils-parse-args "$0" - <<< "${@@Q}")";
 
-    time (
-        (
-            cd "${CPP_SRC}"/build/latest/;
-            cpack -G TGZ ${v:+-V};
-        ) || true;
-
-        if test -d "${out_dir}"/; then
-            find "${CPP_SRC}"/build/latest/     \
-                -iname "${CPP_LIB}-*.tar.gz"    \
-                -print0                         \
-          | xargs -0 -I% cp -a "%" "${out_dir}"/;
+    for lib in ${CPP_LIB}; do
+        if type cpack-${lib}-cpp >/dev/null 2>&1; then
+            cpack-${lib}-cpp "$@";
         fi
-
-        { set +x; } 2>/dev/null; echo -n "lib${CPP_LIB} CPack time:";
-    ) 2>&1;
+    done
 }
 
 if test -n "${rapids_build_utils_debug:-}" \
 && { test -z "${rapids_build_utils_debug##*"*"*}" \
   || test -z "${rapids_build_utils_debug##*"cpack-all"*}" \
-  || test -z "${rapids_build_utils_debug##*"cpack-${CPP_LIB}-cpp"*}"; }; then
+  || test -z "${rapids_build_utils_debug##*"cpack-${NAME}"*}"; }; then
     PS4="+ ${BASH_SOURCE[0]}:\${LINENO} "; set -x;
 fi
 
-cpack_${CPP_LIB}_cpp "$@";
+cpack_${NAME} "$@";

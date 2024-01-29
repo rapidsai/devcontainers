@@ -1,14 +1,76 @@
 #!/usr/bin/env bash
 
+# shellcheck disable=SC2016
+
 ALT_SCRIPT_DIR="${ALT_SCRIPT_DIR:-/usr/bin}";
 TEMPLATES="${TEMPLATES:-/opt/rapids-build-utils/bin/tmpl}";
 TMP_SCRIPT_DIR="${TMP_SCRIPT_DIR:-/tmp/rapids-build-utils}";
 
-clean_scripts() {
+clean_completions() {
+
+    local -;
+
+    if test -n "${rapids_build_utils_debug:-}" \
+    && { test -z "${rapids_build_utils_debug##*"*"*}" \
+      || test -z "${rapids_build_utils_debug##*"generate-scripts"*}"; }; then
+        PS4="+ ${BASH_SOURCE[0]}:\${LINENO} "; set -x;
+    fi
+
     set -euo pipefail;
-    mkdir -p "${TMP_SCRIPT_DIR}" ~/.bash_completion.d;
-    find "${TMP_SCRIPT_DIR}"/ -maxdepth 1 -type f -exec basename {} \; \
-  | xargs -r -I% rm -f "${TMP_SCRIPT_DIR}"/% ~/.bash_completion.d/%;
+
+    mkdir -p "${TMP_SCRIPT_DIR}";
+    mkdir -p "${HOME}/.bash_completion.d";
+    readarray -t commands < <(find "${TMP_SCRIPT_DIR}"/ -maxdepth 1 -type f -exec basename {} \;);
+
+    local -r completions_file="${HOME}/.bash_completion.d/rapids-build-utils-utils-completions";
+
+    if test -f "${completions_file}"; then
+        local cmd; for cmd in "${commands[@]}"; do
+            complete -r "${cmd}" 2>/dev/null || true;
+            sed -i "/complete -F _devcontainer_utils_completions ${cmd};.*/d" "${completions_file}";
+        done
+    fi
+}
+
+generate_completions() {
+
+    local -;
+
+    if test -n "${rapids_build_utils_debug:-}" \
+    && { test -z "${rapids_build_utils_debug##*"*"*}" \
+      || test -z "${rapids_build_utils_debug##*"generate-scripts"*}"; }; then
+        PS4="+ ${BASH_SOURCE[0]}:\${LINENO} "; set -x;
+    fi
+
+    set -euo pipefail;
+
+    mkdir -p "${HOME}/.bash_completion.d";
+    readarray -t commands < <(find "${TMP_SCRIPT_DIR}"/ -maxdepth 1 -type f -exec basename {} \;);
+
+    local -r completions_file="${HOME}/.bash_completion.d/rapids-build-utils-utils-completions";
+    local -r template="${COMPLETION_TMPL:-"$(which devcontainer-utils-bash-completion.tmpl)"}";
+
+    if test -f "${template}"; then
+        if ! test -f "${completions_file}"; then
+            cp "${template}" "${completions_file}";
+        fi
+        local cmd; for cmd in "${commands[@]}"; do
+            local str="complete -F _devcontainer_utils_completions ${cmd};";
+            if ! grep -q "${str}" "${completions_file}"; then
+                echo "${str}" >> "${completions_file}";
+            fi
+        done
+    fi
+}
+
+clean_scripts() {
+    local -;
+    set -euo pipefail;
+    mkdir -p "${TMP_SCRIPT_DIR}";
+    readarray -t commands < <(find "${TMP_SCRIPT_DIR}"/ -maxdepth 1 -type f -exec basename {} \;);
+    sudo rm -f -- \
+        "${commands[@]/#/${ALT_SCRIPT_DIR}\/}" \
+        "${commands[@]/#/${TMP_SCRIPT_DIR}\/}" ;
 }
 
 generate_script() {
@@ -42,8 +104,6 @@ generate_script() {
             if [[ "${bin}" != "${bin,,}" ]]; then
                 sudo ln -sf "${TMP_SCRIPT_DIR}/${bin,,}" "${ALT_SCRIPT_DIR}/${bin,,}";
             fi
-
-            devcontainer-utils-generate-bash-completion --command "${bin}" --out-dir ~/.bash_completion.d;
         ) & true;
 
         echo "$!"
@@ -62,8 +122,6 @@ generate_all_script_impl() {
             chmod +x "${TMP_SCRIPT_DIR}/${bin}";
 
             sudo ln -sf "${TMP_SCRIPT_DIR}/${bin}" "${ALT_SCRIPT_DIR}/${bin}";
-
-            devcontainer-utils-generate-bash-completion --command "${bin}" --out-dir ~/.bash_completion.d;
         ) & true;
 
         echo "$!"
@@ -72,10 +130,12 @@ generate_all_script_impl() {
 
 generate_all_script() {
     if test -f "${TEMPLATES}/all.${SCRIPT}.tmpl.sh"; then (
+        # shellcheck disable=SC2002
         cat "${TEMPLATES}/all.${SCRIPT}.tmpl.sh" \
       | generate_all_script_impl       ;
     ) || true;
     elif test -f "${TEMPLATES}/all.tmpl.sh"; then (
+        # shellcheck disable=SC2002
         cat "${TEMPLATES}/all.tmpl.sh" \
       | generate_all_script_impl       ;
     ) || true;
@@ -84,6 +144,7 @@ generate_all_script() {
 
 generate_clone_script() {
     if test -f "${TEMPLATES}/repo.clone.tmpl.sh"; then (
+        # shellcheck disable=SC2002
         cat "${TEMPLATES}/repo.clone.tmpl.sh" \
       | generate_script "clone-${NAME}"  ;
     ) || true;
@@ -92,8 +153,9 @@ generate_clone_script() {
 
 generate_repo_scripts() {
     local script_name;
-    for script_name in "configure" "build" "clean" "install" "uninstall"; do
+    for script_name in "configure" "build" "cpack" "clean" "install" "uninstall"; do
         if test -f "${TEMPLATES}/repo.${script_name}.tmpl.sh"; then (
+            # shellcheck disable=SC2002
             cat "${TEMPLATES}/repo.${script_name}.tmpl.sh" \
           | generate_script "${script_name}-${NAME}"  ;
         ) || true;
@@ -105,9 +167,10 @@ generate_cpp_scripts() {
     local script_name;
     for script_name in "clean" "configure" "build" "cpack" "install" "uninstall"; do
         if test -f "${TEMPLATES}/cpp.${script_name}.tmpl.sh"; then (
+            # shellcheck disable=SC2002
             cat "${TEMPLATES}/cpp.${script_name}.tmpl.sh"  \
           | CPP_SRC="${SRC_PATH:-}${CPP_SRC:+/$CPP_SRC}"   \
-            generate_script "${script_name}-${CPP_LIB}-cpp";
+            generate_script "${script_name}-${CPP_LIB-}-cpp";
         ) || true;
         fi
     done
@@ -117,6 +180,7 @@ generate_python_scripts() {
     local script_name;
     for script_name in "build" "clean" "uninstall"; do
         if test -f "${TEMPLATES}/python.${script_name}.tmpl.sh"; then (
+            # shellcheck disable=SC2002
             cat "${TEMPLATES}/python.${script_name}.tmpl.sh" \
           | generate_script "${script_name}-${PY_LIB}-python";
         ) || true;
@@ -124,6 +188,7 @@ generate_python_scripts() {
     done
     for script_name in "editable" "wheel"; do
         if test -f "${TEMPLATES}/python.build.${script_name}.tmpl.sh"; then (
+            # shellcheck disable=SC2002
             cat "${TEMPLATES}/python.build.${script_name}.tmpl.sh" \
           | generate_script "build-${PY_LIB}-python-${script_name}";
         ) || true;
@@ -133,6 +198,14 @@ generate_python_scripts() {
 
 generate_scripts() {
 
+    local -;
+
+    if test -n "${rapids_build_utils_debug:-}" \
+    && { test -z "${rapids_build_utils_debug##*"*"*}" \
+      || test -z "${rapids_build_utils_debug##*"generate-scripts"*}"; }; then
+        PS4="+ ${BASH_SOURCE[0]}:\${LINENO} "; set -x;
+    fi
+
     # Generate and install the "clone-<repo>" scripts
 
     set -euo pipefail;
@@ -140,12 +213,9 @@ generate_scripts() {
     # Ensure we're in this script's directory
     cd "$( cd "$( dirname "$(realpath -m "${BASH_SOURCE[0]}")" )" && pwd )";
 
-    eval "$(                                  \
-        rapids-list-repos "$@"                \
-      | xargs -r -d'\n' -I% echo -n local %\; \
-    )";
+    eval "$(rapids-list-repos "$@")";
 
-    declare -A cpp_name_to_path;
+    local -A cpp_name_to_path;
 
     local i;
     local j;
@@ -185,7 +255,7 @@ generate_scripts() {
             cpp_dirs+=("${cpp_path}");
             cpp_libs+=("${!cpp_name:-}");
             cpp_name="${!cpp_name:-}";
-            cpp_name_lower="${cpp_name,,}";
+            # cpp_name_lower="${cpp_name,,}";
 
             cpp_name_to_path["${cpp_name}"]="${cpp_path}";
 
@@ -199,20 +269,20 @@ generate_scripts() {
                 fi
                 local dep_cpp_path="${cpp_name_to_path["${dep_cpp_name}"]}";
 
-                deps+=(-D${!dep}_ROOT=\"${dep_cpp_path}/build/latest\");
-                deps+=(-D${!dep,,}_ROOT=\"${dep_cpp_path}/build/latest\");
-                deps+=(-D${!dep^^}_ROOT=\"${dep_cpp_path}/build/latest\");
+                deps+=("-D${!dep}_ROOT=\"${dep_cpp_path}/build/latest\"");
+                deps+=("-D${!dep,,}_ROOT=\"${dep_cpp_path}/build/latest\"");
+                deps+=("-D${!dep^^}_ROOT=\"${dep_cpp_path}/build/latest\"");
             done
 
             if [[ -d ~/"${!repo_path:-}/.git" ]]; then
-            (
+            # (
                 SRC_PATH=~/"${!repo_path:-}" \
                 CPP_LIB="${cpp_name:-}"      \
                 CPP_SRC="${!cpp_sub_dir:-}"  \
                 CPP_ARGS="${!cpp_args:-}"    \
-                CPP_DEPS="${deps[@]}"        \
+                CPP_DEPS="${deps[*]}"        \
                 generate_cpp_scripts         ;
-            ) || true;
+            # ) || true;
             fi
         done
 
@@ -225,12 +295,12 @@ generate_scripts() {
             # scikit-build CMakeLists.txt's aren't 100% consistent in the casing
             local cpp_dir="${cpp_dirs[$k]}";
             local cpp_lib="${cpp_libs[$k]}";
-            args+=(-DFIND_${cpp_lib}_CPP=ON);
-            args+=(-DFIND_${cpp_lib,,}_CPP=ON);
-            args+=(-DFIND_${cpp_lib^^}_CPP=ON);
-            deps+=(-D${cpp_lib}_ROOT=\"${cpp_dir}/build/latest\");
-            deps+=(-D${cpp_lib,,}_ROOT=\"${cpp_dir}/build/latest\");
-            deps+=(-D${cpp_lib^^}_ROOT=\"${cpp_dir}/build/latest\");
+            args+=("-DFIND_${cpp_lib}_CPP=ON");
+            args+=("-DFIND_${cpp_lib,,}_CPP=ON");
+            args+=("-DFIND_${cpp_lib^^}_CPP=ON");
+            deps+=("-D${cpp_lib}_ROOT=\"${cpp_dir}/build/latest\"");
+            deps+=("-D${cpp_lib,,}_ROOT=\"${cpp_dir}/build/latest\"");
+            deps+=("-D${cpp_lib^^}_ROOT=\"${cpp_dir}/build/latest\"");
         done
 
         for ((j=0; j < ${!py_length:-0}; j+=1)); do
@@ -240,51 +310,51 @@ generate_scripts() {
             local pip_wheel_args="${repo}_python_${j}_args_wheel";
             local pip_install_args="${repo}_python_${j}_args_install";
             local py_sub_dir="${repo}_python_${j}_sub_dir";
-            local py_depends_length="${repo}_python_${j}_depends_length";
+            # local py_depends_length="${repo}_python_${j}_depends_length";
             local py_path=~/"${!repo_path:-}${!py_sub_dir:+/${!py_sub_dir}}";
 
             py_dirs+=("${py_path}");
             py_libs+=("${!py_name}");
 
             if [[ -d ~/"${!repo_path:-}/.git" ]]; then
-            (
+            # (
                 SRC_PATH=~/"${!repo_path:-}"              \
                 PY_SRC="${py_path}"                       \
                 PY_LIB="${!py_name}"                      \
                 PY_ENV="${!py_env:-}"                     \
-                CPP_ARGS="${args[@]}"                     \
-                CPP_DEPS="${deps[@]}"                     \
+                CPP_ARGS="${args[*]}"                     \
+                CPP_DEPS="${deps[*]}"                     \
                 PY_CMAKE_ARGS="${!py_cmake_args:-}"       \
                 PIP_WHEEL_ARGS="${!pip_wheel_args:-}"     \
                 PIP_INSTALL_ARGS="${!pip_install_args:-}" \
                 generate_python_scripts                   ;
-            ) || true;
+            # ) || true;
             fi
         done;
 
         if [[ -d ~/"${!repo_path:-}/.git" ]]; then
-        (
+        # (
             NAME="${repo_name:-}"    \
-            PY_LIB="${py_libs[@]}"   \
-            CPP_LIB="${cpp_libs[@]}" \
+            PY_LIB="${py_libs[*]}"   \
+            CPP_LIB="${cpp_libs[*]}" \
             generate_repo_scripts    ;
-        ) || true;
+        # ) || true;
         fi
 
         # Generate a clone script for each repo
-        (
+        # (
             NAME="${repo_name:-}"             \
             SRC_PATH=~/"${!repo_path:-}"      \
-            PY_LIB="${py_libs[@]}"            \
-            PY_SRC="${py_dirs[@]}"            \
-            CPP_LIB="${cpp_libs[@]}"          \
-            CPP_SRC="${cpp_dirs[@]}"          \
+            PY_LIB="${py_libs[*]}"            \
+            PY_SRC="${py_dirs[*]}"            \
+            CPP_LIB="${cpp_libs[*]}"          \
+            CPP_SRC="${cpp_dirs[*]}"          \
             GIT_TAG="${!git_tag:-}"           \
             GIT_REPO="${!git_repo:-}"         \
             GIT_HOST="${!git_host:-}"         \
             GIT_UPSTREAM="${!git_upstream:-}" \
             generate_clone_script             ;
-        ) || true;
+        # ) || true;
     done
 
     sudo find /opt/rapids-build-utils \
@@ -295,26 +365,24 @@ generate_scripts() {
 
     for script in "clone" "clean" "configure" "build" "cpack" "install" "uninstall"; do
         # Generate a script to run a script for all repos
-        (
-            NAMES="${repo_names[@]}" \
+        # (
+            NAMES="${repo_names[*]}" \
             SCRIPT="${script}"       \
             generate_all_script      ;
-        ) || true;
+        # ) || true;
     done;
 }
 
-if test -n "${rapids_build_utils_debug:-}" \
-&& ( test -z "${rapids_build_utils_debug##*"all"*}" \
-  || test -z "${rapids_build_utils_debug##*"generate-scripts"*}" ); then
-    PS4="+ ${BASH_SOURCE[0]}:\${LINENO} "; set -x;
-fi
+if [ "$(basename "${BASH_SOURCE[${#BASH_SOURCE[@]}-1]}")" = rapids-generate-scripts ]; then
 
-clean_scripts;
+    clean_completions;
+    clean_scripts;
 
-rm -rf "${TMP_SCRIPT_DIR}"/*;
-
-for pid in $(generate_scripts "$@"); do
-    while [[ -e "/proc/$pid" ]]; do
-        sleep 0.1
+    for pid in $(generate_scripts "$@"); do
+        while [[ -e "/proc/$pid" ]]; do
+            sleep 0.1
+        done
     done
-done
+
+    generate_completions;
+fi

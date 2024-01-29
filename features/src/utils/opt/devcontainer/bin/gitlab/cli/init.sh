@@ -29,7 +29,7 @@ init_gitlab_cli() {
                 export GITLAB_USER=;
                 return;
             else
-                read -s -p "Please enter a GitLab API token (or leave blank to skip): " GITLAB_TOKEN <$(tty);
+                read -rsp "Please enter a GitLab API token (or leave blank to skip): " GITLAB_TOKEN <"$(tty)";
             fi
         fi
 

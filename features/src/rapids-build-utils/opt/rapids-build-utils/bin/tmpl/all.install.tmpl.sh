@@ -21,12 +21,10 @@
 #                                               (default: all)
 #  --default-directory-permissions <permission> Default install permission. Use default permission <permission>.
 
-. devcontainer-utils-parse-args-from-docstring;
-
 install_all() {
     set -Eeuo pipefail;
 
-    parse_args_or_show_help - <<< "$@";
+    eval "$(devcontainer-utils-parse-args "$0" - <<< "${@@Q}")";
 
     for name in ${NAMES}; do
         if type install-${name} >/dev/null 2>&1; then
@@ -36,8 +34,8 @@ install_all() {
 }
 
 if test -n "${rapids_build_utils_debug:-}" \
-&& ( test -z "${rapids_build_utils_debug##*"all"*}" \
-  || test -z "${rapids_build_utils_debug##*"install-all"*}" ); then
+&& { test -z "${rapids_build_utils_debug##*"*"*}" \
+  || test -z "${rapids_build_utils_debug##*"install-all"*}"; }; then
     PS4="+ ${BASH_SOURCE[0]}:\${LINENO} "; set -x;
 fi
 

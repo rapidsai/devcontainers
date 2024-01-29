@@ -7,6 +7,7 @@
 #
 # Boolean options:
 #  -h,--help,--usage       print this text
+#  --no-dedupe             don't sort and dedupe the combined requirements.txt
 #
 # Options that require values:
 #  -k,--key <key>          Only include the key(s)
@@ -18,11 +19,9 @@
 #                          (default: all repositories)
 #  -r,--requirement <file> Path(s) to additional requirement files to include.
 
-. devcontainer-utils-parse-args-from-docstring;
-
 generate_requirements() {
     (
-        (rapids-dependency-file-generator ${@:2} 2>/dev/null || echo "") \
+        (rapids-dependency-file-generator "${@:2}" 2>/dev/null || echo "") \
       | (grep -v '^#' || [ "$?" == "1" ]) \
       | tee "${1}" 1>/dev/null;
     ) & true
@@ -31,34 +30,25 @@ generate_requirements() {
 make_pip_dependencies() {
     set -Eeuo pipefail;
 
-    parse_args_or_show_help - <<< "$@";
+    eval "$(devcontainer-utils-parse-args "$0" --passthrough '
+        -m,--manifest
+        -o,--omit
+        --repo
+    ' - <<< "${@@Q}")";
 
-    local keys=();
-    keys+=(${k[@]:-}); unset k;
-    keys+=(${key[@]:-}); unset key;
-    keys=(${keys[@]:-py_build py_run py_test all});
-
-    local repos=();
-    repos+=(${repo[@]:-}); unset repo;
-    repos=(${repos[@]:-});
-
-    local requirements=();
-    requirements+=(${r[@]:-}); unset r;
-    requirements+=(${requirement[@]:-}); unset requirement;
+    # shellcheck disable=SC2206
+    key=(${key[@]:-py_build py_run py_test all});
 
     local cuda_version="${CUDA_VERSION:-${CUDA_VERSION_MAJOR:-12}.${CUDA_VERSION_MINOR:-0}}";
     cuda_version="$(grep -o '^[0-9]*.[0-9]*' <<< "${cuda_version}")";
-    local cuda_version_major="$(cut -d'.' -f1 <<< "${cuda_version}")";
+    local -r cuda_version_major="$(cut -d'.' -f1 <<< "${cuda_version}")";
 
     local python_version="${PYTHON_VERSION:-$(python3 --version 2>&1 | cut -d' ' -f2)}";
     python_version="$(cut -d'.' -f3 --complement <<< "${python_version}")";
 
     local pip_reqs_txts=();
 
-    eval "$(                                  \
-        rapids-list-repos ${repos[@]/#/-r }   \
-      | xargs -r -d'\n' -I% echo -n local %\; \
-    )";
+    eval "$(rapids-list-repos "${OPTS[@]}")";
 
     local i;
 
@@ -77,7 +67,7 @@ make_pip_dependencies() {
 
                 echo "Generating ${!py_name}'s requirements.txt" 1>&2;
 
-                local repo_keys=(${keys[@]} ${keys[@]/%/_${!py_name//"-"/"_"}});
+                local repo_keys=("${key[@]}" "${key[@]/%/_${!py_name//"-"/"_"}}");
                 local keyi;
 
                 for ((keyi=0; keyi < ${#repo_keys[@]}; keyi+=1)); do
@@ -85,7 +75,7 @@ make_pip_dependencies() {
                     pip_reqs_txts+=("${file}");
                     generate_requirements                                                     \
                         "${file}"                                                             \
-                        --file_key ${repo_keys[$keyi]}                                        \
+                        --file_key "${repo_keys[$keyi]}"                                      \
                         --output requirements                                                 \
                         --config ~/"${!repo_path}/dependencies.yaml"                          \
                         --matrix "arch=$(uname -m);cuda=${cuda_version};py=${python_version}" \
@@ -117,11 +107,14 @@ make_pip_dependencies() {
         done
 
         # Generate a combined requirements.txt file
-        cat "${requirements[@]}" "${pip_reqs_txts[@]}"                                                              \
-          | (grep -v -P "^($(tr -d '[:blank:]' <<< "${pip_noinstall[@]/%/|}"))(=.*|>.*|<.*)?$" || [ "$?" == "1" ])  \
-          | sed -E "s/-cu([0-9]+)/-cu${cuda_version_major}/g"                                                       \
-          | sed -E "s/cupy-cuda[0-9]+x/cupy-cuda${cuda_version_major}x/g"                                           \
-          | sed -E "s/cuda-python.*/cuda-python>=${cuda_version}.0,<$((cuda_version_major+1)).0a0/g"                \
+        # shellcheck disable=SC2154
+        cat "${requirement[@]}" "${pip_reqs_txts[@]}"                                                           \
+      | (grep -v -E '^$' || [ "$?" == "1" ])                                                                    \
+      | ( if test -n "${no_dedupe:-}"; then cat -; else tr -s "[:blank:]" | LC_ALL=C sort -u; fi )              \
+      | (grep -v -P "^($(tr -d '[:blank:]' <<< "${pip_noinstall[@]/%/|}"))(=.*|>.*|<.*)?$" || [ "$?" == "1" ])  \
+      | sed -E "s/-cu([0-9]+)/-cu${cuda_version_major}/g"                                                       \
+      | sed -E "s/cupy-cuda[0-9]+x/cupy-cuda${cuda_version_major}x/g"                                           \
+      | sed -E "s/cuda-python.*/cuda-python>=${cuda_version}.0,<$((cuda_version_major+1)).0a0/g"                \
         ;
 
         rm -f "${pip_reqs_txts[@]}";
@@ -129,8 +122,8 @@ make_pip_dependencies() {
 }
 
 if test -n "${rapids_build_utils_debug:-}" \
-&& ( test -z "${rapids_build_utils_debug##*"all"*}" \
-  || test -z "${rapids_build_utils_debug##*"make-pip-dependencies"*}" ); then
+&& { test -z "${rapids_build_utils_debug##*"*"*}" \
+    || test -z "${rapids_build_utils_debug##*"make-pip-dependencies"*}"; }; then
     PS4="+ ${BASH_SOURCE[0]}:\${LINENO} "; set -x;
 fi
 

@@ -24,8 +24,6 @@
 #  upstream                     set <upstream> as the `upstream` remote
 #  directory                    clone the repo into <directory>
 
-. devcontainer-utils-parse-args-from-docstring;
-
 get_default_branch() {
     local repo="${1}";
     gh repo view "${repo}" --json defaultBranchRef --jq '.defaultBranchRef.name';
@@ -58,7 +56,7 @@ get_user_fork_name() {
     if [ "${user}" = "${owner}" ]; then
         echo "${owner}/${name}";
     else
-        local query="$(cat <<________EOF | tr -s '[:space:]'
+        local -r query="$(cat <<________EOF | tr -s '[:space:]'
             | map(select(
                 .parent.name == "${name}"
                 and
@@ -67,7 +65,8 @@ get_user_fork_name() {
             | map(.nameWithOwner)[]
 ________EOF
         )";
-        local nameWithOwner="$(gh repo list "${user}" --fork --json nameWithOwner --json parent --jq ". ${query}" 2>/dev/null || echo "err")";
+        local nameWithOwner;
+        nameWithOwner="$(gh repo list "${user}" --fork --json nameWithOwner --json parent --jq ". ${query}" 2>/dev/null || echo "err")";
         if [ "${nameWithOwner}" = "err" ]; then
             nameWithOwner="";
             for repo in $(gh repo list "${user}" --fork --json name --jq 'map(.name)[]'); do
@@ -84,10 +83,12 @@ ________EOF
 clone_github_repo() {
     set -Eeuo pipefail;
 
-    parse_args_or_show_help - <<< "$@";
+    eval "$(devcontainer-utils-parse-args "$0" --passthrough '
+        -j,--parallel
+    ' - <<< "${@@Q}")";
 
-    local nargs="${#__rest__[@]}";
-    local upstream="${__rest__[$((nargs - 2))]}";
+    local nargs="${#REST[@]}";
+    local upstream="${REST[$((nargs - 2))]}";
     upstream="${upstream:?upstream is required}";
 
     local no_fork="${no_fork:-}";
@@ -95,11 +96,8 @@ clone_github_repo() {
     local parallel="${j:-${parallel:-1}}";
     local clone_upstream="${clone_upstream:-}";
 
-    local directory="${__rest__[$((nargs - 1))]}";
+    local directory="${REST[$((nargs - 1))]}";
     directory="${directory:?directory is required}";
-
-    __rest__=("${__rest__[@]/"${upstream}"}");
-    __rest__=("${__rest__[@]/"${directory}"}");
 
     local origin="${upstream}";
     local name=;
@@ -110,7 +108,8 @@ clone_github_repo() {
     if test -z "${no_fork:-}" && \
        test -z "${clone_upstream:-}" && \
        devcontainer-utils-shell-is-interactive; then
-        source devcontainer-utils-init-github-cli;
+        # shellcheck disable=SC1091
+        . devcontainer-utils-init-github-cli;
         user="${GITHUB_USER:-}";
     fi
 
@@ -131,8 +130,8 @@ clone_github_repo() {
          devcontainer-utils-shell-is-interactive; then
         while true; do
             local CHOICE;
-            read -p "'${GITHUB_HOST:-github.com}/${user}/${name}.git' not found.
-    Fork '${upstream}' into '${user}/${name}' now (y/n)? " CHOICE <$(tty)
+            read -rp "'${GITHUB_HOST:-github.com}/${user}/${name}.git' not found.
+    Fork '${upstream}' into '${user}/${name}' now (y/n)? " CHOICE <"$(tty)"
             case "${CHOICE:-}" in
                 [Nn]* ) origin="${upstream}"; break;;
                 [Yy]* ) origin="${user}/${name}";
@@ -143,7 +142,7 @@ clone_github_repo() {
         done
     fi
 
-    if test -n "${GITHUB_USER:-}"; then
+    if gh auth status >/dev/null 2>&1; then
         if [ "$(gh config get git_protocol)" = "ssh" ]; then
             origin="$(get_repo_ssh_url "${origin}")";
             upstream="$(get_repo_ssh_url "${upstream}")";
@@ -159,16 +158,16 @@ clone_github_repo() {
     devcontainer-utils-clone-git-repo         \
         ${branch:+--branch "${branch}"}       \
         ${upstream:+--upstream "${upstream}"} \
-        -j ${parallel}                        \
-        ${__rest__[@]}                        \
+        "${OPTS[@]}"                          \
+        --                                    \
         "${origin}" "${directory}"            \
         ;
 }
 
 if test -n "${devcontainer_utils_debug:-}" \
-&& ( test -z "${devcontainer_utils_debug##*"all"*}" \
+&& { test -z "${devcontainer_utils_debug##*"*"*}" \
   || test -z "${devcontainer_utils_debug##*"clone"*}" \
-  || test -z "${devcontainer_utils_debug##*"clone-github-repo"*}" ); then
+  || test -z "${devcontainer_utils_debug##*"clone-github-repo"*}"; }; then
     PS4="+ ${BASH_SOURCE[0]}:\${LINENO} "; set -x;
 fi
 

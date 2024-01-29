@@ -16,17 +16,12 @@
 #  -r,--repo <repo>      Filter the results to only include <repo> entries.
 #                        (default: all repositories)
 
-. devcontainer-utils-parse-args-from-docstring;
-
 push_repositories() {
     set -Eeuo pipefail;
 
-    parse_args_or_show_help - <<< "$@";
+    eval "$(devcontainer-utils-parse-args "$0" - <<< "${@@Q}")";
 
-    eval "$(                                  \
-        rapids-list-repos "$@"                \
-      | xargs -r -d'\n' -I% echo -n local %\; \
-    )";
+    eval "$(rapids-list-repos "$@")";
 
     for ((i=0; i < ${repos_length:-0}; i+=1)); do
 
@@ -40,14 +35,14 @@ push_repositories() {
 
         echo "Pushing ${!repo_name}...";
 
-        git -C ~/${!repo_path} push origin $(git -C ~/${!repo_path} rev-parse --abbrev-ref HEAD);
+        git -C ~/${!repo_path} push origin "$(git -C ~/${!repo_path} rev-parse --abbrev-ref HEAD)";
     done;
 }
 
 if test -n "${rapids_build_utils_debug:-}" \
-&& ( test -z "${rapids_build_utils_debug##*"all"*}" \
-  || test -z "${rapids_build_utils_debug##*"push-repositories"*}" ); then
+&& { test -z "${rapids_build_utils_debug##*"*"*}" \
+  || test -z "${rapids_build_utils_debug##*"push-repositories"*}"; }; then
     PS4="+ ${BASH_SOURCE[0]}:\${LINENO} "; set -x;
 fi
 
-(push_repositories "$@");
+push_repositories "$@";

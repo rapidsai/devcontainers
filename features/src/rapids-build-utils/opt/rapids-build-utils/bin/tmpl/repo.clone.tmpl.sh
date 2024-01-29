@@ -20,29 +20,25 @@
 #  -d,--directory <dir>         clone the repo into <dir>
 #                               (default: `${NAME}.path` in manifest.yaml)
 #  -j,--parallel <num>          Clone <num> submodules in parallel
+#                               (default: $(nproc --ignore=1))
 #  -u,--upstream <upstream>     set <upstream> as the `upstream` remote
 #                               (default: `${NAME}.git.upstream` in manifest.yaml)
-
-. devcontainer-utils-parse-args-from-docstring;
 
 clone_${NAME}() {
     set -Eeuo pipefail;
 
-    parse_args_or_show_help - <<< "$@";
+    eval "$(devcontainer-utils-parse-args "$0" --passthrough '
+        --no-fork
+        --clone-upstream
+    ' - <<< "${@@Q}")";
 
     if [[ ! -d "${SRC_PATH}"/.git ]]; then
 
-        eval "$(                                    \
-            rapids-get-num-archs-jobs-and-load "$@" \
-          | xargs -r -d'\n' -I% echo -n local %\;   \
-        )";
+        eval "$(rapids-get-num-archs-jobs-and-load "$@")";
 
-        local no_fork="${no_fork:-}";
-        local no_update_env="${no_update_env:-}";
-        local clone_upstream="${clone_upstream:-}";
-        local branch="${b:-${branch:-"${GIT_TAG}"}}";
-        local directory="${d:-${directory:-"${SRC_PATH}"}}";
-        local upstream="${u:-${upstream:-"${GIT_UPSTREAM}/${GIT_REPO}"}}";
+        branch="${b:-"${GIT_TAG}"}";
+        directory="${d:-"${SRC_PATH}"}";
+        upstream="${u:-"${GIT_UPSTREAM}/${GIT_REPO}"}";
 
         echo 'Cloning ${NAME}' 1>&2;
 
@@ -52,9 +48,8 @@ clone_${NAME}() {
             --recurse-submodules                  \
             -j ${n_jobs:-$(nproc --ignore=1)}     \
             -c checkout.defaultRemote=upstream    \
-            ${no_fork:+--no-fork 1}               \
-            ${clone_upstream:+--clone-upstream 1} \
-            ${__rest__[@]}                        \
+            "${OPTS[@]}"                          \
+            --                                    \
             "${upstream}"                         \
             "${directory}"                        \
         ;
@@ -68,7 +63,7 @@ clone_${NAME}() {
 
         git -C "${SRC_PATH}" remote prune upstream;
 
-        if test -z "${no_update_env:-}"; then
+        if test -z "${no_update_env}"; then
             rapids-update-content-command;
             rapids-post-attach-command;
         fi
@@ -76,8 +71,9 @@ clone_${NAME}() {
 }
 
 if test -n "${rapids_build_utils_debug:-}" \
-&& ( test -z "${rapids_build_utils_debug##*"all"*}" \
-  || test -z "${rapids_build_utils_debug##*"clone-${NAME}"*}" ); then
+&& { test -z "${rapids_build_utils_debug##*"*"*}" \
+  || test -z "${rapids_build_utils_debug##*"clone-all"*}" \
+  || test -z "${rapids_build_utils_debug##*"clone-${NAME}"*}"; }; then
     PS4="+ ${BASH_SOURCE[0]}:\${LINENO} "; set -x;
 fi
 

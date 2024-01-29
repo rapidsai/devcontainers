@@ -15,7 +15,7 @@ init_github_cli() {
     if [[ "${CODESPACES:-false}" == "true" ]]; then
         git_protocol="https";
     else
-        if grep -q "You've successfully authenticated" <<< "$(ssh -T git@${GITHUB_HOST:-github.com} 2>&1)"; then
+        if grep -q "You've successfully authenticated" <<< "$(ssh -T "git@${GITHUB_HOST:-github.com}" 2>&1)"; then
             git_protocol="ssh";
             if type ssh-keygen > /dev/null 2>&1; then
                 avoid_gh_cli_ssh_keygen_prompt=1;
@@ -23,16 +23,12 @@ init_github_cli() {
         fi
     fi
 
-    scope_flags() {
-        echo -n "$(echo -n "${@}" | xargs -r -n1 -d' ' echo -n ' --scopes')";
-    }
-
-    local active_scopes="$(GITHUB_TOKEN=     \
-        gh api -i -X GET --silent rate_limit \
-        2>/dev/null                          \
-      | grep -i 'x-oauth-scopes:'            \
-      | cut -d' ' -f1 --complement           \
-      | tr -d ','                            \
+    local -r active_scopes="$(GITHUB_TOKEN="" \
+        gh api -i -X GET --silent rate_limit  \
+        2>/dev/null                           \
+      | grep -i 'x-oauth-scopes:'             \
+      | cut -d' ' -f1 --complement            \
+      | tr -d ','                             \
     )";
 
     local needed_scopes="read:org";
@@ -57,31 +53,34 @@ init_github_cli() {
         done
     fi
 
+    read -ra scopes <<< "${active_scopes} ${needed_scopes}";
+
+    # shellcheck disable=SC2068
     if ! gh auth status >/dev/null 2>&1; then
         echo "Logging into GitHub..." >&2;
 
-        local ssh_keygen="$(which ssh-keygen || echo "")";
+        local -r ssh_keygen="$(which ssh-keygen || echo "")";
 
         if [ -n "${ssh_keygen}" ] \
         && [ -n "${avoid_gh_cli_ssh_keygen_prompt}" ]; then
-            sudo mv $ssh_keygen{,.bak} || true;
+            sudo mv "${ssh_keygen}"{,.bak} || true;
         fi
 
         gh auth login \
-            --web --git-protocol ${git_protocol} \
+            --web --git-protocol ${git_protocol}    \
             --hostname "${GITHUB_HOST:-github.com}" \
-            $(scope_flags ${active_scopes} ${needed_scopes}) \
+            ${scopes[@]/#/--scopes }                \
         || echo "Continuing without logging into GitHub";
 
         if [ -n "${ssh_keygen}" ] \
         && [ -n "${avoid_gh_cli_ssh_keygen_prompt}" ]; then
-            sudo mv $ssh_keygen{.bak,} || true;
+            sudo mv "${ssh_keygen}"{.bak,} || true;
         fi
     elif [ -n "${needed_scopes}" ]; then
         echo "Logging into GitHub..." >&2;
         gh auth refresh \
             --hostname "${GITHUB_HOST:-github.com}" \
-            $(scope_flags ${active_scopes} ${needed_scopes}) \
+            ${scopes[@]/#/--scopes }                \
         || echo "Continuing without logging into GitHub";
     fi
 
