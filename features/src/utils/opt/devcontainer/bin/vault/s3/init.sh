@@ -16,7 +16,7 @@ init_vault_s3_creds() {
         PS4="+ ${BASH_SOURCE[0]}:\${LINENO} "; set -x;
     fi
 
-    if type sccache >/dev/null; then
+    if type sccache >/dev/null 2>&1; then
         if test -n "${SCCACHE_BUCKET:-}"; then
             if grep -qE "^$" <<< "${AWS_ACCESS_KEY_ID:-}"     \
             && grep -qE "^$" <<< "${AWS_SECRET_ACCESS_KEY:-}" ; then
