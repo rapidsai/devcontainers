@@ -59,7 +59,7 @@ make_conda_env() {
             cat "${new_env_path}";
             echo "";
 
-            mamba env create -n "${env_name}" -f "${new_env_path}";
+            conda env create -n "${env_name}" -f "${new_env_path}" --solver=libmamba;
         # If the conda env does exist but it's different from the generated one,
         # print the diff between the envs and update it
         elif ! diff -BNqw "${old_env_path}" "${new_env_path}" >/dev/null 2>&1; then
@@ -75,7 +75,7 @@ make_conda_env() {
 
             # Update the current conda env + prune libs that were removed
             # Use conda instead of mamba due to https://github.com/mamba-org/mamba/issues/3059
-            conda env update -n "${env_name}" -f "${new_env_path}" --prune --solver=libmamba
+            conda env update -n "${env_name}" -f "${new_env_path}" --prune --solver=libmamba;
         fi
 
         cp -a "${new_env_path}" "${old_env_path}";
