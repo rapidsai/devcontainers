@@ -1,5 +1,5 @@
 #! /usr/bin/env bash
-set -e
+set -ex
 
 # Ensure we're in this feature's directory during build
 cd "$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )";
@@ -22,7 +22,7 @@ check_packages      \
 source /etc/lsb-release;
 
 if [[ ! "23.04" > "${DISTRIB_RELEASE}" ]]; then
-  BREAK_PACKAGES="--break-system-packages"
+  BREAK_PACKAGES="--break-system-packages";
 fi
 
 # upgrade pip

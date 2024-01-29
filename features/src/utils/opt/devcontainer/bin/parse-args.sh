@@ -278,15 +278,19 @@ parse_args() {
         echo >&2;
         echo "exit 0";
     else
-        echo "declare -A ARGS; ARGS=(${args[*]@K})";
-        echo "declare -a OPTS; OPTS=(${opts[*]@Q})";
-        echo "declare -a REST; REST=(${rest[*]@Q})";
+        echo "declare -A ARGS=(";
+        for key in "${!args[@]}"; do
+            echo "[${key@Q}]=${args["${key}"]@Q}";
+        done
+        echo ")";
+        echo "declare -a OPTS=(${opts[*]@Q})";
+        echo "declare -a REST=(${rest[*]@Q})";
 
         for key in "${!args[@]}"; do
             if test "${typs["${key}"]}" = bool; then
-                echo "declare ${key//-/_}; ${key//-/_}=${args["${key}"]}";
+                echo "declare ${key//-/_}=${args["${key}"]}";
             else
-                echo "declare -a ${key//-/_}; ${key//-/_}=(${args["${key}"]})";
+                echo "declare -a ${key//-/_}=(${args["${key}"]})";
             fi
             local -a aliases="(${alias_map["${key}"]})";
             for alias in "${aliases[@]}"; do

@@ -29,9 +29,9 @@ generate_bash_completion() {
 
     eval "$(devcontainer-utils-parse-args "$0" - <<< "${@@Q}")";
 
-    local -r command="${c:-${command:?-c|--command is required}}";
-    local -r out_dir="$(realpath -m "${o:-${out_dir:-"${HOME}/.bash_completion.d"}}")";
-    local -r template="${t:-${template:-${COMPLETION_TMPL:-"$(which devcontainer-utils-bash-completion.tmpl)"}}}";
+    command="${c:?-c|--command is required}";
+    out_dir="$(realpath -m "${o:-"${HOME}/.bash_completion.d"}")";
+    template="${t:-${COMPLETION_TMPL:-"$(which devcontainer-utils-bash-completion.tmpl)"}}";
 
     if test -f "${template}"; then
         mkdir -p "${out_dir}";

@@ -1,5 +1,5 @@
 #! /usr/bin/env bash
-set -e
+set -ex
 
 # Ensure we're in this feature's directory during build
 cd "$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )";
@@ -22,9 +22,15 @@ if ! type yq >/dev/null 2>&1; then
         | tar -C /usr/bin -zf - -x ./${YQ_BINARY} --transform="s/${YQ_BINARY}/yq/";
 fi
 
+source /etc/lsb-release;
+
+if [[ ! "23.04" > "${DISTRIB_RELEASE}" ]]; then
+  BREAK_PACKAGES="--break-system-packages";
+fi
+
 # Install the rapids dependency file generator and conda-merge
 if type python >/dev/null 2>&1; then
-    python -m pip install rapids-dependency-file-generator conda-merge toml;
+    python -m pip install $BREAK_PACKAGES rapids-dependency-file-generator conda-merge toml;
 fi
 
 # Install RAPIDS build utility scripts to /opt/
@@ -38,7 +44,9 @@ install_utility() {
     update-alternatives --install /usr/bin/${cmd} ${cmd} /opt/rapids-build-utils/bin/${src} 0;
 
     # Install bash_completion script
-    devcontainer-utils-generate-bash-completion --command "${cmd}" --out-dir /etc/bash_completion.d;
+    if type devcontainer-utils-generate-bash-completion >/dev/null 2>&1; then
+        devcontainer-utils-generate-bash-completion --command "${cmd}" --out-dir /etc/bash_completion.d;
+    fi
 }
 
 install_utility update-content-command;
