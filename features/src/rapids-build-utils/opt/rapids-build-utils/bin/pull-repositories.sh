@@ -45,11 +45,11 @@ pull_repositories() {
         git -C ~/${!repo_path} fetch --no-tags upstream;
         git -C ~/${!repo_path} fetch --no-tags origin;
 
-        local -r branch_name="$(git -C ~/${!repo_path} rev-parse --abbrev-ref HEAD)";
+        local branch_name="$(git -C ~/${!repo_path} rev-parse --abbrev-ref HEAD)";
 
         while ! git -C ~/${!repo_path} branch -r | grep -q "upstream/${branch_name}"; do
 
-            local -r upstream_info="$(git -C ~/${!repo_path} remote -v show | grep upstream | head -n1)";
+            local upstream_info="$(git -C ~/${!repo_path} remote -v show | grep upstream | head -n1)";
 
             read -rp "
 ############################################################
