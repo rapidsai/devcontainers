@@ -6,14 +6,12 @@
 # Clean the ${CPP_LIB} build dirs.
 #
 # Boolean options:
-#  -h,--help,--usage            print this text
-
-. devcontainer-utils-parse-args-from-docstring;
+#  -h,--help,--usage  print this text
 
 clean_${CPP_LIB}_cpp() {
     set -Eeuo pipefail;
 
-    parse_args_or_show_help - <<< "$@";
+    eval "$(devcontainer-utils-parse-args "$0" - <<< "${@@Q}")";
 
     if [[ ! -d "${CPP_SRC}" ]]; then
         exit 1;
@@ -24,8 +22,9 @@ clean_${CPP_LIB}_cpp() {
 }
 
 if test -n "${rapids_build_utils_debug:-}" \
-&& ( test -z "${rapids_build_utils_debug##*"all"*}" \
-  || test -z "${rapids_build_utils_debug##*"clean-${CPP_LIB}-cpp"*}" ); then
+&& { test -z "${rapids_build_utils_debug##*"*"*}" \
+  || test -z "${rapids_build_utils_debug##*"clean-all"*}" \
+  || test -z "${rapids_build_utils_debug##*"clean-${CPP_LIB}-cpp"*}"; }; then
     PS4="+ ${BASH_SOURCE[0]}:\${LINENO} "; set -x;
 fi
 

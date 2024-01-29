@@ -23,29 +23,23 @@
 #                                         Higher values yield fewer parallel CUDA device object compilations.
 #                                         (default: 1)
 
-. devcontainer-utils-parse-args-from-docstring;
-
 get_num_archs_jobs_and_load() {
     set -Eeuo pipefail
 
-    parse_args_or_show_help - <<< "$@";
+    eval "$(devcontainer-utils-parse-args "$0" - <<< "${@@Q}")";
 
-    local archs="${a:-${archs:-1}}";
-    archs="${archs//"true"/}";
+    if test ${#j[@]} -gt 0 && test -z "${j:-}"; then
+        j=$(nproc);
+    fi
 
-    local parallel="${j:-${parallel:-${JOBS:-${PARALLEL_LEVEL:-1}}}}";
-    parallel="${parallel//"true"/}";
-    parallel="${parallel:-$(nproc)}";
-
-    local max_device_obj_memory_usage="${m:-${max_device_obj_memory_usage:-${MAX_DEVICE_OBJ_MEMORY_USAGE:-}}}";
-    max_device_obj_memory_usage="${max_device_obj_memory_usage//"true"/}";
-    max_device_obj_memory_usage="${max_device_obj_memory_usage:-1}";
+    parallel="${j:-${JOBS:-${PARALLEL_LEVEL:-1}}}";
+    max_device_obj_memory_usage="${m:-${MAX_DEVICE_OBJ_MEMORY_USAGE:-1}}";
 
     local n_arch=${archs:-1};
 
     if test -z "${archs:-}" \
     && test -n "${INFER_NUM_DEVICE_ARCHITECTURES:-}"; then
-        archs=$(rapids-parse-cmake-var-from-args CMAKE_CUDA_ARCHITECTURES "${__rest__[@]}");
+        archs=$(rapids-parse-cmake-var-from-args CMAKE_CUDA_ARCHITECTURES "${OPTS[@]}");
         archs="${archs:-${CMAKE_CUDA_ARCHITECTURES:-${CUDAARCHS:-}}}";
 
         case "${archs:-}" in
@@ -74,10 +68,11 @@ get_num_archs_jobs_and_load() {
     # Clamp between 1 and 3 threads per nvcc job
     n_arch=$(( n_arch < 1 ? 1 : n_arch > 3 ? 3 : n_arch ));
 
-    local free_mem=$(free --giga | grep -E '^Mem:' | tr -s '[:space:]' | cut -d' ' -f7 || echo '0');
-    local freeswap=$(free --giga | grep -E '^Swap:' | tr -s '[:space:]' | cut -d' ' -f4 || echo '0');
+    local -r free_mem=$(free --giga | grep -E '^Mem:' | tr -s '[:space:]' | cut -d' ' -f7 || echo '0');
+    local -r freeswap=$(free --giga | grep -E '^Swap:' | tr -s '[:space:]' | cut -d' ' -f4 || echo '0');
     local all_cpus="${parallel}";
     local n_load="${all_cpus}";
+    # shellcheck disable=SC2155
     local n_jobs="$(cat<<____EOF | bc
 scale=0
 max_cpu=(${all_cpus} / ${n_arch} / 2 * 3)
@@ -88,15 +83,15 @@ ____EOF
     n_jobs=$((n_jobs < 1 ? 1 : n_jobs));
     n_jobs=$((n_arch > 1 ? n_jobs : n_load));
 
-    echo "n_arch=${n_arch}";
-    echo "n_jobs=${n_jobs}";
-    echo "n_load=${n_load}";
+    echo "declare n_arch; n_arch=${n_arch}";
+    echo "declare n_jobs; n_jobs=${n_jobs}";
+    echo "declare n_load; n_load=${n_load}";
 }
 
 if test -n "${rapids_build_utils_debug:-}" \
-&& ( test -z "${rapids_build_utils_debug##*"all"*}" \
-  || test -z "${rapids_build_utils_debug##*"get-num-archs-jobs-and-load"*}" ); then
+&& { test -z "${rapids_build_utils_debug##*"*"*}" \
+  || test -z "${rapids_build_utils_debug##*"get-num-archs-jobs-and-load"*}"; }; then
     PS4="+ ${BASH_SOURCE[0]}:\${LINENO} "; set -x;
 fi
 
-(get_num_archs_jobs_and_load "$@");
+get_num_archs_jobs_and_load "$@";

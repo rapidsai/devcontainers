@@ -16,31 +16,34 @@
 #  -t,--template <path>         Path to the bash completion script template file
 #                               (default: `which devcontainer-utils-bash-completion.tmpl`)
 
-. devcontainer-utils-parse-args-from-docstring;
-
 generate_bash_completion() {
+    local -;
 
     set -Eeuo pipefail;
 
-    parse_args_or_show_help - <<< "$@";
+    eval "$(devcontainer-utils-parse-args "$0" - <<< "${@@Q}")";
 
-    local command="${c:-${command:?-c|--command is required}}";
-    local out_dir="$(realpath -m "${o:-${out_dir:-"${HOME}/.bash_completion.d"}}")";
-    local template="${t:-${template:-${COMPLETION_TMPL:-"$(which devcontainer-utils-bash-completion.tmpl)"}}}";
+    local -r command="${c:-${command:?-c|--command is required}}";
+    local -r out_dir="$(realpath -m "${o:-${out_dir:-"${HOME}/.bash_completion.d"}}")";
+    local -r template="${t:-${template:-${COMPLETION_TMPL:-"$(which devcontainer-utils-bash-completion.tmpl)"}}}";
 
     if test -f "${template}"; then
         mkdir -p "${out_dir}";
-        cat "${template}"                     \
-      | CMD="${command}"                      \
-        NAME="${command//-/_}"                \
-        envsubst '$CMD $NAME'                 \
-      | tee "${out_dir}/${command}" >/dev/null;
+        local file="${out_dir}/devcontainer-utils-completions";
+        if ! test -f "${file}"; then
+            cp "${template}" "${file}";
+        fi
+
+        local str="complete -F _devcontainer_utils_completions ${command};";
+        if ! grep -q "${str}" "${file}"; then
+            echo "${str}" >> "${file}";
+        fi
     fi
 }
 
 if test -n "${devcontainer_utils_debug:-}" \
-&& ( test -z "${devcontainer_utils_debug##*"all"*}" \
-  || test -z "${devcontainer_utils_debug##*"generate-bash-completion"*}" ); then
+&& { test -z "${devcontainer_utils_debug##*"*"*}" \
+  || test -z "${devcontainer_utils_debug##*"generate-bash-completion"*}"; }; then
     PS4="+ ${BASH_SOURCE[0]}:\${LINENO} "; set -x;
 fi
 

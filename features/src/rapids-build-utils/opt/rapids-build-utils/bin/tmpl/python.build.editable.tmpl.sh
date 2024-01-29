@@ -13,6 +13,7 @@
 #  -a,--archs <num>                       Build <num> CUDA archs in parallel
 #                                         (default: 1)
 #  -j,--parallel <num>                    Run <num> parallel compilation jobs
+#                                         (default: $(nproc))
 #  -m,--max-device-obj-memory-usage <num> An upper-bound on the amount of memory each CUDA device object compilation
 #                                         is expected to take. This is used to estimate the number of parallel device
 #                                         object compilations that can be launched without hitting the system memory
@@ -20,23 +21,18 @@
 #                                         Higher values yield fewer parallel CUDA device object compilations.
 #                                         (default: 1)
 
-. devcontainer-utils-parse-args-from-docstring;
-
 build_${PY_LIB}_python_editable() {
     set -Eeuo pipefail;
 
-    parse_args_or_show_help - <<< "$@";
+    eval "$(devcontainer-utils-parse-args "$0" - <<< "${@@Q}")";
 
     if [[ ! -d "${PY_SRC}" ]]; then
         exit 1;
     fi
 
-    local verbose="${v:-${verbose:-}}";
-
     eval "$(                                    \
     PARALLEL_LEVEL=${PARALLEL_LEVEL:-$(nproc)}  \
         rapids-get-num-archs-jobs-and-load "$@" \
-      | xargs -r -d'\n' -I% echo -n local %\;   \
     )";
 
     local cmake_args=(${PY_CMAKE_ARGS});
@@ -44,13 +40,13 @@ build_${PY_LIB}_python_editable() {
     cmake_args+=(${CMAKE_ARGS:-});
     cmake_args+=(${CPP_DEPS});
     cmake_args+=(${CPP_ARGS});
-    cmake_args+=(${verbose:+--log-level=VERBOSE});
-    cmake_args+=(${__rest__[@]});
+    cmake_args+=(${v:+--log-level=VERBOSE});
+    cmake_args+=("${OPTS[@]}");
 
     local ninja_args=();
     local pip_args=(${PIP_INSTALL_ARGS});
 
-    if test -n "${verbose}"; then
+    if test -n "${v}"; then
         ninja_args+=("-v");
         pip_args+=("-vv");
     fi
@@ -92,9 +88,10 @@ build_${PY_LIB}_python_editable() {
 }
 
 if test -n "${rapids_build_utils_debug:-}" \
-&& ( test -z "${rapids_build_utils_debug##*"all"*}" \
+&& { test -z "${rapids_build_utils_debug##*"*"*}" \
+  || test -z "${rapids_build_utils_debug##*"build-all"*}" \
   || test -z "${rapids_build_utils_debug##*"build-${PY_LIB}-python"*}" \
-  || test -z "${rapids_build_utils_debug##*"build-${PY_LIB}-python-editable"*}" ); then
+  || test -z "${rapids_build_utils_debug##*"build-${PY_LIB}-python-editable"*}"; }; then
     PS4="+ ${BASH_SOURCE[0]}:\${LINENO} "; set -x;
 fi
 

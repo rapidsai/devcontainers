@@ -16,53 +16,43 @@
 #  -r,--repo <repo>      Filter the results to include <repo> entries.
 #                        (default: all repositories)
 
-. devcontainer-utils-parse-args-from-docstring;
-
 list_repos() {
     set -Eeuo pipefail;
 
-    parse_args_or_show_help - <<< "$@";
-
-    local repos=();
-    repos+=(${r[@]:-}); unset r;
-    repos+=(${repo[@]:-}); unset repo;
-    repos=(${repos[@]:-});
-
-    local omits=();
-    omits+=(${o[@]:-}); unset o;
-    omits+=(${omit[@]:-}); unset omit;
-    omits=(${omits[@]:-});
+    eval "$(devcontainer-utils-parse-args "$0" --passthrough '
+        -m,--manifest
+    ' - <<< "${@@Q}")";
 
     local query=".repos | {repos: .}";
     local filters=();
 
-    if test ${#repos[@]} -gt 0; then
+    if test ${#repo[@]} -gt 0; then
         # prefix each element
-        repos=("${repos[@]/#/'.name == "'}");
+        repo=("${repo[@]/#/'.name == "'}");
         # suffix each element
-        repos=("${repos[@]/%/'" or'}");
-        filters+=("| map(select(${repos[@]} false))");
+        repo=("${repo[@]/%/'" or'}");
+        filters+=("| map(select(${repo[@]} false))");
     fi
 
-    if test ${#omits[@]} -gt 0; then
+    if test ${#omit[@]} -gt 0; then
         # prefix each element
-        omits=("${omits[@]/#/'.name != "'}");
+        omit=("${omit[@]/#/'.name != "'}");
         # suffix each element
-        omits=("${omits[@]/%/'" and'}");
-        filters+=("| map(select(${omits[@]} true))");
+        omit=("${omit[@]/%/'" and'}");
+        filters+=("| map(select(${omit[@]} true))");
     fi
 
     if test -n "${filters:-}"; then
-        query=".repos ${filters[@]} | {repos: .}";
+        query=".repos ${filters[*]} | {repos: .}";
     fi
 
-    rapids-query-manifest "$@" "${query}";
+    rapids-query-manifest "${OPTS[@]}" -- "${query}";
 }
 
 if test -n "${rapids_build_utils_debug:-}" \
-&& ( test -z "${rapids_build_utils_debug##*"all"*}" \
-  || test -z "${rapids_build_utils_debug##*"list-repos"*}" ); then
+&& { test -z "${rapids_build_utils_debug##*"*"*}" \
+    || test -z "${rapids_build_utils_debug##*"list-repos"*}"; }; then
     PS4="+ ${BASH_SOURCE[0]}:\${LINENO} "; set -x;
 fi
 
-(list_repos "$@");
+list_repos "$@";

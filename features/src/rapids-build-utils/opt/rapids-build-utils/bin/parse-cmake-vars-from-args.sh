@@ -14,10 +14,10 @@ parse_cmake_vars_from_args() {
 
     local args="";
     args="$(rapids-parse-cmake-args "$@")";
-    args="$(join_with_delimiter "\n" $args)";
+    args="$(join_with_delimiter "\n" "${args}")";
     echo -e "$args" \
   | grep '\-D' \
   | sed -r 's/^-D//';
 }
 
-(parse_cmake_vars_from_args "$@");
+parse_cmake_vars_from_args "$@";

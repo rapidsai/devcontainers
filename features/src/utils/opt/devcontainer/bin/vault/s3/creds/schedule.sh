@@ -4,19 +4,19 @@ schedule_s3_creds_refresh() {
 
     set -euo pipefail;
 
-    local now="$(date '+%s')";
+    local -r now="$(date '+%s')";
     local ttl="${VAULT_S3_TTL:-"43200"}";
     ttl="${ttl%s}";
 
-    local stamp="$(cat ~/.aws/stamp 2>/dev/null || echo "${now}")";
+    local -r stamp="$(cat ~/.aws/stamp 2>/dev/null || echo "${now}")";
     local then="$((ttl - (now - stamp)))";
     then="$((then < ttl ? ttl : then))";
     then="$((((then + 59) / 60) * 60))";
     then="$((now + then))";
 
-    crontab -u $(whoami) -r 2>/dev/null || true;
+    crontab -u "$(whoami)" -r 2>/dev/null || true;
 
-    cat <<____EOF | crontab -u $(whoami) -
+    cat <<____EOF | crontab -u "$(whoami)" -
 SHELL=/bin/bash
 BASH_ENV="${BASH_ENV:-}"
 VAULT_HOST="${VAULT_HOST:-}"
@@ -37,4 +37,4 @@ if test -n "${devcontainer_utils_debug:-}"; then
     PS4="+ ${BASH_SOURCE[0]}:\${LINENO} "; set -x;
 fi
 
-(schedule_s3_creds_refresh "$@");
+schedule_s3_creds_refresh "$@";

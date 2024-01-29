@@ -1,7 +1,14 @@
+# If not running interactively, don't do anything
+case $- in
+    *i*) ;;
+      *) return;;
+esac
+
 if [ -d ~/.bash_completion.d ]; then
   for i in ~/.bash_completion.d/*; do
-    if [ -r $i ]; then
-      . $i
+    if [ -r "$i" ]; then
+      # shellcheck disable=SC1090
+      . "$i" 2>/dev/null
     fi
   done
   unset i

@@ -8,12 +8,10 @@
 # Boolean options:
 #  -h,--help,--usage            print this text
 
-. devcontainer-utils-parse-args-from-docstring;
-
 clean_${PY_LIB}_python() {
     set -Eeuo pipefail;
 
-    parse_args_or_show_help - <<< "$@";
+    eval "$(devcontainer-utils-parse-args "$0" - <<< "${@@Q}")";
 
     if [[ ! -d "${PY_SRC}" ]]; then
         exit 1;
@@ -47,8 +45,9 @@ clean_${PY_LIB}_python() {
 }
 
 if test -n "${rapids_build_utils_debug:-}" \
-&& ( test -z "${rapids_build_utils_debug##*"all"*}" \
-  || test -z "${rapids_build_utils_debug##*"clean-${PY_LIB}-python"*}" ); then
+&& { test -z "${rapids_build_utils_debug##*"*"*}" \
+  || test -z "${rapids_build_utils_debug##*"clean-all"*}" \
+  || test -z "${rapids_build_utils_debug##*"clean-${PY_LIB}-python"*}"; }; then
     PS4="+ ${BASH_SOURCE[0]}:\${LINENO} "; set -x;
 fi
 

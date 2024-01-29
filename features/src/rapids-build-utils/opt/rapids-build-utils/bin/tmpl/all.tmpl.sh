@@ -11,12 +11,10 @@
 #  -h,--help,--usage                      print this text
 #  -v,--verbose                           verbose output
 
-. devcontainer-utils-parse-args-from-docstring;
-
 ${SCRIPT}_all() {
     set -Eeuo pipefail;
 
-    parse_args_or_show_help - <<< "$@";
+    eval "$(devcontainer-utils-parse-args "$0" - <<< "${@@Q}")";
 
     for name in ${NAMES}; do
         if type ${SCRIPT}-${name} >/dev/null 2>&1; then
@@ -26,8 +24,8 @@ ${SCRIPT}_all() {
 }
 
 if test -n "${rapids_build_utils_debug:-}" \
-&& ( test -z "${rapids_build_utils_debug##*"all"*}" \
-  || test -z "${rapids_build_utils_debug##*"${SCRIPT}-all"*}" ); then
+&& { test -z "${rapids_build_utils_debug##*"*"*}" \
+  || test -z "${rapids_build_utils_debug##*"${SCRIPT}-all"*}"; }; then
     PS4="+ ${BASH_SOURCE[0]}:\${LINENO} "; set -x;
 fi
 

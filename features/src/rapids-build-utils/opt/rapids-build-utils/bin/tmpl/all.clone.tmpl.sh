@@ -16,44 +16,41 @@
 #
 # Options that require values:
 #  -j,--parallel <num>          Clone <num> repos in parallel
-
-. devcontainer-utils-parse-args-from-docstring;
+#                               (default: 1)
 
 clone_all() {
     set -Eeuo pipefail;
 
-    parse_args_or_show_help - <<< "$@";
+    eval "$(devcontainer-utils-parse-args "$0" --passthrough '
+        --no-fork
+        --clone-upstream
+    ' - <<< "${@@Q}")";
 
-    eval "$(                                    \
-        rapids-get-num-archs-jobs-and-load "$@" \
-      | xargs -r -d'\n' -I% echo -n local %\;   \
-    )";
+    eval "$(rapids-get-num-archs-jobs-and-load -a1 "$@")";
 
-    local all_cpus=$(nproc);
-    local n_repos=$(wc -w <<< "${NAMES}");
+    local -r n_repos=$(wc -w <<< "${NAMES}");
     n_jobs=$((n_repos < n_jobs ? n_repos : n_jobs));
 
-    local n_modules=$((all_cpus / n_jobs));
+    local n_modules=$((n_jobs / n_repos));
     n_modules=$((n_modules < 1 ? 1 : n_modules));
-
-    local clone_args=();
-    clone_args+=(-j ${n_modules});
-    clone_args+=(${no_fork:+"--no-fork"});
-    clone_args+=(${no_update_env:+"--no-update-env"});
-    clone_args+=(${clone_upstream:+"--clone-upstream"});
 
     echo "${NAMES}"                     \
   | tr '[:space:]' '\0'                 \
   | xargs -r -0 -P${n_jobs} -I% bash -c "
     if type clone-% >/dev/null 2>&1; then
-        clone-% ${clone_args[*]};
+        clone-% -j ${n_modules} --no-update-env ${OPTS[*]} || exit 255;
     fi
     ";
+
+    if test -z "${no_update_env-}"; then
+        rapids-update-content-command;
+        rapids-post-attach-command;
+    fi
 }
 
 if test -n "${rapids_build_utils_debug:-}" \
-&& ( test -z "${rapids_build_utils_debug##*"all"*}" \
-  || test -z "${rapids_build_utils_debug##*"clone-all"*}" ); then
+&& { test -z "${rapids_build_utils_debug##*"*"*}" \
+  || test -z "${rapids_build_utils_debug##*"clone-all"*}"; }; then
     PS4="+ ${BASH_SOURCE[0]}:\${LINENO} "; set -x;
 fi
 

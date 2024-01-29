@@ -16,17 +16,12 @@
 #  -r,--repo <repo>      Filter the results to only include <repo> entries.
 #                        (default: all repositories)
 
-. devcontainer-utils-parse-args-from-docstring;
-
 python_pkg_names() {
     set -Eeuo pipefail;
 
-    parse_args_or_show_help - <<< "$@";
+    eval "$(devcontainer-utils-parse-args "$0" - <<< "${@@Q}")";
 
-    eval "$(                                  \
-        rapids-list-repos "$@"                \
-      | xargs -r -d'\n' -I% echo -n local %\; \
-    )";
+    eval "$(rapids-list-repos "$@")";
 
     local i;
     local j;
@@ -46,4 +41,4 @@ python_pkg_names() {
     done
 }
 
-(python_pkg_names "$@");
+python_pkg_names "$@";

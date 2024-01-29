@@ -23,7 +23,7 @@ parse_cmake_args() {
         args+=("$(printf %q "${ARG}")");
     done;
 
-    echo ${args[@]};
+    echo "${args[@]}";
 }
 
-(parse_cmake_args "$@");
+parse_cmake_args "$@";

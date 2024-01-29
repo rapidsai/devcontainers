@@ -18,26 +18,29 @@
 #  --repo <repo>         Only include dependencies for repo(s).
 #                        (default: all repositories)
 
-. devcontainer-utils-parse-args-from-docstring;
-
 make_conda_env() {
     set -Eeuo pipefail;
 
     local env_name="${1}"; shift;
     local env_file_name="${env_name}.yml";
 
-    parse_args_or_show_help - <<< "$@";
+    eval "$(devcontainer-utils-parse-args "$0" --passthrough '
+        -k,--key
+        -m,--manifest
+        -o,--omit
+        --repo
+    ' - <<< "${@@Q}")";
 
     # Remove the current conda env if called with `-f|--force`
     if test -n "${f:-${force:-}}"; then
-        rm -rf "$HOME/.conda/envs/${env_name}" \
-               "$HOME/.conda/envs/${env_file_name}";
+        rm -rf "${HOME}/.conda/envs/${env_name}" \
+               "${HOME}/.conda/envs/${env_file_name}";
     fi
 
-    local new_env_path="$(realpath -m /tmp/${env_file_name})";
-    local old_env_path="$(realpath -m ~/.conda/envs/${env_file_name})";
+    local -r new_env_path="$(realpath -m "/tmp/${env_file_name}")";
+    local -r old_env_path="$(realpath -m "${HOME}/.conda/envs/${env_file_name}")";
 
-    rapids-make-conda-dependencies "$@" > "${new_env_path}";
+    rapids-make-conda-dependencies "${OPTS[@]}" > "${new_env_path}";
 
     if test -f "${new_env_path}"; then
 
@@ -72,14 +75,17 @@ make_conda_env() {
 }
 
 if test -n "${rapids_build_utils_debug:-}" \
-&& ( test -z "${rapids_build_utils_debug##*"all"*}" \
-  || test -z "${rapids_build_utils_debug##*"make-conda-env"*}" ); then
+&& { test -z "${rapids_build_utils_debug##*"*"*}" \
+  || test -z "${rapids_build_utils_debug##*"make-conda-env"*}"; }; then
     PS4="+ ${BASH_SOURCE[0]}:\${LINENO} "; set -x;
 fi
 
+# shellcheck disable=SC1091
 . /opt/conda/etc/profile.d/conda.sh;
+# shellcheck disable=SC1091
 . /opt/conda/etc/profile.d/mamba.sh;
 
 make_conda_env "${DEFAULT_CONDA_ENV:-rapids}" "$@";
 
+# shellcheck disable=SC1090
 . /etc/profile.d/*-mambaforge.sh;

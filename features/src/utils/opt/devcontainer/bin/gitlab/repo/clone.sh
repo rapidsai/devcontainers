@@ -23,8 +23,6 @@
 #  upstream                     set <upstream> as the `upstream` remote
 #  directory                    clone the repo into <directory>
 
-. devcontainer-utils-parse-args-from-docstring;
-
 get_default_branch() {
     local repo="${1}";
     glab api graphql -f query="$(cat <<________EOF | tr -s '[:space:]'
@@ -109,22 +107,20 @@ get_user_fork_name() {
 clone_gitlab_repo() {
     set -Eeuo pipefail;
 
-    parse_args_or_show_help - <<< "$@";
+    eval "$(devcontainer-utils-parse-args "$0" --passthrough '
+        -j,--parallel
+    ' - <<< "${@@Q}")";
 
-    local nargs="${#__rest__[@]}";
-    local upstream="${__rest__[$((nargs - 2))]}";
+    local nargs="${#REST[@]}";
+    local upstream="${REST[$((nargs - 2))]}";
     upstream="${upstream:?upstream is required}";
 
     local no_fork="${no_fork:-}";
     local branch="${b:-"${branch:-}"}";
-    local parallel="${j:-${parallel:-1}}";
     local clone_upstream="${clone_upstream:-}";
 
-    local directory="${__rest__[$((nargs - 1))]}";
+    local directory="${REST[$((nargs - 1))]}";
     directory="${directory:?directory is required}";
-
-    __rest__=("${__rest__[@]/"${upstream}"}");
-    __rest__=("${__rest__[@]/"${directory}"}");
 
     local origin="${upstream}";
     local fork=;
@@ -135,7 +131,8 @@ clone_gitlab_repo() {
     if test -z "${no_fork:-}" && \
        test -z "${clone_upstream:-}" && \
        devcontainer-utils-shell-is-interactive; then
-        source devcontainer-utils-init-gitlab-cli;
+        # shellcheck disable=SC1091
+        . devcontainer-utils-init-gitlab-cli;
         user="${GITLAB_USER:-}";
     fi
 
@@ -156,8 +153,8 @@ clone_gitlab_repo() {
          devcontainer-utils-shell-is-interactive; then
         while true; do
             local CHOICE;
-            read -p "'${GITLAB_HOST:-gitlab.com}/${user}/${name}.git' not found.
-    Fork '${upstream}' into '${user}/${name}' now (y/n)? " CHOICE <$(tty)
+            read -rp "'${GITLAB_HOST:-gitlab.com}/${user}/${name}.git' not found.
+    Fork '${upstream}' into '${user}/${name}' now (y/n)? " CHOICE <"$(tty)"
             case "${CHOICE:-}" in
                 [Nn]* ) origin="${upstream}"; break;;
                 [Yy]* ) origin="${user}/${name}";
@@ -168,7 +165,7 @@ clone_gitlab_repo() {
         done
     fi
 
-    if test -n "${GITLAB_USER:-}"; then
+    if ! glab auth status 2>&1 | grep -q "No token provided"; then
         if [ "$(glab config get git_protocol)" = "ssh" ]; then
             origin="$(get_repo_ssh_url "${origin}")";
             upstream="$(get_repo_ssh_url "${upstream}")";
@@ -184,16 +181,16 @@ clone_gitlab_repo() {
     devcontainer-utils-clone-git-repo         \
         ${branch:+--branch "${branch}"}       \
         ${upstream:+--upstream "${upstream}"} \
-        -j ${parallel}                        \
-        ${__rest__[@]}                        \
+        "${OPTS[@]}"                          \
+        --                                    \
         "${origin}" "${directory}"            \
         ;
 }
 
 if test -n "${devcontainer_utils_debug:-}" \
-&& ( test -z "${devcontainer_utils_debug##*"all"*}" \
+&& { test -z "${devcontainer_utils_debug##*"*"*}" \
   || test -z "${devcontainer_utils_debug##*"clone"*}" \
-  || test -z "${devcontainer_utils_debug##*"clone-gitlab-repo"*}" ); then
+  || test -z "${devcontainer_utils_debug##*"clone-gitlab-repo"*}"; }; then
     PS4="+ ${BASH_SOURCE[0]}:\${LINENO} "; set -x;
 fi
 

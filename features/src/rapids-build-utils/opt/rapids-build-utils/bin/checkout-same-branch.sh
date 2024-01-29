@@ -19,23 +19,17 @@
 #  -r,--repo <repo>      Filter the results to include <repo> entries.
 #                        (default: all repositories)
 
-. devcontainer-utils-parse-args-from-docstring;
-
 checkout_same_branch() {
     set -Eeuo pipefail;
 
-    parse_args_or_show_help - <<< "$@";
+    eval "$(devcontainer-utils-parse-args "$0" - <<< "${@@Q}")";
 
-    eval "$(                                    \
-    PARALLEL_LEVEL=${PARALLEL_LEVEL:-$(nproc)}  \
-        rapids-get-num-archs-jobs-and-load "$@" \
-      | xargs -r -d'\n' -I% echo -n local %\;   \
+    eval "$(                                        \
+    PARALLEL_LEVEL=${PARALLEL_LEVEL:-$(nproc)}      \
+        rapids-get-num-archs-jobs-and-load -a1 "$@" \
     )";
 
-    eval "$(                                  \
-        rapids-list-repos "$@"                \
-      | xargs -r -d'\n' -I% echo -n local %\; \
-    )";
+    eval "$(rapids-list-repos "$@")";
 
     echo "Determining available branches...";
 
@@ -51,59 +45,60 @@ checkout_same_branch() {
         fi
         local name="${!repo_name}";
         local path="${!repo_path}";
-        repo_names+=(${name});
-        repo_paths+=(${path});
+        repo_names+=("${name}");
+        repo_paths+=("${path}");
         repo_pairs+=("${name//"-"/"_"} ${path}");
     done
 
     eval "$(
         echo -e "${repo_pairs[@]/%/\\n}"                                                              \
-      | xargs -r -P${n_jobs} -I% bash -c "                                                            \
+      | xargs -r -P"${n_jobs-}" -I% bash -c "                                                         \
         name=\$(cut -d' ' -f1 <<< \$0);                                                               \
         path=\$(cut -d' ' -f2 <<< \$0);                                                               \
-        echo \"repo_branches_\${name}_='\$(                                                           \
+        echo \"local repo_branches_\${name}_='\$(                                                     \
             cat <(git -C ~/\${path} ls-remote -h origin | cut -f2 | sed \"s@refs/heads@origin@\")     \
                 <(git -C ~/\${path} ls-remote -h upstream | cut -f2 | sed \"s@refs/heads@upstream@\") \
-          | grep -Pv \"(refs/heads/pull-request/|master|main)\" | tr '[:space:]' ' '                  \
+          | grep -Pv \"(/pull-request/|master|main)\" | tr '[:space:]' ' '                            \
         )'\"                                                                                          \
-        " % \
-      | xargs -r -d'\n' -I% echo -n local %\;
+        " %
     )";
 
     local repo_branches=;
     local common_branches=;
 
     for repo_branches in ${!repo_branches_*}; do
-        if test -z "${common_branches}"; then
+
+        if test "${#common_branches}" -eq 0; then
             # start with first repo's set of branches
             common_branches="$(\
-                echo "${!repo_branches}"     \
-              | xargs -r -n1                 \
-              | sort -V --parallel=${n_jobs} \
-              | tr '[:space:]' ' '           \
+                echo "${!repo_branches}"       \
+              | xargs -r -n1                   \
+              | sort -V --parallel="${n_jobs}" \
+              | tr '[:space:]' ' '             \
             )";
         else
             # get a sorted set of branches common to all repos up to this point
             common_branches="$(\
                 echo "${common_branches} ${!repo_branches}" \
               | xargs -r -n1                                \
-              | sort -V --parallel=${n_jobs}                \
+              | sort -V --parallel="${n_jobs}"              \
               | uniq -d                                     \
               | tr '[:space:]' ' '                          \
             )";
         fi
+
+        if test "${#common_branches}" -eq 0; then
+            echo "No branches in common for repos: ${repo_names[*]}" >&2;
+            exit 1;
+        fi
     done
 
-    if test -z "${common_branches}"; then
-        echo "No branches in common for repos: ${repo_names[@]}";
-        exit 0;
-    fi;
-
-    echo "Found branches in common for: ${repo_names[@]}";
-
+    echo "Found branches in common for: ${repo_names[*]}";
     echo "Please select a branch to check out:";
 
-    local branches=($(echo "${common_branches}" | xargs -r -n1 | sort -Vr --parallel=${n_jobs}));
+    # local branches=($(echo "${common_branches}" | xargs -r -n1 | sort -Vr --parallel=${n_jobs}));
+    local -a branches=();
+    readarray -t branches < <(echo "${common_branches}" | xargs -r -n1 | sort -Vr --parallel="${n_jobs}");
     local branch_name="";
 
     select branch_name in "${branches[@]}" "Quit"; do
@@ -130,21 +125,21 @@ checkout_same_branch() {
         local remote="${branch_name/\/*}";
         local branch="${branch_name/*\/}";
 
-        git -C ~/${!repo_path} fetch ${remote} "refs/heads/${branch}";
+        git -C ~/${!repo_path} fetch "${remote}" "refs/heads/${branch}";
 
         if ! git -C ~/${!repo_path} checkout -b "${branch}" -t "${remote}/${branch}" 2>/dev/null; then
             git -C ~/${!repo_path} checkout "${branch}";
             git -C ~/${!repo_path} branch "${branch}" -u "${remote}/${branch}";
         fi
 
-        git -C ~/${!repo_path} submodule update --init --recursive -j $(nproc --ignore=2);
+        git -C ~/${!repo_path} submodule update --init --recursive -j "${n_jobs}";
     done;
 }
 
 if test -n "${rapids_build_utils_debug:-}" \
-&& ( test -z "${rapids_build_utils_debug##*"all"*}" \
-  || test -z "${rapids_build_utils_debug##*"checkout-same-branch"*}" ); then
+&& { test -z "${rapids_build_utils_debug##*"*"*}" \
+  || test -z "${rapids_build_utils_debug##*"checkout-same-branch"*}"; }; then
     PS4="+ ${BASH_SOURCE[0]}:\${LINENO} "; set -x;
 fi
 
-(checkout_same_branch "$@");
+checkout_same_branch "$@";

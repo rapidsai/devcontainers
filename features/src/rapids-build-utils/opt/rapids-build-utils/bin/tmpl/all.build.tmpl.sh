@@ -21,16 +21,14 @@
 #                                         limit.
 #                                         Higher values yield fewer parallel CUDA device object compilations.
 #                                         (default: 1)
-#  -t,--type editable|wheel               The type of Python build to run (editable or wheel)
+#  -t,--type (editable|wheel)             The type of Python build to run (editable or wheel)
 #                                         (default: editable)
 #  -D* <var>[:<type>]=<value>             Create or update a cmake cache entry.
-
-. devcontainer-utils-parse-args-from-docstring;
 
 build_all() {
     set -Eeuo pipefail;
 
-    parse_args_or_show_help - <<< "$@";
+    eval "$(devcontainer-utils-parse-args "$0" - <<< "${@@Q}")";
 
     for name in ${NAMES}; do
         if type build-${name} >/dev/null 2>&1; then
@@ -40,8 +38,8 @@ build_all() {
 }
 
 if test -n "${rapids_build_utils_debug:-}" \
-&& ( test -z "${rapids_build_utils_debug##*"all"*}" \
-  || test -z "${rapids_build_utils_debug##*"build-all"*}" ); then
+&& { test -z "${rapids_build_utils_debug##*"*"*}" \
+  || test -z "${rapids_build_utils_debug##*"build-all"*}"; }; then
     PS4="+ ${BASH_SOURCE[0]}:\${LINENO} "; set -x;
 fi
 

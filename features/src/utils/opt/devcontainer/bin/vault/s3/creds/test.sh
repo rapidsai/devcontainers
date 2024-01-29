@@ -9,8 +9,8 @@ test_aws_creds() {
     if ! type sccache >/dev/null 2>&1; then exit 1; fi
 
     if test -f ~/.aws/stamp; then
-        local now="$(date '+%s')";
-        local stamp="$(cat ~/.aws/stamp)";
+        local -r now="$(date '+%s')";
+        local -r stamp="$(cat ~/.aws/stamp)";
         local ttl="${VAULT_S3_TTL:-"43200"}";
         if [ $((now - stamp)) -ge "${ttl%s}" ]; then
             exit 1;
@@ -64,4 +64,4 @@ if test -n "${devcontainer_utils_debug:-}"; then
     PS4="+ ${BASH_SOURCE[0]}:\${LINENO} "; set -x;
 fi
 
-(test_aws_creds "$@");
+test_aws_creds "$@";

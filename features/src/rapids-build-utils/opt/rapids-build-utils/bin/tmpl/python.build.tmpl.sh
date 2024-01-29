@@ -10,22 +10,21 @@
 #  -v,--verbose                           verbose output
 #
 # Options that require values:
-#  -t,--type editable|wheel               The type of Python build to run (editable or wheel)
+#  -t,--type (editable|wheel)             The type of Python build to run (editable or wheel)
 #                                         (default: editable)
-
-. devcontainer-utils-parse-args-from-docstring;
 
 build_${PY_LIB}_python() {
     set -Eeuo pipefail;
 
-    parse_args_or_show_help - <<< "$@";
+    eval "$(devcontainer-utils-parse-args "$0" - <<< "${@@Q}")";
 
-    build-${PY_LIB}-python-${t:-${type:-"editable"}} ${__rest__[@]};
+    build-${PY_LIB}-python-${t:-${type:-"editable"}} "${OPTS[@]}";
 }
 
 if test -n "${rapids_build_utils_debug:-}" \
-&& ( test -z "${rapids_build_utils_debug##*"all"*}" \
-  || test -z "${rapids_build_utils_debug##*"build-${PY_LIB}-python"*}" ); then
+&& { test -z "${rapids_build_utils_debug##*"*"*}" \
+  || test -z "${rapids_build_utils_debug##*"build-all"*}" \
+  || test -z "${rapids_build_utils_debug##*"build-${PY_LIB}-python"*}"; }; then
     PS4="+ ${BASH_SOURCE[0]}:\${LINENO} "; set -x;
 fi
 

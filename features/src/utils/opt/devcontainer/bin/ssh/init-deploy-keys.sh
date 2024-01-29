@@ -8,9 +8,9 @@ init_ssh_deploy_keys() {
     local line;
 
     ssh-add -L | while read -r line; do
-        local key="$(cut -d' ' -f2 <<< "${line}")";
-        local url="$(cut -d' ' -f3 <<< "${line}")";
-        local sha="$(md5sum --tag <<< "${key}" | cut -d' ' -f4)";
+        local -r key="$(cut -d' ' -f2 <<< "${line}")";
+        local -r url="$(cut -d' ' -f3 <<< "${line}")";
+        local -r sha="$(md5sum --tag <<< "${key}" | cut -d' ' -f4)";
 
         if [[ ${url} =~ ${re} ]]; then
 

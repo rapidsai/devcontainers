@@ -53,4 +53,4 @@ init_git_cli_config() {
     fi
 }
 
-(init_git_cli_config "$@");
+init_git_cli_config "$@";
