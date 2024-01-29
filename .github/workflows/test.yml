@@ -156,7 +156,7 @@ jobs:
       node_type: cpu32
       gh_token: GIST_REPO_READ_ORG_GITHUB_TOKEN
       build_command: |
-        set -Eeuxo pipefail;
+        set -euxo pipefail;
         sccache -z;
         clone-all --verbose --no-update-env;
         rapids-generate-scripts;
