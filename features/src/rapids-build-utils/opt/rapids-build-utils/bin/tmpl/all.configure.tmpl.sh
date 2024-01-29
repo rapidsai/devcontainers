@@ -24,7 +24,15 @@
 #  -D* <var>[:<type>]=<value>             Create or update a cmake cache entry.
 
 configure_all() {
+    local -;
     set -Eeuo pipefail;
+
+    # shellcheck disable=SC2154
+    if test -n "${rapids_build_utils_debug:-}" \
+    && { test -z "${rapids_build_utils_debug##*"*"*}" \
+      || test -z "${rapids_build_utils_debug##*"configure-all"*}"; }; then
+        PS4="+ ${BASH_SOURCE[0]}:\${LINENO} "; set -x;
+    fi
 
     eval "$(devcontainer-utils-parse-args "$0" - <<< "${@@Q}")";
 
@@ -34,11 +42,5 @@ configure_all() {
         fi
     done
 }
-
-if test -n "${rapids_build_utils_debug:-}" \
-&& { test -z "${rapids_build_utils_debug##*"*"*}" \
-  || test -z "${rapids_build_utils_debug##*"configure-all"*}"; }; then
-    PS4="+ ${BASH_SOURCE[0]}:\${LINENO} "; set -x;
-fi
 
 configure_all "$@";

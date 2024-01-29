@@ -10,7 +10,16 @@
 #  -v,--verbose       verbose output
 
 uninstall_${NAME}() {
+    local -;
     set -Eeuo pipefail;
+
+    # shellcheck disable=SC2154
+    if test -n "${rapids_build_utils_debug:-}" \
+    && { test -z "${rapids_build_utils_debug##*"*"*}" \
+      || test -z "${rapids_build_utils_debug##*"uninstall-all"*}" \
+      || test -z "${rapids_build_utils_debug##*"uninstall-${NAME}"*}"; }; then
+        PS4="+ ${BASH_SOURCE[0]}:\${LINENO} "; set -x;
+    fi
 
     eval "$(devcontainer-utils-parse-args "$0" - <<< "${@@Q}")";
 
@@ -26,12 +35,5 @@ uninstall_${NAME}() {
         fi
     done
 }
-
-if test -n "${rapids_build_utils_debug:-}" \
-&& { test -z "${rapids_build_utils_debug##*"*"*}" \
-  || test -z "${rapids_build_utils_debug##*"uninstall-all"*}" \
-  || test -z "${rapids_build_utils_debug##*"uninstall-${NAME}"*}"; }; then
-    PS4="+ ${BASH_SOURCE[0]}:\${LINENO} "; set -x;
-fi
 
 uninstall_${NAME} "$@";

@@ -20,7 +20,15 @@
 #                        (default: all repositories)
 
 checkout_same_branch() {
+    local -;
     set -Eeuo pipefail;
+
+    # shellcheck disable=SC2154
+    if test -n "${rapids_build_utils_debug:-}" \
+    && { test -z "${rapids_build_utils_debug##*"*"*}" \
+      || test -z "${rapids_build_utils_debug##*"checkout-same-branch"*}"; }; then
+        PS4="+ ${BASH_SOURCE[0]}:\${LINENO} "; set -x;
+    fi
 
     eval "$(devcontainer-utils-parse-args "$0" - <<< "${@@Q}")";
 
@@ -135,11 +143,5 @@ checkout_same_branch() {
         git -C ~/${!repo_path} submodule update --init --recursive -j "${n_jobs}";
     done;
 }
-
-if test -n "${rapids_build_utils_debug:-}" \
-&& { test -z "${rapids_build_utils_debug##*"*"*}" \
-  || test -z "${rapids_build_utils_debug##*"checkout-same-branch"*}"; }; then
-    PS4="+ ${BASH_SOURCE[0]}:\${LINENO} "; set -x;
-fi
 
 checkout_same_branch "$@";

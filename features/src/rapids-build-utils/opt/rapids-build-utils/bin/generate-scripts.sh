@@ -7,16 +7,15 @@ TEMPLATES="${TEMPLATES:-/opt/rapids-build-utils/bin/tmpl}";
 TMP_SCRIPT_DIR="${TMP_SCRIPT_DIR:-/tmp/rapids-build-utils}";
 
 clean_completions() {
-
     local -;
+    set -Eeuo pipefail;
 
+    # shellcheck disable=SC2154
     if test -n "${rapids_build_utils_debug:-}" \
     && { test -z "${rapids_build_utils_debug##*"*"*}" \
-      || test -z "${rapids_build_utils_debug##*"generate-scripts"*}"; }; then
+        || test -z "${rapids_build_utils_debug##*"generate-scripts"*}"; }; then
         PS4="+ ${BASH_SOURCE[0]}:\${LINENO} "; set -x;
     fi
-
-    set -euo pipefail;
 
     mkdir -p "${TMP_SCRIPT_DIR}";
     mkdir -p "${HOME}/.bash_completion.d";
@@ -33,16 +32,15 @@ clean_completions() {
 }
 
 generate_completions() {
-
     local -;
+    set -Eeuo pipefail;
 
+    # shellcheck disable=SC2154
     if test -n "${rapids_build_utils_debug:-}" \
     && { test -z "${rapids_build_utils_debug##*"*"*}" \
-      || test -z "${rapids_build_utils_debug##*"generate-scripts"*}"; }; then
+        || test -z "${rapids_build_utils_debug##*"generate-scripts"*}"; }; then
         PS4="+ ${BASH_SOURCE[0]}:\${LINENO} "; set -x;
     fi
-
-    set -euo pipefail;
 
     mkdir -p "${HOME}/.bash_completion.d";
     readarray -t commands < <(find "${TMP_SCRIPT_DIR}"/ -maxdepth 1 -type f -exec basename {} \;);
@@ -65,7 +63,7 @@ generate_completions() {
 
 clean_scripts() {
     local -;
-    set -euo pipefail;
+    set -Eeuo pipefail;
     mkdir -p "${TMP_SCRIPT_DIR}";
     readarray -t commands < <(find "${TMP_SCRIPT_DIR}"/ -maxdepth 1 -type f -exec basename {} \;);
     sudo rm -f -- \
@@ -197,18 +195,17 @@ generate_python_scripts() {
 }
 
 generate_scripts() {
-
     local -;
+    set -Eeuo pipefail;
 
+    # shellcheck disable=SC2154
     if test -n "${rapids_build_utils_debug:-}" \
     && { test -z "${rapids_build_utils_debug##*"*"*}" \
-      || test -z "${rapids_build_utils_debug##*"generate-scripts"*}"; }; then
+        || test -z "${rapids_build_utils_debug##*"generate-scripts"*}"; }; then
         PS4="+ ${BASH_SOURCE[0]}:\${LINENO} "; set -x;
     fi
 
     # Generate and install the "clone-<repo>" scripts
-
-    set -euo pipefail;
 
     # Ensure we're in this script's directory
     cd "$( cd "$( dirname "$(realpath -m "${BASH_SOURCE[0]}")" )" && pwd )";

@@ -20,7 +20,16 @@
 #  --default-directory-permissions <permission> Default install permission. Use default permission <permission>.
 
 install_${CPP_LIB}_cpp() {
+    local -;
     set -Eeuo pipefail;
+
+    # shellcheck disable=SC2154
+    if test -n "${rapids_build_utils_debug:-}" \
+    && { test -z "${rapids_build_utils_debug##*"*"*}" \
+      || test -z "${rapids_build_utils_debug##*"install-all"*}" \
+      || test -z "${rapids_build_utils_debug##*"install-${CPP_LIB}-cpp"*}"; }; then
+        PS4="+ ${BASH_SOURCE[0]}:\${LINENO} "; set -x;
+    fi
 
     eval "$(devcontainer-utils-parse-args "$0" --passthrough '
         -v,--verbose
@@ -47,12 +56,5 @@ install_${CPP_LIB}_cpp() {
         ) 2>&1;
     done
 }
-
-if test -n "${rapids_build_utils_debug:-}" \
-&& { test -z "${rapids_build_utils_debug##*"*"*}" \
-  || test -z "${rapids_build_utils_debug##*"install-all"*}" \
-  || test -z "${rapids_build_utils_debug##*"install-${CPP_LIB}-cpp"*}"; }; then
-    PS4="+ ${BASH_SOURCE[0]}:\${LINENO} "; set -x;
-fi
 
 install_${CPP_LIB}_cpp "$@";

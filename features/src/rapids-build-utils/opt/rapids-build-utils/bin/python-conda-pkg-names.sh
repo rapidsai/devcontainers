@@ -20,7 +20,15 @@
 #                        (default: all repositories)
 
 python_conda_pkg_names() {
+    local -;
     set -Eeuo pipefail;
+
+    # shellcheck disable=SC2154
+    if test -n "${rapids_build_utils_debug:-}" \
+    && { test -z "${rapids_build_utils_debug##*"*"*}" \
+      || test -z "${rapids_build_utils_debug##*"python-conda-pkg-names"*}"; }; then
+        PS4="+ ${BASH_SOURCE[0]}:\${LINENO} "; set -x;
+    fi
 
     eval "$(devcontainer-utils-parse-args "$0" - <<< "${@@Q}")";
 
@@ -48,11 +56,5 @@ python_conda_pkg_names() {
         fi
     done
 }
-
-if test -n "${rapids_build_utils_debug:-}" \
-&& { test -z "${rapids_build_utils_debug##*"*"*}" \
-  || test -z "${rapids_build_utils_debug##*"python-conda-pkg-names"*}"; }; then
-    PS4="+ ${BASH_SOURCE[0]}:\${LINENO} "; set -x;
-fi
 
 python_conda_pkg_names "$@";

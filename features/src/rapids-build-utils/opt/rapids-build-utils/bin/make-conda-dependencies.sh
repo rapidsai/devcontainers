@@ -26,7 +26,15 @@ generate_env_yaml() {
 }
 
 make_conda_dependencies() {
+    local -;
     set -Eeuo pipefail;
+
+    # shellcheck disable=SC2154
+    if test -n "${rapids_build_utils_debug:-}" \
+    && { test -z "${rapids_build_utils_debug##*"*"*}" \
+      || test -z "${rapids_build_utils_debug##*"make-conda-dependencies"*}"; }; then
+        PS4="+ ${BASH_SOURCE[0]}:\${LINENO} "; set -x;
+    fi
 
     eval "$(devcontainer-utils-parse-args "$0" --passthrough '
         -m,--manifest
@@ -102,11 +110,5 @@ make_conda_dependencies() {
         rm -f "${conda_env_yamls[@]}";
     fi
 }
-
-if test -n "${rapids_build_utils_debug:-}" \
-&& { test -z "${rapids_build_utils_debug##*"*"*}" \
-  || test -z "${rapids_build_utils_debug##*"make-conda-dependencies"*}"; }; then
-    PS4="+ ${BASH_SOURCE[0]}:\${LINENO} "; set -x;
-fi
 
 make_conda_dependencies "$@";

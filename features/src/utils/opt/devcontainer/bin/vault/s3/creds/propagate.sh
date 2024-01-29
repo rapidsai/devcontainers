@@ -1,8 +1,15 @@
 #! /usr/bin/env bash
 
 ensure_s3_creds_have_propagated() {
+    local -;
+    set -Eeuo pipefail;
 
-    set -euo pipefail;
+    # shellcheck disable=SC2154
+    if test -n "${devcontainer_utils_debug:-}" \
+    && { test -z "${devcontainer_utils_debug##*"*"*}" \
+      || test -z "${rapids_build_utils_debug##*"vault-s3-creds-propagate"*}"; }; then
+        PS4="+ ${BASH_SOURCE[0]}:\${LINENO} "; set -x;
+    fi
 
     if ! type sccache >/dev/null 2>&1; then
         return;
@@ -35,9 +42,5 @@ ensure_s3_creds_have_propagated() {
         sleep 1;
     done
 }
-
-if test -n "${devcontainer_utils_debug:-}"; then
-    PS4="+ ${BASH_SOURCE[0]}:\${LINENO} "; set -x;
-fi
 
 ensure_s3_creds_have_propagated "$@";

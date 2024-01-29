@@ -24,7 +24,15 @@
 #                                         (default: 1)
 
 get_num_archs_jobs_and_load() {
+    local -;
     set -Eeuo pipefail
+
+    # shellcheck disable=SC2154
+    if test -n "${rapids_build_utils_debug:-}" \
+    && { test -z "${rapids_build_utils_debug##*"*"*}" \
+      || test -z "${rapids_build_utils_debug##*"get-num-archs-jobs-and-load"*}"; }; then
+        PS4="+ ${BASH_SOURCE[0]}:\${LINENO} "; set -x;
+    fi
 
     eval "$(devcontainer-utils-parse-args "$0" - <<< "${@@Q}")";
 
@@ -87,11 +95,5 @@ ____EOF
     echo "declare n_jobs; n_jobs=${n_jobs}";
     echo "declare n_load; n_load=${n_load}";
 }
-
-if test -n "${rapids_build_utils_debug:-}" \
-&& { test -z "${rapids_build_utils_debug##*"*"*}" \
-  || test -z "${rapids_build_utils_debug##*"get-num-archs-jobs-and-load"*}"; }; then
-    PS4="+ ${BASH_SOURCE[0]}:\${LINENO} "; set -x;
-fi
 
 get_num_archs_jobs_and_load "$@";

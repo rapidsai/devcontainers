@@ -17,7 +17,15 @@
 #                        (default: all repositories)
 
 list_repos() {
+    local -;
     set -Eeuo pipefail;
+
+    # shellcheck disable=SC2154
+    if test -n "${rapids_build_utils_debug:-}" \
+    && { test -z "${rapids_build_utils_debug##*"*"*}" \
+          || test -z "${rapids_build_utils_debug##*"list-repos"*}"; }; then
+        PS4="+ ${BASH_SOURCE[0]}:\${LINENO} "; set -x;
+    fi
 
     eval "$(devcontainer-utils-parse-args "$0" --passthrough '
         -m,--manifest
@@ -48,11 +56,5 @@ list_repos() {
 
     rapids-query-manifest "${OPTS[@]}" -- "${query}";
 }
-
-if test -n "${rapids_build_utils_debug:-}" \
-&& { test -z "${rapids_build_utils_debug##*"*"*}" \
-    || test -z "${rapids_build_utils_debug##*"list-repos"*}"; }; then
-    PS4="+ ${BASH_SOURCE[0]}:\${LINENO} "; set -x;
-fi
 
 list_repos "$@";

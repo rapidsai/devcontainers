@@ -3,8 +3,15 @@
 # Test sccache AWS S3 credentials are valid
 
 test_aws_creds() {
+    local -;
+    set -Eeuo pipefail;
 
-    set -euo pipefail;
+    # shellcheck disable=SC2154
+    if test -n "${devcontainer_utils_debug:-}" \
+    && { test -z "${devcontainer_utils_debug##*"*"*}" \
+      || test -z "${rapids_build_utils_debug##*"vault-s3-creds-test"*}"; }; then
+        PS4="+ ${BASH_SOURCE[0]}:\${LINENO} "; set -x;
+    fi
 
     if ! type sccache >/dev/null 2>&1; then exit 1; fi
 
@@ -59,9 +66,5 @@ test_aws_creds() {
 
     exit 0;
 }
-
-if test -n "${devcontainer_utils_debug:-}"; then
-    PS4="+ ${BASH_SOURCE[0]}:\${LINENO} "; set -x;
-fi
 
 test_aws_creds "$@";

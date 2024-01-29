@@ -1,8 +1,8 @@
 #! /usr/bin/env bash
 
 init_github_cli() {
-
-    set -euo pipefail;
+    local -;
+    set -Eeuo pipefail;
 
     if ! type gh > /dev/null 2>&1; then
         export GITHUB_USER="";

@@ -81,7 +81,16 @@ ________EOF
 }
 
 clone_github_repo() {
+    local -;
     set -Eeuo pipefail;
+
+    # shellcheck disable=SC2154
+    if test -n "${devcontainer_utils_debug:-}" \
+    && { test -z "${devcontainer_utils_debug##*"*"*}" \
+      || test -z "${devcontainer_utils_debug##*"clone"*}" \
+      || test -z "${devcontainer_utils_debug##*"clone-github-repo"*}"; }; then
+        PS4="+ ${BASH_SOURCE[0]}:\${LINENO} "; set -x;
+    fi
 
     eval "$(devcontainer-utils-parse-args "$0" --passthrough '
         -j,--parallel
@@ -163,12 +172,5 @@ clone_github_repo() {
         "${origin}" "${directory}"            \
         ;
 }
-
-if test -n "${devcontainer_utils_debug:-}" \
-&& { test -z "${devcontainer_utils_debug##*"*"*}" \
-  || test -z "${devcontainer_utils_debug##*"clone"*}" \
-  || test -z "${devcontainer_utils_debug##*"clone-github-repo"*}"; }; then
-    PS4="+ ${BASH_SOURCE[0]}:\${LINENO} "; set -x;
-fi
 
 clone_github_repo "$@";

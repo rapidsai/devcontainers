@@ -22,7 +22,17 @@
 #                                         (default: 1)
 
 build_${PY_LIB}_python_editable() {
+    local -;
     set -Eeuo pipefail;
+
+    # shellcheck disable=SC2154
+    if test -n "${rapids_build_utils_debug:-}" \
+    && { test -z "${rapids_build_utils_debug##*"*"*}" \
+      || test -z "${rapids_build_utils_debug##*"build-all"*}" \
+      || test -z "${rapids_build_utils_debug##*"build-${PY_LIB}-python"*}" \
+      || test -z "${rapids_build_utils_debug##*"build-${PY_LIB}-python-editable"*}"; }; then
+        PS4="+ ${BASH_SOURCE[0]}:\${LINENO} "; set -x;
+    fi
 
     eval "$(devcontainer-utils-parse-args "$0" - <<< "${@@Q}")";
 
@@ -86,13 +96,5 @@ build_${PY_LIB}_python_editable() {
         { set +x; } 2>/dev/null; echo -n "${PY_LIB} install time:";
     ) 2>&1;
 }
-
-if test -n "${rapids_build_utils_debug:-}" \
-&& { test -z "${rapids_build_utils_debug##*"*"*}" \
-  || test -z "${rapids_build_utils_debug##*"build-all"*}" \
-  || test -z "${rapids_build_utils_debug##*"build-${PY_LIB}-python"*}" \
-  || test -z "${rapids_build_utils_debug##*"build-${PY_LIB}-python-editable"*}"; }; then
-    PS4="+ ${BASH_SOURCE[0]}:\${LINENO} "; set -x;
-fi
 
 build_${PY_LIB}_python_editable "$@";

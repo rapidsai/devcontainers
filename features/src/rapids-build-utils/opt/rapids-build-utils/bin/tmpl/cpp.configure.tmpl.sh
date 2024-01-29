@@ -23,7 +23,16 @@
 #  -D* <var>[:<type>]=<value>             Create or update a cmake cache entry.
 
 configure_${CPP_LIB}_cpp() {
+    local -;
     set -Eeuo pipefail;
+
+    # shellcheck disable=SC2154
+    if test -n "${rapids_build_utils_debug:-}" \
+    && { test -z "${rapids_build_utils_debug##*"*"*}" \
+      || test -z "${rapids_build_utils_debug##*"configure-all"*}" \
+      || test -z "${rapids_build_utils_debug##*"configure-${CPP_LIB}-cpp"*}"; }; then
+        PS4="+ ${BASH_SOURCE[0]}:\${LINENO} "; set -x;
+    fi
 
     eval "$(devcontainer-utils-parse-args "$0" - <<< "${@@Q}")";
 
@@ -72,12 +81,5 @@ configure_${CPP_LIB}_cpp() {
             ;
     fi
 }
-
-if test -n "${rapids_build_utils_debug:-}" \
-&& { test -z "${rapids_build_utils_debug##*"*"*}" \
-  || test -z "${rapids_build_utils_debug##*"configure-all"*}" \
-  || test -z "${rapids_build_utils_debug##*"configure-${CPP_LIB}-cpp"*}"; }; then
-    PS4="+ ${BASH_SOURCE[0]}:\${LINENO} "; set -x;
-fi
 
 configure_${CPP_LIB}_cpp "$@";
