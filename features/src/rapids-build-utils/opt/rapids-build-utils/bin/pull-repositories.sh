@@ -47,7 +47,7 @@ pull_repositories() {
 
         local branch_name="$(git -C ~/${!repo_path} rev-parse --abbrev-ref HEAD)";
 
-        while ! git -C ~/${!repo_path} branch -r | grep -q "upstream/${branch_name}"; do
+        while [[ -z "$(git -C ~/${!repo_path} branch -r | grep upstream/${branch_name})" ]]; do
 
             local upstream_info="$(git -C ~/${!repo_path} remote -v show | grep upstream | head -n1)";
 
