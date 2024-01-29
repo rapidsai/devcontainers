@@ -42,7 +42,7 @@ install_${CPP_LIB}_cpp() {
     prefix="${p:-${CMAKE_INSTALL_PREFIX:-/usr/local}}";
 
     local comp;
-    for comp in "${components[@]}"; do
+    for comp in "${component[@]}"; do
         if test "all" = "${comp}"; then
             comp="";
         fi
