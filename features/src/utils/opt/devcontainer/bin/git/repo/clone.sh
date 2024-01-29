@@ -39,6 +39,8 @@ clone_git_repo() {
 
     local branch="${b:-"${branch:-}"}";
     local parallel="${j:-${parallel:-1}}";
+    parallel="${parallel:+-j "${parallel}"}";
+
     local upstream="${u:-"${upstream:-}"}";
 
     local nargs="${#REST[@]}";
@@ -53,7 +55,8 @@ clone_git_repo() {
     if [ ! -d "${directory}"/.git ]; then
         git clone "${OPTS[@]}" -- "${origin}" "${directory}";
         git -C "${directory}" remote add upstream "${upstream}" || true;
-        git -C "${directory}" fetch "${quiet}" -j "${parallel}" upstream || true;
+        # shellcheck disable=SC2086
+        git -C "${directory}" fetch ${quiet} ${parallel} upstream || true;
         git -C "${directory}" remote set-url --push upstream read_only || true;
 
         if [ "${upstream}" != "${origin}" ]; then
@@ -70,23 +73,24 @@ clone_git_repo() {
         local -r origin_has_branch="$(git -C "${directory}" ls-remote -q --exit-code -h origin "${branch}" && echo 1 || echo)";
         local -r origin_has_tag="$(git -C "${directory}" ls-remote -q --exit-code -t origin "${branch}" && echo 1 || echo)";
 
+        # shellcheck disable=SC2086
         if false; then exit 1;
         elif test -n "${upstream_has_branch}"; then
-            git -C "${directory}" fetch "${quiet}" upstream "refs/heads/${branch}";
-            if ! git -C "${directory}" checkout "${quiet}" -b "${branch}" -t "upstream/${branch}" 2>/dev/null; then
-                git -C "${directory}" checkout "${quiet}" "${branch}";
+            git -C "${directory}" fetch ${quiet} upstream "refs/heads/${branch}";
+            if ! git -C "${directory}" checkout ${quiet} -b "${branch}" -t "upstream/${branch}" 2>/dev/null; then
+                git -C "${directory}" checkout ${quiet} "${branch}";
                 git -C "${directory}" branch "${branch}" -u "upstream/${branch}";
             fi
         elif test -n "${upstream_has_tag}"; then
-            git -C "${directory}" checkout "${quiet}" -m -b "upstream/${branch}" "${branch}";
+            git -C "${directory}" checkout ${quiet} -m -b "upstream/${branch}" "${branch}";
         elif test -n "${origin_has_branch}"; then
-            git -C "${directory}" fetch "${quiet}" origin "refs/heads/${branch}";
-            if ! git -C "${directory}" checkout "${quiet}" -b "${branch}" -t "origin/${branch}" 2>/dev/null; then
-                git -C "${directory}" checkout "${quiet}" "${branch}";
+            git -C "${directory}" fetch ${quiet} origin "refs/heads/${branch}";
+            if ! git -C "${directory}" checkout ${quiet} -b "${branch}" -t "origin/${branch}" 2>/dev/null; then
+                git -C "${directory}" checkout ${quiet} "${branch}";
                 git -C "${directory}" branch "${branch}" -u "origin/${branch}";
             fi
         elif test -n "${origin_has_tag}"; then
-            git -C "${directory}" checkout "${quiet}" -f -b "origin/${branch}" "${branch}";
+            git -C "${directory}" checkout ${quiet} -f -b "origin/${branch}" "${branch}";
         fi
 
         if test -n "${origin_has_branch}"; then
@@ -98,7 +102,8 @@ clone_git_repo() {
         fi
     fi
 
-    git -C "${directory}" submodule update --init --recursive -j "${parallel}" "${quiet}";
+    # shellcheck disable=SC2086
+    git -C "${directory}" submodule update --init --recursive ${parallel} ${quiet};
 }
 
 if test -n "${devcontainer_utils_debug:-}" \
