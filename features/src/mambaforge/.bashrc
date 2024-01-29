@@ -5,8 +5,16 @@ for default_conda_env_name in ${DEFAULT_CONDA_ENV:-} ${CONDA_DEFAULT_ENV:-} base
     if grep -qF "(${default_conda_env_name})" <<< "${CONDA_PROMPT_MODIFIER:-}"; then
         break;
     fi
-    conda activate "$default_conda_env_name" 2>/dev/null && break || continue;
-done;
+    # Temporarily allow unbound variables for conda activation.
+    oldstate="$(shopt -po; shopt -p)"; [[ -o errexit ]] && oldstate="${oldstate}; set -e"; set +u;
+    if conda activate "${default_conda_env_name}" 2>/dev/null; then
+        { set +vx; } 2>/dev/null; eval "${oldstate}"; unset oldstate;
+        break;
+    else
+        { set +vx; } 2>/dev/null; eval "${oldstate}"; unset oldstate;
+        continue;
+    fi
+done
 
 if [ -n "${CONDA_EXE:-}" ]; then
     conda_bin_paths="$(dirname "$(dirname "${CONDA_EXE}")")/condabin";
