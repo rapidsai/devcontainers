@@ -1,7 +1,7 @@
 {
   "name": "NVIDIA CCCL development utilities",
   "id": "cccl-dev",
-  "version": "24.2.3",
+  "version": "24.4.1",
   "description": "A feature to install NVIDIA CCCL development utilities",
   "options": {
     "litVersion": {
