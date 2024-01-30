@@ -106,7 +106,7 @@ get_user_fork_name() {
 
 clone_gitlab_repo() {
     local -;
-    set -Eeuo pipefail;
+    set -euo pipefail;
 
     eval "$(devcontainer-utils-parse-args "$0" --passthrough '
         -j,--parallel

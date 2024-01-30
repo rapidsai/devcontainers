@@ -18,7 +18,7 @@
 
 python_pkg_names() {
     local -;
-    set -Eeuo pipefail;
+    set -euo pipefail;
 
     eval "$(devcontainer-utils-parse-args "$0" - <<< "${@@Q}")";
 

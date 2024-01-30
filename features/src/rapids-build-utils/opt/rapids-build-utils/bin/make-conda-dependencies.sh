@@ -27,7 +27,7 @@ generate_env_yaml() {
 
 make_conda_dependencies() {
     local -;
-    set -Eeuo pipefail;
+    set -euo pipefail;
 
     # shellcheck disable=SC2154
     if test -n "${rapids_build_utils_debug:-}" \

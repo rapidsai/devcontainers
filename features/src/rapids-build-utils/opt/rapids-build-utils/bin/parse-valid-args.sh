@@ -2,7 +2,7 @@
 
 parse_valid_args() {
     local -;
-    set -Eeuo pipefail;
+    set -euo pipefail;
 
     local -r cmd="$*";
     local -r hash="$(echo "$cmd" | tr -d'[:space:]')";

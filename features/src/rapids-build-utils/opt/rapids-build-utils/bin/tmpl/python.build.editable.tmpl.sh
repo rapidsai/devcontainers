@@ -23,7 +23,7 @@
 
 build_${PY_LIB}_python_editable() {
     local -;
-    set -Eeuo pipefail;
+    set -euo pipefail;
 
     # shellcheck disable=SC2154
     if test -n "${rapids_build_utils_debug:-}" \

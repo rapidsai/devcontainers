@@ -25,7 +25,7 @@
 
 get_num_archs_jobs_and_load() {
     local -;
-    set -Eeuo pipefail
+    set -euo pipefail
 
     # shellcheck disable=SC2154
     if test -n "${rapids_build_utils_debug:-}" \

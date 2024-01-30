@@ -2,7 +2,7 @@
 
 init_github_cli() {
     local -;
-    set -Eeuo pipefail;
+    set -euo pipefail;
 
     if ! type gh > /dev/null 2>&1; then
         export GITHUB_USER="";

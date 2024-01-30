@@ -18,7 +18,7 @@
 
 generate_bash_completion() {
     local -;
-    set -Eeuo pipefail;
+    set -euo pipefail;
 
     # shellcheck disable=SC2154
     if test -n "${devcontainer_utils_debug:-}" \
