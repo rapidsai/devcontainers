@@ -8,7 +8,8 @@
 # Forwards all arguments to each underlying script.
 #
 # Boolean options:
-#  -h,--help,--usage                      print this text
+#  -h,--help,--usage            print this text
+#  -v,--verbose                 verbose output
 #
 # Options that require values:
 #  -j,--parallel <num>          Clone <num> repos in parallel
@@ -30,7 +31,7 @@ clean_all() {
 
     echo "${NAMES}"                     \
   | tr '[:space:]' '\0'                 \
-  | xargs -r -0 -P${n_jobs} -I% bash -c "
+  | xargs ${v:+-t} -r -0 -P${n_jobs} -I% bash -c "
     if type clean-% >/dev/null 2>&1; then
         clean-% $* || exit 255;
     fi

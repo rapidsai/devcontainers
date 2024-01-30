@@ -7,6 +7,7 @@
 #
 # Boolean options:
 #  -h,--help,--usage            print this text
+#  -v,--verbose                 verbose output
 #  --no-fork                    don't prompt the user to fork the repo if a user fork isn't found
 #                               (default: false)
 #  --no-update-env              don't update the Python env with the repo's dependencies after cloning
@@ -44,7 +45,7 @@ clone_all() {
 
     echo "${NAMES}"                     \
   | tr '[:space:]' '\0'                 \
-  | xargs -r -0 -P${n_jobs} -I% bash -c "
+  | xargs ${v:+-t} -r -0 -P${n_jobs} -I% bash -c "
     if type clone-% >/dev/null 2>&1; then
         clone-% -j ${n_modules} --no-update-env ${OPTS[*]} || exit 255;
     fi
