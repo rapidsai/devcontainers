@@ -8,7 +8,7 @@ TMP_SCRIPT_DIR="${TMP_SCRIPT_DIR:-/tmp/rapids-build-utils}";
 
 clean_completions() {
     local -;
-    set -Eeuo pipefail;
+    set -euo pipefail;
 
     # shellcheck disable=SC2154
     if test -n "${rapids_build_utils_debug:-}" \
@@ -33,7 +33,7 @@ clean_completions() {
 
 generate_completions() {
     local -;
-    set -Eeuo pipefail;
+    set -euo pipefail;
 
     # shellcheck disable=SC2154
     if test -n "${rapids_build_utils_debug:-}" \
@@ -63,7 +63,7 @@ generate_completions() {
 
 clean_scripts() {
     local -;
-    set -Eeuo pipefail;
+    set -euo pipefail;
     mkdir -p "${TMP_SCRIPT_DIR}";
     readarray -t commands < <(find "${TMP_SCRIPT_DIR}"/ -maxdepth 1 -type f -exec basename {} \;);
     sudo rm -f -- \
@@ -196,7 +196,7 @@ generate_python_scripts() {
 
 generate_scripts() {
     local -;
-    set -Eeuo pipefail;
+    set -euo pipefail;
 
     # shellcheck disable=SC2154
     if test -n "${rapids_build_utils_debug:-}" \

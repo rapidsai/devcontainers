@@ -2,7 +2,7 @@
 
 parse_cmake_args() {
     local -;
-    set -Eeuo pipefail;
+    set -euo pipefail;
 
     local ARG="";
     local args=(-GNinja);

@@ -7,7 +7,7 @@
 #     --base-image ubuntu:22.04 .'
 # ```
 
-set -Eeuo pipefail
+set -euo pipefail
 
 # Optional: Import test library bundled with the devcontainer CLI
 source dev-container-features-test-lib

@@ -2,7 +2,7 @@
 
 parse_cmake_var_from_args() {
     local -;
-    set -Eeuo pipefail;
+    set -euo pipefail;
 
     eval "$(                                       \
         rapids-parse-cmake-vars-from-args "${@:2}" \

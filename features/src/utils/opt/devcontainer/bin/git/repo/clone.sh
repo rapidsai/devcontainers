@@ -28,7 +28,7 @@
 
 clone_git_repo() {
     local -;
-    set -Eeuo pipefail;
+    set -euo pipefail;
 
     # shellcheck disable=SC2154
     if test -n "${devcontainer_utils_debug:-}" \

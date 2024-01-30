@@ -2,7 +2,7 @@
 
 init_git_cli_config() {
     local -;
-    set -Eeuo pipefail;
+    set -euo pipefail;
 
     # PS4="+ ${BASH_SOURCE[0]}:\${LINENO} "; set -x;
 
