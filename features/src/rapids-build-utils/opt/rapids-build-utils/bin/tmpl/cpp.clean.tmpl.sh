@@ -26,8 +26,10 @@ clean_${CPP_LIB}_cpp() {
         exit 1;
     fi
 
-    rm -rf "${CPP_SRC}/build/latest"/* \
-           "${CPP_SRC}"/compile_commands.json;
+    rm -rf -- \
+        "${CPP_SRC}/build/latest"/{*,.*} \
+        "${CPP_SRC}"/compile_commands.json \
+        2>/dev/null || true;
 }
 
 clean_${CPP_LIB}_cpp "$@";
