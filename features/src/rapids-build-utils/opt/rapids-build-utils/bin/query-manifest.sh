@@ -42,7 +42,7 @@ query_manifest() {
           }
         ]
         | map(select(.key))
-        | map("declare " + .key + "; " + .key + "=" + (.val | @sh | gsub("[\\n]"; " ")))[]
+        | map("declare " + .key + "=" + (.val | @sh | gsub("[\\n]"; " ")))[]
 ________EOF
 )";
 

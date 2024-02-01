@@ -11,13 +11,13 @@
 #  --strip                      Strip before installing.
 #
 # Options that require values:
-#  -p,--prefix <dir>                            Install C++ library into <dir>
-#                                               (default: none)
-#  --config    <cfg>                            For multi-configuration generators, choose configuration <cfg>
-#                                               (default: none)
 #  --component <comp>                           Component-based install. Only install component <comp>.
 #                                               (default: all)
+#  --config    <cfg>                            For multi-configuration generators, choose configuration <cfg>
+#                                               (default: none)
 #  --default-directory-permissions <permission> Default install permission. Use default permission <permission>.
+#  -p,--prefix <dir>                            Install C++ library into <dir>
+#                                               (default: none)
 
 install_${CPP_LIB}_cpp() {
     local -;
@@ -38,7 +38,7 @@ install_${CPP_LIB}_cpp() {
         --default-directory-permissions
     ' - <<< "${@@Q}")";
 
-    component=(${component[@]:-all});
+    test ${#component[@]} -eq 0 && component=(all);
     prefix="${p:-${CMAKE_INSTALL_PREFIX:-/usr/local}}";
 
     local comp;

@@ -44,8 +44,7 @@ make_pip_dependencies() {
         --repo
     ' - <<< "${@@Q}")";
 
-    # shellcheck disable=SC2206
-    key=(${key[@]:-py_build py_run py_test all});
+    test ${#key[@]} -eq 0 && key=(py_build py_run py_test all);
 
     local cuda_version="${CUDA_VERSION:-${CUDA_VERSION_MAJOR:-12}.${CUDA_VERSION_MINOR:-0}}";
     cuda_version="$(grep -o '^[0-9]*.[0-9]*' <<< "${cuda_version}")";
