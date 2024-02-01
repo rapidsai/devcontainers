@@ -55,7 +55,10 @@ configure_${CPP_LIB}_cpp() {
     fi
 
     mkdir -p ${binary_dir};
-    ln -sfn ${binary_dir} ${source_dir}/build/latest;
+    (
+        cd ${source_dir}/build;
+        ln -sfn ${build_type} latest;
+    );
 
     local cmake_args=(-GNinja);
     cmake_args+=(-S ${source_dir});
