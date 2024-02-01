@@ -158,11 +158,12 @@ parse_args() {
                         $long_value1)
                             typ="value";
                             key="${OPTARG}";
-                            if [ -n "${!OPTIND:-}" ] && [[ "${!OPTIND}" != -* ]]; then
+                            arg+=("--${key}");
+                            if [[ "${!OPTIND:--}" != -* ]]; then
                                 val="${!OPTIND}";
+                                arg+=("${val}");
                                 OPTIND=$((OPTIND + 1));
                             fi
-                            arg+=("--${key}" "${val}");
                             ;;
                         # known value opt with value after =
                         $long_value2)
@@ -178,7 +179,7 @@ parse_args() {
                         # unknown long opt with value following
                         *)
                             opts+=("--${OPTARG}");
-                            if [ -n "${!OPTIND:-}" ] && [[ "${!OPTIND}" != -* ]]; then
+                            if [[ "${!OPTIND:--}" != -* ]]; then
                                 opts+=("${!OPTIND}");
                                 OPTIND=$((OPTIND + 1));
                             fi
