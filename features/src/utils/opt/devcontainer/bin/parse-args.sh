@@ -28,6 +28,7 @@ parse_args() {
     local -A typs=();
     local -a rest=();
 
+    local -A take_map=();
     local -A skip_map=();
     local -A reverse_alias_map=();
     local -Ar alias_map="($(parse_all_names_from_usage     <<< "${usage}" | parse_aliases))";
@@ -36,17 +37,52 @@ parse_args() {
     local -ar short_bools="($(parse_bool_names_from_usage  <<< "${usage}" | parse_short_names))";
     local -ar short_value="($(parse_value_names_from_usage <<< "${usage}" | parse_short_names))";
 
-    if [ "${1:-}" = "--passthrough" ]; then
-        shift;
-        if test -n "${1:-}"; then
-            local -ar pass_through="($(echo "${1}" | parse_args_to_names))";
-            for key in "${pass_through[@]}"; do
-                # shellcheck disable=SC2034
-                skip_map["${key}"]=1;
-            done
+    for ((idx=0; idx < 2; idx+=1)); do
+        if [ "${1:-}" = "--take" ]; then
             shift;
+            if test -n "${1:-}"; then
+                local -ar take="($(echo "${1}" | parse_args_to_names))";
+                for key in "${take[@]}"; do
+                    # shellcheck disable=SC2034
+                    take_map["${key}"]=1;
+                done
+                shift;
+            fi
         fi
+        if [ "${1:-}" = "--skip" ] || [ "${1:-}" = "--passthrough" ]; then
+            shift;
+            if test -n "${1:-}"; then
+                local -ar skip="($(echo "${1}" | parse_args_to_names))";
+                for key in "${skip[@]}"; do
+                    # shellcheck disable=SC2034
+                    skip_map["${key}"]=1;
+                done
+                shift;
+            fi
+        fi
+    done
+
+    if test ${#take_map[@]} -eq 0; then
+        for key in "${long_bools[@]}" "${short_bools[@]}" \
+                   "${long_value[@]}" "${short_value[@]}"; do
+            take_map[${key}]=1;
+        done
     fi
+
+    # Always include the -h,--help flags
+    take_map["h"]=1;
+    take_map["help"]=1;
+
+    for key in "${!alias_map[@]}"; do
+        args["${key}"]="";
+        local -a aliases="(${alias_map[${key}]})";
+        for alias in "${aliases[@]}"; do
+            reverse_alias_map["${alias}"]="${key}";
+        done
+    done
+
+    for key in "${long_bools[@]}" "${short_bools[@]}"; do typs[${key}]="bool"; done
+    for key in "${long_value[@]}" "${short_value[@]}"; do typs[${key}]="value"; done
 
     local -r optstring="$(                                                                               \
         cat <(parse_bool_names_from_usage  <<< "${usage}" | parse_short_names | xargs -r -I% echo -n %)  \
@@ -66,17 +102,6 @@ parse_args() {
     local -r long_value2="@($(echo -n "${long_value[@]/%/ |}"   | rev | cut -d'|' -f1 --complement | rev | tr -d '[:space:]'))=*";
     local -r short_bools1="@($(echo -n "${short_bools[@]/%/ |}" | rev | cut -d'|' -f1 --complement | rev | tr -d '[:space:]'))";
     local -r short_value1="@($(echo -n "${short_value[@]/%/ |}" | rev | cut -d'|' -f1 --complement | rev | tr -d '[:space:]'))";
-
-    for key in "${!alias_map[@]}"; do
-        args["${key}"]="";
-        local -a aliases="(${alias_map[${key}]})";
-        for alias in "${aliases[@]}"; do
-            reverse_alias_map["${alias}"]="${key}";
-        done
-    done
-
-    for key in "${long_bools[@]}" "${short_bools[@]}"; do typs[${key}]="bool"; done
-    for key in "${long_value[@]}" "${short_value[@]}"; do typs[${key}]="value"; done
 
     while test -n "${1:-}"; do
 
@@ -230,20 +255,19 @@ parse_args() {
 
             if test -n "${key}"; then
 
-                if test -v skip_map["${key}"]; then
+                if test -v skip_map["${key}"] || ! test -v take_map["${key}"]; then
                     opts+=("${arg[@]}");
-                fi
-
-                if test -v reverse_alias_map["${key}"]; then
-                    key="${reverse_alias_map["${key}"]}";
-                fi
-
-                if test "${typ}" = bool; then
-                    args["${key}"]="${val@Q}";
-                elif test -z "${args["${key}"]}"; then
-                    args["${key}"]="${val@Q}";
                 else
-                    args["${key}"]+=" ${val@Q}";
+                    if test -v reverse_alias_map["${key}"]; then
+                        key="${reverse_alias_map["${key}"]}";
+                    fi
+                    if test "${typ}" = bool; then
+                        args["${key}"]="${val@Q}";
+                    elif test -z "${args["${key}"]}"; then
+                        args["${key}"]="${val@Q}";
+                    else
+                        args["${key}"]+=" ${val@Q}";
+                    fi
                 fi
             fi
 
