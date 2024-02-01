@@ -7,6 +7,7 @@
 #
 # Boolean options:
 #  -h,--help,--usage            print this text
+#  -q,--quiet                   Operate quietly. Progress is not reported to the standard error stream.
 #  --no-fork                    don't prompt the user to fork the repo if a user fork isn't found
 #                               (default: false)
 #  --no-update-env              don't update the Python env with the repo's dependencies after cloning
@@ -37,6 +38,7 @@ clone_${NAME}() {
     fi
 
     eval "$(devcontainer-utils-parse-args "$0" --passthrough '
+        -q,--quiet
         --no-fork
         --clone-upstream
     ' - <<< "${@@Q}")";

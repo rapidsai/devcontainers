@@ -370,16 +370,13 @@ generate_scripts() {
     done;
 }
 
-if [ "$(basename "${BASH_SOURCE[${#BASH_SOURCE[@]}-1]}")" = rapids-generate-scripts ]; then
+clean_completions;
+clean_scripts;
 
-    clean_completions;
-    clean_scripts;
-
-    for pid in $(generate_scripts "$@"); do
-        while [[ -e "/proc/$pid" ]]; do
-            sleep 0.1
-        done
+for pid in $(generate_scripts "$@"); do
+    while [[ -e "/proc/$pid" ]]; do
+        sleep 0.1
     done
+done
 
-    generate_completions;
-fi
+generate_completions;
