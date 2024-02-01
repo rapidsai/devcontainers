@@ -52,6 +52,7 @@ install_utility() {
 install_utility update-content-command;
 install_utility post-start-command;
 install_utility post-attach-command;
+install_utility post-attach-command-entrypoint;
 
 install_utility checkout-same-branch;
 install_utility pull-repositories;
