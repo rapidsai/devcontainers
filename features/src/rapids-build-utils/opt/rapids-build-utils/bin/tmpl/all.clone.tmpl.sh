@@ -6,7 +6,7 @@
 # Runs clone-<repo> for each repo in "${NAMES}".
 #
 # Boolean options:
-#  -h,--help,--usage            print this text
+#  -h,--help                    print this text
 #  -v,--verbose                 verbose output
 #  --no-fork                    don't prompt the user to fork the repo if a user fork isn't found
 #                               (default: false)
@@ -35,19 +35,13 @@ clone_all() {
         --clone-upstream
     ' - <<< "${@@Q}")";
 
-    eval "$(rapids-get-num-archs-jobs-and-load -a1 "$@")";
-
-    local -r n_repos=$(wc -w <<< "${NAMES}");
-    n_jobs=$((n_repos < n_jobs ? n_repos : n_jobs));
-
-    local n_modules=$((n_jobs / n_repos));
-    n_modules=$((n_modules < 1 ? 1 : n_modules));
+    eval "$(rapids-get-num-archs-jobs-and-load -a3 "$@")";
 
     echo "${NAMES}"                     \
   | tr '[:space:]' '\0'                 \
   | xargs ${v:+-t} -r -0 -P${n_jobs} -I% bash -c "
     if type clone-% >/dev/null 2>&1; then
-        clone-% -j ${n_modules} --no-update-env ${OPTS[*]} || exit 255;
+        clone-% -j ${n_arch} --no-update-env ${OPTS[*]} || exit 255;
     fi
     ";
 
