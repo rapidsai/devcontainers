@@ -6,7 +6,7 @@
 # Generate a combined pip requirements file for all repos.
 #
 # Boolean options:
-#  -h,--help,--usage       print this text
+#  -h,--help               print this text
 #  --no-dedupe             don't sort and dedupe the combined requirements.txt
 #
 # Options that require values:
@@ -38,7 +38,7 @@ make_pip_dependencies() {
         PS4="+ ${BASH_SOURCE[0]}:\${LINENO} "; set -x;
     fi
 
-    eval "$(devcontainer-utils-parse-args "$0" --passthrough '
+    eval "$(devcontainer-utils-parse-args "$0" --skip '
         -m,--manifest
         -o,--omit
         --repo

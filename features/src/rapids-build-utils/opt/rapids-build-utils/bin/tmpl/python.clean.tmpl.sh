@@ -6,7 +6,7 @@
 # Clean the ${PY_LIB} build dirs.
 #
 # Boolean options:
-#  -h,--help,--usage            print this text
+#  -h,--help                    print this text
 
 clean_${PY_LIB}_python() {
     local -;

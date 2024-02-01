@@ -49,7 +49,7 @@ parse_args() {
                 shift;
             fi
         fi
-        if [ "${1:-}" = "--skip" ] || [ "${1:-}" = "--passthrough" ]; then
+        if [ "${1:-}" = "--skip" ]; then
             shift;
             if test -n "${1:-}"; then
                 local -ar skip="($(echo "${1}" | parse_args_to_names))";

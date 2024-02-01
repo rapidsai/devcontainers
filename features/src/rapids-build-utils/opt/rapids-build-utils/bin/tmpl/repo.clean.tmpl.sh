@@ -6,7 +6,7 @@
 # Clean the ${NAME} repository.
 #
 # Boolean options:
-#  -h,--help,--usage  print this text
+#  -h,--help          print this text
 
 clean_${NAME}() {
     local -;

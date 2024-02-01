@@ -6,7 +6,7 @@
 # Query the `manifest.yaml` in a shell-friendly format, optionally filtering results by repository name.
 #
 # Boolean options:
-#  -h,--help,--usage     print this text
+#  -h,--help             print this text
 #
 # Options that require values:
 #  -m,--manifest <file>  Use a specific manifest.json
@@ -27,7 +27,7 @@ list_repos() {
         PS4="+ ${BASH_SOURCE[0]}:\${LINENO} "; set -x;
     fi
 
-    eval "$(devcontainer-utils-parse-args "$0" --passthrough '
+    eval "$(devcontainer-utils-parse-args "$0" --skip '
         -m,--manifest
     ' - <<< "${@@Q}")";
 

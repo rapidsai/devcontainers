@@ -6,7 +6,7 @@
 # Clone the ${NAME} repository.
 #
 # Boolean options:
-#  -h,--help,--usage            print this text
+#  -h,--help                    print this text
 #  -q,--quiet                   Operate quietly. Progress is not reported to the standard error stream.
 #  --no-fork                    don't prompt the user to fork the repo if a user fork isn't found
 #                               (default: false)
@@ -37,7 +37,7 @@ clone_${NAME}() {
         PS4="+ ${BASH_SOURCE[0]}:\${LINENO} "; set -x;
     fi
 
-    eval "$(devcontainer-utils-parse-args "$0" --passthrough '
+    eval "$(devcontainer-utils-parse-args "$0" --skip '
         -q,--quiet
         --no-fork
         --clone-upstream

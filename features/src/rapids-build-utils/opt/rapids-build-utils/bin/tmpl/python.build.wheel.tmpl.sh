@@ -6,7 +6,7 @@
 # Build a ${PY_LIB} wheel.
 #
 # Boolean options:
-#  -h,--help,--usage                      print this text
+#  -h,--help                              print this text
 #  -v,--verbose                           verbose output
 #  --ignore-requires-python               Ignore the Requires-Python information.
 #  --no-clean                             Don't clean up build directories.
@@ -34,6 +34,7 @@
 #                                         limit.
 #                                         Higher values yield fewer parallel CUDA device object compilations.
 #                                         (default: 1)
+#  -D* <var>[:<type>]=<value>             Create or update a cmake cache entry.
 #  --cache-dir <dir>                      Store the cache data in <dir>.
 #  --only-binary <format_control>         Do not use source packages. Can be supplied multiple times, and each time
 #                                         adds to the existing value. Accepts either ":all:" to disable all source

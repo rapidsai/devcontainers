@@ -6,7 +6,7 @@
 # List python package source dirs as determined by manifest.yaml
 #
 # Boolean options:
-#  -h,--help,--usage     print this text
+#  -h,--help             print this text
 #
 # Options that require values:
 #  -m,--manifest <file>  Use a specific manifest.json

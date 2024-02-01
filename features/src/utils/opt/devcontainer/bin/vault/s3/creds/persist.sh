@@ -6,7 +6,7 @@
 # Set, unset, or reset the S3 bucket, region, and credentials in the environment.
 #
 # Boolean options:
-#  -h,--help,--usage              print this text
+#  -h,--help                      print this text
 #  --no-bucket                    Unset the $SCCACHE_BUCKET environment variable for all shells.
 #                                 (default: false)
 #  --no-region                    Unset the $SCCACHE_REGION environment variable for all shells.

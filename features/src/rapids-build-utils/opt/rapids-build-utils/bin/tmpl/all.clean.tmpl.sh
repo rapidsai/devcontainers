@@ -8,7 +8,7 @@
 # Forwards all arguments to each underlying script.
 #
 # Boolean options:
-#  -h,--help,--usage            print this text
+#  -h,--help                    print this text
 #  -v,--verbose                 verbose output
 #
 # Options that require values:
@@ -25,7 +25,7 @@ clean_all() {
         PS4="+ ${BASH_SOURCE[0]}:\${LINENO} "; set -x;
     fi
 
-    eval "$(devcontainer-utils-parse-args "$0" --passthrough '
+    eval "$(devcontainer-utils-parse-args "$0" --skip '
         -v,--verbose
     ' - <<< "${@@Q}")";
 

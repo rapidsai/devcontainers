@@ -6,7 +6,7 @@
 # Generate a bash completion script for a command.
 #
 # Boolean options:
-#  -h,--help,--usage            print this text
+#  -h,--help                    print this text
 #  -v,--verbose                 verbose output
 #
 # Options that require values:
