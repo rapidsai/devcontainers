@@ -6,10 +6,12 @@
 # CPack ${CPP_LIB}.
 #
 # Boolean options:
-#  -h,--help,--usage            print this text
+#  -h,--help                    print this text
 #  -v,--verbose                 verbose output
 #
 # Options that require values:
+#  -j,--parallel <num>          Use <num> to compress in parallel
+#                               (default: $(nproc))
 #  -o,--out-dir <dir>           copy cpack'd TGZ file into <dir>
 #                               (default: none)
 

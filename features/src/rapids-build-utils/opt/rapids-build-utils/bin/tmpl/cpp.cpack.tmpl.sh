@@ -6,10 +6,12 @@
 # CPack ${CPP_LIB}.
 #
 # Boolean options:
-#  -h,--help,--usage                            print this text
+#  -h,--help                                    print this text
 #  -v,--verbose                                 verbose output
 #
 # Options that require values:
+#  -j,--parallel <num>                          Use <num> to compress in parallel
+#                                               (default: $(nproc))
 #  --component <comp>                           Component-based install. Only install component <comp>.
 #                                               (default: all)
 #  --config    <cfg>                            For multi-configuration generators, choose configuration <cfg>
@@ -36,6 +38,8 @@ cpack_${CPP_LIB}_cpp() {
         --config
         --default-directory-permissions
     ' - <<< "${@@Q}")";
+
+    eval "$(rapids-get-num-archs-jobs-and-load -a1 "$@")";
 
     test ${#component[@]} -eq 0 && component=(all);
 
@@ -92,7 +96,7 @@ cpack_${CPP_LIB}_cpp() {
             install-${CPP_LIB}-cpp -p "${outd}/${slug}" ${comp:+--component "${comp}"} "${OPTS[@]}";
 
             if test -d "${outd}/${slug}"; then
-                tar -C "${outd}" -cz ${v:+-v} -f "${outd}/${slug}.tar.gz" "${slug}";
+                tar -C "${outd}" -c ${v:+-v} -f "${outd}/${slug}.tar.gz" -I "pigz -p ${n_jobs}" "${slug}";
                 cp -a "${outd}/${slug}.tar.gz" "${CPP_SRC}/build/latest/";
                 if test -d "${out_dir}"/ \
                 && test -f "${CPP_SRC}/build/latest/${slug}.tar.gz"; then
