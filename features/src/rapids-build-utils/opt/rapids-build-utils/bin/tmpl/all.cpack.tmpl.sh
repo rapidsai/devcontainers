@@ -10,6 +10,7 @@
 # Boolean options:
 #  -h,--help,--usage                            print this text
 #  -v,--verbose                                 verbose output
+#  --strip                                      Strip before installing.
 #
 # Options that require values:
 #  -j,--parallel <num>                          CPack <num> repos in parallel
