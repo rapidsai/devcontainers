@@ -25,7 +25,9 @@ clean_all() {
         PS4="+ ${BASH_SOURCE[0]}:\${LINENO} "; set -x;
     fi
 
-    eval "$(devcontainer-utils-parse-args "$0" - <<< "${@@Q}")";
+    eval "$(devcontainer-utils-parse-args "$0" --passthrough '
+        -v,--verbose
+    ' - <<< "${@@Q}")";
 
     eval "$(rapids-get-num-archs-jobs-and-load -a1 "$@")";
 
@@ -33,7 +35,7 @@ clean_all() {
   | tr '[:space:]' '\0'                 \
   | xargs ${v:+-t} -r -0 -P${n_jobs} -I% bash -c "
     if type clean-% >/dev/null 2>&1; then
-        clean-% $* || exit 255;
+        clean-% ${OPTS[*]} || exit 255;
     fi
     ";
 }
