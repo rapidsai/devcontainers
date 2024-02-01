@@ -8,12 +8,18 @@
 # Forwards all arguments to each underlying script.
 #
 # Boolean options:
-#  -h,--help,--usage            print this text
+#  -h,--help,--usage                            print this text
+#  -v,--verbose                                 verbose output
 #
 # Options that require values:
-#  -j,--parallel <num>          Clone <num> repos in parallel
-#  -o,--out-dir <dir>           copy cpack'd TGZ file into <dir>
-#                               (default: none)
+#  -j,--parallel <num>                          CPack <num> repos in parallel
+#  --component <comp>                           Component-based install. Only install component <comp>.
+#                                               (default: all)
+#  --config    <cfg>                            For multi-configuration generators, choose configuration <cfg>
+#                                               (default: none)
+#  --default-directory-permissions <permission> Default install permission. Use default permission <permission>.
+#  -o,--out-dir <dir>                           copy cpack'd TGZ file into <dir>
+#                                               (default: none)
 
 cpack_all() {
     local -;
@@ -26,7 +32,13 @@ cpack_all() {
         PS4="+ ${BASH_SOURCE[0]}:\${LINENO} "; set -x;
     fi
 
-    eval "$(devcontainer-utils-parse-args "$0" - <<< "${@@Q}")";
+    eval "$(devcontainer-utils-parse-args "$0" --passthrough '
+        -v,--verbose
+        --component
+        --config
+        --default-directory-permissions
+        -o,--out-dir
+    ' - <<< "${@@Q}")";
 
     eval "$(rapids-get-num-archs-jobs-and-load -a1 "$@")";
 
@@ -34,7 +46,7 @@ cpack_all() {
   | tr '[:space:]' '\0'                 \
   | xargs -r -0 -P${n_jobs} -I% bash -c "
     if type cpack-% >/dev/null 2>&1; then
-        cpack-% $* || exit 255;
+        cpack-% ${OPTS[*]} || exit 255;
     fi
     ";
 }
