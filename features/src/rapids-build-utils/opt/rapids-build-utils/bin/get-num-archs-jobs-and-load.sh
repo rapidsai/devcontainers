@@ -10,11 +10,13 @@
 # note: This wouldn't be necessary if `nvcc` interacted with the POSIX jobserver.
 #
 # Boolean options:
-#  -h,--help,--usage            print this text
+#  -h,--help                    print this text
 #
 # Options that require values:
 #  -a,--archs <num>                       Build <num> CUDA archs in parallel
 #                                         (default: 1)
+#  --max-archs <num>                      Build at most <num> CUDA archs in parallel
+#                                         (default: 3)
 #  -j,--parallel <num>                    Run <num> parallel compilation jobs
 #  -m,--max-device-obj-memory-usage <num> An upper-bound on the amount of memory each CUDA device object compilation
 #                                         is expected to take. This is used to estimate the number of parallel device
@@ -40,6 +42,7 @@ get_num_archs_jobs_and_load() {
         j=$(nproc);
     fi
 
+    max_archs="${max_archs:-3}";
     parallel="${j:-${JOBS:-${PARALLEL_LEVEL:-1}}}";
     max_device_obj_memory_usage="${m:-${MAX_DEVICE_OBJ_MEMORY_USAGE:-1}}";
 
@@ -58,7 +61,7 @@ get_num_archs_jobs_and_load() {
                 ;;
             all | all-major)
                 # Max out at 3 threads per object
-                n_arch=3;
+                n_arch=${max_archs};
                 ;;
             ALL | RAPIDS)
                 # currently: 60-real;70-real;75-real;80-real;86-real;90
@@ -73,8 +76,8 @@ get_num_archs_jobs_and_load() {
         esac
     fi
 
-    # Clamp between 1 and 3 threads per nvcc job
-    n_arch=$(( n_arch < 1 ? 1 : n_arch > 3 ? 3 : n_arch ));
+    # Clamp between 1 and ${max_archs} threads per nvcc job
+    n_arch=$(( n_arch < 1 ? 1 : n_arch > max_archs ? max_archs : n_arch ));
 
     local -r free_mem=$(free --giga | grep -E '^Mem:' | tr -s '[:space:]' | cut -d' ' -f7 || echo '0');
     local -r freeswap=$(free --giga | grep -E '^Swap:' | tr -s '[:space:]' | cut -d' ' -f4 || echo '0');

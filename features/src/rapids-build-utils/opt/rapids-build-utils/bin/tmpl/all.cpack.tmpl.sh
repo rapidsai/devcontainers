@@ -8,12 +8,13 @@
 # Forwards all arguments to each underlying script.
 #
 # Boolean options:
-#  -h,--help,--usage                            print this text
+#  -h,--help                                    print this text
 #  -v,--verbose                                 verbose output
 #  --strip                                      Strip before installing.
 #
 # Options that require values:
 #  -j,--parallel <num>                          CPack <num> repos in parallel
+#                                               (default: 1)
 #  --component <comp>                           Component-based install. Only install component <comp>.
 #                                               (default: all)
 #  --config    <cfg>                            For multi-configuration generators, choose configuration <cfg>
@@ -41,13 +42,17 @@ cpack_all() {
         -o,--out-dir
     ' - <<< "${@@Q}")";
 
-    eval "$(rapids-get-num-archs-jobs-and-load -a1 "$@")";
+    j=${j:-1};
+    local -r n_repos=$(wc -w <<< "${NAMES}");
+    local k=$((n_repos / j));
+
+    eval "$(rapids-get-num-archs-jobs-and-load -j "${j}" -a "${k}" --max-archs "${k}")";
 
     echo "${NAMES}"                     \
   | tr '[:space:]' '\0'                 \
-  | xargs -r -0 -P${n_jobs} -I% bash -c "
+  | xargs -r -0 -P${n_load} -I% bash -c "
     if type cpack-% >/dev/null 2>&1; then
-        cpack-% ${OPTS[*]} || exit 255;
+        cpack-% -j ${n_arch} ${OPTS[*]} || exit 255;
     fi
     ";
 }
