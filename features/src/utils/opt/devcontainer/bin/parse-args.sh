@@ -1,7 +1,7 @@
 #! /usr/bin/env bash
 
 # shellcheck disable=SC1091
-. devcontainer-utils-parse-args-from-docstring;
+. "$(dirname "$(realpath -m "${BASH_SOURCE[0]}")")/parse-args-from-docstring.sh";
 
 parse_args() {
     local -;
@@ -10,13 +10,14 @@ parse_args() {
     # shellcheck disable=SC2154
     if test -n "${devcontainer_utils_debug:-}" \
     && { test -z "${devcontainer_utils_debug##*"*"*}" \
-      || test -z "${rapids_build_utils_debug##*"parse-args"*}"; }; then
+      || test -z "${devcontainer_utils_debug##*"parse-args"*}"; }; then
         PS4="+ ${BASH_SOURCE[0]}:\${LINENO} "; set -x;
     fi
 
     local -r usage="$(print_usage "${1:-}")";
     shift;
 
+    local idx;
     local key;
     local typ;
     local val;
@@ -47,10 +48,10 @@ parse_args() {
         fi
     fi
 
-    local -r optstring="$(                                           \
-        cat <(echo "${short_bools[@]}" | xargs -d' ' -I% echo -n %)  \
-            <(echo "${short_value[@]}" | xargs -d' ' -I% echo -n %:) \
-      | tr -d '[:space:]'                                            \
+    local -r optstring="$(                                                                               \
+        cat <(parse_bool_names_from_usage  <<< "${usage}" | parse_short_names | xargs -r -I% echo -n %)  \
+            <(parse_value_names_from_usage <<< "${usage}" | parse_short_names | xargs -r -I% echo -n %:) \
+      | tr -d '[:space:]'                                                                                \
     )";
 
     if test ${#long_bools[@]} -gt 0 || test ${#long_value[@]} -gt 0; then
@@ -94,6 +95,7 @@ parse_args() {
             arg=();
             key=;
             val=;
+            idx=$((OPTIND-1));
 
             # shellcheck disable=SC2254
             case "${opt}" in
@@ -105,36 +107,34 @@ parse_args() {
                     ;;
                 # unknown short opt
                 \?)
-                    opts+=("${!OPTIND:-${OPTARG:+-$OPTARG}}");
+                    # Compare ${OPTARG} to ${!idx} with its leading `-`.
+                    # This only works when getopts is in silent mode, i.e. when `:` is at the front of the optstring.
+                    # If getopts is not in silent mode, it does not populate `OPTARG`.
+                    if [[ "-${OPTARG}" != "${!idx:-}" ]]; then
+                        # Special cases:
+                        # -f=foo
+                        # -Wno-dev
+                        opts+=("${!OPTIND:-}");
+                        # Splice the argument at index `OPTIND` out of $@
+                        set -- "${@:1:$((OPTIND-1))}" "${@:$((OPTIND+1))}";
+                    else
+                        # Normal cases:
+                        # -f
+                        # -f foo
+                        opts+=("-${OPTARG}");
+                        OPTIND=$((OPTIND <= 1 ? 1 : OPTIND-1));
+                        # Splice the argument at index `OPTIND` out of $@
+                        set -- "${@:1:$((OPTIND-1))}" "${@:$((OPTIND+1))}";
 
-                    # Splice the argument at index `OPTIND` out of $@
-                    set -- "${@:1:$((OPTIND-1))}" "${@:$((OPTIND+1))}";
-
-                    # Peek at the next argument.
-                    # If it begins with `-`, leave it for getopts.
-                    # Otherwise, shift it onto the skipped list.
-
-                    # Guard here because there may not be another argument
-                    # at index `OPTIND` after the splice we did above.
-                    val="${!OPTIND:-}";
-                    # Slice off the leading `-X`. Note, this only works
-                    # when getopts is in silent mode, i.e. when `:` is
-                    # at the front of getopts' optstring. If getopts is
-                    # not in silent mode, it does not populate `OPTARG`.
-                    val="${val#-"${OPTARG:-}"}";
-
-                    case "${val}" in
-                        # unknown short opt with value after =
-                        *=*) ;;
-                        # unknown short opt with possible value following
-                        *)
-                            if [ -n "${!OPTIND:-}" ] && [[ "${!OPTIND}" != -* ]]; then
-                                opts+=("${!OPTIND}");
-                                # Splice the argument at index `OPTIND` out of $@
-                                set -- "${@:1:$((OPTIND-1))}" "${@:$((OPTIND+1))}";
-                            fi
-                            ;;
-                    esac
+                        # Peek at the next argument.
+                        # If it begins with `-`, leave it for getopts.
+                        # Otherwise, push it onto the skipped list and splice it out of $@.
+                        if [[ "${!OPTIND:--}" != -* ]]; then
+                            opts+=("${!OPTIND}");
+                            # Splice the argument at index `OPTIND` out of $@
+                            set -- "${@:1:$((OPTIND-1))}" "${@:$((OPTIND+1))}";
+                        fi
+                    fi
                     break;
                     ;;
                 # long opt
@@ -300,6 +300,4 @@ parse_args() {
     fi
 }
 
-if [ "$(basename "${BASH_SOURCE[${#BASH_SOURCE[@]}-1]}")" = devcontainer-utils-parse-args ]; then
-    parse_args "$@" <&0;
-fi
+parse_args "$@" <&0;

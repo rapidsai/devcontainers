@@ -35,20 +35,25 @@ parse_value_types_from_usage() {
   | sed -rn 's/^[ ]*(--?[^ \*]+|,|_)+[ ]*([<(].[^)>]*)([)>]).*$/\2\3/p';
 }
 
+_listify() {
+    cat -                                   \
+  `# trim whitespace`                       \
+  | tr -s '[:space:]'                       \
+  `# replace spaces with pipes`             \
+  | tr '[:space:]' '|'                      \
+  | rev | cut -d'|' -f1 --complement | rev  \
+  `# replace pipes with newlines`           \
+  | tr '|' '\n'                             \
+    ;
+}
+
 parse_short_names() {
     cat -                                   \
   `# skip the long opts`                    \
   | sed -r 's/([ ]?--[^ ,]+)+,?//g'         \
   `# take the short opts`                   \
   | sed -r 's/-([^ ,\*]+)+[,\*]?/\1/g'      \
-  `# trim whitespace`                       \
-  | tr -s '[:space:]'                       \
-  `# replace spaces with pipes`             \
-  | tr '[:space:]' '|'                      \
-  | rev | cut -d'|' -f1 --complement | rev  \
-  `# replace pipes with spaces`             \
-  | tr '|' ' '                              \
-    ;
+  | _listify;
 }
 
 parse_long_names() {
@@ -57,16 +62,7 @@ parse_long_names() {
   | sed -r 's/(-[^ ,\*]+)?[ ]?(--[^,]+)+,?/\2/g' \
   `# remove the leading --`                      \
   | sed -r 's/--?([^ ,]+)+/\1/g'                 \
-  `# trim whitespace`                            \
-  | tr -s '[:space:]'                            \
-  `# replace newlines with spaces`               \
-  | tr '[:space:]' ' '                           \
-  `# replace spaces with pipes`                  \
-  | sed -r 's/ /|/g'                             \
-  | rev | cut -d'|' -f1 --complement | rev       \
-  `# replace pipes with spaces`                  \
-  | tr '|' ' '                                   \
-    ;
+  | _listify;
 }
 
 parse_aliases() {
