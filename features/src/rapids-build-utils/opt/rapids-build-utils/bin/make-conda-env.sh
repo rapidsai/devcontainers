@@ -6,7 +6,7 @@
 # Make a combined conda environment for all repos.
 #
 # Boolean options:
-#  -h,--help,--usage     print this text
+#  -h,--help             print this text
 #  -f,--force            Delete the existing conda env and recreate it from scratch.
 #
 # Options that require values:
@@ -32,7 +32,7 @@ make_conda_env() {
     local env_name="${1}"; shift;
     local env_file_name="${env_name}.yml";
 
-    eval "$(devcontainer-utils-parse-args "$0" --passthrough '
+    eval "$(devcontainer-utils-parse-args "$0" --skip '
         -k,--key
         -m,--manifest
         -o,--omit

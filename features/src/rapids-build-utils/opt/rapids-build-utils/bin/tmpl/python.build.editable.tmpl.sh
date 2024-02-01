@@ -6,7 +6,7 @@
 # Build ${PY_LIB} in editable mode.
 #
 # Boolean options:
-#  -h,--help,--usage                      print this text
+#  -h,--help                              print this text
 #  -v,--verbose                           verbose output
 #
 # Options that require values:
@@ -20,6 +20,7 @@
 #                                         limit.
 #                                         Higher values yield fewer parallel CUDA device object compilations.
 #                                         (default: 1)
+#  -D* <var>[:<type>]=<value>             Create or update a cmake cache entry.
 
 build_${PY_LIB}_python_editable() {
     local -;

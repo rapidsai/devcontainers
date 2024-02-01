@@ -6,7 +6,7 @@
 # Make a combined pip virtual environment for all repos.
 #
 # Boolean options:
-#  -h,--help,--usage       print this text
+#  -h,--help               print this text
 #  -f,--force              Delete the existing pip venv and recreate it from scratch.
 #  --no-dedupe             don't sort and dedupe the combined requirements.txt
 #
@@ -34,7 +34,7 @@ make_pip_env() {
     local env_name="${1}"; shift;
     local env_file_name="${env_name}.requirements.txt";
 
-    eval "$(devcontainer-utils-parse-args "$0" --passthrough '
+    eval "$(devcontainer-utils-parse-args "$0" --skip '
         --no-dedupe
         -k,--key
         -m,--manifest

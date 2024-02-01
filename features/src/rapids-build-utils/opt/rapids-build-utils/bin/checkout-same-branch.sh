@@ -8,7 +8,7 @@
 # then checks out all repositories to this common branch.
 #
 # Boolean options:
-#  -h,--help,--usage  print this text
+#  -h,--help          print this text
 #
 # Options that require values:
 #  -j,--parallel <num>   Fetch <num> repos in parallel

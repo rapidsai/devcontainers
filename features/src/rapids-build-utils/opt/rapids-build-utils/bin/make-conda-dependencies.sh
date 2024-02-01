@@ -6,7 +6,7 @@
 # Generate a combined conda environment YAML file for all repos.
 #
 # Boolean options:
-#  -h,--help,--usage     print this text
+#  -h,--help             print this text
 #
 # Options that require values:
 #  -k,--key <key>        Only include the key(s)
@@ -36,7 +36,7 @@ make_conda_dependencies() {
         PS4="+ ${BASH_SOURCE[0]}:\${LINENO} "; set -x;
     fi
 
-    eval "$(devcontainer-utils-parse-args "$0" --passthrough '
+    eval "$(devcontainer-utils-parse-args "$0" --skip '
         -m,--manifest
         -o,--omit
         --repo

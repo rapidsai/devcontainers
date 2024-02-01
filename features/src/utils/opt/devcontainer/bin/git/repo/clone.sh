@@ -8,7 +8,7 @@
 # If the user doesn't have a fork of the repository, notify the user and ask whether they would like to fork it.
 #
 # Boolean options:
-#  -h,--help,--usage            print this text
+#  -h,--help                    print this text
 #  -q,--quiet                   Operate quietly. Progress is not reported to the standard error stream.
 #  --no-fork                    don't prompt the user to fork the repo if a user fork isn't found
 #                               (default: false)
@@ -38,7 +38,7 @@ clone_git_repo() {
         PS4="+ ${BASH_SOURCE[0]}:\${LINENO} "; set -x;
     fi
 
-    eval "$(devcontainer-utils-parse-args "$0" --passthrough '
+    eval "$(devcontainer-utils-parse-args "$0" --skip '
         -q,--quiet
         -j,--parallel
     ' - <<< "${@@Q}")";

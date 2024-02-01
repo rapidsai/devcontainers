@@ -32,7 +32,7 @@ cpack_${CPP_LIB}_cpp() {
         PS4="+ ${BASH_SOURCE[0]}:\${LINENO} "; set -x;
     fi
 
-    eval "$(devcontainer-utils-parse-args "$0" --passthrough '
+    eval "$(devcontainer-utils-parse-args "$0" --skip '
         -v,--verbose
         --strip
         --config

@@ -6,7 +6,7 @@
 # Uninstall ${PY_LIB}.
 #
 # Boolean options:
-#  -h,--help,--usage print this text
+#  -h,--help         print this text
 #  -v,--verbose      verbose output
 
 uninstall_${PY_LIB}_python() {
