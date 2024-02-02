@@ -5,6 +5,9 @@ description: Setup self-hosted runner environment
 runs:
   using: composite
   steps:
+      name: Dump env
+      shell: bash -eo pipefail {0}
+      run: echo "${{ toJSON(env) }}"
 
     - if: env.RUNNER_ENVIRONMENT == 'github-hosted'
       name: Free up disk space
