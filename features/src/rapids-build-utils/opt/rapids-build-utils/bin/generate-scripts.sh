@@ -235,6 +235,7 @@ generate_scripts() {
         repo_name="${!repo_name,,}";
         repo_names+=("${repo_name}");
 
+        local deps=();
         local cpp_libs=();
         local cpp_dirs=();
 
@@ -256,7 +257,7 @@ generate_scripts() {
 
             cpp_name_to_path["${cpp_name}"]="${cpp_path}";
 
-            local deps=();
+            local cpp_deps=();
 
             for ((k=0; k < ${!cpp_depends_length:-0}; k+=1)); do
                 local dep="${repo}_cpp_${j}_depends_${k}";
@@ -266,9 +267,10 @@ generate_scripts() {
                 fi
                 local dep_cpp_path="${cpp_name_to_path["${dep_cpp_name}"]}";
 
-                deps+=("-D${!dep}_ROOT=\"${dep_cpp_path}/build/latest\"");
-                deps+=("-D${!dep,,}_ROOT=\"${dep_cpp_path}/build/latest\"");
-                deps+=("-D${!dep^^}_ROOT=\"${dep_cpp_path}/build/latest\"");
+                cpp_deps+=("-D${!dep}_ROOT=\"${dep_cpp_path}/build/latest\"");
+                cpp_deps+=("-D${!dep,,}_ROOT=\"${dep_cpp_path}/build/latest\"");
+                cpp_deps+=("-D${!dep^^}_ROOT=\"${dep_cpp_path}/build/latest\"");
+                deps+=(${cpp_deps[@]});
             done
 
             if [[ -d ~/"${!repo_path:-}/.git" ]]; then
@@ -277,14 +279,13 @@ generate_scripts() {
                 CPP_LIB="${cpp_name:-}"      \
                 CPP_SRC="${!cpp_sub_dir:-}"  \
                 CPP_ARGS="${!cpp_args:-}"    \
-                CPP_DEPS="${deps[*]}"        \
+                CPP_DEPS="${cpp_deps[*]}"    \
                 generate_cpp_scripts         ;
             # ) || true;
             fi
         done
 
         local args=();
-        local deps=();
 
         for ((k=0; k < ${#cpp_libs[@]}; k+=1)); do
             # Define both lowercase and uppercase
