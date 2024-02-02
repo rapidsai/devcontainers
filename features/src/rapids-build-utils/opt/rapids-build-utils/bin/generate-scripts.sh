@@ -270,18 +270,16 @@ generate_scripts() {
                 cpp_deps+=("-D${!dep}_ROOT=\"${dep_cpp_path}/build/latest\"");
                 cpp_deps+=("-D${!dep,,}_ROOT=\"${dep_cpp_path}/build/latest\"");
                 cpp_deps+=("-D${!dep^^}_ROOT=\"${dep_cpp_path}/build/latest\"");
-                deps+=(${cpp_deps[@]});
+                deps+=("${cpp_deps[@]}");
             done
 
             if [[ -d ~/"${!repo_path:-}/.git" ]]; then
-            # (
                 SRC_PATH=~/"${!repo_path:-}" \
                 CPP_LIB="${cpp_name:-}"      \
                 CPP_SRC="${!cpp_sub_dir:-}"  \
                 CPP_ARGS="${!cpp_args:-}"    \
                 CPP_DEPS="${cpp_deps[*]}"    \
                 generate_cpp_scripts         ;
-            # ) || true;
             fi
         done
 
@@ -315,7 +313,6 @@ generate_scripts() {
             py_libs+=("${!py_name}");
 
             if [[ -d ~/"${!repo_path:-}/.git" ]]; then
-            # (
                 SRC_PATH=~/"${!repo_path:-}"              \
                 PY_SRC="${py_path}"                       \
                 PY_LIB="${!py_name}"                      \
@@ -326,33 +323,28 @@ generate_scripts() {
                 PIP_WHEEL_ARGS="${!pip_wheel_args:-}"     \
                 PIP_INSTALL_ARGS="${!pip_install_args:-}" \
                 generate_python_scripts                   ;
-            # ) || true;
             fi
         done;
 
         if [[ -d ~/"${!repo_path:-}/.git" ]]; then
-        # (
             NAME="${repo_name:-}"    \
             PY_LIB="${py_libs[*]}"   \
             CPP_LIB="${cpp_libs[*]}" \
             generate_repo_scripts    ;
-        # ) || true;
         fi
 
         # Generate a clone script for each repo
-        # (
-            NAME="${repo_name:-}"             \
-            SRC_PATH=~/"${!repo_path:-}"      \
-            PY_LIB="${py_libs[*]}"            \
-            PY_SRC="${py_dirs[*]}"            \
-            CPP_LIB="${cpp_libs[*]}"          \
-            CPP_SRC="${cpp_dirs[*]}"          \
-            GIT_TAG="${!git_tag:-}"           \
-            GIT_REPO="${!git_repo:-}"         \
-            GIT_HOST="${!git_host:-}"         \
-            GIT_UPSTREAM="${!git_upstream:-}" \
-            generate_clone_script             ;
-        # ) || true;
+        NAME="${repo_name:-}"             \
+        SRC_PATH=~/"${!repo_path:-}"      \
+        PY_LIB="${py_libs[*]@Q}"          \
+        PY_SRC="${py_dirs[*]@Q}"          \
+        CPP_LIB="${cpp_libs[*]@Q}"        \
+        CPP_SRC="${cpp_dirs[*]@Q}"        \
+        GIT_TAG="${!git_tag:-}"           \
+        GIT_REPO="${!git_repo:-}"         \
+        GIT_HOST="${!git_host:-}"         \
+        GIT_UPSTREAM="${!git_upstream:-}" \
+        generate_clone_script             ;
     done
 
     sudo find /opt/rapids-build-utils \
@@ -363,11 +355,9 @@ generate_scripts() {
 
     for script in "clone" "clean" "configure" "build" "cpack" "install" "uninstall"; do
         # Generate a script to run a script for all repos
-        # (
-            NAMES="${repo_names[*]}" \
-            SCRIPT="${script}"       \
-            generate_all_script      ;
-        # ) || true;
+        NAMES="${repo_names[*]}" \
+        SCRIPT="${script}"       \
+        generate_all_script      ;
     done;
 }
 
