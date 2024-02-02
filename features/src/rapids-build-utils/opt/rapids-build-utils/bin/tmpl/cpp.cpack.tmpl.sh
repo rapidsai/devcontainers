@@ -39,6 +39,10 @@ cpack_${CPP_LIB}_cpp() {
         --default-directory-permissions
     ' - <<< "${@@Q}")";
 
+    if ! test -f "${CPP_SRC}/build/latest/CMakeCache.txt"; then
+        exit 0;
+    fi
+
     eval "$(rapids-get-num-archs-jobs-and-load -a1 "$@")";
 
     test ${#component[@]} -eq 0 && component=(all);
