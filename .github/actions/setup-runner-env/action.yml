@@ -5,7 +5,7 @@ description: Setup self-hosted runner environment
 runs:
   using: composite
   steps:
-      name: Dump env
+    - name: Dump env
       shell: bash -eo pipefail {0}
       run: echo "${{ toJSON(env) }}"
 
