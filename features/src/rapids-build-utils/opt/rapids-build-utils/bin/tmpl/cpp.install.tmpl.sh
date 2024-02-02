@@ -39,7 +39,7 @@ install_${CPP_LIB}_cpp() {
     ' - <<< "${@@Q}")";
 
     test ${#component[@]} -eq 0 && component=(all);
-    prefix="${p:-${CMAKE_INSTALL_PREFIX:-/usr/local}}";
+    prefix="${p:-${CONDA_PREFIX:-${CMAKE_INSTALL_PREFIX:-/usr}}}";
 
     local comp;
     for comp in "${component[@]}"; do
@@ -48,9 +48,9 @@ install_${CPP_LIB}_cpp() {
         fi
         time (
             cmake \
-                --install "${CPP_SRC}"/build/latest/                 \
-                --prefix "${p:-${CMAKE_INSTALL_PREFIX:-/usr/local}}" \
-                ${comp:+--component "${comp}"}                       \
+                --install "${CPP_SRC}"/build/latest/                            \
+                --prefix "${p:-${CONDA_PREFIX:-${CMAKE_INSTALL_PREFIX:-/usr}}}" \
+                ${comp:+--component "${comp}"}                                  \
                 "${OPTS[@]}";
             { set +x; } 2>/dev/null; echo -n "lib${CPP_LIB}${component:+ $component} install time:";
         ) 2>&1;
