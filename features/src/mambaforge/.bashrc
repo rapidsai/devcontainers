@@ -6,12 +6,12 @@ for default_conda_env_name in ${DEFAULT_CONDA_ENV:-} ${CONDA_DEFAULT_ENV:-} base
         break;
     fi
     # Temporarily allow unbound variables for conda activation.
-    oldstate="$(shopt -po; shopt -p)"; [[ -o errexit ]] && oldstate="${oldstate}; set -e"; set +u;
+    oldstate="$(shopt -po | grep -E '(nounset|verbose|xtrace)')"; set +u;
     if conda activate "${default_conda_env_name}" 2>/dev/null; then
-        { set +vx; } 2>/dev/null; eval "${oldstate}"; unset oldstate;
+        { set +vxo history; } 2>/dev/null; eval "${oldstate}"; unset oldstate;
         break;
     else
-        { set +vx; } 2>/dev/null; eval "${oldstate}"; unset oldstate;
+        { set +vxo history; } 2>/dev/null; eval "${oldstate}"; unset oldstate;
         continue;
     fi
 done
