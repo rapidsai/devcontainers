@@ -85,8 +85,6 @@ clone_gitlab_repo() {
 
     set -euo pipefail;
 
-    source devcontainer-utils-init-gitlab-cli;
-
     local branch=;
     local no_fork=;
     local clone_upstream=;
@@ -118,7 +116,17 @@ clone_gitlab_repo() {
     local user=;
     local owner=;
 
-    if test -z "${clone_upstream:-}"; then
+    if test -z "${no_fork:-}" && \
+       test -z "${clone_upstream:-}" && \
+       devcontainer-utils-shell-is-interactive; then
+        # shellcheck disable=SC1091
+        . devcontainer-utils-init-gitlab-cli;
+        user="${GITLAB_USER:-}";
+    fi
+
+    if test -n "${clone_upstream:-}"; then
+        fork="${upstream}";
+    else
         name="$(get_repo_name "${upstream}")";
         owner="$(get_repo_owner "${upstream}")";
         user="${GITLAB_USER:-"${owner}"}";
@@ -132,7 +140,7 @@ clone_gitlab_repo() {
          devcontainer-utils-shell-is-interactive; then
         while true; do
             local CHOICE;
-            read -p "'${GITLAB_HOST:-gitlab.com}/${user}/${name}.git' not found.
+            read -rp "'${GITLAB_HOST:-gitlab.com}/${user}/${name}.git' not found.
     Fork '${upstream}' into '${user}/${name}' now (y/n)? " CHOICE <$(tty)
             case "${CHOICE:-}" in
                 [Nn]* ) origin="${upstream}"; break;;
@@ -144,12 +152,17 @@ clone_gitlab_repo() {
         done
     fi
 
-    if [ "$(glab config get git_protocol)" = "ssh" ]; then
-        origin="$(get_repo_ssh_url "${origin}")";
-        upstream="$(get_repo_ssh_url "${upstream}")";
+    if ! glab auth status 2>&1 | grep -q "No token provided"; then
+        if [ "$(glab config get git_protocol)" = "ssh" ]; then
+            origin="$(get_repo_ssh_url "${origin}")";
+            upstream="$(get_repo_ssh_url "${upstream}")";
+        else
+            origin="$(get_repo_git_url "${origin}")";
+            upstream="$(get_repo_git_url "${upstream}")";
+        fi
     else
-        origin="$(get_repo_git_url "${origin}")";
-        upstream="$(get_repo_git_url "${upstream}")";
+        origin="https://${GITLAB_HOST:-gitlab.com}/${origin}.git";
+        upstream="https://${GITLAB_HOST:-gitlab.com}/${upstream}.git";
     fi
 
     devcontainer-utils-clone-git-repo \
