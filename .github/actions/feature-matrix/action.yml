@@ -30,18 +30,11 @@ runs:
         files: |
           features/src/**
           features/test/**
-          .github/actions/build-and-test-feature/*
-          .github/actions/free-disk-space/*
-          .github/actions/build-linux-image/*
-          .github/actions/image-matrix/*
-          .github/actions/copy-common-scripts/*
-          .github/actions/get-pr-info/*
-          .github/actions/install-devcontainers-cli/*
-          .github/actions/devcontainer-json/*
-          .github/actions/setup-runner-env/*
-          .github/actions/feature-matrix/*
           .github/workflows/test.yml
+          .github/actions/feature-matrix/action.sh
+          .github/actions/feature-matrix/action.yml
           .github/workflows/build-and-test-feature.yml
+          .github/actions/build-and-test-feature/action.yml
 
     - name: Report changes
       if: inputs.full_matrix != 'true'
