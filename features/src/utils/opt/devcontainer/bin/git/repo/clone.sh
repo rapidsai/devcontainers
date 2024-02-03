@@ -32,8 +32,11 @@ clone_git_repo() {
 
     eval "$(devcontainer-utils-parse-args "$0" - <<< "${@@Q}")";
 
+    if test "${REST[0]:-}" == --; then REST=("${REST[@]:1}"); fi;
+
     local origin;
     local directory;
+
     local nargs="${#REST[@]}";
 
     if test "${nargs}" -gt 1; then
