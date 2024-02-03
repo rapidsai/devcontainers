@@ -171,6 +171,9 @@ repos:
     - name: cugraph-dgl
       sub_dir: python/cugraph-dgl
       depends: [cugraph]
+    - name: cugraph-equivariant
+      sub_dir: python/cugraph-equivariant
+      depends: [cugraph]
     - name: cugraph_pyg
       sub_dir: python/cugraph-pyg
       depends: [cugraph]
