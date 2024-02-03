@@ -3,7 +3,7 @@
 # Usage:
 #  clone-${NAME} [OPTION]...
 #
-# Clone the ${NAME} repository.
+# Clone the ${NAME} repository if it doesn't already exist.
 #
 # Boolean options:
 #  -h,--help                    print this text
@@ -53,26 +53,18 @@ clone_${NAME}() {
 
         echo 'Cloning ${NAME}' 1>&2;
 
-        devcontainer-utils-clone-${GIT_HOST}-repo \
-            --tags                                \
-            --branch "${branch}"                  \
-            --recurse-submodules                  \
-            -j ${n_jobs:-$(nproc --ignore=1)}     \
-            -c checkout.defaultRemote=upstream    \
-            "${OPTS[@]}"                          \
-            --                                    \
-            "${upstream}"                         \
-            "${directory}"                        \
+        devcontainer-utils-clone-${GIT_HOST}-repo                 \
+            --tags                                                \
+            --branch "${branch}"                                  \
+            --recurse-submodules                                  \
+            -j ${n_jobs:-$(nproc --ignore=1)}                     \
+            -c checkout.defaultRemote=upstream                    \
+            -c remote.upstream.fetch='^refs/heads/pull-request/*' \
+            "${OPTS[@]}"                                          \
+            --                                                    \
+            "${upstream}"                                         \
+            "${directory}"                                        \
         ;
-
-        git -C "${SRC_PATH}" config --add remote.upstream.fetch '^refs/heads/pull-request/*';
-
-        local upstream_branches="$(git -C "${SRC_PATH}" branch --remotes --list 'upstream/pull-request/*')";
-        if test -n "${upstream_branches:-}"; then
-            git -C "${SRC_PATH}" branch --remotes -d ${upstream_branches};
-        fi
-
-        git -C "${SRC_PATH}" remote prune upstream;
 
         if test -z "${no_update_env}"; then
             rapids-update-content-command;

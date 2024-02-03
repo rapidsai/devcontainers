@@ -1,30 +1,22 @@
 #!/usr/bin/env bash
 
 # Usage:
-#  devcontainer-utils-clone-git-repo [OPTION]... <directory>
+#  devcontainer-utils-clone-git-repo [OPTION]... [--] <repository> [<directory>]
 #
-# Clone a GitLab repository for the logged in user (as reported by `glab auth status`).
-#
-# If the user doesn't have a fork of the repository, notify the user and ask whether they would like to fork it.
+# Clone a git repository, optionally checking out a branch or tag, and optionally setting the upstream remote.
 #
 # Boolean options:
 #  -h,--help                    print this text
 #  -q,--quiet                   Operate quietly. Progress is not reported to the standard error stream.
-#  --no-fork                    don't prompt the user to fork the repo if a user fork isn't found
-#                               (default: false)
-#  --no-update-env              don't update the Python env with the repo's dependencies after cloning
-#                               (default: false)
-#  --clone-upstream             always clone the upstream, not the user's fork
-#                               (default: false)
 #
 # Options that require values:
 #  -b,--branch <branch_or_tag>  check the repo out to <branch_or_tag>
-#                               (default: `${NAME}.git.tag` in manifest.yaml)
-#  -j,--parallel <num>          Clone <num> submodules in parallel
+#  -j,--jobs,--parallel <num>   Clone <num> submodules in parallel
 #  -u,--upstream <upstream>     set <upstream> as the `upstream` remote
 #
 # Positional arguments:
-#  directory                    clone the repo into <directory>
+#  repository                   The (possibly remote) repository to clone
+#  directory                    The name of a new directory to clone into
 
 clone_git_repo() {
     local -;
@@ -38,81 +30,79 @@ clone_git_repo() {
         PS4="+ ${BASH_SOURCE[0]}:\${LINENO} "; set -x;
     fi
 
-    eval "$(devcontainer-utils-parse-args "$0" --skip '
-        -q,--quiet
-        -j,--parallel
-    ' - <<< "${@@Q}")";
+    eval "$(devcontainer-utils-parse-args "$0" - <<< "${@@Q}")";
 
-    local quiet="${q:-${quiet:-}}";
-    quiet=${quiet:+--quiet};
-
-    local branch="${b:-"${branch:-}"}";
-    local parallel="${j:-${parallel:-1}}";
-    parallel="${parallel:+-j "${parallel}"}";
-
-    local upstream="${u:-"${upstream:-}"}";
-
+    local origin;
+    local directory;
     local nargs="${#REST[@]}";
-    local origin="${REST[$((nargs - 2))]}";
-    origin="${origin:?origin is required}";
 
-    local directory="${REST[$((nargs - 1))]}";
-    directory="${directory:?directory is required}";
+    if test "${nargs}" -gt 1; then
+        origin="${REST[0]:?"fatal: missing required positional argument <repository>"}";
+        directory="${REST[1]:?"fatal: missing required positional argument <directory>"}";
+    else
+        if test "${nargs}" -eq 0; then
+            if test -z "${upstream:-}"; then
+                echo "fatal: missing required positional argument <repository>" 1>&2;
+                exit 1;
+            fi
+            origin="${upstream}";
+        elif test "${nargs}" -eq 1; then
+            origin="${REST[0]:?"fatal: missing required positional argument <repository>"}";
+        fi
 
-    upstream="${upstream:-"${origin}"}";
-
-    if [ ! -d "${directory}"/.git ]; then
-        git clone "${OPTS[@]}" -- "${origin}" "${directory}";
-        git -C "${directory}" remote add upstream "${upstream}" || true;
-        # shellcheck disable=SC2086
-        git -C "${directory}" fetch ${quiet} ${parallel} upstream || true;
-        git -C "${directory}" remote set-url --push upstream read_only || true;
-
-        if [ "${upstream}" != "${origin}" ]; then
-            git -C "${directory}" remote set-url origin "${origin}";
+        local re="(ssh:\/\/|https:\/\/)?(git@)?(.*\.com)[:\/](.*)";
+        if [[ "${origin}" =~ ${re} ]]; then
+            directory="$(basename "${BASH_REMATCH[4]//.git/}")";
+        elif test -d "${origin}" && test -d "${origin}"/.git; then
+            directory="$(basename "${origin}")";
         else
-            git -C "${directory}" remote set-url --push origin read_only;
+            echo "fatal: '${origin}' is not a git repository" 1>&2;
+            exit 1;
         fi
     fi
 
-    if [ -n "${branch:-}" ]; then
+    j="${j:+-j ${j}}";
+    q="${q:+--quiet}";
+    upstream="${upstream:-"${origin}"}";
+    directory="$(realpath -m "${directory}")";
 
-        local -r upstream_has_branch="$(git -C "${directory}" ls-remote -q --exit-code -h upstream "${branch}" && echo 1 || echo)";
-        local -r upstream_has_tag="$(git -C "${directory}" ls-remote -q --exit-code -t upstream "${branch}" && echo 1 || echo)";
-        local -r origin_has_branch="$(git -C "${directory}" ls-remote -q --exit-code -h origin "${branch}" && echo 1 || echo)";
-        local -r origin_has_tag="$(git -C "${directory}" ls-remote -q --exit-code -t origin "${branch}" && echo 1 || echo)";
-
-        # shellcheck disable=SC2086
-        if false; then exit 1;
-        elif test -n "${upstream_has_branch}"; then
-            git -C "${directory}" fetch ${quiet} upstream "refs/heads/${branch}";
-            if ! git -C "${directory}" checkout ${quiet} -b "${branch}" -t "upstream/${branch}" 2>/dev/null; then
-                git -C "${directory}" checkout ${quiet} "${branch}";
-                git -C "${directory}" branch "${branch}" -u "upstream/${branch}";
-            fi
-        elif test -n "${upstream_has_tag}"; then
-            git -C "${directory}" checkout ${quiet} -m -b "upstream/${branch}" "${branch}";
-        elif test -n "${origin_has_branch}"; then
-            git -C "${directory}" fetch ${quiet} origin "refs/heads/${branch}";
-            if ! git -C "${directory}" checkout ${quiet} -b "${branch}" -t "origin/${branch}" 2>/dev/null; then
-                git -C "${directory}" checkout ${quiet} "${branch}";
-                git -C "${directory}" branch "${branch}" -u "origin/${branch}";
-            fi
-        elif test -n "${origin_has_tag}"; then
-            git -C "${directory}" checkout ${quiet} -f -b "origin/${branch}" "${branch}";
+    # shellcheck disable=SC2086
+    if ! test -d "${directory}"/.git; then
+        git clone ${j} ${q} "${OPTS[@]}" -- "${origin}" "${directory}";
+        git -C "${directory}" remote add upstream "${upstream}" || true;
+        git -C "${directory}" remote set-url upstream "${upstream}" || true;
+        git -C "${directory}" remote set-url --push upstream read_only || true;
+        if test "${upstream}" == "${origin}"; then
+            git -C "${directory}" remote set-url --push origin read_only || true;
         fi
-
-        if test -n "${origin_has_branch}"; then
-            git -C "${directory}" pull origin "${branch}";
-        fi
-
-        if test -n "${upstream_has_branch}"; then
-            git -C "${directory}" pull upstream "${branch}";
-        fi
+        git -C "${directory}" fetch ${j} ${q} upstream;
     fi
 
     # shellcheck disable=SC2086
-    git -C "${directory}" submodule update --init --recursive ${parallel} ${quiet};
+    if test -n "${branch:-}"; then
+        local remote;
+        for remote in upstream origin; do
+            # if remote has branch
+            if git -C "${directory}" ls-remote -q --exit-code -h "${remote}" "${branch}"; then
+                # fetch, checkout, and track the remote branch
+                git -C "${directory}" fetch ${j} ${q} "${remote}" "refs/heads/${branch}";
+                if ! git -C "${directory}" checkout ${q} -b "${branch}" -t "${remote}/${branch}" 2>/dev/null; then
+                    git -C "${directory}" checkout ${q} "${branch}";
+                    git -C "${directory}" branch "${branch}" -u "${remote}/${branch}";
+                fi
+                git -C "${directory}" pull "${remote}" "${branch}";
+                break;
+            # if remote has tag
+            elif git -C "${directory}" ls-remote -q --exit-code -t "${remote}" "${branch}"; then
+                # make a local branch for the tag
+                git -C "${directory}" checkout ${q} -m -b "${remote}/${branch}" "${branch}";
+                break;
+            fi
+        done
+    fi
+
+    # shellcheck disable=SC2086
+    git -C "${directory}" submodule update --init --recursive ${j} ${q};
 }
 
 clone_git_repo "$@";
