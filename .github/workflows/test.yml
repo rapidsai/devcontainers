@@ -154,10 +154,9 @@ jobs:
     uses: rapidsai/shared-workflows/.github/workflows/build-in-devcontainer.yaml@fix/devcontainer-json-location
     with:
       node_type: cpu32
-      gh_token: GIST_REPO_READ_ORG_GITHUB_TOKEN
       build_command: |
         sccache -z;
-        clone-all --verbose --no-update-env;
+        clone-all --verbose --clone-upstream --no-update-env;
         rapids-generate-scripts;
         rapids-make-${PYTHON_PACKAGE_MANAGER}-env;
         build-all \
