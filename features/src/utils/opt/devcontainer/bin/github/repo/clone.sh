@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 # Usage:
-#  devcontainer-utils-clone-github-repo [OPTION]... <upstream> <directory>
+#  devcontainer-utils-clone-github-repo [OPTION]... [--] <upstream> [<directory>]
 #
 # Clone a GitHub repository for the logged in user (as reported by `gh auth status`).
 #
@@ -19,7 +19,7 @@
 #
 # Options that require values:
 #  -b,--branch <branch_or_tag>  check the repo out to <branch_or_tag>
-#  -j,--parallel <num>          Clone <num> submodules in parallel
+#  -j,--jobs,--parallel <num>   Clone <num> submodules in parallel
 #
 # Positional arguments:
 #  upstream                     set <upstream> as the `upstream` remote
@@ -95,20 +95,14 @@ clone_github_repo() {
 
     eval "$(devcontainer-utils-parse-args "$0" --skip '
         -q,--quiet
-        -j,--parallel
+        -j,--jobs,--parallel
     ' - <<< "${@@Q}")";
 
-    local nargs="${#REST[@]}";
-    local upstream="${REST[$((nargs - 2))]}";
-    upstream="${upstream:?upstream is required}";
+    local upstream="${REST[0]:?"fatal: missing required positional argument <upstream>"}";
 
-    local no_fork="${no_fork:-}";
-    local branch="${b:-"${branch:-}"}";
-    local parallel="${j:-${parallel:-1}}";
-    local clone_upstream="${clone_upstream:-}";
-
-    local directory="${REST[$((nargs - 1))]}";
-    directory="${directory:?directory is required}";
+    if test "${#REST[@]}" -gt 1; then
+        REST=("${REST[@]:1}");
+    fi
 
     local origin="${upstream}";
     local name=;
@@ -171,7 +165,7 @@ clone_github_repo() {
         ${upstream:+--upstream "${upstream}"} \
         "${OPTS[@]}"                          \
         --                                    \
-        "${origin}" "${directory}"            \
+        "${origin}" "${REST[@]}"              \
         ;
 }
 
