@@ -115,11 +115,11 @@ clone_gitlab_repo() {
         -j,--jobs,--parallel
     ' - <<< "${@@Q}")";
 
+    if test "${REST[0]:-}" == --; then REST=("${REST[@]:1}"); fi;
+
     local upstream="${REST[0]:?"fatal: missing required positional argument <upstream>"}";
 
-    if test "${#REST[@]}" -gt 1; then
-        REST=("${REST[@]:1}");
-    fi
+    if test "${#REST[@]}" -gt 1; then REST=("${REST[@]:1}"); fi
 
     local origin="${upstream}";
     local fork=;
