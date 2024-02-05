@@ -35,6 +35,7 @@ jobs:
         uses: ./.github/actions/build-and-test-feature
         with:
           args: "${{ inputs.args }}"
+          runner_env: "${{ env.RUNNER_ENVIRONMENT }}"
           gh_token: "${{ secrets.GIST_REPO_READ_ORG_GITHUB_TOKEN }}"
           vault_host: "${{ secrets.GIST_REPO_READ_ORG_GITHUB_TOKEN && 'https://vault.ops.k8s.rapids.ai' || '' }}"
           rw_sccache_bucket: "${{ secrets.GIST_REPO_READ_ORG_GITHUB_TOKEN && 'rapids-sccache-devs' || '' }}"
