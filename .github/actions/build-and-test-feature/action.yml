@@ -6,7 +6,6 @@ inputs:
   args: {type: string, required: true}
   gh_token: {type: string, defaut: '', required: false}
   vault_host: {type: string, defaut: '', required: false}
-  runner_env: {type: string, default: '', required: false}
   rw_sccache_bucket: {type: string, defaut: '', required: false}
   rw_sccache_region: {type: string, defaut: '', required: false}
   ro_sccache_bucket: {type: string, defaut: '', required: false}
@@ -17,8 +16,6 @@ runs:
   steps:
     - name: Setup runner environment
       uses: ./.github/actions/setup-runner-env
-      with:
-        runner_env: ${{ inputs.runner_env }}
 
     - name: Copy common scripts into features
       uses: ./.github/actions/copy-common-scripts

@@ -21,7 +21,7 @@ runs:
   using: composite
   steps:
 
-    - if: env.RUNNER_ENVIRONMENT != 'github-hosted'
+    - if: contains(runner.name, "GitHub Actions") == false
       name: Setup Node.js
       uses: actions/setup-node@v3
       with:

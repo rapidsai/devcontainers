@@ -3,7 +3,6 @@ name: build-image
 description: Build Linux image
 
 inputs:
-  runner_env: {type: string, default: '', required: false}
   tag: {type: string, required: true, description: Image tag}
   arch: {type: string, required: true, description: Image arch}
   repo: {type: string, required: true, description: Image repo}
@@ -14,8 +13,6 @@ runs:
 
     - name: Setup runner environment
       uses: ./.github/actions/setup-runner-env
-      with:
-        runner_env: ${{ inputs.runner_env }}
 
     - name: Copy common scripts into features
       uses: ./.github/actions/copy-common-scripts

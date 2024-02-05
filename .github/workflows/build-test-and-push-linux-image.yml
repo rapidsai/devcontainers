@@ -63,7 +63,6 @@ jobs:
           arch: "${{ matrix.arch }}"
           repo: "${{ inputs.repo }}"
           tag: "${{ steps.json.outputs.tag }}"
-          runner_env: "${{ env.RUNNER_ENVIRONMENT }}"
 
       - if: inputs.push == 'true'
         name: Upload ${{ steps.json.outputs.tag }}-${{ matrix.arch }}
