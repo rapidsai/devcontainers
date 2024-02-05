@@ -11,26 +11,26 @@ runs:
         echo "env: ${{ toJSON(env) }}"
         echo "runner: '${{ toJSON(runner) }}'"
 
-    - if: ${{ contains(runner.name, 'GitHub Actions') == true }}
+    - if: runner.environment != 'self-hosted'
       name: Free up disk space
       uses: ./.github/actions/free-disk-space
       with:
         tool_cache: "${{ runner.tool_cache }}"
 
-    - if: ${{ contains(runner.name, 'GitHub Actions') == false }}
+    - if: runner.environment == 'self-hosted'
       name: Setup self-hosted runner environment
       shell: bash -eo pipefail {0}
       run: |
         echo "HOME=${{ runner.workspace }}" >> $GITHUB_ENV;
         echo "TMPDIR=${{ runner.temp }}" >> $GITHUB_ENV;
 
-    - if: ${{ contains(runner.name, 'GitHub Actions') == false }}
+    - if: runner.environment == 'self-hosted'
       name: Setup Node.js
       uses: actions/setup-node@v3
       with:
         node-version: '16'
 
-    - if: ${{ contains(runner.name, 'GitHub Actions') == true }}
+    - if: runner.environment != 'self-hosted'
       name: Set up QEMU
       uses: docker/setup-qemu-action@v2
 
@@ -38,14 +38,14 @@ runs:
       shell: bash
       run: docker context create builder
 
-    - if: ${{ contains(runner.name, 'GitHub Actions') == true }}
+    - if: runner.environment != 'self-hosted'
       name: Setup docker buildx on github-hosted runners
       uses: docker/setup-buildx-action@v2
       with:
         buildkitd-flags: --debug
         endpoint: builder
 
-    - if: ${{ contains(runner.name, 'GitHub Actions') == false }}
+    - if: runner.environment == 'self-hosted'
       name: Setup docker buildx on self-hosted runners
       uses: docker/setup-buildx-action@v2
       with:

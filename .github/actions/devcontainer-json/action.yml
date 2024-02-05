@@ -21,7 +21,7 @@ runs:
   using: composite
   steps:
 
-    - if: ${{ contains(runner.name, 'GitHub Actions') == false }}
+    - if: runner.environment == 'self-hosted'
       name: Setup Node.js
       uses: actions/setup-node@v3
       with:
