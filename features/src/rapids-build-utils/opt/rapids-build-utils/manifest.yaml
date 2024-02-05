@@ -158,6 +158,9 @@ repos:
     - name: cugraph
       sub_dir: cpp
       depends: [rmm, raft, cugraph-ops]
+    - name: cugraph_etl
+      sub_dir: cpp/libcugraph_etl
+      depends: [cugraph, cudf]
   python:
     - name: pylibcugraph
       sub_dir: python/pylibcugraph
