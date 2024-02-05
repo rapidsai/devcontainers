@@ -173,8 +173,13 @@ clone_gitlab_repo() {
             upstream="$(get_repo_git_url "${upstream}")";
         fi
     else
-        origin="https://${GITLAB_HOST:-gitlab.com}/${origin}.git";
-        upstream="https://${GITLAB_HOST:-gitlab.com}/${upstream}.git";
+        if [ "$(glab config get git_protocol)" = "ssh" ]; then
+            origin="git@${GITLAB_HOST:-gitlab.com}:${origin}.git";
+            upstream="git@${GITLAB_HOST:-gitlab.com}:${upstream}.git";
+        else
+            origin="https://${GITLAB_HOST:-gitlab.com}/${origin}.git";
+            upstream="https://${GITLAB_HOST:-gitlab.com}/${upstream}.git";
+        fi
     fi
 
     devcontainer-utils-clone-git-repo         \

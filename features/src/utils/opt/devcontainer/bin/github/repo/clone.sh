@@ -156,8 +156,13 @@ clone_github_repo() {
             upstream="$(get_repo_git_url "${upstream}")";
         fi
     else
-        origin="https://${GITHUB_HOST:-github.com}/${origin}.git";
-        upstream="https://${GITHUB_HOST:-github.com}/${upstream}.git";
+        if [ "$(gh config get git_protocol)" = "ssh" ]; then
+            origin="git@${GITHUB_HOST:-github.com}:${origin}.git";
+            upstream="git@${GITHUB_HOST:-github.com}:${upstream}.git";
+        else
+            origin="https://${GITHUB_HOST:-github.com}/${origin}.git";
+            upstream="https://${GITHUB_HOST:-github.com}/${upstream}.git";
+        fi
     fi
 
     devcontainer-utils-clone-git-repo         \
