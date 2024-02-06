@@ -154,18 +154,9 @@ jobs:
     uses: rapidsai/shared-workflows/.github/workflows/build-in-devcontainer.yaml@fix/devcontainer-json-location
     with:
       node_type: cpu32
+      extra-repo-deploy-key: CUMLPRIMS_SSH_PRIVATE_DEPLOY_KEY
+      extra-repo-deploy-key-2: CUGRAPH_OPS_SSH_PRIVATE_DEPLOY_KEY
       build_command: |
-        # Load private repo deploy keys
-        if ! grep -qE "^$" <<< "${{ secrets.CUMLPRIMS_SSH_PRIVATE_DEPLOY_KEY }}" \
-        || ! grep -qE "^$" <<< "${{ secrets.CUGRAPH_OPS_SSH_PRIVATE_DEPLOY_KEY }}"; then
-          if ! pgrep ssh-agent >/dev/null 2>&1; then eval "$(ssh-agent -s)"; fi;
-          ssh-add - << "__EOF"
-        ${{ secrets.CUMLPRIMS_SSH_PRIVATE_DEPLOY_KEY }}
-        ${{ secrets.CUGRAPH_OPS_SSH_PRIVATE_DEPLOY_KEY }}
-        __EOF
-          devcontainer-utils-init-ssh-deploy-keys || true;
-        fi
-
         sccache -z;
         clone-all --verbose --clone-upstream --no-update-env;
         rapids-generate-scripts;
