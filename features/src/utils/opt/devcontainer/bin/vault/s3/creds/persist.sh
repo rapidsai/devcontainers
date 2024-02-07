@@ -28,34 +28,8 @@
 #  --aws-secret-access-key <key>  Set the $AWS_SECRET_ACCESS_KEY environment variable for all shells to <key> and persist in ~/.aws/credentials.
 #                                 (default: none)
 
-export_envvar() {
-    if [ -n "${1:-}" ]; then
-        for file in ~/.bashrc /etc/profile.d/*-devcontainer-utils.sh; do
-            echo "export ${1}=\"${2:-}\";" | sudo tee -a "${file}" >/dev/null;
-        done;
-    fi
-}
-
-unset_envvar() {
-    if [ -n "${1:-}" ]; then
-        for file in ~/.bashrc /etc/profile.d/*-devcontainer-utils.sh; do
-            echo "unset ${1};" | sudo tee -a "${file}" >/dev/null;
-        done;
-    fi
-}
-
-reset_envvar() {
-    if [ -n "${1:-}" ]; then
-        for file in ~/.bashrc /etc/profile.d/*-devcontainer-utils.sh; do
-            if grep -q -E "^unset ${1};\$" "${file}"; then
-                sudo sed -Ei "/^unset ${1};\$/d" "${file}";
-            fi
-            if grep -q -E "^export ${1}=.*$" "${file}"; then
-                sudo sed -Ei "/^export ${1}=.*\$/d" "${file}";
-            fi
-        done
-    fi
-}
+# shellcheck disable=SC1091
+. "$(dirname "$(realpath -m "${BASH_SOURCE[0]}")")/../../../update-envvars.sh";
 
 persist_s3_creds() {
     local -;
@@ -142,4 +116,6 @@ ____________EOF
     fi
 }
 
-persist_s3_creds "$@";
+if [ "$(basename "${BASH_SOURCE[${#BASH_SOURCE[@]}-1]}")" = devcontainer-utils-vault-s3-creds-persist ]; then
+    persist_s3_creds "$@";
+fi

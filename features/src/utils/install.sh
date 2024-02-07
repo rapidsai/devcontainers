@@ -13,6 +13,7 @@ check_packages      \
     curl            \
     sudo            \
     wget            \
+    socat           \
     tzdata          \
     gettext-base    \
     openssh-client  \
@@ -83,6 +84,7 @@ update-alternatives --install /usr/bin/devcontainer-utils-generate-bash-completi
 devcontainer-utils-generate-bash-completion --command devcontainer-utils-generate-bash-completion --out-dir /etc/bash_completion.d;
 
 install_utility shell-is-interactive shell-is-interactive.sh;
+install_utility post-create-command post-create-command.sh;
 install_utility post-attach-command post-attach-command.sh;
 install_utility post-attach-command-entrypoint post-attach-command-entrypoint.sh;
 install_utility python-repl-startup python-repl-startup.py;
