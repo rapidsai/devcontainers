@@ -1,6 +1,6 @@
 x-git-defaults: &git_defaults
     host: github
-    tag: branch-24.04
+    tag: branch-24.02
     upstream: rapidsai
 
 repos:
@@ -24,7 +24,7 @@ repos:
   git:
     repo: ucxx
     <<: *git_defaults
-    tag: branch-0.37
+    tag: branch-0.36
   cpp:
     - name: ucxx
       sub_dir: "cpp"
@@ -158,9 +158,6 @@ repos:
     - name: cugraph
       sub_dir: cpp
       depends: [rmm, raft, cugraph-ops]
-    - name: cugraph_etl
-      sub_dir: cpp/libcugraph_etl
-      depends: [cugraph, cudf]
   python:
     - name: pylibcugraph
       sub_dir: python/pylibcugraph
@@ -173,9 +170,6 @@ repos:
       depends: [pylibcugraph]
     - name: cugraph-dgl
       sub_dir: python/cugraph-dgl
-      depends: [cugraph]
-    - name: cugraph-equivariant
-      sub_dir: python/cugraph-equivariant
       depends: [cugraph]
     - name: cugraph_pyg
       sub_dir: python/cugraph-pyg
