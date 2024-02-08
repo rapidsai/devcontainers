@@ -77,10 +77,6 @@ build_${PY_LIB}_python_wheel() {
 
     local cmake_args=(${PY_CMAKE_ARGS});
 
-    if test -n "${v}"; then
-        cmake_args+=("--log-level=VERBOSE");
-    fi
-
     cmake_args+=(${CMAKE_ARGS:-});
     cmake_args+=(${CPP_DEPS});
     cmake_args+=(${CPP_ARGS});
