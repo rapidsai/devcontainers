@@ -123,7 +123,8 @@ prepend_to_etc_zshrc() {
 export -f prepend_to_etc_zshrc;
 
 add_etc_profile_d_script() {
-    local name="$(($(find /etc/profile.d/ -maxdepth 1 -type f -name '*.sh' | wc -l) + 20))-${1}.sh";
+    # shellcheck disable=SC2012
+    local name="$(($(ls -1q /etc/profile.d/*.sh | wc -l) + 20))-${1}.sh";
     echo -e "#! /usr/bin/env bash\n${*:2}" > "/etc/profile.d/${name}";
     chmod +x "/etc/profile.d/${name}";
 }
