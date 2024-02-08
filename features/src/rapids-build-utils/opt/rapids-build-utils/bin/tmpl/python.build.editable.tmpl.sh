@@ -22,6 +22,13 @@
 #                                         (default: 1)
 #  -D* <var>[:<type>]=<value>             Create or update a cmake cache entry.
 
+is_using_scikit_build_core() {
+    local -;
+    set -euo pipefail;
+    test -f "${PY_SRC}/pyproject.toml";
+    test "scikit_build_core.build" = "$(python -c "import toml; print(toml.load('${PY_SRC}/pyproject.toml')['build-system']['build-backend'])")";
+}
+
 build_${PY_LIB}_python_editable() {
     local -;
     set -euo pipefail;
@@ -70,6 +77,12 @@ build_${PY_LIB}_python_editable() {
         ninja_args+=("-l${n_load}");
     fi
 
+    if is_using_scikit_build_core; then
+        local bin_dir;
+        bin_dir="$(rapids-get-cmake-build-dir "${PY_SRC}" "${cmake_args[@]}")";
+        pip_args+=("--config-settings=build-dir=${bin_dir}");
+    fi
+
     pip_args+=("--no-build-isolation");
     pip_args+=("--no-deps");
     pip_args+=("--editable");
@@ -88,11 +101,11 @@ build_${PY_LIB}_python_editable() {
         CUDAFLAGS="${cudaflags}"                     \
         CMAKE_GENERATOR="Ninja"                      \
         PARALLEL_LEVEL="${n_jobs}"                   \
-        CMAKE_ARGS="${cmake_args[@]}"                \
-        SKBUILD_BUILD_OPTIONS="${ninja_args[@]}"     \
+        CMAKE_ARGS="${cmake_args[*]}"                \
+        SKBUILD_BUILD_OPTIONS="${ninja_args[*]}"     \
         NVCC_APPEND_FLAGS="${nvcc_append_flags}"     \
         SETUPTOOLS_ENABLE_FEATURES="legacy-editable" \
-            python -m pip install ${pip_args[@]}     \
+            python -m pip install "${pip_args[@]}"   \
         ;
         { set +x; } 2>/dev/null; echo -n "${PY_LIB} install time:";
     ) 2>&1;

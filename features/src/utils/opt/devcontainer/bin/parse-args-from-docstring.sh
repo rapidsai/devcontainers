@@ -1,7 +1,11 @@
 #! /usr/bin/env bash
 
 print_usage() {
-    sed -n '2,/^$/p' "$(which "${1:-${BASH_SOURCE[${#BASH_SOURCE[@]}-1]}}")" | sed -r 's/^# ?//';
+    local -;
+    set -euo pipefail;
+    local file="${1:-${BASH_SOURCE[${#BASH_SOURCE[@]}-1]}}";
+    if which "${file}"; then file=$(which "${file}"); fi
+    sed -n '2,/^$/p' "${file}" | sed -r 's/^# ?//';
 }
 
 parse_args_to_names() {
@@ -23,7 +27,7 @@ _squeeze_spaces_in_options() {
 parse_all_names_from_usage() {
     cat - \
   | _squeeze_spaces_in_options \
-  | sed -rn 's/^([ ]*)(--?[^*][^ *]+|,|_)+(.*)$/\2/p' \
+  | sed -rn 's/^([ ]*)(--?[^ *]+|,|_)+[^*](.*)$/\2/p' \
   | sed -r 's/(,|\|)/ /g' \
   ;
 }
@@ -60,6 +64,7 @@ _listify() {
   `# replace pipes with newlines`           \
   | tr '|' '\n'                             \
   | grep -v -e '^$'                         \
+  | sort -su                                \
     ;
 }
 
@@ -75,7 +80,7 @@ parse_short_names() {
 parse_long_names() {
     cat -                                        \
   `# take the long opts`                         \
-  | sed -r 's/(-[^ ,\*]+)?[ ]?(--[^,]+)+,?/\2/g' \
+  | sed -rn 's/(--[^,]+)+/\1/p'                  \
   `# remove the leading --`                      \
   | sed -r 's/--?([^ ,]+)+/\1/g'                 \
   | _listify;

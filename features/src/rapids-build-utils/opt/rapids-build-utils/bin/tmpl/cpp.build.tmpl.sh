@@ -50,7 +50,7 @@ build_${CPP_LIB}_cpp() {
     # Build C++ lib
     time (
         cmake                               \
-        --build "${CPP_SRC}/build/latest"   \
+        --build "${CPP_SRC}/${BIN_DIR}"     \
         ${v:+--verbose}                     \
         -j${n_jobs}                         \
         --                                  \

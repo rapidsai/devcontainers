@@ -82,6 +82,7 @@ generate_script() {
                       $PY_ENV
                       $PY_SRC
                       $PY_LIB
+                      $BIN_DIR
                       $CPP_LIB
                       $CPP_SRC
                       $CPP_ARGS
@@ -219,6 +220,7 @@ generate_scripts() {
     local k;
 
     local repo_names=();
+    local -r bin_dir="$(dirname "$(rapids-get-cmake-build-dir)")/latest";
 
     for ((i=0; i < ${repos_length:-0}; i+=1)); do
 
@@ -253,7 +255,6 @@ generate_scripts() {
             cpp_dirs+=("${cpp_path}");
             cpp_libs+=("${!cpp_name:-}");
             cpp_name="${!cpp_name:-}";
-            # cpp_name_lower="${cpp_name,,}";
 
             cpp_name_to_path["${cpp_name}"]="${cpp_path}";
 
@@ -267,14 +268,15 @@ generate_scripts() {
                 fi
                 local dep_cpp_path="${cpp_name_to_path["${dep_cpp_name}"]}";
 
-                cpp_deps+=("-D${!dep}_ROOT=\"${dep_cpp_path}/build/latest\"");
-                cpp_deps+=("-D${!dep,,}_ROOT=\"${dep_cpp_path}/build/latest\"");
-                cpp_deps+=("-D${!dep^^}_ROOT=\"${dep_cpp_path}/build/latest\"");
+                cpp_deps+=("-D${!dep}_ROOT=\"${dep_cpp_path}/${bin_dir}\"");
+                cpp_deps+=("-D${!dep,,}_ROOT=\"${dep_cpp_path}/${bin_dir}\"");
+                cpp_deps+=("-D${!dep^^}_ROOT=\"${dep_cpp_path}/${bin_dir}\"");
                 deps+=("${cpp_deps[@]}");
             done
 
             if [[ -d ~/"${!repo_path:-}/.git" ]]; then
                 SRC_PATH=~/"${!repo_path:-}" \
+                BIN_DIR="${bin_dir}"         \
                 CPP_LIB="${cpp_name:-}"      \
                 CPP_SRC="${!cpp_sub_dir:-}"  \
                 CPP_ARGS="${!cpp_args:-}"    \
@@ -294,9 +296,9 @@ generate_scripts() {
             args+=("-DFIND_${cpp_lib}_CPP=ON");
             args+=("-DFIND_${cpp_lib,,}_CPP=ON");
             args+=("-DFIND_${cpp_lib^^}_CPP=ON");
-            deps+=("-D${cpp_lib}_ROOT=\"${cpp_dir}/build/latest\"");
-            deps+=("-D${cpp_lib,,}_ROOT=\"${cpp_dir}/build/latest\"");
-            deps+=("-D${cpp_lib^^}_ROOT=\"${cpp_dir}/build/latest\"");
+            deps+=("-D${cpp_lib}_ROOT=\"${cpp_dir}/${bin_dir}\"");
+            deps+=("-D${cpp_lib,,}_ROOT=\"${cpp_dir}/${bin_dir}\"");
+            deps+=("-D${cpp_lib^^}_ROOT=\"${cpp_dir}/${bin_dir}\"");
         done
 
         for ((j=0; j < ${!py_length:-0}; j+=1)); do
@@ -313,6 +315,7 @@ generate_scripts() {
             py_libs+=("${!py_name}");
 
             if [[ -d ~/"${!repo_path:-}/.git" ]]; then
+                BIN_DIR="${bin_dir}"                      \
                 SRC_PATH=~/"${!repo_path:-}"              \
                 PY_SRC="${py_path}"                       \
                 PY_LIB="${!py_name}"                      \

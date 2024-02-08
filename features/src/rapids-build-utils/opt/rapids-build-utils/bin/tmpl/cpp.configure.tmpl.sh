@@ -45,42 +45,35 @@ configure_${CPP_LIB}_cpp() {
         rapids-get-num-archs-jobs-and-load "$@" \
     )";
 
-    local build_type="$(rapids-parse-cmake-build-type "${OPTS[@]}" | tr '[:upper:]' '[:lower:]')";
-    local binary_dir="${CPP_SRC}/build/${build_type}";
-    local source_dir="${CPP_SRC}";
-
-    # Reconfigure if previous configure failed
-    if [[ ! -f ${binary_dir}/build.ninja ]]; then
-        rm -rf ${binary_dir};
-    fi
-
-    mkdir -p ${binary_dir};
-    (
-        cd ${source_dir}/build;
-        ln -sfn ${build_type} latest;
-    );
-
     local cmake_args=(-GNinja);
-    cmake_args+=(-S ${source_dir});
-    cmake_args+=(-B ${binary_dir});
     cmake_args+=(${CMAKE_ARGS:-});
     cmake_args+=(${CPP_DEPS});
     cmake_args+=(${CPP_ARGS});
-    cmake_args+=(${v:+--log-level=VERBOSE});
+    cmake_args+=("${v:+--log-level=VERBOSE}");
     cmake_args+=("${OPTS[@]}");
+
+    local -r bin_dir="$(rapids-get-cmake-build-dir "${CPP_SRC}" "${cmake_args[@]}")";
+
+    # Reconfigure if previous configure failed
+    if [[ ! -f "${bin_dir}/build.ninja" ]]; then
+        rm -rf "${bin_dir}";
+    fi
+
+    cmake_args+=(-S "${CPP_SRC}");
+    cmake_args+=(-B "${bin_dir}");
 
     time (
         CUDAFLAGS="${CUDAFLAGS:+$CUDAFLAGS }-t=${n_arch}" \
-            cmake ${cmake_args[@]};
+            cmake "${cmake_args[@]}";
         { set +x; } 2>/dev/null; echo -n "lib${CPP_LIB} configure time:";
     ) 2>&1;
 
-    if [[ ! -L ${source_dir}/compile_commands.json \
-            || "$(readlink "${source_dir}/compile_commands.json")" \
-            != ${source_dir}/build/latest/compile_commands.json ]]; then
+    if [[ ! -L "${CPP_SRC}/compile_commands.json" \
+            || "$(readlink "${CPP_SRC}/compile_commands.json")" \
+            != "${CPP_SRC}/${BIN_DIR}/compile_commands.json" ]]; then
         ln -sfn \
-            ${source_dir}/build/latest/compile_commands.json \
-            ${source_dir}/compile_commands.json \
+            "${CPP_SRC}/${BIN_DIR}/compile_commands.json" \
+            "${CPP_SRC}/compile_commands.json" \
             ;
     fi
 }

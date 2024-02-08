@@ -44,6 +44,13 @@
 #  -w,--wheel-dir <dir>                   copy built wheel into <dir>
 #                                         (default: none)
 
+is_using_scikit_build_core() {
+    local -;
+    set -euo pipefail;
+    test -f "${PY_SRC}/pyproject.toml";
+    test "scikit_build_core.build" = "$(python -c "import toml; print(toml.load('${PY_SRC}/pyproject.toml')['build-system']['build-backend'])")";
+}
+
 build_${PY_LIB}_python_wheel() {
     local -;
     set -euo pipefail;
@@ -110,7 +117,7 @@ build_${PY_LIB}_python_wheel() {
 
     if test -n "${only_binary[@]:-}"; then
         pip_args+=("--only-binary");
-        if [ "${only_binary[@]}" != "true" ]; then
+        if test "${only_binary[@]}" != "true"; then
             pip_args+=("${only_binary[@]}");
         fi
     fi
@@ -141,6 +148,10 @@ build_${PY_LIB}_python_wheel() {
 
     if test -n "${no_build_isolation:-}"; then
         pip_args+=("--no-build-isolation");
+        if is_using_scikit_build_core; then
+            local -r bin_dir="$(rapids-get-cmake-build-dir "${PY_SRC}" "${cmake_args[@]}")";
+            pip_args+=("--config-settings=build-dir=${bin_dir}");
+        fi
     fi
 
     if test -n "${ignore_requires_python:-}"; then
@@ -160,8 +171,8 @@ build_${PY_LIB}_python_wheel() {
         CUDAFLAGS="${cudaflags}"                 \
         CMAKE_GENERATOR="Ninja"                  \
         PARALLEL_LEVEL="${n_jobs}"               \
-        CMAKE_ARGS="${cmake_args[@]}"            \
-        SKBUILD_BUILD_OPTIONS="${ninja_args[@]}" \
+        CMAKE_ARGS="${cmake_args[*]}"            \
+        SKBUILD_BUILD_OPTIONS="${ninja_args[*]}" \
         NVCC_APPEND_FLAGS="${nvcc_append_flags}" \
             python -m pip wheel ${pip_args[@]}   \
         ;

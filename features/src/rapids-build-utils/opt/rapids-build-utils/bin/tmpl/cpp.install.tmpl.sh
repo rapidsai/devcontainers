@@ -48,7 +48,7 @@ install_${CPP_LIB}_cpp() {
         fi
         time (
             cmake \
-                --install "${CPP_SRC}"/build/latest/                            \
+                --install "${CPP_SRC}/${BIN_DIR}/"                              \
                 --prefix "${p:-${CONDA_PREFIX:-${CMAKE_INSTALL_PREFIX:-/usr}}}" \
                 ${comp:+--component "${comp}"}                                  \
                 "${OPTS[@]}";

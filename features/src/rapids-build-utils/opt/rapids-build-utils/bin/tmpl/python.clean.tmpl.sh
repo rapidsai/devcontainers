@@ -28,8 +28,11 @@ clean_${PY_LIB}_python() {
 
     local py_lib="${PY_LIB}";
 
-    rm -rf "${PY_SRC}"/_skbuild \
-        "${PY_SRC}"/{${py_lib},${py_lib//"-"/"_"}}.egg-info;
+    rm -rf -- \
+        "${PY_SRC}"/_skbuild \
+        "${PY_SRC}/${BIN_DIR}"/{*,.*} \
+        "${PY_SRC}"/{${py_lib},${py_lib//"-"/"_"}}.egg-info \
+        2>/dev/null || true;
 
     for lib in ${py_lib} ${py_lib//"-"/"_"}; do
         if test -d "${PY_SRC}"/${lib}/; then
@@ -44,7 +47,7 @@ clean_${PY_LIB}_python() {
 
     if test -d "${PY_SRC}"/build; then
         local slug="$(uname -s)-$(uname -m)";
-        rm -rf                                                                                      \
+        rm -rf --                                                                                   \
             `# scikit-buld-core build dirs`                                                         \
             "${PY_SRC}"/build/cp{${py_ver},${py_ver/./}}-cp{${py_ver},${py_ver/./}}*                \
             `# setuptools/distutils build dirs`                                                     \

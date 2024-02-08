@@ -23,9 +23,9 @@ uninstall_${CPP_LIB}_cpp() {
 
     eval "$(devcontainer-utils-parse-args "$0" - <<< "${@@Q}")";
 
-    if test -f "${CPP_SRC}"/build/latest/install_manifest.txt; then
+    if test -f "${CPP_SRC}/${BIN_DIR}/install_manifest.txt"; then
         time (
-            xargs ${v:+-t} -rd "\n" --arg-file=<(<"${CPP_SRC}"/build/latest/install_manifest.txt tr -d "\r") rm -f ${v:+-v} --;
+            xargs ${v:+-t} -rd "\n" --arg-file=<(<"${CPP_SRC}/${BIN_DIR}/install_manifest.txt" tr -d "\r") rm -f ${v:+-v} --;
         { set +x; } 2>/dev/null; echo -n "lib${CPP_LIB} uninstall time:";
     ) 2>&1;
     fi

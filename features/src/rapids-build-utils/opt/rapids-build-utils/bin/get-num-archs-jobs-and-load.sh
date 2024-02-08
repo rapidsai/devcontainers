@@ -50,7 +50,7 @@ get_num_archs_jobs_and_load() {
 
     if test -z "${archs:-}" \
     && test -n "${INFER_NUM_DEVICE_ARCHITECTURES:-}"; then
-        archs=$(rapids-parse-cmake-var-from-args CMAKE_CUDA_ARCHITECTURES "${OPTS[@]}");
+        archs="$(rapids-parse-cmake-define CMAKE_CUDA_ARCHITECTURES "${OPTS[@]}" || echo)";
         archs="${archs:-${CMAKE_CUDA_ARCHITECTURES:-${CUDAARCHS:-}}}";
 
         case "${archs:-}" in
