@@ -142,7 +142,7 @@ build_${PY_LIB}_python_wheel() {
         pip_args+=("--no-use-pep517");
     fi
 
-    case "${no_build_isolation:-$(pip config get wheel.no-build-isolation || echo)}" in
+    case "${no_build_isolation:-$(pip config get wheel.no-build-isolation 2>/dev/null || echo)}" in
         True|true|yes|1)
             pip_args+=("--no-build-isolation");
             if is_using_scikit_build_core; then
