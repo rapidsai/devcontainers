@@ -17,47 +17,25 @@ test_aws_creds() {
         fi
     fi
 
-    local bucket="${SCCACHE_BUCKET:-"$(grep 'bucket=' ~/.aws/config 2>/dev/null | sed 's/bucket=//' || echo)"}";
+    local bucket="${SCCACHE_BUCKET:-"$(sed -n 's/bucket=//p' ~/.aws/config 2>/dev/null)"}";
     if [ -z "${bucket:-}" ]; then exit 1; fi
 
-    local region="${SCCACHE_REGION:-"${AWS_DEFAULT_REGION:-"$(grep 'region=' ~/.aws/config 2>/dev/null | sed 's/region=//' || echo)"}"}";
-    local aws_access_key_id="${AWS_ACCESS_KEY_ID:-"$(grep 'aws_access_key_id=' ~/.aws/credentials 2>/dev/null | sed 's/aws_access_key_id=//' || echo)"}";
-    local aws_session_token="${AWS_SESSION_TOKEN:-"$(grep 'aws_session_token=' ~/.aws/credentials 2>/dev/null | sed 's/aws_session_token=//' || echo)"}";
-    local aws_secret_access_key="${AWS_SECRET_ACCESS_KEY:-"$(grep 'aws_secret_access_key=' ~/.aws/credentials 2>/dev/null | sed 's/aws_secret_access_key=//' || echo)"}";
+    local region="${SCCACHE_REGION:-"${AWS_DEFAULT_REGION:-"$(sed -n 's/region=//p' ~/.aws/config 2>/dev/null)"}"}";
+    local aws_access_key_id="${AWS_ACCESS_KEY_ID:-"$(sed -n 's/aws_access_key_id=//p' ~/.aws/credentials 2>/dev/null)"}";
+    local aws_session_token="${AWS_SESSION_TOKEN:-"$(sed -n 's/aws_session_token=//p' ~/.aws/credentials 2>/dev/null)"}";
+    local aws_secret_access_key="${AWS_SECRET_ACCESS_KEY:-"$(sed -n 's/aws_secret_access_key=//p' ~/.aws/credentials 2>/dev/null)"}";
 
     if test -n "$(pgrep sccache || echo)"; then
         sccache --stop-server >/dev/null 2>&1 || true;
     fi
 
-    export SCCACHE_NO_DAEMON="1";
-    export SCCACHE_BUCKET="${bucket:-}";
-    export SCCACHE_REGION="${region:-}";
-    export AWS_ACCESS_KEY_ID="${aws_access_key_id:-}";
-    export AWS_SESSION_TOKEN="${aws_session_token:-}";
-    export AWS_SECRET_ACCESS_KEY="${aws_secret_access_key:-}";
-
-    if ! sccache --show-stats 2>&1 | grep -qE 'Cache location \s+ s3'; then
-
-        export SCCACHE_S3_NO_CREDENTIALS="1";
-
-        export AWS_ACCESS_KEY_ID=;
-        export AWS_SESSION_TOKEN=;
-        export AWS_SECRET_ACCESS_KEY=;
-        export -n AWS_ACCESS_KEY_ID;
-        export -n AWS_SESSION_TOKEN;
-        export -n AWS_SECRET_ACCESS_KEY;
-        unset AWS_ACCESS_KEY_ID;
-        unset AWS_SESSION_TOKEN;
-        unset AWS_SECRET_ACCESS_KEY;
-
-        if sccache --show-stats 2>&1 | grep -qE 'Cache location \s+ s3'; then
-            exit 2;
-        fi
-
-        exit 1;
-    fi
-
-    exit 0;
+    SCCACHE_BUCKET="${bucket:-}" \
+    SCCACHE_REGION="${region:-}" \
+    AWS_ACCESS_KEY_ID="${aws_access_key_id:-}" \
+    AWS_SESSION_TOKEN="${aws_session_token:-}" \
+    AWS_SECRET_ACCESS_KEY="${aws_secret_access_key:-}" \
+    sccache --start-server >/dev/null 2>&1;
+    sccache --show-stats | grep -qE 'Cache location \s+ s3';
 }
 
 if test -n "${devcontainer_utils_debug:-}"; then
