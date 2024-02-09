@@ -143,7 +143,7 @@ build_${PY_LIB}_python_wheel() {
     fi
 
     case "${no_build_isolation:-$(pip config get wheel.no-build-isolation || echo)}" in
-        True|true|yes||1)
+        True|true|yes|1)
             pip_args+=("--no-build-isolation");
             if is_using_scikit_build_core; then
                 pip_args+=("--config-settings=build-dir=$(rapids-get-cmake-build-dir "${PY_SRC}" "${cmake_args[@]}")");
