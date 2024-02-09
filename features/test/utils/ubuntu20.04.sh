@@ -126,19 +126,6 @@ if test -n "${rw_sccache_bucket:-}"; then
     check "bad creds with SCCACHE_BUCKET and no VAULT_HOST uses local disk cache" bad_creds_with_sccache_bucket_and_no_vault_host_uses_local_disk_cache;
 fi
 
-if test -n "${ro_sccache_bucket:-}"; then
-
-    readonly_sccache_bucket_uses_s3_cache() {
-        reset_state;
-        SCCACHE_BUCKET="${ro_sccache_bucket}" \
-        SCCACHE_REGION="${ro_sccache_region}" \
-        devcontainer-utils-post-attach-command;
-        expect_s3_cache_is_used;
-    }
-
-    # check "Readonly SCCACHE_BUCKET uses S3 cache" readonly_sccache_bucket_uses_s3_cache;
-fi
-
 if test -n "${gh_token:-}" \
 && test -n "${vault_host:-}" \
 && test -n "${rw_sccache_bucket:-}"; then
