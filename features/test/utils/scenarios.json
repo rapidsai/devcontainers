@@ -7,9 +7,7 @@
       "vault_host": "${localEnv:vault_host}",
       "VAULT_S3_TTL": "${localEnv:VAULT_S3_TTL}",
       "rw_sccache_bucket": "${localEnv:rw_sccache_bucket}",
-      "rw_sccache_region": "${localEnv:rw_sccache_region}",
-      "ro_sccache_bucket": "${localEnv:ro_sccache_bucket}",
-      "ro_sccache_region": "${localEnv:ro_sccache_region}"
+      "rw_sccache_region": "${localEnv:rw_sccache_region}"
     },
     "features": {
       "ghcr.io/devcontainers/features/common-utils:2": {
@@ -53,9 +51,7 @@
       "vault_host": "${localEnv:vault_host}",
       "VAULT_S3_TTL": "${localEnv:VAULT_S3_TTL}",
       "rw_sccache_bucket": "${localEnv:rw_sccache_bucket}",
-      "rw_sccache_region": "${localEnv:rw_sccache_region}",
-      "ro_sccache_bucket": "${localEnv:ro_sccache_bucket}",
-      "ro_sccache_region": "${localEnv:ro_sccache_region}"
+      "rw_sccache_region": "${localEnv:rw_sccache_region}"
     },
     "features": {
       "ghcr.io/devcontainers/features/common-utils:2": {
@@ -99,9 +95,7 @@
       "vault_host": "${localEnv:vault_host}",
       "VAULT_S3_TTL": "${localEnv:VAULT_S3_TTL}",
       "rw_sccache_bucket": "${localEnv:rw_sccache_bucket}",
-      "rw_sccache_region": "${localEnv:rw_sccache_region}",
-      "ro_sccache_bucket": "${localEnv:ro_sccache_bucket}",
-      "ro_sccache_region": "${localEnv:ro_sccache_region}"
+      "rw_sccache_region": "${localEnv:rw_sccache_region}"
     },
     "features": {
       "ghcr.io/devcontainers/features/common-utils:2": {
