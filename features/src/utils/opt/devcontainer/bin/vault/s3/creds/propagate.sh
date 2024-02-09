@@ -16,7 +16,7 @@ ensure_s3_creds_have_propagated() {
 
     while true; do
 
-        if SCCACHE_NO_DAEMON=1 sccache --show-stats >/dev/null 2>&1; then
+        if sccache --start-server >/dev/null 2>&1; then
             if [ "${num_restarts}" -gt "0" ]; then echo "Success!"; fi
             exit 0;
         fi
