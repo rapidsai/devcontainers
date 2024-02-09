@@ -68,6 +68,8 @@ install_utility make-vscode-workspace;
 install_utility parse-cmake-args;
 install_utility parse-cmake-build-type;
 install_utility parse-cmake-define;
+install_utility parse-pip-install-args;
+install_utility parse-pip-wheel-args;
 install_utility python-pkg-roots;
 install_utility python-pkg-names;
 install_utility python-conda-pkg-names;

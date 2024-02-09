@@ -27,7 +27,7 @@ _squeeze_spaces_in_options() {
 parse_all_names_from_usage() {
     cat - \
   | _squeeze_spaces_in_options \
-  | sed -rn 's/^([ ]*)(--?[^ *]+|,|_)+[^*](.*)$/\2/p' \
+  | sed -rn 's/^[ ]*(--?[^ *]+)+[^*]*$/\1/p' \
   | sed -r 's/(,|\|)/ /g' \
   ;
 }
@@ -46,12 +46,14 @@ parse_value_types_from_usage() {
 }
 
 parse_bool_names_from_usage() {
+    # bool names are the complement of `all names` \ `value names`
     tee >(parse_all_names_from_usage)   \
         >(parse_value_names_from_usage) \
-        1>/dev/null \
-  | sort -s         \
-  | uniq -u         \
-  | sed -r 's/(,|\|)/ /g';
+        1>/dev/null                     \
+  | sort -s                             \
+  | uniq -u                             \
+  | sed -r 's/(,|\|)/ /g'               \
+    ;
 }
 
 _listify() {
@@ -68,22 +70,34 @@ _listify() {
     ;
 }
 
-parse_short_names() {
+_take_short_opts() {
     cat -                                   \
   `# skip the long opts`                    \
   | sed -r 's/([ ]?--[^ ,]+)+,?//g'         \
-  `# take the short opts`                   \
+  | _listify                                \
+    ;
+}
+
+parse_short_names() {
+    cat -                                   \
+  `# skip the long opts`                    \
+  | _take_short_opts                        \
+  `# remove the leading -`                  \
   | sed -r 's/-([^ ,\*]+)+[,\*]?/\1/g'      \
-  | _listify;
+    ;
 }
 
 parse_long_names() {
-    cat -                                        \
-  `# take the long opts`                         \
-  | sed -rn 's/(--[^,]+)+/\1/p'                  \
-  `# remove the leading --`                      \
-  | sed -r 's/--?([^ ,]+)+/\1/g'                 \
-  | _listify;
+    # long opts are the complement of `all opts` \ `short opts`
+    tee >(_listify)              \
+        >(_take_short_opts)      \
+        1>/dev/null              \
+  | sort -s                      \
+  | uniq -u                      \
+  `# remove the leading --`      \
+  | sed -r 's/--?([^ ,]+)+/\1/g' \
+  | _listify                     \
+    ;
 }
 
 parse_aliases() {

@@ -42,7 +42,7 @@
 #  -W (no-error=deprecated)        Make deprecated macro and function warnings not errors.
 #  --preset <preset>               Specify a configure preset.
 #  --graphviz <file>               Generate graphviz of dependencies, see CMakeGraphVizOptions.cmake for more.
-#  --loglevel,--log-level (ERROR|WARNING|NOTICE|STATUS|VERBOSE|DEBUG|TRACE)
+#  --log-level,--loglevel (ERROR|WARNING|NOTICE|STATUS|VERBOSE|DEBUG|TRACE)
 #                                  Set the verbosity of messages from CMake files. --loglevel is also accepted for backward compatibility reasons.
 #  --debug-find-pkg <pkg-name>     Limit cmake debug-find to the comma-separated list of packages
 #  --debug-find-var <var-name>     Limit cmake debug-find to the comma-separated list of result variables
@@ -69,52 +69,7 @@ parse_cmake_args() {
 
     eval "$(devcontainer-utils-parse-args rapids-parse-cmake-args "$@" <&0)";
 
-    local -r usage="$(print_usage "$(realpath -m "${BASH_SOURCE[0]}")")";
-    local -ar long_bools="($(parse_bool_names_from_usage   <<< "${usage}" | parse_long_names))";
-    local -ar long_value="($(parse_value_names_from_usage  <<< "${usage}" | parse_long_names))";
-    local -ar short_bools="($(parse_bool_names_from_usage  <<< "${usage}" | parse_short_names))";
-    local -ar short_value="($(parse_value_names_from_usage <<< "${usage}" | parse_short_names | grep -vP '(S|B|G|C|U|T|A)'))";
-
-    local k;
-    local cmake_args=();
-
-    for k in "${short_bools[@]}"; do
-        local -n v=${k//-/_};
-        if test -n "${v[*]:-}"; then
-            cmake_args+=("-${k}");
-        fi
-    done
-    unset "${short_bools[@]//-/_}";
-
-    # short value options that might need spaces
-    for k in S B G C U T A; do
-        local -n v=${k//-/_};
-        cmake_args+=("${v[@]/#/-${k} }");
-    done
-    unset S B G C U T A;
-
-    # All other value opts should be fine w/o spaces
-    for k in "${short_value[@]}"; do
-        local -n v=${k//-/_};
-        cmake_args+=("${v[@]/#/-${k}}");
-    done
-    unset "${short_value[@]//-/_}";
-
-    for k in "${long_bools[@]}"; do
-        local -n v=${k//-/_};
-        if test -n "${v[*]:-}"; then
-            cmake_args+=("--${k}");
-        fi
-    done
-    unset "${long_bools[@]//-/_}";
-
-    for k in "${long_value[@]}"; do
-        local -n v=${k//-/_};
-        cmake_args+=("${v[@]/#/--${k}=}");
-    done
-    unset "${long_value[@]//-/_}";
-
-    echo "${cmake_args[@]}";
+    echo "${ARGS[*]}";
 }
 
 parse_cmake_args "$@" <&0;

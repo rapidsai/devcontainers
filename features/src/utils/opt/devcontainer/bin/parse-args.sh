@@ -23,7 +23,8 @@ parse_args() {
     local val;
     local -a arg;
 
-    local -A args=();
+    local -A _map=();
+    local -a args=();
     local -a opts=();
     local -A typs=();
     local -a rest=();
@@ -74,7 +75,7 @@ parse_args() {
     take_map["help"]=1;
 
     for key in "${!alias_map[@]}"; do
-        args["${key}"]="";
+        _map["${key}"]="";
         local -a aliases="(${alias_map[${key}]})";
         for alias in "${aliases[@]}"; do
             reverse_alias_map["${alias}"]="${key}";
@@ -258,15 +259,16 @@ parse_args() {
                 if test -v skip_map["${key}"] || ! test -v take_map["${key}"]; then
                     opts+=("${arg[@]}");
                 else
+                    args+=("${arg[@]}");
                     if test -v reverse_alias_map["${key}"]; then
                         key="${reverse_alias_map["${key}"]}";
                     fi
                     if test "${typ}" = bool; then
-                        args["${key}"]="${val@Q}";
-                    elif test -z "${args["${key}"]}"; then
-                        args["${key}"]="${val@Q}";
+                        _map["${key}"]="${val@Q}";
+                    elif test -z "${_map["${key}"]}"; then
+                        _map["${key}"]="${val@Q}";
                     else
-                        args["${key}"]+=" ${val@Q}";
+                        _map["${key}"]+=" ${val@Q}";
                     fi
                 fi
             fi
@@ -298,24 +300,25 @@ parse_args() {
         done
     done
 
-    if test -n "${args[h]:-}"; then
+    if test -n "${_map[h]:-}"; then
         cat <<< "${usage}" >&2;
         echo >&2;
         echo "exit 0";
     else
-        echo "declare -A ARGS=(";
-        for key in "${!args[@]}"; do
-            echo "[${key@Q}]=${args["${key}"]@Q}";
+        echo "declare -A ARGS_MAP=(";
+        for key in "${!_map[@]}"; do
+            echo "[${key@Q}]=${_map["${key}"]@Q}";
         done
         echo ")";
+        echo "declare -a ARGS=(${args[*]@Q})";
         echo "declare -a OPTS=(${opts[*]@Q})";
         echo "declare -a REST=(${rest[*]@Q})";
 
-        for key in "${!args[@]}"; do
+        for key in "${!_map[@]}"; do
             if test "${typs["${key}"]}" = bool; then
-                echo "declare ${key//-/_}=${args["${key}"]}";
+                echo "declare ${key//-/_}=${_map["${key}"]}";
             else
-                echo "declare -a ${key//-/_}=(${args["${key}"]})";
+                echo "declare -a ${key//-/_}=(${_map["${key}"]})";
             fi
             local -a aliases="(${alias_map["${key}"]})";
             for alias in "${aliases[@]}"; do
