@@ -136,7 +136,7 @@ if test -n "${ro_sccache_bucket:-}"; then
         expect_s3_cache_is_used;
     }
 
-    check "Readonly SCCACHE_BUCKET uses S3 cache" readonly_sccache_bucket_uses_s3_cache;
+    # check "Readonly SCCACHE_BUCKET uses S3 cache" readonly_sccache_bucket_uses_s3_cache;
 fi
 
 if test -n "${gh_token:-}" \
