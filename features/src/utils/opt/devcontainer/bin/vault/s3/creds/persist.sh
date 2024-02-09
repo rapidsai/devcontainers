@@ -38,7 +38,6 @@ store_s3_creds() {
     local region=;
     local no_bucket=;
     local no_region=;
-    local no_credentials=;
     local aws_access_key_id=;
     local aws_session_token=;
     local aws_secret_access_key=;
@@ -50,7 +49,6 @@ store_s3_creds() {
             region                            |
             no_bucket                         |
             no_region                         |
-            no_credentials                    |
             aws_access_key_id                 |
             aws_session_token                 |
             aws_secret_access_key             |
@@ -64,7 +62,6 @@ store_s3_creds() {
     reset_envvar "AWS_ACCESS_KEY_ID";
     reset_envvar "AWS_SESSION_TOKEN";
     reset_envvar "AWS_SECRET_ACCESS_KEY";
-    reset_envvar "SCCACHE_S3_NO_CREDENTIALS";
 
     mkdir -p ~/.aws;
     rm -f ~/.aws/{config,credentials};
@@ -92,41 +89,37 @@ ________EOF
     fi
 
     if test -f ~/.aws/config; then
-        cat <<________EOF > ~/.aws/config
+        cat <<________EOF > ~/.aws/config2 && mv ~/.aws/config{2,}
 [default]
 $(cat ~/.aws/config)
 ________EOF
     fi
 
-    if ! grep -qE "^$" <<< "${no_credentials:-}"; then
-        export_envvar "SCCACHE_S3_NO_CREDENTIALS" "1";
-    else
 
-        if ! grep -qE "^$" <<< "${aws_access_key_id:-}"; then
-            cat <<____________EOF >> ~/.aws/credentials
+    if ! grep -qE "^$" <<< "${aws_access_key_id:-}"; then
+        cat <<________EOF >> ~/.aws/credentials
 aws_access_key_id=${aws_access_key_id}
-____________EOF
-        fi
+________EOF
+    fi
 
-        if ! grep -qE "^$" <<< "${aws_session_token:-}"; then
-            cat <<____________EOF >> ~/.aws/credentials
+    if ! grep -qE "^$" <<< "${aws_session_token:-}"; then
+        cat <<________EOF >> ~/.aws/credentials
 aws_session_token=${aws_session_token}
-____________EOF
-        fi
+________EOF
+    fi
 
-        if ! grep -qE "^$" <<< "${aws_secret_access_key:-}"; then
-            cat <<____________EOF >> ~/.aws/credentials
+    if ! grep -qE "^$" <<< "${aws_secret_access_key:-}"; then
+        cat <<________EOF >> ~/.aws/credentials
 aws_secret_access_key=${aws_secret_access_key}
-____________EOF
-        fi
+________EOF
+    fi
 
-        if test -f ~/.aws/credentials; then
-            cat <<____________EOF > ~/.aws/credentials
+    if test -f ~/.aws/credentials; then
+        cat <<________EOF > ~/.aws/credentials2 && mv ~/.aws/credentials{2,}
 [default]
 $(cat ~/.aws/credentials)
-____________EOF
-            chmod 0600 ~/.aws/credentials;
-        fi
+________EOF
+        chmod 0600 ~/.aws/credentials;
     fi
 }
 
