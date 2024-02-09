@@ -67,6 +67,7 @@ include:
   - {features: [*python, *gcc_8, {<<: *cuda_curr_max, <<: *cccl_cuda_opts}, *cccl_clang_tools, *cccl_dev], env: *gcc_env}
   - {features: [*python, *gcc_9, {<<: *cuda_curr_max, <<: *cccl_cuda_opts}, *cccl_clang_tools, *cccl_dev], env: *gcc_env}
   - {features: [*python, *gcc_10, {<<: *cuda_curr_max, <<: *cccl_cuda_opts}, *cccl_clang_tools, *cccl_dev], env: *gcc_env}
+  - {features: [*python, *gcc_10, {<<: *cuda_prev_max, <<: *cccl_cuda_opts}, *cccl_clang_tools, *cccl_dev], env: *gcc_env}
   - {features: [*python, *llvm_9, {<<: *cuda_curr_max, <<: *cccl_cuda_opts}, *cccl_clang_tools, *cccl_dev], env: *llvm_env}
   - {features: [*python, *llvm_10, {<<: *cuda_curr_max, <<: *cccl_cuda_opts}, *cccl_clang_tools, *cccl_dev], env: *llvm_env}
   - {features: [*python, *llvm_11, {<<: *cuda_curr_max, <<: *cccl_cuda_opts}, *cccl_clang_tools, *cccl_dev], env: *llvm_env}
