@@ -1,11 +1,10 @@
 #! /usr/bin/env bash
 
 s3_cred() {
-    grep "$1=" ~/.aws/credentials 2>/dev/null | sed "s/$1=//" || echo;
+    sed -n "s/$1=//p" ~/.aws/credentials 2>/dev/null;
 }
 
 init_vault_s3_creds() {
-
     local -
     set -euo pipefail;
 
@@ -48,15 +47,11 @@ init_vault_s3_creds() {
                     # bucket is inaccessible
                     devcontainer-utils-vault-s3-creds-persist - <<< --no-bucket --no-region;
                 fi
-            else
-                # Block until the new temporary AWS S3 credentials propagate
-                devcontainer-utils-vault-s3-creds-propagate;
+            elif ! devcontainer-utils-vault-s3-creds-propagate; then
+                # bucket is inaccessible
+                devcontainer-utils-vault-s3-creds-persist <<< "--no_bucket --no_region";
             fi
         fi
-        # shellcheck disable=SC1090
-        . /etc/profile.d/*-devcontainer-utils.sh;
-        # start the sccache server
-        sccache --start-server || true;
     fi
 }
 

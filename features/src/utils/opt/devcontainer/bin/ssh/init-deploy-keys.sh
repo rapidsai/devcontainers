@@ -7,7 +7,7 @@ init_ssh_deploy_keys() {
     # shellcheck disable=SC2154
     if test -n "${devcontainer_utils_debug:-}" \
     && { test -z "${devcontainer_utils_debug##*"*"*}" \
-      || test -z "${rapids_build_utils_debug##*"init-deploy-keys"*}"; }; then
+      || test -z "${devcontainer_utils_debug##*"init-deploy-keys"*}"; }; then
         PS4="+ ${BASH_SOURCE[0]}:\${LINENO} "; set -x;
     fi
 
