@@ -19,12 +19,12 @@ _zip_names_and_types() {
     done < "${1}";
 }
 
-declare -A usage=();
-declare -A script=();
-declare -A bool_names=();
-declare -A value_names=();
-declare -A value_types="";
-declare -A option_names="";
+declare -g -A _devcontainer_utils_completions_usage=();
+declare -g -A _devcontainer_utils_completions_script=();
+declare -g -A _devcontainer_utils_completions_bool_names=();
+declare -g -A _devcontainer_utils_completions_value_names=();
+declare -g -A _devcontainer_utils_completions_value_types="";
+declare -g -A _devcontainer_utils_completions_option_names="";
 
 _devcontainer_utils_completions() {
     # trap 'sleep 10;' EXIT;
@@ -33,33 +33,33 @@ _devcontainer_utils_completions() {
 
     local CMD="$1";
 
-    if test "${script[${CMD}]:-}" != "$(which "${CMD}")"; then
-        script["${CMD}"]="$(which "${CMD}")";
-        if test ${#script["${CMD}"]} -eq 0; then return; fi
-        unset "usage[${CMD}]";
-        unset "bool_names[${CMD}]";
-        unset "value_names[${CMD}]";
-        unset "value_types[${CMD}]";
-        unset "option_names[${CMD}]";
+    if test "${_devcontainer_utils_completions_script[${CMD}]:-}" != "$(which "${CMD}")"; then
+        _devcontainer_utils_completions_script["${CMD}"]="$(which "${CMD}")";
+        if test ${#_devcontainer_utils_completions_script["${CMD}"]} -eq 0; then return; fi
+        unset "_devcontainer_utils_completions_usage[${CMD}]";
+        unset "_devcontainer_utils_completions_bool_names[${CMD}]";
+        unset "_devcontainer_utils_completions_value_names[${CMD}]";
+        unset "_devcontainer_utils_completions_value_types[${CMD}]";
+        unset "_devcontainer_utils_completions_option_names[${CMD}]";
     fi
-    if ! test -v usage["${CMD}"]; then
-        usage["${CMD}"]="$(sed -n '2,/^$/p' "${script[${CMD}]}" | sed -r 's/^# ?//')";
-        if test ${#usage[${CMD}]} -eq 0; then return; fi
+    if ! test -v _devcontainer_utils_completions_usage["${CMD}"]; then
+        _devcontainer_utils_completions_usage["${CMD}"]="$(sed -n '2,/^$/p' "${_devcontainer_utils_completions_script[${CMD}]}" | sed -r 's/^# ?//')";
+        if test ${#_devcontainer_utils_completions_usage[${CMD}]} -eq 0; then return; fi
     fi
-    if test "${#bool_names[${CMD}]}" -eq 0; then
-        bool_names["${CMD}"]="$(parse_bool_names_from_usage <<< "${usage[${CMD}]}")";
+    if test "${#_devcontainer_utils_completions_bool_names[${CMD}]}" -eq 0; then
+        _devcontainer_utils_completions_bool_names["${CMD}"]="$(parse_bool_names_from_usage <<< "${_devcontainer_utils_completions_usage[${CMD}]}")";
     fi
-    if test "${#value_names[${CMD}]}" -eq 0; then
-        value_names["${CMD}"]="$(parse_value_names_from_usage <<< "${usage[${CMD}]}")";
+    if test "${#_devcontainer_utils_completions_value_names[${CMD}]}" -eq 0; then
+        _devcontainer_utils_completions_value_names["${CMD}"]="$(parse_value_names_from_usage <<< "${_devcontainer_utils_completions_usage[${CMD}]}")";
     fi
-    if ! test -v value_types["${CMD}"]; then
-        value_types["${CMD}"]="$(_zip_names_and_types              \
-            <(parse_value_names_from_usage <<< "${usage[${CMD}]}") \
-            <(parse_value_types_from_usage <<< "${usage[${CMD}]}") \
+    if ! test -v _devcontainer_utils_completions_value_types["${CMD}"]; then
+        _devcontainer_utils_completions_value_types["${CMD}"]="$(_zip_names_and_types              \
+            <(parse_value_names_from_usage <<< "${_devcontainer_utils_completions_usage[${CMD}]}") \
+            <(parse_value_types_from_usage <<< "${_devcontainer_utils_completions_usage[${CMD}]}") \
         )";
     fi
-    if ! test -v option_names["${CMD}"]; then
-        option_names["${CMD}"]="${bool_names[${CMD}]} ${value_names[${CMD}]}";
+    if ! test -v _devcontainer_utils_completions_option_names["${CMD}"]; then
+        _devcontainer_utils_completions_option_names["${CMD}"]="${_devcontainer_utils_completions_bool_names[${CMD}]} ${_devcontainer_utils_completions_value_names[${CMD}]}";
     fi
 
     local cur="${COMP_WORDS[$COMP_CWORD]}";
@@ -73,20 +73,16 @@ _devcontainer_utils_completions() {
             local type_="${pair[1]}";
             if [[ ${name_} == ${prev}* ]]; then
                 case "${type_}" in
-                    "<num>")
+                    "<num>"|"<number>")
                         # shellcheck disable=SC2207
                         COMPREPLY=($(grep -P "^[0-9]+$" <<< "${cur}"));
                         return;
                         ;;
-                    "<dir>")
+                    "<dir>"|"<directory>")
                         _filedir -d;
                         return;
                         ;;
-                    "<file>")
-                        _filedir;
-                        return;
-                        ;;
-                    "<path>")
+                    "<file>"|"<path>")
                         _filedir;
                         return;
                         ;;
@@ -110,25 +106,25 @@ _devcontainer_utils_completions() {
                         ;;
                 esac
             fi
-        done <<< "${value_types[${CMD}]}";
+        done <<< "${_devcontainer_utils_completions_value_types[${CMD}]}";
     fi
 
-    declare -a bools="(${bool_names[${CMD}]})";
+    declare -a bools="(${_devcontainer_utils_completions_bool_names[${CMD}]})";
 
     for ((idx_a=0; idx_a < ${#bools[@]}; idx_a+=1)); do
         if [[ ${bools[$idx_a]} == ${cur}* ]]; then
             # shellcheck disable=SC2207
-            COMPREPLY=($(compgen -o nosort -W "${option_names[$CMD]}" -- "${cur}"));
+            COMPREPLY=($(compgen -o nosort -W "${_devcontainer_utils_completions_option_names[$CMD]}" -- "${cur}"));
             return;
         fi
     done
 
-    declare -a value="(${value_names[${CMD}]})";
+    declare -a value="(${_devcontainer_utils_completions_value_names[${CMD}]})";
 
     for ((idx_a=0; idx_a < ${#value[@]}; idx_a+=1)); do
         if [[ ${value[$idx_a]} == ${cur}* ]]; then
             # shellcheck disable=SC2207
-            COMPREPLY=($(compgen -o nosort -W "${option_names[$CMD]}" -- "${cur}"));
+            COMPREPLY=($(compgen -o nosort -W "${_devcontainer_utils_completions_option_names[$CMD]}" -- "${cur}"));
             return;
         fi
     done
