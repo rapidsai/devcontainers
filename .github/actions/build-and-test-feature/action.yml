@@ -8,8 +8,6 @@ inputs:
   vault_host: {type: string, defaut: '', required: false}
   rw_sccache_bucket: {type: string, defaut: '', required: false}
   rw_sccache_region: {type: string, defaut: '', required: false}
-  ro_sccache_bucket: {type: string, defaut: '', required: false}
-  ro_sccache_region: {type: string, defaut: '', required: false}
 
 runs:
   using: composite
@@ -34,5 +32,3 @@ runs:
         vault_host: "${{ inputs.vault_host }}"
         rw_sccache_bucket: "${{ inputs.rw_sccache_bucket }}"
         rw_sccache_region: "${{ inputs.rw_sccache_region }}"
-        ro_sccache_bucket: "${{ inputs.ro_sccache_bucket }}"
-        ro_sccache_region: "${{ inputs.ro_sccache_region }}"
