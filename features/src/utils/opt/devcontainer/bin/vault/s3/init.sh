@@ -1,23 +1,7 @@
 #! /usr/bin/env bash
 
-<<<<<<< HEAD
 s3_cred() {
     sed -n "s/$1=//p" ~/.aws/credentials 2>/dev/null;
-=======
-s3_bucket_args() {
-    cat <<____EOF
-        --bucket='${SCCACHE_BUCKET:-}'
-        --region='${SCCACHE_REGION:-"${AWS_DEFAULT_REGION:-}"}'
-____EOF
-}
-
-s3_bucket_auth() {
-    cat <<____EOF
-        --aws_access_key_id='$(sed -n 's/aws_access_key_id=//p' ~/.aws/credentials 2>/dev/null)'
-        --aws_session_token='$(sed -n 's/aws_session_token=//p' ~/.aws/credentials 2>/dev/null)'
-        --aws_secret_access_key='$(sed -n 's/aws_secret_access_key=//p' ~/.aws/credentials 2>/dev/null)'
-____EOF
->>>>>>> 8de2d6631671f189a4d739e212f533dbd26f9551
 }
 
 init_vault_s3_creds() {
