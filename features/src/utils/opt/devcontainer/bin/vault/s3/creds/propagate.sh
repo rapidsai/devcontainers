@@ -7,7 +7,8 @@ ensure_s3_creds_have_propagated() {
     # shellcheck disable=SC2154
     if test -n "${devcontainer_utils_debug:-}" \
     && { test -z "${devcontainer_utils_debug##*"*"*}" \
-      || test -z "${rapids_build_utils_debug##*"vault-s3-creds-propagate"*}"; }; then
+      || test -z "${devcontainer_utils_debug##*"vault-s3"*}" \
+      || test -z "${devcontainer_utils_debug##*"vault-s3-creds-propagate"*}"; }; then
         PS4="+ ${BASH_SOURCE[0]}:\${LINENO} "; set -x;
     fi
 
@@ -23,8 +24,9 @@ ensure_s3_creds_have_propagated() {
 
     while true; do
 
-        if SCCACHE_NO_DAEMON=1 sccache --show-stats >/dev/null 2>&1; then
+        if sccache --start-server >/dev/null 2>&1; then
             if [ "${num_restarts}" -gt "0" ]; then echo "Success!"; fi
+            sccache --stop-server >/dev/null 2>&1 || true;
             exit 0;
         fi
 

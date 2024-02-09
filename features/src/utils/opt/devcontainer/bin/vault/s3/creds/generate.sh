@@ -9,7 +9,8 @@ generate_s3_creds() {
     # shellcheck disable=SC2154
     if test -n "${devcontainer_utils_debug:-}" \
     && { test -z "${devcontainer_utils_debug##*"*"*}" \
-      || test -z "${rapids_build_utils_debug##*"vault-s3-creds-generate"*}"; }; then
+      || test -z "${devcontainer_utils_debug##*"vault-s3"*}" \
+      || test -z "${devcontainer_utils_debug##*"vault-s3-creds-generate"*}"; }; then
         PS4="+ ${BASH_SOURCE[0]}:\${LINENO} "; set -x;
     fi
 

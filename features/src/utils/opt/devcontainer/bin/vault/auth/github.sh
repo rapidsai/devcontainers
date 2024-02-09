@@ -8,7 +8,7 @@ get_vault_token() {
     # shellcheck disable=SC2154
     if test -n "${devcontainer_utils_debug:-}" \
     && { test -z "${devcontainer_utils_debug##*"*"*}" \
-      || test -z "${rapids_build_utils_debug##*"vault-auth-github"*}"; }; then
+      || test -z "${devcontainer_utils_debug##*"vault-auth-github"*}"; }; then
         PS4="+ ${BASH_SOURCE[0]}:\${LINENO} "; set -x;
     fi
 

@@ -11,8 +11,6 @@
 #                                 (default: false)
 #  --no-region                    Unset the $SCCACHE_REGION environment variable for all shells.
 #                                 (default: false)
-#  --no-credentials               Set the $SCCACHE_S3_NO_CREDENTIALS environment variable for all shells to 1.
-#                                 (default: false)
 #
 # Options that require values:
 #  --stamp <stamp>                Timestamp when the S3 credentials were generated.
@@ -38,7 +36,8 @@ persist_s3_creds() {
     # shellcheck disable=SC2154
     if test -n "${devcontainer_utils_debug:-}" \
     && { test -z "${devcontainer_utils_debug##*"*"*}" \
-      || test -z "${rapids_build_utils_debug##*"vault-s3-creds-persist"*}"; }; then
+      || test -z "${devcontainer_utils_debug##*"vault-s3"*}" \
+      || test -z "${devcontainer_utils_debug##*"vault-s3-creds-persist"*}"; }; then
         PS4="+ ${BASH_SOURCE[0]}:\${LINENO} "; set -x;
     fi
 
@@ -50,7 +49,6 @@ persist_s3_creds() {
     reset_envvar "AWS_ACCESS_KEY_ID";
     reset_envvar "AWS_SESSION_TOKEN";
     reset_envvar "AWS_SECRET_ACCESS_KEY";
-    reset_envvar "SCCACHE_S3_NO_CREDENTIALS";
 
     mkdir -p ~/.aws;
     rm -f ~/.aws/{config,credentials};
@@ -84,35 +82,30 @@ $(cat ~/.aws/config)
 ________EOF
     fi
 
-    if ! grep -qE "^$" <<< "${no_credentials:-}"; then
-        export_envvar "SCCACHE_S3_NO_CREDENTIALS" "1";
-    else
-
-        if ! grep -qE "^$" <<< "${aws_access_key_id:-}"; then
-            cat <<____________EOF >> ~/.aws/credentials
+    if ! grep -qE "^$" <<< "${aws_access_key_id:-}"; then
+        cat <<________EOF >> ~/.aws/credentials
 aws_access_key_id=${aws_access_key_id}
-____________EOF
-        fi
+________EOF
+    fi
 
-        if ! grep -qE "^$" <<< "${aws_session_token:-}"; then
-            cat <<____________EOF >> ~/.aws/credentials
+    if ! grep -qE "^$" <<< "${aws_session_token:-}"; then
+        cat <<________EOF >> ~/.aws/credentials
 aws_session_token=${aws_session_token}
-____________EOF
-        fi
+________EOF
+    fi
 
-        if ! grep -qE "^$" <<< "${aws_secret_access_key:-}"; then
-            cat <<____________EOF >> ~/.aws/credentials
+    if ! grep -qE "^$" <<< "${aws_secret_access_key:-}"; then
+        cat <<________EOF >> ~/.aws/credentials
 aws_secret_access_key=${aws_secret_access_key}
-____________EOF
-        fi
+________EOF
+    fi
 
-        if test -f ~/.aws/credentials; then
-            cat <<____________EOF > ~/.aws/credentials2 && mv ~/.aws/credentials{2,}
+    if test -f ~/.aws/credentials; then
+        cat <<________EOF > ~/.aws/credentials2 && mv ~/.aws/credentials{2,}
 [default]
 $(cat ~/.aws/credentials)
-____________EOF
-            chmod 0600 ~/.aws/credentials;
-        fi
+________EOF
+        chmod 0600 ~/.aws/credentials;
     fi
 }
 
