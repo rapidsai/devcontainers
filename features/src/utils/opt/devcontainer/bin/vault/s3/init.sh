@@ -9,9 +9,9 @@ ____EOF
 
 s3_bucket_auth() {
     cat <<____EOF
-        --aws_access_key_id='$(grep 'aws_access_key_id=' ~/.aws/credentials 2>/dev/null | sed 's/aws_access_key_id=//' || echo)'
-        --aws_session_token='$(grep 'aws_session_token=' ~/.aws/credentials 2>/dev/null | sed 's/aws_session_token=//' || echo)'
-        --aws_secret_access_key='$(grep 'aws_secret_access_key=' ~/.aws/credentials 2>/dev/null | sed 's/aws_secret_access_key=//' || echo)'
+        --aws_access_key_id='$(sed -n 's/aws_access_key_id=//p' ~/.aws/credentials 2>/dev/null)'
+        --aws_session_token='$(sed -n 's/aws_session_token=//p' ~/.aws/credentials 2>/dev/null)'
+        --aws_secret_access_key='$(sed -n 's/aws_secret_access_key=//p' ~/.aws/credentials 2>/dev/null)'
 ____EOF
 }
 
@@ -47,14 +47,11 @@ init_vault_s3_creds() {
                     # bucket is inaccessible
                     devcontainer-utils-vault-s3-creds-persist <<< "--no_bucket --no_region";
                 fi
-            else
-                # Block until the new temporary AWS S3 credentials propagate
-                devcontainer-utils-vault-s3-creds-propagate;
+            elif ! devcontainer-utils-vault-s3-creds-propagate; then
+                # bucket is inaccessible
+                devcontainer-utils-vault-s3-creds-persist <<< "--no_bucket --no_region";
             fi
         fi
-        . /etc/profile.d/*-devcontainer-utils.sh;
-        # start the sccache server
-        sccache --start-server || true;
     fi
 }
 

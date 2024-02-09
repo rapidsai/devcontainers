@@ -18,7 +18,6 @@ ensure_s3_creds_have_propagated() {
 
         if sccache --start-server >/dev/null 2>&1; then
             if [ "${num_restarts}" -gt "0" ]; then echo "Success!"; fi
-            sccache --stop-server >/dev/null 2>&1 || true;
             exit 0;
         fi
 

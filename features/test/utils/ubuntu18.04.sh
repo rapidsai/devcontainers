@@ -160,9 +160,9 @@ if test -n "${gh_token:-}" \
         reset_state;
         export SCCACHE_BUCKET="${rw_sccache_bucket}";
         export SCCACHE_REGION="${rw_sccache_region}";
-        export AWS_ACCESS_KEY_ID="$(grep 'aws_access_key_id=' /tmp/.aws/credentials 2>/dev/null | sed 's/aws_access_key_id=//' || echo)";
-        export AWS_SESSION_TOKEN="$(grep 'aws_session_token=' /tmp/.aws/credentials 2>/dev/null | sed 's/aws_session_token=//' || echo)";
-        export AWS_SECRET_ACCESS_KEY="$(grep 'aws_secret_access_key=' /tmp/.aws/credentials 2>/dev/null | sed 's/aws_secret_access_key=//' || echo)";
+        export AWS_ACCESS_KEY_ID="$(sed -n 's/aws_access_key_id=//p' /tmp/.aws/credentials 2>/dev/null)";
+        export AWS_SESSION_TOKEN="$(sed -n 's/aws_session_token=//p' /tmp/.aws/credentials 2>/dev/null)";
+        export AWS_SECRET_ACCESS_KEY="$(sed -n 's/aws_secret_access_key=//p' /tmp/.aws/credentials 2>/dev/null)";
         devcontainer-utils-post-attach-command;
         expect_s3_cache_is_used;
     }
