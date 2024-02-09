@@ -23,10 +23,10 @@
     },
     "ghcr.io/devcontainers/features/git-lfs:1": {},
     "ghcr.io/devcontainers/features/github-cli:1": {},
-    "./features/src/gitlab-cli": {},
-    "./features/src/cmake": {},
-    "./features/src/ninja": {},
-    "./features/src/sccache": {
+    "./features/gitlab-cli": {},
+    "./features/cmake": {},
+    "./features/ninja": {},
+    "./features/sccache": {
       "version": "0.7.7"
     },
     "./features/utils": {}
