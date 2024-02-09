@@ -34,9 +34,9 @@ clean_${PY_LIB}_python() {
         "${PY_SRC}"/{${py_lib},${py_lib//"-"/"_"}}.egg-info \
         2>/dev/null || true;
 
-    for lib in ${py_lib} ${py_lib//"-"/"_"}; do
-        if test -d "${PY_SRC}"/${lib}/; then
-            find "${PY_SRC}"/${lib}/ -type f \
+    for lib in "${py_lib}" "${py_lib//"-"/"_"}"; do
+        if test -d "${PY_SRC}/${lib}/"; then
+            find "${PY_SRC}/${lib}/" -type f \
                 -iname "*.cpython-*-$(uname -m)-$(uname -s)-*.so" \
                 -delete;
         fi
@@ -45,7 +45,7 @@ clean_${PY_LIB}_python() {
     local py_ver="${PYTHON_VERSION:-$(python3 --version 2>&1 | cut -d' ' -f2)}";
     py_ver="$(grep -o '^[0-9]*.[0-9]*' <<< "${py_ver}")";
 
-    if test -d "${PY_SRC}"/build; then
+    if test -d "${PY_SRC}/build"; then
         local slug="$(uname -s)-$(uname -m)";
         rm -rf --                                                                                   \
             `# scikit-buld-core build dirs`                                                         \

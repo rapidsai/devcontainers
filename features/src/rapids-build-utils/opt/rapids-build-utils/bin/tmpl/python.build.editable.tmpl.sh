@@ -78,9 +78,7 @@ build_${PY_LIB}_python_editable() {
     fi
 
     if is_using_scikit_build_core; then
-        local bin_dir;
-        bin_dir="$(rapids-get-cmake-build-dir "${PY_SRC}" "${cmake_args[@]}")";
-        pip_args+=("--config-settings=build-dir=${bin_dir}");
+        pip_args+=("--config-settings=build-dir=$(rapids-get-cmake-build-dir "${PY_SRC}" "${cmake_args[@]}")");
     fi
 
     pip_args+=("--no-build-isolation");

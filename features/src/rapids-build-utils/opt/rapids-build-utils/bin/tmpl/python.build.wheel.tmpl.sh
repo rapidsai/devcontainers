@@ -142,13 +142,14 @@ build_${PY_LIB}_python_wheel() {
         pip_args+=("--no-use-pep517");
     fi
 
-    if test -n "${no_build_isolation:-}"; then
-        pip_args+=("--no-build-isolation");
-        if is_using_scikit_build_core; then
-            local -r bin_dir="$(rapids-get-cmake-build-dir "${PY_SRC}" "${cmake_args[@]}")";
-            pip_args+=("--config-settings=build-dir=${bin_dir}");
-        fi
-    fi
+    case "${no_build_isolation:-$(pip config get wheel.no-build-isolation || echo)}" in
+        True|true|yes||1)
+            pip_args+=("--no-build-isolation");
+            if is_using_scikit_build_core; then
+                pip_args+=("--config-settings=build-dir=$(rapids-get-cmake-build-dir "${PY_SRC}" "${cmake_args[@]}")");
+            fi
+            ;;
+    esac
 
     if test -n "${ignore_requires_python:-}"; then
         pip_args+=("--ignore-requires-python");
