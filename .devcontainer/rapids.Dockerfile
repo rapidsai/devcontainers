@@ -7,10 +7,23 @@ FROM ${BASE} as pip-base
 
 RUN apt update -y \
  && DEBIAN_FRONTEND=noninteractive apt install -y --no-install-recommends \
+    # C++ build tools
+    doxygen \
+    graphviz \
+    # C++ test dependencies
+    libgmock-dev \
+    libgtest-dev \
     # needed by libcudf_kafka
     librdkafka-dev \
+    # cuML/cuGraph dependencies
+    libblas-dev \
+    liblapack-dev \
     # needed by libcuspatial
-    sqlite3 libsqlite3-dev libtiff-dev libcurl4-openssl-dev \
+    libgdal-dev \
+    sqlite3 \
+    libsqlite3-dev \
+    libtiff-dev \
+    libcurl4-openssl-dev \
  && rm -rf /tmp/* /var/tmp/* /var/cache/apt/* /var/lib/apt/lists/*;
 
 ENV DEFAULT_VIRTUAL_ENV=rapids
