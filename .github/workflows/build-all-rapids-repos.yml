@@ -30,7 +30,7 @@ jobs:
     uses: rapidsai/shared-workflows/.github/workflows/build-in-devcontainer.yaml@fix/devcontainer-json-location
     with:
       arch: '["amd64", "arm64"]'
-      cuda: '["12.0"]'
+      cuda: '["12.0", "12.2"]'
       node_type: cpu32
       extra-repo-deploy-key: CUMLPRIMS_SSH_PRIVATE_DEPLOY_KEY
       extra-repo-deploy-key-2: CUGRAPH_OPS_SSH_PRIVATE_DEPLOY_KEY
