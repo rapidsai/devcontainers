@@ -43,19 +43,19 @@ _devcontainer_utils_completions() {
         unset "_devcontainer_utils_completions_option_names[${CMD}]";
     fi
     if ! test -v _devcontainer_utils_completions_usage["${CMD}"]; then
-        _devcontainer_utils_completions_usage["${CMD}"]="$(sed -n '2,/^$/p' "${_devcontainer_utils_completions_script[${CMD}]}" | sed -r 's/^# ?//')";
+        _devcontainer_utils_completions_usage["${CMD}"]="$(${CMD} -h 2>&1)";
         if test ${#_devcontainer_utils_completions_usage[${CMD}]} -eq 0; then return; fi
     fi
     if test "${#_devcontainer_utils_completions_bool_names[${CMD}]}" -eq 0; then
-        _devcontainer_utils_completions_bool_names["${CMD}"]="$(parse_bool_names_from_usage <<< "${_devcontainer_utils_completions_usage[${CMD}]}")";
+        _devcontainer_utils_completions_bool_names["${CMD}"]="$(_parse_bool_names_from_usage <<< "${_devcontainer_utils_completions_usage[${CMD}]}")";
     fi
     if test "${#_devcontainer_utils_completions_value_names[${CMD}]}" -eq 0; then
-        _devcontainer_utils_completions_value_names["${CMD}"]="$(parse_value_names_from_usage <<< "${_devcontainer_utils_completions_usage[${CMD}]}")";
+        _devcontainer_utils_completions_value_names["${CMD}"]="$(_parse_value_names_from_usage <<< "${_devcontainer_utils_completions_usage[${CMD}]}" | sort -su)";
     fi
     if ! test -v _devcontainer_utils_completions_value_types["${CMD}"]; then
         _devcontainer_utils_completions_value_types["${CMD}"]="$(_zip_names_and_types              \
-            <(parse_value_names_from_usage <<< "${_devcontainer_utils_completions_usage[${CMD}]}") \
-            <(parse_value_types_from_usage <<< "${_devcontainer_utils_completions_usage[${CMD}]}") \
+            <(_parse_value_names_from_usage <<< "${_devcontainer_utils_completions_usage[${CMD}]}") \
+            <(_parse_value_types_from_usage <<< "${_devcontainer_utils_completions_usage[${CMD}]}") \
         )";
     fi
     if ! test -v _devcontainer_utils_completions_option_names["${CMD}"]; then
@@ -71,7 +71,7 @@ _devcontainer_utils_completions() {
             read -a pair -r <<< "${name_and_type}";
             local name_="${pair[0]}";
             local type_="${pair[1]}";
-            if [[ ${name_} == ${prev}* ]]; then
+            if [[ ${name_} == "${prev}" ]]; then
                 case "${type_}" in
                     "<num>"|"<number>")
                         # shellcheck disable=SC2207
@@ -109,7 +109,7 @@ _devcontainer_utils_completions() {
         done <<< "${_devcontainer_utils_completions_value_types[${CMD}]}";
     fi
 
-    declare -a bools="(${_devcontainer_utils_completions_bool_names[${CMD}]})";
+    local -a bools="(${_devcontainer_utils_completions_bool_names[${CMD}]})";
 
     for ((idx_a=0; idx_a < ${#bools[@]}; idx_a+=1)); do
         if [[ ${bools[$idx_a]} == ${cur}* ]]; then
@@ -119,7 +119,7 @@ _devcontainer_utils_completions() {
         fi
     done
 
-    declare -a value="(${_devcontainer_utils_completions_value_names[${CMD}]})";
+    local -a value="(${_devcontainer_utils_completions_value_names[${CMD}]})";
 
     for ((idx_a=0; idx_a < ${#value[@]}; idx_a+=1)); do
         if [[ ${value[$idx_a]} == ${cur}* ]]; then

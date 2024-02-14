@@ -3,18 +3,15 @@
 # shellcheck disable=SC1091
 . "$(dirname "$(realpath -m "${BASH_SOURCE[0]}")")/parse-args-from-docstring.sh";
 
-parse_args() {
+_parse_args_for_file() {
     local -;
     set -euo pipefail;
 
-    # shellcheck disable=SC2154
-    if test -n "${devcontainer_utils_debug:-}" \
-    && { test -z "${devcontainer_utils_debug##*"*"*}" \
-      || test -z "${devcontainer_utils_debug##*"parse-args"*}"; }; then
-        PS4="+ ${BASH_SOURCE[0]}:\${LINENO} "; set -x;
-    fi
+    # shellcheck disable=SC1091
+    . "$(dirname "$(realpath -m "${BASH_SOURCE[0]}")")/debug-output.sh" \
+        'devcontainer_utils_debug' 'parse-args';
 
-    local -r usage="$(print_usage "${1:-}")";
+    local -r usage="$(_print_usage "${1:-}")";
     shift;
 
     local idx;
@@ -23,26 +20,14 @@ parse_args() {
     local val;
     local -a arg;
 
-    local -A _map=();
-    local -a args=();
-    local -a opts=();
-    local -A typs=();
-    local -a rest=();
-
     local -A take_map=();
     local -A skip_map=();
-    local -A reverse_alias_map=();
-    local -Ar alias_map="($(parse_all_names_from_usage     <<< "${usage}" | parse_aliases))";
-    local -ar long_bools="($(parse_bool_names_from_usage   <<< "${usage}" | parse_long_names))";
-    local -ar long_value="($(parse_value_names_from_usage  <<< "${usage}" | parse_long_names))";
-    local -ar short_bools="($(parse_bool_names_from_usage  <<< "${usage}" | parse_short_names))";
-    local -ar short_value="($(parse_value_names_from_usage <<< "${usage}" | parse_short_names))";
 
     for ((idx=0; idx < 2; idx+=1)); do
         if [ "${1:-}" = "--take" ]; then
             shift;
             if test -n "${1:-}"; then
-                local -ar take="($(echo "${1}" | parse_args_to_names))";
+                local -ar take="($(_parse_args_to_names <<< "${1}" | tr '\n' ' ' | tr -s '[:blank:]'))";
                 for key in "${take[@]}"; do
                     # shellcheck disable=SC2034
                     take_map["${key}"]=1;
@@ -53,7 +38,7 @@ parse_args() {
         if [ "${1:-}" = "--skip" ]; then
             shift;
             if test -n "${1:-}"; then
-                local -ar skip="($(echo "${1}" | parse_args_to_names))";
+                local -ar skip="($(_parse_args_to_names <<< "${1}" | tr '\n' ' ' | tr -s '[:blank:]'))";
                 for key in "${skip[@]}"; do
                     # shellcheck disable=SC2034
                     skip_map["${key}"]=1;
@@ -63,6 +48,27 @@ parse_args() {
         fi
     done
 
+    # Quick early exit for `-h,--help`
+    if [[ " $* " == *" -h "* ]] || [[ " $* " == *" --help "* ]]; then
+        cat <<< "${usage}" >&2;
+        echo >&2;
+        echo "exit 0";
+        return;
+    fi
+
+    local -A _map=();
+    local -a args=();
+    local -a opts=();
+    local -A typs=();
+    local -a rest=();
+
+    local -A reverse_alias_map=();
+    local -Ar alias_map="($(_parse_all_names_from_usage     <<< "${usage}" | _parse_aliases))";
+    local -ar long_bools="($(_parse_bool_names_from_usage   <<< "${usage}" | _parse_long_names))";
+    local -ar long_value="($(_parse_value_names_from_usage  <<< "${usage}" | _parse_long_names))";
+    local -ar short_bools="($(_parse_bool_names_from_usage  <<< "${usage}" | _parse_short_names))";
+    local -ar short_value="($(_parse_value_names_from_usage <<< "${usage}" | _parse_short_names))";
+
     if test ${#take_map[@]} -eq 0; then
         for key in "${long_bools[@]}" "${short_bools[@]}" \
                    "${long_value[@]}" "${short_value[@]}"; do
@@ -71,6 +77,8 @@ parse_args() {
     fi
 
     # Always include the -h,--help flags
+    typs["h"]="bool";
+    typs["help"]="bool";
     take_map["h"]=1;
     take_map["help"]=1;
 
@@ -86,8 +94,8 @@ parse_args() {
     for key in "${long_value[@]}" "${short_value[@]}"; do typs[${key}]="value"; done
 
     local -r optstring="$(                                                                               \
-        cat <(parse_bool_names_from_usage  <<< "${usage}" | parse_short_names | xargs -r -I% echo -n %)  \
-            <(parse_value_names_from_usage <<< "${usage}" | parse_short_names | xargs -r -I% echo -n %:) \
+        cat <(_parse_bool_names_from_usage  <<< "${usage}" | _parse_short_names | xargs -r -I% echo -n %)  \
+            <(_parse_value_names_from_usage <<< "${usage}" | _parse_short_names | xargs -r -I% echo -n %:) \
       | tr -d '[:space:]'                                                                                \
     )";
 
@@ -133,16 +141,21 @@ parse_args() {
                     ;;
                 # unknown short opt
                 \?)
+                    if test "${OPTARG}" == "h"; then
+                        typ="bool";
+                        key="${OPTARG}";
+                        arg+=("-${key}");
                     # Compare ${OPTARG} to ${!idx} with its leading `-`.
                     # This only works when getopts is in silent mode, i.e. when `:` is at the front of the optstring.
                     # If getopts is not in silent mode, it does not populate `OPTARG`.
-                    if [[ "-${OPTARG}" != "${!idx:-}" ]]; then
+                    elif [[ "-${OPTARG}" != "${!idx:-}" ]]; then
                         # Special cases:
                         # -f=foo
                         # -Wno-dev
                         opts+=("${!OPTIND:-}");
                         # Splice the argument at index `OPTIND` out of $@
                         set -- "${@:1:$((OPTIND-1))}" "${@:$((OPTIND+1))}";
+                        break;
                     else
                         # Normal cases:
                         # -f
@@ -160,8 +173,8 @@ parse_args() {
                             # Splice the argument at index `OPTIND` out of $@
                             set -- "${@:1:$((OPTIND-1))}" "${@:$((OPTIND+1))}";
                         fi
+                        break;
                     fi
-                    break;
                     ;;
                 # long opt
                 -)
@@ -204,10 +217,16 @@ parse_args() {
                             ;;
                         # unknown long opt with value following
                         *)
-                            opts+=("--${OPTARG}");
-                            if [[ "${!OPTIND:--}" != -* ]]; then
-                                opts+=("${!OPTIND}");
-                                OPTIND=$((OPTIND + 1));
+                            if test "${OPTARG}" == "help"; then
+                                typ="bool";
+                                key="${OPTARG}";
+                                arg+=("--${key}");
+                            else
+                                opts+=("--${OPTARG}");
+                                if [[ "${!OPTIND:--}" != -* ]]; then
+                                    opts+=("${!OPTIND}");
+                                    OPTIND=$((OPTIND + 1));
+                                fi
                             fi
                             ;;
                     esac
@@ -315,17 +334,26 @@ parse_args() {
         echo "declare -a REST=(${rest[*]@Q})";
 
         for key in "${!_map[@]}"; do
+            local k_="${key}";
+            k_="${k_//-/_}";
+            k_="${k_//./_}";
             if test "${typs["${key}"]}" = bool; then
-                echo "declare ${key//-/_}=${_map["${key}"]}";
+                echo "declare ${k_}=${_map["${key}"]}";
             else
-                echo "declare -a ${key//-/_}=(${_map["${key}"]})";
+                echo "declare -a ${k_}=(${_map["${key}"]})";
             fi
             local -a aliases="(${alias_map["${key}"]})";
             for alias in "${aliases[@]}"; do
-                echo "declare -n ${alias//-/_}=${key//-/_}";
+                local a_="${alias}";
+                a_="${a_//-/_}";
+                a_="${a_//./_}";
+                echo "declare -n ${a_}=${k_}";
             done
         done
     fi
 }
 
-parse_args "$@" <&0;
+if [ "$(basename "${BASH_SOURCE[${#BASH_SOURCE[@]}-1]}")" = parse-args.sh ] \
+|| [ "$(basename "${BASH_SOURCE[${#BASH_SOURCE[@]}-1]}")" = devcontainer-utils-parse-args ]; then
+    _parse_args_for_file "$@" <&0;
+fi
