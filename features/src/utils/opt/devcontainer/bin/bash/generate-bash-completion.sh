@@ -33,7 +33,6 @@ generate_bash_completion() {
 
     if test -f "${template}"; then
         mkdir -p "$(dirname "${out_file}")";
-        local file="${out_file}";
         cp -n "${template}" "${out_file}";
         local cmd;
         for cmd in "${command[@]}"; do
