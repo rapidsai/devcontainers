@@ -85,18 +85,13 @@ clone_github_repo() {
     local -;
     set -euo pipefail;
 
-    # shellcheck disable=SC2154
-    if test -n "${devcontainer_utils_debug:-}" \
-    && { test -z "${devcontainer_utils_debug##*"*"*}" \
-      || test -z "${devcontainer_utils_debug##*"clone"*}" \
-      || test -z "${devcontainer_utils_debug##*"clone-github-repo"*}"; }; then
-        PS4="+ ${BASH_SOURCE[0]}:\${LINENO} "; set -x;
-    fi
-
     eval "$(devcontainer-utils-parse-args "$0" --skip '
         -q,--quiet
         -j,--jobs,--parallel
     ' - <<< "${@@Q}")";
+
+    # shellcheck disable=SC1091
+    . devcontainer-utils-debug-output 'devcontainer_utils_debug' 'clone clone-github-repo';
 
     if test "${REST[0]:-}" == --; then REST=("${REST[@]:1}"); fi;
 

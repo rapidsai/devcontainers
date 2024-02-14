@@ -55,15 +55,6 @@ build_${PY_LIB}_python_wheel() {
     local -;
     set -euo pipefail;
 
-    # shellcheck disable=SC2154
-    if test -n "${rapids_build_utils_debug:-}" \
-    && { test -z "${rapids_build_utils_debug##*"*"*}" \
-      || test -z "${rapids_build_utils_debug##*"build-all"*}" \
-      || test -z "${rapids_build_utils_debug##*"build-${PY_LIB}-python"*}" \
-      || test -z "${rapids_build_utils_debug##*"build-${PY_LIB}-python-wheel"*}"; }; then
-        PS4="+ ${BASH_SOURCE[0]}:\${LINENO} "; set -x;
-    fi
-
     eval "$(devcontainer-utils-parse-args "$0" - <<< "${@@Q}")";
 
     if [[ ! -d "${PY_SRC}" ]]; then
@@ -76,6 +67,8 @@ build_${PY_LIB}_python_wheel() {
     )";
 
     local cmake_args=(${PY_CMAKE_ARGS});
+    # shellcheck disable=SC1091
+    . devcontainer-utils-debug-output 'rapids_build_utils_debug' 'build-all build-${NAME} build-${PY_LIB}-python build-${PY_LIB}-python-wheel';
 
     cmake_args+=(${CMAKE_ARGS:-});
     cmake_args+=(${CPP_DEPS});

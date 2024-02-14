@@ -24,14 +24,6 @@ cpack_${CPP_LIB}_cpp() {
     local -;
     set -euo pipefail;
 
-    # shellcheck disable=SC2154
-    if test -n "${rapids_build_utils_debug:-}" \
-    && { test -z "${rapids_build_utils_debug##*"*"*}" \
-      || test -z "${rapids_build_utils_debug##*"cpack-all"*}" \
-      || test -z "${rapids_build_utils_debug##*"cpack-${CPP_LIB}-cpp"*}"; }; then
-        PS4="+ ${BASH_SOURCE[0]}:\${LINENO} "; set -x;
-    fi
-
     eval "$(devcontainer-utils-parse-args "$0" --skip '
         -v,--verbose
         --strip
@@ -44,6 +36,8 @@ cpack_${CPP_LIB}_cpp() {
     fi
 
     eval "$(rapids-get-num-archs-jobs-and-load -a1 "$@")";
+    # shellcheck disable=SC1091
+    . devcontainer-utils-debug-output 'rapids_build_utils_debug' 'cpack-all cpack-${NAME} cpack-${CPP_LIB}-cpp';
 
     test ${#component[@]} -eq 0 && component=(all);
 

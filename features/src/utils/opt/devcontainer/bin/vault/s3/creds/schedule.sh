@@ -4,13 +4,8 @@ schedule_s3_creds_refresh() {
     local -;
     set -euo pipefail;
 
-    # shellcheck disable=SC2154
-    if test -n "${devcontainer_utils_debug:-}" \
-    && { test -z "${devcontainer_utils_debug##*"*"*}" \
-      || test -z "${devcontainer_utils_debug##*"vault-s3"*}" \
-      || test -z "${devcontainer_utils_debug##*"vault-s3-creds-schedule"*}"; }; then
-        PS4="+ ${BASH_SOURCE[0]}:\${LINENO} "; set -x;
-    fi
+    # shellcheck disable=SC1091
+    . devcontainer-utils-debug-output 'devcontainer_utils_debug' 'vault-s3 vault-s3-creds-schedule';
 
     local -r now="$(date '+%s')";
     local ttl="${VAULT_S3_TTL:-"28800"}";

@@ -4,12 +4,8 @@ init_ssh_deploy_keys() {
     local -;
     set -euo pipefail;
 
-    # shellcheck disable=SC2154
-    if test -n "${devcontainer_utils_debug:-}" \
-    && { test -z "${devcontainer_utils_debug##*"*"*}" \
-      || test -z "${devcontainer_utils_debug##*"init-deploy-keys"*}"; }; then
-        PS4="+ ${BASH_SOURCE[0]}:\${LINENO} "; set -x;
-    fi
+    # shellcheck disable=SC1091
+    . devcontainer-utils-debug-output 'devcontainer_utils_debug' 'init-deploy-keys';
 
     local re="(ssh:\/\/|https:\/\/)?(git@)?(.*\.com)[:\/](.*)";
     local line;

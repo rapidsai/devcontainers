@@ -29,13 +29,6 @@ clone_${NAME}() {
     local -;
     set -euo pipefail;
 
-    # shellcheck disable=SC2154
-    if test -n "${rapids_build_utils_debug:-}" \
-    && { test -z "${rapids_build_utils_debug##*"*"*}" \
-      || test -z "${rapids_build_utils_debug##*"clone-all"*}" \
-      || test -z "${rapids_build_utils_debug##*"clone-${NAME}"*}"; }; then
-        PS4="+ ${BASH_SOURCE[0]}:\${LINENO} "; set -x;
-    fi
 
     eval "$(devcontainer-utils-parse-args "$0" --skip '
         -q,--quiet
@@ -44,6 +37,8 @@ clone_${NAME}() {
     ' - <<< "${@@Q}")";
 
     if [[ ! -d "${SRC_PATH}"/.git ]]; then
+    # shellcheck disable=SC1091
+    . devcontainer-utils-debug-output 'rapids_build_utils_debug' 'clone-all clone-${NAME}';
 
         eval "$(rapids-get-num-archs-jobs-and-load "$@")";
 

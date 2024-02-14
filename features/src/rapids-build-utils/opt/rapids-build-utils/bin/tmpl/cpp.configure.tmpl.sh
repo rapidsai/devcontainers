@@ -26,14 +26,6 @@ configure_${CPP_LIB}_cpp() {
     local -;
     set -euo pipefail;
 
-    # shellcheck disable=SC2154
-    if test -n "${rapids_build_utils_debug:-}" \
-    && { test -z "${rapids_build_utils_debug##*"*"*}" \
-      || test -z "${rapids_build_utils_debug##*"configure-all"*}" \
-      || test -z "${rapids_build_utils_debug##*"configure-${CPP_LIB}-cpp"*}"; }; then
-        PS4="+ ${BASH_SOURCE[0]}:\${LINENO} "; set -x;
-    fi
-
     eval "$(devcontainer-utils-parse-args "$0" - <<< "${@@Q}")";
 
     if [[ ! -d "${CPP_SRC}" ]]; then
@@ -51,6 +43,8 @@ configure_${CPP_LIB}_cpp() {
     cmake_args+=(${CPP_ARGS});
     cmake_args+=("${v:+--log-level=VERBOSE}");
     cmake_args+=("${OPTS[@]}");
+    # shellcheck disable=SC1091
+    . devcontainer-utils-debug-output 'rapids_build_utils_debug' 'configure-all configure-${NAME} configure-${CPP_LIB}-cpp';
 
     local -r bin_dir="$(rapids-get-cmake-build-dir "${CPP_SRC}" "${cmake_args[@]}")";
 

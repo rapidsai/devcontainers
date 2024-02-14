@@ -24,6 +24,9 @@ python_pkg_roots() {
 
     eval "$(rapids-list-repos "$@")";
 
+    # shellcheck disable=SC1091
+    . devcontainer-utils-debug-output 'rapids_build_utils_debug' 'python-pkg-roots';
+
     local i;
     local j;
 

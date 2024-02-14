@@ -22,15 +22,10 @@ clone_git_repo() {
     local -;
     set -euo pipefail;
 
-    # shellcheck disable=SC2154
-    if test -n "${devcontainer_utils_debug:-}" \
-    && { test -z "${devcontainer_utils_debug##*"*"*}" \
-      || test -z "${devcontainer_utils_debug##*"clone"*}" \
-      || test -z "${devcontainer_utils_debug##*"clone-git-repo"*}"; }; then
-        PS4="+ ${BASH_SOURCE[0]}:\${LINENO} "; set -x;
-    fi
 
     eval "$(devcontainer-utils-parse-args "$0" - <<< "${@@Q}")";
+    # shellcheck disable=SC1091
+    . devcontainer-utils-debug-output 'devcontainer_utils_debug' 'clone clone-git-repo';
 
     if test "${REST[0]:-}" == --; then REST=("${REST[@]:1}"); fi;
 

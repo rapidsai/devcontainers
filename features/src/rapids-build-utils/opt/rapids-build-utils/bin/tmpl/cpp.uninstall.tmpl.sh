@@ -13,15 +13,10 @@ uninstall_${CPP_LIB}_cpp() {
     local -;
     set -euo pipefail;
 
-    # shellcheck disable=SC2154
-    if test -n "${rapids_build_utils_debug:-}" \
-    && { test -z "${rapids_build_utils_debug##*"*"*}" \
-      || test -z "${rapids_build_utils_debug##*"uninstall-all"*}" \
-      || test -z "${rapids_build_utils_debug##*"uninstall-${CPP_LIB}-cpp"*}"; }; then
-        PS4="+ ${BASH_SOURCE[0]}:\${LINENO} "; set -x;
-    fi
 
     eval "$(devcontainer-utils-parse-args "$0" - <<< "${@@Q}")";
+    # shellcheck disable=SC1091
+    . devcontainer-utils-debug-output 'rapids_build_utils_debug' 'uninstall-all uninstall-${NAME} uninstall-${CPP_LIB}-cpp';
 
     if test -f "${CPP_SRC}/${BIN_DIR}/install_manifest.txt"; then
         time (

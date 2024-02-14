@@ -27,13 +27,6 @@ cpack_all() {
     local -;
     set -euo pipefail;
 
-    # shellcheck disable=SC2154
-    if test -n "${rapids_build_utils_debug:-}" \
-    && { test -z "${rapids_build_utils_debug##*"*"*}" \
-      || test -z "${rapids_build_utils_debug##*"cpack-all"*}"; }; then
-        PS4="+ ${BASH_SOURCE[0]}:\${LINENO} "; set -x;
-    fi
-
     eval "$(devcontainer-utils-parse-args "$0" --skip '
         -v,--verbose
         --component
@@ -48,8 +41,11 @@ cpack_all() {
 
     eval "$(rapids-get-num-archs-jobs-and-load -j "${j}" -a "${k}" --max-archs "${k}")";
 
-    echo "${NAMES}"                     \
-  | tr '[:space:]' '\0'                 \
+    # shellcheck disable=SC1091
+    . devcontainer-utils-debug-output 'rapids_build_utils_debug' 'cpack-all';
+
+    echo ${NAMES} \
+  | tr '[:space:]' '\0' \
   | xargs -r -0 -P${n_load} -I% bash -c "
     if type cpack-% >/dev/null 2>&1; then
         cpack-% -j ${n_arch} ${OPTS[*]} || exit 255;

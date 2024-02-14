@@ -23,13 +23,6 @@ clone_all() {
     local -;
     set -euo pipefail;
 
-    # shellcheck disable=SC2154
-    if test -n "${rapids_build_utils_debug:-}" \
-    && { test -z "${rapids_build_utils_debug##*"*"*}" \
-      || test -z "${rapids_build_utils_debug##*"clone-all"*}"; }; then
-        PS4="+ ${BASH_SOURCE[0]}:\${LINENO} "; set -x;
-    fi
-
     eval "$(devcontainer-utils-parse-args "$0" --skip '
         --no-fork
         --clone-upstream
@@ -37,8 +30,11 @@ clone_all() {
 
     eval "$(rapids-get-num-archs-jobs-and-load -a3 "$@")";
 
-    echo "${NAMES}"                     \
-  | tr '[:space:]' '\0'                 \
+    # shellcheck disable=SC1091
+    . devcontainer-utils-debug-output 'rapids_build_utils_debug' 'clone-all';
+
+    echo ${NAMES} \
+  | tr '[:space:]' '\0' \
   | xargs ${v:+-t} -r -0 -P${n_jobs} -I% bash -c "
     if type clone-% >/dev/null 2>&1; then
         clone-% -j ${n_arch} --no-update-env ${OPTS[*]} || exit 255;

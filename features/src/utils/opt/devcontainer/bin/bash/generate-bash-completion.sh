@@ -20,14 +20,12 @@ generate_bash_completion() {
     local -;
     set -euo pipefail;
 
-    # shellcheck disable=SC2154
-    if test -n "${devcontainer_utils_debug:-}" \
-    && { test -z "${devcontainer_utils_debug##*"*"*}" \
-      || test -z "${devcontainer_utils_debug##*"generate-bash-completion"*}"; }; then
-        PS4="+ ${BASH_SOURCE[0]}:\${LINENO} "; set -x;
-    fi
+    local -r utils="$(dirname "$(realpath -m "${BASH_SOURCE[0]}")")/..";
 
-    eval "$(devcontainer-utils-parse-args "$0" - <<< "${@@Q}")";
+    eval "$("${utils}/parse-args.sh" "$0" "$@" <&0)";
+
+    # shellcheck disable=SC1091
+    . "${utils}/debug-output.sh" 'devcontainer_utils_debug' 'generate-bash-completion';
 
     command="${c:?-c|--command is required}";
     out_dir="$(realpath -m "${o:-"${HOME}/.bash_completion.d"}")";

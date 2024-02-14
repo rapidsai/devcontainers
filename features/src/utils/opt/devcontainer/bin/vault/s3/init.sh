@@ -8,13 +8,8 @@ init_vault_s3_creds() {
     local -
     set -euo pipefail;
 
-    # shellcheck disable=SC2154
-    if test -n "${devcontainer_utils_debug:-}" \
-    && { test -z "${devcontainer_utils_debug##*"*"*}" \
-      || test -z "${devcontainer_utils_debug##*"vault-s3"*}" \
-      || test -z "${devcontainer_utils_debug##*"vault-s3-init"*}"; }; then
-        PS4="+ ${BASH_SOURCE[0]}:\${LINENO} "; set -x;
-    fi
+    # shellcheck disable=SC1091
+    . devcontainer-utils-debug-output 'devcontainer_utils_debug' 'vault-s3 vault-s3-init';
 
     if type sccache >/dev/null 2>&1; then
         if test -n "${SCCACHE_BUCKET:-}"; then

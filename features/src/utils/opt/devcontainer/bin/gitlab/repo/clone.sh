@@ -115,6 +115,9 @@ clone_gitlab_repo() {
         -j,--jobs,--parallel
     ' - <<< "${@@Q}")";
 
+    # shellcheck disable=SC1091
+    . devcontainer-utils-debug-output 'devcontainer_utils_debug' 'clone clone-gitlab-repo';
+
     if test "${REST[0]:-}" == --; then REST=("${REST[@]:1}"); fi;
 
     local upstream="${REST[0]:?"fatal: missing required positional argument <upstream>"}";
@@ -190,12 +193,5 @@ clone_gitlab_repo() {
         "${origin}" "${REST[@]}"              \
         ;
 }
-
-if test -n "${devcontainer_utils_debug:-}" \
-&& { test -z "${devcontainer_utils_debug##*"*"*}" \
-  || test -z "${devcontainer_utils_debug##*"clone"*}" \
-  || test -z "${devcontainer_utils_debug##*"clone-gitlab-repo"*}"; }; then
-    PS4="+ ${BASH_SOURCE[0]}:\${LINENO} "; set -x;
-fi
 
 clone_gitlab_repo "$@";

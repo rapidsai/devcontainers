@@ -24,6 +24,9 @@ python_pkg_names() {
 
     eval "$(rapids-list-repos "$@")";
 
+    # shellcheck disable=SC1091
+    . devcontainer-utils-debug-output 'rapids_build_utils_debug' 'python-pkg-names';
+
     local i;
     local j;
 

@@ -50,17 +50,12 @@ build_${PY_LIB}_python() {
     local -;
     set -euo pipefail;
 
-    # shellcheck disable=SC2154
-    if test -n "${rapids_build_utils_debug:-}" \
-    && { test -z "${rapids_build_utils_debug##*"*"*}" \
-      || test -z "${rapids_build_utils_debug##*"build-all"*}" \
-      || test -z "${rapids_build_utils_debug##*"build-${PY_LIB}-python"*}"; }; then
-        PS4="+ ${BASH_SOURCE[0]}:\${LINENO} "; set -x;
-    fi
 
     eval "$(devcontainer-utils-parse-args "$0" --take '
         -t,--type
     ' - <<< "${@@Q}")";
+    # shellcheck disable=SC1091
+    . devcontainer-utils-debug-output 'rapids_build_utils_debug' 'build-all build-${NAME} build-${PY_LIB}-python';
 
     build-${PY_LIB}-python-${t:-${type:-"editable"}} "${OPTS[@]}";
 }

@@ -4,8 +4,6 @@ init_git_cli_config() {
     local -;
     set -euo pipefail;
 
-    # PS4="+ ${BASH_SOURCE[0]}:\${LINENO} "; set -x;
-
     if ! test -f ~/.gitconfig; then
         if test -f ~/.gitconfig.default; then
             cp -a ~/.gitconfig{.default,};

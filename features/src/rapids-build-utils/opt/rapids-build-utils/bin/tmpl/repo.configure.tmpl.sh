@@ -27,15 +27,10 @@ configure_${NAME}() {
     local -;
     set -euo pipefail;
 
-    # shellcheck disable=SC2154
-    if test -n "${rapids_build_utils_debug:-}" \
-    && { test -z "${rapids_build_utils_debug##*"*"*}" \
-      || test -z "${rapids_build_utils_debug##*"configure-all"*}" \
-      || test -z "${rapids_build_utils_debug##*"configure-${NAME}"*}"; }; then
-        PS4="+ ${BASH_SOURCE[0]}:\${LINENO} "; set -x;
-    fi
 
     eval "$(devcontainer-utils-parse-args "$0" - <<< "${@@Q}")";
+    # shellcheck disable=SC1091
+    . devcontainer-utils-debug-output 'rapids_build_utils_debug' 'configure-all configure-${NAME}';
 
     for lib in ${CPP_LIB}; do
         if type configure-${lib}-cpp >/dev/null 2>&1; then

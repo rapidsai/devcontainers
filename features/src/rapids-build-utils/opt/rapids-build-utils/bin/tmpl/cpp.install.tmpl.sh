@@ -23,13 +23,6 @@ install_${CPP_LIB}_cpp() {
     local -;
     set -euo pipefail;
 
-    # shellcheck disable=SC2154
-    if test -n "${rapids_build_utils_debug:-}" \
-    && { test -z "${rapids_build_utils_debug##*"*"*}" \
-      || test -z "${rapids_build_utils_debug##*"install-all"*}" \
-      || test -z "${rapids_build_utils_debug##*"install-${CPP_LIB}-cpp"*}"; }; then
-        PS4="+ ${BASH_SOURCE[0]}:\${LINENO} "; set -x;
-    fi
 
     eval "$(devcontainer-utils-parse-args "$0" --skip '
         -v,--verbose
@@ -37,6 +30,8 @@ install_${CPP_LIB}_cpp() {
         --config
         --default-directory-permissions
     ' - <<< "${@@Q}")";
+    # shellcheck disable=SC1091
+    . devcontainer-utils-debug-output 'rapids_build_utils_debug' 'install-all install-${NAME} install-${CPP_LIB}-cpp';
 
     test ${#component[@]} -eq 0 && component=(all);
     prefix="${p:-${CONDA_PREFIX:-${CMAKE_INSTALL_PREFIX:-/usr}}}";

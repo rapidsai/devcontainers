@@ -76,6 +76,7 @@ install_utility() {
 # Install alternatives
 
 # Install these first since we use it in `install_utility`
+update-alternatives --install /usr/bin/devcontainer-utils-debug-output              devcontainer-utils-debug-output              /opt/devcontainer/bin/debug-output.sh                  0;
 update-alternatives --install /usr/bin/devcontainer-utils-parse-args                devcontainer-utils-parse-args                /opt/devcontainer/bin/parse-args.sh                    0;
 update-alternatives --install /usr/bin/devcontainer-utils-parse-args-from-docstring devcontainer-utils-parse-args-from-docstring /opt/devcontainer/bin/parse-args-from-docstring.sh     0;
 update-alternatives --install /usr/bin/devcontainer-utils-bash-completion.tmpl      devcontainer-utils-bash-completion.tmpl      /opt/devcontainer/bin/bash/completion.tmpl.sh          0;
