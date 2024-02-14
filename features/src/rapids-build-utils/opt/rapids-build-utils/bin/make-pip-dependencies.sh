@@ -31,18 +31,14 @@ make_pip_dependencies() {
     local -;
     set -euo pipefail;
 
-    # shellcheck disable=SC2154
-    if test -n "${rapids_build_utils_debug:-}" \
-    && { test -z "${rapids_build_utils_debug##*"*"*}" \
-          || test -z "${rapids_build_utils_debug##*"make-pip-dependencies"*}"; }; then
-        PS4="+ ${BASH_SOURCE[0]}:\${LINENO} "; set -x;
-    fi
 
     eval "$(devcontainer-utils-parse-args "$0" --skip '
         -m,--manifest
         -o,--omit
         --repo
     ' - <<< "${@@Q}")";
+    # shellcheck disable=SC1091
+    . devcontainer-utils-debug-output 'rapids_build_utils_debug' 'make-pip-env make-pip-dependencies';
 
     test ${#key[@]} -eq 0 && key=(py_build py_run py_test all);
 

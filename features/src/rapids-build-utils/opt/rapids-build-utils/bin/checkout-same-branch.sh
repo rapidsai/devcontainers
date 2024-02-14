@@ -23,14 +23,6 @@ checkout_same_branch() {
     local -;
     set -euo pipefail;
 
-    # shellcheck disable=SC2154
-    if test -n "${rapids_build_utils_debug:-}" \
-    && { test -z "${rapids_build_utils_debug##*"*"*}" \
-      || test -z "${rapids_build_utils_debug##*"checkout-same-branch"*}"; }; then
-        PS4="+ ${BASH_SOURCE[0]}:\${LINENO} "; set -x;
-    fi
-
-    eval "$(devcontainer-utils-parse-args "$0" - <<< "${@@Q}")";
 
     eval "$(                                        \
     PARALLEL_LEVEL=${PARALLEL_LEVEL:-$(nproc)}      \
@@ -38,6 +30,9 @@ checkout_same_branch() {
     )";
 
     eval "$(rapids-list-repos "$@")";
+
+    # shellcheck disable=SC1091
+    . devcontainer-utils-debug-output 'rapids_build_utils_debug' 'checkout-same-branch';
 
     echo "Determining available branches...";
 

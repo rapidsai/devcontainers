@@ -10,12 +10,8 @@ clean_completions() {
     local -;
     set -euo pipefail;
 
-    # shellcheck disable=SC2154
-    if test -n "${rapids_build_utils_debug:-}" \
-    && { test -z "${rapids_build_utils_debug##*"*"*}" \
-        || test -z "${rapids_build_utils_debug##*"generate-scripts"*}"; }; then
-        PS4="+ ${BASH_SOURCE[0]}:\${LINENO} "; set -x;
-    fi
+    # shellcheck disable=SC1091
+    . devcontainer-utils-debug-output 'rapids_build_utils_debug' 'generate-scripts';
 
     mkdir -p "${TMP_SCRIPT_DIR}";
     mkdir -p "${HOME}/.bash_completion.d";
@@ -35,13 +31,6 @@ generate_completions() {
     local -;
     set -euo pipefail;
 
-    # shellcheck disable=SC2154
-    if test -n "${rapids_build_utils_debug:-}" \
-    && { test -z "${rapids_build_utils_debug##*"*"*}" \
-        || test -z "${rapids_build_utils_debug##*"generate-scripts"*}"; }; then
-        PS4="+ ${BASH_SOURCE[0]}:\${LINENO} "; set -x;
-    fi
-
     mkdir -p "${HOME}/.bash_completion.d";
     readarray -t commands < <(find "${TMP_SCRIPT_DIR}"/ -maxdepth 1 -type f -exec basename {} \;);
 
@@ -60,6 +49,8 @@ generate_completions() {
         done
     fi
 }
+    # shellcheck disable=SC1091
+    . devcontainer-utils-debug-output 'rapids_build_utils_debug' 'generate-scripts';
 
 clean_scripts() {
     local -;
@@ -199,19 +190,15 @@ generate_scripts() {
     local -;
     set -euo pipefail;
 
-    # shellcheck disable=SC2154
-    if test -n "${rapids_build_utils_debug:-}" \
-    && { test -z "${rapids_build_utils_debug##*"*"*}" \
-        || test -z "${rapids_build_utils_debug##*"generate-scripts"*}"; }; then
-        PS4="+ ${BASH_SOURCE[0]}:\${LINENO} "; set -x;
-    fi
-
     # Generate and install the "clone-<repo>" scripts
 
     # Ensure we're in this script's directory
     cd "$( cd "$( dirname "$(realpath -m "${BASH_SOURCE[0]}")" )" && pwd )";
 
     eval "$(rapids-list-repos "$@")";
+
+    # shellcheck disable=SC1091
+    . devcontainer-utils-debug-output 'rapids_build_utils_debug' 'generate-scripts';
 
     local -A cpp_name_to_path;
 

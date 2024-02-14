@@ -24,13 +24,6 @@ make_pip_env() {
     local -;
     set -euo pipefail;
 
-    # shellcheck disable=SC2154
-    if test -n "${rapids_build_utils_debug:-}" \
-    && { test -z "${rapids_build_utils_debug##*"*"*}" \
-          || test -z "${rapids_build_utils_debug##*"make-pip-env"*}"; }; then
-        PS4="+ ${BASH_SOURCE[0]}:\${LINENO} "; set -x;
-    fi
-
     local env_name="${1}"; shift;
     local env_file_name="${env_name}.requirements.txt";
 
@@ -42,6 +35,9 @@ make_pip_env() {
         --repo
         -r,--requirement
     ' - <<< "${@@Q}")";
+
+    # shellcheck disable=SC1091
+    . devcontainer-utils-debug-output 'rapids_build_utils_debug' 'make-pip-env';
 
     # Remove the current virtual env if called with `-f|--force`
     if test -n "${force:-}"; then

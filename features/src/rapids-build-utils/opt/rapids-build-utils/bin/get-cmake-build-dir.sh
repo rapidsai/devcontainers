@@ -23,6 +23,9 @@ get_cmake_build_dir() {
     local -;
     set -euo pipefail;
 
+    # shellcheck disable=SC1091
+    . devcontainer-utils-debug-output 'rapids_build_utils_debug' 'get-cmake-build-dir';
+
     local src="${1:-}";
     if test $# -gt 0; then shift; fi;
 
