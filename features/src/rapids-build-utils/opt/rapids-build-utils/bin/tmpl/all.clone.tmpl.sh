@@ -3,30 +3,25 @@
 # Usage:
 #  clone-all [OPTION]...
 #
-# Runs clone-<repo> for each repo in "${NAMES}".
+# Runs clone-<repo> for each repo in ${NAMES}.
 #
 # Boolean options:
-#  -h,--help                    print this text
-#  -v,--verbose                 verbose output
-#  --no-fork                    don't prompt the user to fork the repo if a user fork isn't found
-#                               (default: false)
-#  --no-update-env              don't update the Python env with the repo's dependencies after cloning
-#                               (default: false)
-#  --clone-upstream             always clone the upstream, not the user's fork
+# @_include_bool_options /usr/bin/devcontainer-utils-clone-github-repo -h | tail -n+2 | head -n-1;
+#  --no-update-env              Don't update the Python env with the repo's dependencies after cloning.
 #                               (default: false)
 #
 # Options that require values:
-#  -j,--parallel <num>          Clone <num> repos in parallel
+#  -j,--parallel <num>          Clone <num> repos in parallel.
 #                               (default: 1)
+
+# shellcheck disable=SC1091
+. rapids-generate-docstring;
 
 clone_all() {
     local -;
     set -euo pipefail;
 
-    eval "$(devcontainer-utils-parse-args "$0" --skip '
-        --no-fork
-        --clone-upstream
-    ' - <<< "${@@Q}")";
+    eval "$(_parse_args --take '-j,--parallel --no-update-env' "$@" <&0)";
 
     eval "$(rapids-get-num-archs-jobs-and-load -a3 "$@")";
 
@@ -47,4 +42,4 @@ clone_all() {
     fi
 }
 
-clone_all "$@";
+clone_all "$@" <&0;

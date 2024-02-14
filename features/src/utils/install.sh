@@ -59,57 +59,53 @@ chgrp crontab /var/log/devcontainer-utils-vault-s3-creds-refresh.log;
 # Install Devcontainer utility scripts to /opt/devcontainer
 cp -ar ./opt/devcontainer /opt/;
 
+declare -a commands_and_sources=(
+    "debug-output                       debug-output.sh"
+    "parse-args                         parse-args.sh"
+    "parse-args-from-docstring          parse-args-from-docstring.sh"
+    "bash-completion.tmpl               bash/completion.tmpl.sh"
+    "generate-bash-completion           bash/generate-bash-completion.sh"
+    "shell-is-interactive               shell-is-interactive.sh"
+    "post-create-command                post-create-command.sh"
+    "post-attach-command                post-attach-command.sh"
+    "post-attach-command-entrypoint     post-attach-command-entrypoint.sh"
+    "python-repl-startup                python-repl-startup.py"
+    "init-git                           git/init.sh"
+    "clone-git-repo                     git/repo/clone.sh"
+    "init-ssh-deploy-keys               ssh/init-deploy-keys.sh"
+    "init-github-cli                    github/cli/init.sh"
+    "clone-github-repo                  github/repo/clone.sh"
+    "init-gitlab-cli                    gitlab/cli/init.sh"
+    "clone-gitlab-repo                  gitlab/repo/clone.sh"
+    "print-missing-gitlab-token-warning gitlab/print-missing-token-warning.sh"
+    "vault-auth-github                  vault/auth/github.sh"
+    "vault-s3-init                      vault/s3/init.sh"
+    "vault-s3-creds-generate            vault/s3/creds/generate.sh"
+    "vault-s3-creds-persist             vault/s3/creds/persist.sh"
+    "vault-s3-creds-propagate           vault/s3/creds/propagate.sh"
+    "vault-s3-creds-schedule            vault/s3/creds/schedule.sh"
+    "vault-s3-creds-test                vault/s3/creds/test.sh"
+)
+
+# Install alternatives
+for entry in "${commands_and_sources[@]}"; do
+    declare -a pair=(${entry});
+    declare cmd="devcontainer-utils-${pair[0]}";
+    declare src="/opt/devcontainer/bin/${pair[1]}";
+    update-alternatives --install /usr/bin/${cmd} ${cmd} ${src} 0;
+done
+
+declare -a commands="($(for pair in "${commands_and_sources[@]}"; do cut -d' ' -f1 <<< "${pair}"; done))";
+
+# Install bash_completion script
+devcontainer-utils-generate-bash-completion                          \
+    --out-file /etc/bash_completion.d/devcontainer-utils-completions \
+    ${commands[@]/#/--command }                                      \
+;
+
 find /opt/devcontainer \
     \( -type d -exec chmod 0775 {} \; \
     -o -type f -exec chmod 0755 {} \; \);
-
-install_utility() {
-    local cmd="devcontainer-utils-${1}";
-    local src="${2:-"${1}.sh"}";
-    # Install alternative
-    update-alternatives --install /usr/bin/${cmd} ${cmd} /opt/devcontainer/bin/${src} 0;
-
-    # Install bash_completion script
-    devcontainer-utils-generate-bash-completion --command "${cmd}" --out-dir /etc/bash_completion.d;
-}
-
-# Install alternatives
-
-# Install these first since we use it in `install_utility`
-update-alternatives --install /usr/bin/devcontainer-utils-debug-output              devcontainer-utils-debug-output              /opt/devcontainer/bin/debug-output.sh                  0;
-update-alternatives --install /usr/bin/devcontainer-utils-parse-args                devcontainer-utils-parse-args                /opt/devcontainer/bin/parse-args.sh                    0;
-update-alternatives --install /usr/bin/devcontainer-utils-parse-args-from-docstring devcontainer-utils-parse-args-from-docstring /opt/devcontainer/bin/parse-args-from-docstring.sh     0;
-update-alternatives --install /usr/bin/devcontainer-utils-bash-completion.tmpl      devcontainer-utils-bash-completion.tmpl      /opt/devcontainer/bin/bash/completion.tmpl.sh          0;
-update-alternatives --install /usr/bin/devcontainer-utils-generate-bash-completion  devcontainer-utils-generate-bash-completion  /opt/devcontainer/bin/bash/generate-bash-completion.sh 0;
-
-# Generate a bash completion for bash-completion generating command
-devcontainer-utils-generate-bash-completion --command devcontainer-utils-generate-bash-completion --out-dir /etc/bash_completion.d;
-
-install_utility shell-is-interactive shell-is-interactive.sh;
-install_utility post-create-command post-create-command.sh;
-install_utility post-attach-command post-attach-command.sh;
-install_utility post-attach-command-entrypoint post-attach-command-entrypoint.sh;
-install_utility python-repl-startup python-repl-startup.py;
-install_utility init-git git/init.sh;
-install_utility clone-git-repo git/repo/clone.sh;
-
-install_utility init-ssh-deploy-keys ssh/init-deploy-keys.sh;
-
-install_utility init-github-cli   github/cli/init.sh;
-install_utility clone-github-repo github/repo/clone.sh;
-
-install_utility init-gitlab-cli                    gitlab/cli/init.sh;
-install_utility clone-gitlab-repo                  gitlab/repo/clone.sh;
-install_utility print-missing-gitlab-token-warning gitlab/print-missing-token-warning.sh;
-
-install_utility vault-auth-github vault/auth/github.sh;
-
-install_utility vault-s3-init            vault/s3/init.sh;
-install_utility vault-s3-creds-generate  vault/s3/creds/generate.sh;
-install_utility vault-s3-creds-persist   vault/s3/creds/persist.sh;
-install_utility vault-s3-creds-propagate vault/s3/creds/propagate.sh;
-install_utility vault-s3-creds-schedule  vault/s3/creds/schedule.sh;
-install_utility vault-s3-creds-test      vault/s3/creds/test.sh;
 
 # Enable GCC colors
 for_each_user_bashrc 'sed -i -re "s/^#(export GCC_COLORS)/\1/g" "$0"';

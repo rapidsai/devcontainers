@@ -5,28 +5,17 @@
 #
 # Configure ${CPP_LIB}.
 #
-# Boolean options:
-#  -h,--help                              print this text
-#  -v,--verbose                           verbose output
-#
-# Options that require values:
-#  -a,--archs <num>                       Build <num> CUDA archs in parallel
-#                                         (default: 1)
-#  -j,--parallel <num>                    Run <num> parallel compilation jobs
-#                                         (default: $(nproc))
-#  -m,--max-device-obj-memory-usage <num> An upper-bound on the amount of memory each CUDA device object compilation
-#                                         is expected to take. This is used to estimate the number of parallel device
-#                                         object compilations that can be launched without hitting the system memory
-#                                         limit.
-#                                         Higher values yield fewer parallel CUDA device object compilations.
-#                                         (default: 1)
-#  -D* <var>[:<type>]=<value>             Create or update a cmake cache entry.
+# @_include_value_options rapids-get-num-archs-jobs-and-load -h;
+# @_include_cmake_options;
+
+# shellcheck disable=SC1091
+. rapids-generate-docstring;
 
 configure_${CPP_LIB}_cpp() {
     local -;
     set -euo pipefail;
 
-    eval "$(devcontainer-utils-parse-args "$0" - <<< "${@@Q}")";
+    eval "$(_parse_args "$@" <&0)";
 
     if [[ ! -d "${CPP_SRC}" ]]; then
         exit 1;
@@ -37,14 +26,20 @@ configure_${CPP_LIB}_cpp() {
         rapids-get-num-archs-jobs-and-load "$@" \
     )";
 
-    local cmake_args=(-GNinja);
-    cmake_args+=(${CMAKE_ARGS:-});
-    cmake_args+=(${CPP_DEPS});
-    cmake_args+=(${CPP_ARGS});
-    cmake_args+=("${v:+--log-level=VERBOSE}");
-    cmake_args+=("${OPTS[@]}");
     # shellcheck disable=SC1091
     . devcontainer-utils-debug-output 'rapids_build_utils_debug' 'configure-all configure-${NAME} configure-${CPP_LIB}-cpp';
+
+    local -a cmake_args_=(
+        -GNinja
+        ${CMAKE_ARGS:-}
+        ${CPP_DEPS}
+        ${CPP_ARGS}
+        ${v:+--log-level=VERBOSE}
+    );
+    local -a cmake_args="(
+        ${cmake_args_+"${cmake_args_[*]@Q}"}
+        $(rapids-select-cmake-args "${ARGS[@]}")
+    )";
 
     local -r bin_dir="$(rapids-get-cmake-build-dir "${CPP_SRC}" "${cmake_args[@]}")";
 
@@ -72,4 +67,4 @@ configure_${CPP_LIB}_cpp() {
     fi
 }
 
-configure_${CPP_LIB}_cpp "$@";
+configure_${CPP_LIB}_cpp "$@" <&0;

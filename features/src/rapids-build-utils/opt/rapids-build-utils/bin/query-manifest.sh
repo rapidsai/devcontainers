@@ -6,18 +6,21 @@
 # Query the `manifest.yaml` in a shell-friendly format.
 #
 # Boolean options:
-#  -h,--help          print this text
+#  -h,--help             Print this text.
 #
 # Options that require values:
-#  -m,--manifest <file>  Use a specific manifest.json
+#  -m,--manifest <file>  Use a specific manifest.json.
 #                        (default: ${PROJECT_MANIFEST_YML:-"/opt/rapids-build-utils/manifest.yaml"})
+
+# shellcheck disable=SC1091
+. rapids-generate-docstring;
 
 query_manifest() {
     local -;
     set -euo pipefail;
 
+    eval "$(_parse_args "$@" <&0)";
 
-    eval "$(devcontainer-utils-parse-args "$0" - <<< "${@@Q}")";
     # shellcheck disable=SC1091
     . devcontainer-utils-debug-output 'rapids_build_utils_debug' 'query-manifest';
 
@@ -51,4 +54,4 @@ ________EOF
     yq -Mo json "${manifest}" | jq -r "${query}";
 }
 
-query_manifest "$@";
+query_manifest "$@" <&0;

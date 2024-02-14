@@ -38,44 +38,50 @@ fi
 
 cp -ar ./opt/rapids-build-utils /opt/;
 
-install_utility() {
-    local cmd="rapids-${1}";
-    local src="${2:-"${1}.sh"}";
-    # Install alternative
-    update-alternatives --install /usr/bin/${cmd} ${cmd} /opt/rapids-build-utils/bin/${src} 0;
+declare -a commands=(
+    checkout-same-branch
+    generate-docstring
+    generate-scripts
+    get-cmake-build-dir
+    get-num-archs-jobs-and-load
+    list-repos
+    make-conda-dependencies
+    make-conda-env
+    make-pip-dependencies
+    make-pip-env
+    make-vscode-workspace
+    post-attach-command
+    post-attach-command-entrypoint
+    post-start-command
+    pull-repositories
+    push-repositories
+    python-conda-pkg-names
+    python-pkg-names
+    python-pkg-roots
+    query-manifest
+    select-cmake-args
+    select-cmake-build-args
+    select-cmake-build-type
+    select-cmake-define
+    select-cmake-install-args
+    select-cmd-args
+    select-pip-install-args
+    select-pip-wheel-args
+    update-content-command
+);
 
-    # Install bash_completion script
-    if type devcontainer-utils-generate-bash-completion >/dev/null 2>&1; then
-        devcontainer-utils-generate-bash-completion --command "${cmd}" --out-dir /etc/bash_completion.d;
-    fi
-}
+# Install alternatives
+for cmd in "${commands[@]}"; do
+    update-alternatives --install /usr/bin/rapids-${cmd} rapids-${cmd} /opt/rapids-build-utils/bin/${cmd}.sh 0;
+done
 
-install_utility update-content-command;
-install_utility post-start-command;
-install_utility post-attach-command;
-install_utility post-attach-command-entrypoint;
-
-install_utility checkout-same-branch;
-install_utility pull-repositories;
-install_utility push-repositories;
-install_utility generate-scripts;
-install_utility get-cmake-build-dir;
-install_utility make-conda-dependencies;
-install_utility make-conda-env;
-install_utility make-pip-dependencies;
-install_utility make-pip-env;
-install_utility make-vscode-workspace;
-install_utility parse-cmake-args;
-install_utility parse-cmake-build-type;
-install_utility parse-cmake-define;
-install_utility parse-pip-install-args;
-install_utility parse-pip-wheel-args;
-install_utility python-pkg-roots;
-install_utility python-pkg-names;
-install_utility python-conda-pkg-names;
-install_utility get-num-archs-jobs-and-load;
-install_utility list-repos;
-install_utility query-manifest;
+# Install bash_completion script
+if type devcontainer-utils-generate-bash-completion >/dev/null 2>&1; then
+    devcontainer-utils-generate-bash-completion                          \
+        --out-file /etc/bash_completion.d/rapids-build-utils-completions \
+        ${commands[@]/#/--command }                                      \
+    ;
+fi
 
 find /opt/rapids-build-utils \
     \( -type d -exec chmod 0775 {} \; \

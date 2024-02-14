@@ -6,15 +6,18 @@
 # Uninstall ${CPP_LIB}.
 #
 # Boolean options:
-#  -h,--help          print this text
+#  -h,--help          Print this text.
 #  -v,--verbose       verbose output
+
+# shellcheck disable=SC1091
+. rapids-generate-docstring;
 
 uninstall_${CPP_LIB}_cpp() {
     local -;
     set -euo pipefail;
 
+    eval "$(_parse_args "$@" <&0)";
 
-    eval "$(devcontainer-utils-parse-args "$0" - <<< "${@@Q}")";
     # shellcheck disable=SC1091
     . devcontainer-utils-debug-output 'rapids_build_utils_debug' 'uninstall-all uninstall-${NAME} uninstall-${CPP_LIB}-cpp';
 
@@ -26,4 +29,4 @@ uninstall_${CPP_LIB}_cpp() {
     fi
 }
 
-uninstall_${CPP_LIB}_cpp "$@";
+uninstall_${CPP_LIB}_cpp "$@" <&0;

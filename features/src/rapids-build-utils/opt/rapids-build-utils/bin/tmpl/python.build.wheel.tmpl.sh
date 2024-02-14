@@ -5,44 +5,14 @@
 #
 # Build a ${PY_LIB} wheel.
 #
-# Boolean options:
-#  -h,--help                              print this text
-#  -v,--verbose                           verbose output
-#  --ignore-requires-python               Ignore the Requires-Python information.
-#  --no-clean                             Don't clean up build directories.
-#  --no-deps                              Don't install package dependencies.
-#  --no-verify                            Don't verify if built wheel is valid.
-#  --no-cache-dir                         Disable the pip cache.
-#  --use-pep517                           Use PEP 517 for building source distributions.
-#  --no-use-pep517                        Don't use PEP 517 for building source distributions
-#  --no-build-isolation                   Disable isolation when building a modern source distribution. Build
-#                                         dependencies specified by PEP 518 must be already installed if this option is
-#                                         used.
-#  --pre                                  Include pre-release and development versions. By default, pip only finds
-#                                         stable versions.
-#  --prefer-binary                        Prefer binary packages over source packages, even if the source packages are
-#                                         newer.
-#
-# Options that require values:
-#  -a,--archs <num>                       Build <num> CUDA archs in parallel
-#                                         (default: 1)
-#  -j,--parallel <num>                    Run <num> parallel compilation jobs
-#                                         (default: $(nproc))
-#  -m,--max-device-obj-memory-usage <num> An upper-bound on the amount of memory each CUDA device object compilation
-#                                         is expected to take. This is used to estimate the number of parallel device
-#                                         object compilations that can be launched without hitting the system memory
-#                                         limit.
-#                                         Higher values yield fewer parallel CUDA device object compilations.
-#                                         (default: 1)
-#  -D* <var>[:<type>]=<value>             Create or update a cmake cache entry.
-#  --cache-dir <dir>                      Store the cache data in <dir>.
-#  --only-binary <format_control>         Do not use source packages. Can be supplied multiple times, and each time
-#                                         adds to the existing value. Accepts either ":all:" to disable all source
-#                                         packages, ":none:" to empty the set, or one or more package names with commas
-#                                         between them. Packages without binary distributions will fail to install when
-#                                         this option is used on them.
-#  -w,--wheel-dir <dir>                   copy built wheel into <dir>
-#                                         (default: none)
+# @_include_value_options rapids-get-num-archs-jobs-and-load -h;
+# @_include_cmake_options;
+# @_include_pip_wheel_options;
+# @_include_pip_package_index_options;
+# @_include_pip_general_options;
+
+# shellcheck disable=SC1091
+. rapids-generate-docstring;
 
 is_using_scikit_build_core() {
     local -;
@@ -55,7 +25,7 @@ build_${PY_LIB}_python_wheel() {
     local -;
     set -euo pipefail;
 
-    eval "$(devcontainer-utils-parse-args "$0" - <<< "${@@Q}")";
+    eval "$(_parse_args "$@" <&0)";
 
     if [[ ! -d "${PY_SRC}" ]]; then
         exit 1;
@@ -66,87 +36,49 @@ build_${PY_LIB}_python_wheel() {
         rapids-get-num-archs-jobs-and-load "$@" \
     )";
 
-    local cmake_args=(${PY_CMAKE_ARGS});
     # shellcheck disable=SC1091
     . devcontainer-utils-debug-output 'rapids_build_utils_debug' 'build-all build-${NAME} build-${PY_LIB}-python build-${PY_LIB}-python-wheel';
 
-    cmake_args+=(${CMAKE_ARGS:-});
-    cmake_args+=(${CPP_DEPS});
-    cmake_args+=(${CPP_ARGS});
-    cmake_args+=(${v:+--log-level=VERBOSE});
-    cmake_args+=("${OPTS[@]}");
+    local -a cmake_args_=(
+        ${PY_CMAKE_ARGS}
+        ${CMAKE_ARGS:-}
+        ${CPP_DEPS}
+        ${CPP_ARGS}
+        ${v:+--log-level=VERBOSE}
+    );
+
+    local -a cmake_args="(
+        ${cmake_args_+"${cmake_args_[*]@Q}"}
+        $(rapids-select-cmake-args "${ARGS[@]}")
+    )";
 
     local ninja_args=();
-    local pip_args=(${PIP_WHEEL_ARGS});
 
     if test -n "${v}"; then
         ninja_args+=("-v");
-        pip_args+=("-vv");
     fi
 
-    if test -n "${n_jobs}"; then
+    if test -n "${n_jobs-}"; then
         ninja_args+=("-j${n_jobs}");
     fi
 
-    if test -n "${n_load}"; then
+    if test -n "${n_load-}"; then
         ninja_args+=("-l${n_load}");
     fi
 
-    if test -n "${pre:-}"; then
-        pip_args+=("--pre");
-    fi
-
-    if test -n "${wheel_dir:-}"; then
-        pip_args+=("--wheel-dir" "${wheel_dir}");
-    fi
-
-    if test -n "${prefer_binary:-}"; then
-        pip_args+=("--prefer-binary");
-    fi
-
-    if test -n "${only_binary[@]:-}"; then
-        pip_args+=("--only-binary");
-        if test "${only_binary[@]}" != "true"; then
-            pip_args+=("${only_binary[@]}");
-        fi
-    fi
-
-    if test -n "${no_deps:-}"; then
-        pip_args+=("--no-deps");
-    fi
-
-    if test -n "${no_clean:-}"; then
-        pip_args+=("--no-clean");
-    fi
-
-    if test -n "${no_verify:-}"; then
-        pip_args+=("--no-verify");
-    fi
-
-    if test -n "${cache_dir:-}"; then
-        pip_args+=("--cache-dir" "${cache_dir:-}");
-    elif test -n "${no_cache_dir:-}"; then
-        pip_args+=("--no-cache-dir");
-    fi
-
-    if test -n "${use_pep517:-}"; then
-        pip_args+=("--use-pep517");
-    elif test -n "${no_use_pep517:-}"; then
-        pip_args+=("--no-use-pep517");
-    fi
+    local -a pip_args_=(${PIP_WHEEL_ARGS});
+    local -a pip_args="(
+        ${pip_args_+"${pip_args_[*]@Q}"}
+        $(rapids-select-pip-wheel-args "${ARGS[@]}")
+    )";
 
     case "${no_build_isolation:-$(pip config get wheel.no-build-isolation 2>/dev/null || echo)}" in
         True|true|yes|1)
-            pip_args+=("--no-build-isolation");
             if is_using_scikit_build_core; then
-                pip_args+=("--config-settings=build-dir=$(rapids-get-cmake-build-dir "${PY_SRC}" "${cmake_args[@]}")");
+                pip_args+=(-C "build-dir=$(rapids-get-cmake-build-dir "${PY_SRC}" "${cmake_args[@]}")");
             fi
             ;;
     esac
-
-    if test -n "${ignore_requires_python:-}"; then
-        pip_args+=("--ignore-requires-python");
-    fi
 
     pip_args+=("${PY_SRC}");
 
@@ -164,10 +96,10 @@ build_${PY_LIB}_python_wheel() {
         CMAKE_ARGS="${cmake_args[*]}"            \
         SKBUILD_BUILD_OPTIONS="${ninja_args[*]}" \
         NVCC_APPEND_FLAGS="${nvcc_append_flags}" \
-            python -m pip wheel ${pip_args[@]}   \
+            python -m pip wheel "${pip_args[@]}" \
         ;
         { set +x; } 2>/dev/null; echo -n "${PY_LIB} wheel build time:";
     ) 2>&1;
 }
 
-build_${PY_LIB}_python_wheel "$@";
+build_${PY_LIB}_python_wheel "$@" <&0;

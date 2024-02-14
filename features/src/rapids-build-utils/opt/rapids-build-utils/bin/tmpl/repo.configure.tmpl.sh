@@ -5,38 +5,28 @@
 #
 # Runs the configure script in each ${CPP_LIB}.
 #
-# Forwards all arguments to each underlying script.
+# Forwards relevant arguments to each underlying script.
 #
-# Boolean options:
-#  -h,--help                    print this text
-#  -v,--verbose                 verbose output
-#
-# Options that require values:
-#  -a,--archs <num>                       Build <num> CUDA archs in parallel
-#                                         (default: 1)
-#  -j,--parallel <num>                    Run <num> parallel compilation jobs
-#  -m,--max-device-obj-memory-usage <num> An upper-bound on the amount of memory each CUDA device object compilation
-#                                         is expected to take. This is used to estimate the number of parallel device
-#                                         object compilations that can be launched without hitting the system memory
-#                                         limit.
-#                                         Higher values yield fewer parallel CUDA device object compilations.
-#                                         (default: 1)
-#  -D* <var>[:<type>]=<value>             Create or update a cmake cache entry.
+# @_include_value_options rapids-get-num-archs-jobs-and-load -h;
+# @_include_cmake_options;
+
+# shellcheck disable=SC1091
+. rapids-generate-docstring;
 
 configure_${NAME}() {
     local -;
     set -euo pipefail;
 
+    eval "$(_parse_args --take '-h,--help' "$@" <&0)";
 
-    eval "$(devcontainer-utils-parse-args "$0" - <<< "${@@Q}")";
     # shellcheck disable=SC1091
     . devcontainer-utils-debug-output 'rapids_build_utils_debug' 'configure-all configure-${NAME}';
 
     for lib in ${CPP_LIB}; do
         if type configure-${lib}-cpp >/dev/null 2>&1; then
-            configure-${lib}-cpp "$@";
+            configure-${lib}-cpp "${OPTS[@]}";
         fi
     done
 }
 
-configure_${NAME} "$@";
+configure_${NAME} "$@" <&0;

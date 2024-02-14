@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 # Usage:
-#  rapids-parse-cmake-define <name> [cmake_args]...
+#  rapids-select-cmake-define <name> [cmake_args]...
 #
 # Finds the -D<name>=<val> definition from a list of input CMake arguments.
 # If -D<name>=<val> is found in <cmake_args>, <val> is printed to stdout.
@@ -15,19 +15,14 @@ parse_cmake_define() {
     local -;
     set -euo pipefail;
 
-    # shellcheck disable=SC2154
-    if test -n "${rapids_build_utils_debug:-}" \
-    && { test -z "${rapids_build_utils_debug##*"*"*}" \
-          || test -z "${rapids_build_utils_debug##*"parse-args"*}" \
-          || test -z "${rapids_build_utils_debug##*"parse-cmake-define"*}"; }; then
-        PS4="+ ${BASH_SOURCE[0]}:\${LINENO} "; set -x;
-    fi
-
     local arg;
     local val;
     local def="$1"; shift;
 
     eval "$(devcontainer-utils-parse-args <(echo -e "\n# -D <def>") "$@" <&0)";
+
+    # shellcheck disable=SC1091
+    . devcontainer-utils-debug-output 'rapids_build_utils_debug' 'select-cmake-define';
 
     for arg in "${D[@]}"; do
         if test "${def}" = "${arg%=*}"; then

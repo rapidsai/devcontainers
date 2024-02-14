@@ -6,35 +6,25 @@
 # Make a combined conda environment for all repos.
 #
 # Boolean options:
-#  -h,--help             print this text
+#  -h,--help             Print this text.
 #  -f,--force            Delete the existing conda env and recreate it from scratch.
 #
-# Options that require values:
-#  -k,--key <key>        Only include the key(s)
-#  -m,--manifest <file>  Use a specific manifest.json
-#                        (default: ${PROJECT_MANIFEST_YML:-"/opt/rapids-build-utils/manifest.yaml"})
-#  -o,--omit <repo>      Omit dependencies for repo(s).
-#                        (default: none)
-#  --repo <repo>         Only include dependencies for repo(s).
-#                        (default: all repositories)
+# @_include_value_options rapids-make-conda-dependencies -h
+
+# shellcheck disable=SC1091
+. rapids-generate-docstring;
 
 make_conda_env() {
     local -;
     set -euo pipefail;
 
+    eval "$(_parse_args --skip '-k,--key -m,--manifest -o,--omit --repo' "${@:2}" <&0)";
 
     # shellcheck disable=SC1091
     . devcontainer-utils-debug-output 'rapids_build_utils_debug' 'make-conda-env';
 
     local env_name="${1}"; shift;
     local env_file_name="${env_name}.yml";
-
-    eval "$(devcontainer-utils-parse-args "$0" --skip '
-        -k,--key
-        -m,--manifest
-        -o,--omit
-        --repo
-    ' - <<< "${@@Q}")";
 
     # Remove the current conda env if called with `-f|--force`
     if test -n "${f:-${force:-}}"; then
@@ -84,7 +74,7 @@ make_conda_env() {
 # shellcheck disable=SC1091
 . /opt/conda/etc/profile.d/mamba.sh;
 
-make_conda_env "${DEFAULT_CONDA_ENV:-rapids}" "$@";
+make_conda_env "${DEFAULT_CONDA_ENV:-rapids}" "$@" <&0;
 
 # shellcheck disable=SC1090
 . /etc/profile.d/*-mambaforge.sh;

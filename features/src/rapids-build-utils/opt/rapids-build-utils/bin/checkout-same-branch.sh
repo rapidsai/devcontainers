@@ -8,21 +8,20 @@
 # then checks out all repositories to this common branch.
 #
 # Boolean options:
-#  -h,--help          print this text
+#  -h,--help          Print this text.
 #
 # Options that require values:
-#  -j,--parallel <num>   Fetch <num> repos in parallel
-#  -m,--manifest <file>  Use a specific manifest.json
-#                        (default: ${PROJECT_MANIFEST_YML:-"/opt/rapids-build-utils/manifest.yaml"})
-#  -o,--omit <repo>      Filter the results to exclude <repo> entries.
-#                        (default: none)
-#  -r,--repo <repo>      Filter the results to include <repo> entries.
-#                        (default: all repositories)
+#  -j,--parallel <num>   Fetch <num> repos in parallel.
+# @_include_value_options rapids-list-repos -h | tail -n+2 | head -n-1;
+
+# shellcheck disable=SC1091
+. rapids-generate-docstring;
 
 checkout_same_branch() {
     local -;
     set -euo pipefail;
 
+    eval "$(_parse_args "$@" <&0)";
 
     eval "$(                                        \
     PARALLEL_LEVEL=${PARALLEL_LEVEL:-$(nproc)}      \
@@ -139,4 +138,4 @@ checkout_same_branch() {
     done;
 }
 
-checkout_same_branch "$@";
+checkout_same_branch "$@" <&0;

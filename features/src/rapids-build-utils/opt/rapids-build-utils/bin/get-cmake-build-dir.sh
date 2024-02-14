@@ -30,7 +30,7 @@ get_cmake_build_dir() {
     if test $# -gt 0; then shift; fi;
 
     local bin="build";
-    local -r type="$(rapids-parse-cmake-build-type "$@" <&0 | tr '[:upper:]' '[:lower:]')";
+    local -r type="$(rapids-select-cmake-build-type "$@" <&0 | tr '[:upper:]' '[:lower:]')";
     local -r cuda="$(grep -o '^[0-9]*.[0-9]*' <<< "${CUDA_VERSION:-${CUDA_VERSION_MAJOR:-12}.${CUDA_VERSION_MINOR:-0}}")";
 
     bin+="${PYTHON_PACKAGE_MANAGER:+/${PYTHON_PACKAGE_MANAGER}}${cuda:+/cuda-${cuda}}";

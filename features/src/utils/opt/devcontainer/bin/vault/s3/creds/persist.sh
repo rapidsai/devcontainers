@@ -33,8 +33,8 @@ persist_s3_creds() {
     local -;
     set -euo pipefail;
 
+    eval "$(devcontainer-utils-parse-args "$0" "$@" <&0)";
 
-    eval "$(devcontainer-utils-parse-args devcontainer-utils-vault-s3-creds-persist "$@" <&0)";
     # shellcheck disable=SC1091
     . devcontainer-utils-debug-output 'devcontainer_utils_debug' 'vault-s3 vault-s3-creds-persist';
 
@@ -105,5 +105,5 @@ ________EOF
 }
 
 if [ "$(basename "${BASH_SOURCE[${#BASH_SOURCE[@]}-1]}")" = devcontainer-utils-vault-s3-creds-persist ]; then
-    persist_s3_creds "$@";
+    persist_s3_creds "$@" <&0;
 fi

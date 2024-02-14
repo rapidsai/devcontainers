@@ -5,57 +5,32 @@
 ALT_SCRIPT_DIR="${ALT_SCRIPT_DIR:-/usr/bin}";
 TEMPLATES="${TEMPLATES:-/opt/rapids-build-utils/bin/tmpl}";
 TMP_SCRIPT_DIR="${TMP_SCRIPT_DIR:-/tmp/rapids-build-utils}";
-
-clean_completions() {
-    local -;
-    set -euo pipefail;
-
-    # shellcheck disable=SC1091
-    . devcontainer-utils-debug-output 'rapids_build_utils_debug' 'generate-scripts';
-
-    mkdir -p "${TMP_SCRIPT_DIR}";
-    mkdir -p "${HOME}/.bash_completion.d";
-    readarray -t commands < <(find "${TMP_SCRIPT_DIR}"/ -maxdepth 1 -type f -exec basename {} \;);
-
-    local -r completions_file="${HOME}/.bash_completion.d/rapids-build-utils-utils-completions";
-
-    if test -f "${completions_file}"; then
-        local cmd; for cmd in "${commands[@]}"; do
-            complete -r "${cmd}" 2>/dev/null || true;
-            sed -i "/complete -F _devcontainer_utils_completions ${cmd};.*/d" "${completions_file}";
-        done
-    fi
-}
+COMPLETION_TMPL="${COMPLETION_TMPL:-"$(which devcontainer-utils-bash-completion.tmpl)"}";
+COMPLETION_FILE="${COMPLETION_FILE:-${HOME}/.bash_completion.d/rapids-build-utils-completions}";
 
 generate_completions() {
     local -;
     set -euo pipefail;
 
-    mkdir -p "${HOME}/.bash_completion.d";
-    readarray -t commands < <(find "${TMP_SCRIPT_DIR}"/ -maxdepth 1 -type f -exec basename {} \;);
-
-    local -r completions_file="${HOME}/.bash_completion.d/rapids-build-utils-utils-completions";
-    local -r template="${COMPLETION_TMPL:-"$(which devcontainer-utils-bash-completion.tmpl)"}";
-
-    if test -f "${template}"; then
-        if ! test -f "${completions_file}"; then
-            cp "${template}" "${completions_file}";
-        fi
-        local cmd; for cmd in "${commands[@]}"; do
-            local str="complete -F _devcontainer_utils_completions ${cmd};";
-            if ! grep -q "${str}" "${completions_file}"; then
-                echo "${str}" >> "${completions_file}";
-            fi
-        done
-    fi
-}
     # shellcheck disable=SC1091
     . devcontainer-utils-debug-output 'rapids_build_utils_debug' 'generate-scripts';
 
-clean_scripts() {
+    readarray -t commands < <(find "${TMP_SCRIPT_DIR}"/ -maxdepth 1 -type f -exec basename {} \;);
+
+    devcontainer-utils-generate-bash-completion          \
+        --out-file "$(realpath -m "${COMPLETION_FILE}")" \
+        --template "$(realpath -m "${COMPLETION_TMPL}")" \
+        ${commands[@]/#/--command }                      \
+    ;
+}
+
+clean_scripts_and_aliases() {
     local -;
     set -euo pipefail;
-    mkdir -p "${TMP_SCRIPT_DIR}";
+
+    # shellcheck disable=SC1091
+    . devcontainer-utils-debug-output 'rapids_build_utils_debug' 'generate-scripts';
+
     readarray -t commands < <(find "${TMP_SCRIPT_DIR}"/ -maxdepth 1 -type f -exec basename {} \;);
     sudo rm -f -- \
         "${commands[@]/#/${ALT_SCRIPT_DIR}\/}" \
@@ -67,24 +42,7 @@ generate_script() {
     if test -n "${bin}"; then
         (
             cat - \
-          | envsubst '$HOME
-                      $NAME
-                      $SRC_PATH
-                      $PY_ENV
-                      $PY_SRC
-                      $PY_LIB
-                      $BIN_DIR
-                      $CPP_LIB
-                      $CPP_SRC
-                      $CPP_ARGS
-                      $CPP_DEPS
-                      $GIT_TAG
-                      $GIT_REPO
-                      $GIT_HOST
-                      $GIT_UPSTREAM
-                      $PY_CMAKE_ARGS
-                      $PIP_WHEEL_ARGS
-                      $PIP_INSTALL_ARGS' \
+          | envsubst '$HOME $NAME $SRC_PATH $PY_ENV $PY_SRC $PY_LIB $BIN_DIR $CPP_LIB $CPP_SRC $CPP_ARGS $CPP_DEPS $GIT_TAG $GIT_REPO $GIT_HOST $GIT_UPSTREAM $PY_CMAKE_ARGS $PIP_WHEEL_ARGS $PIP_INSTALL_ARGS' \
           | tee "${TMP_SCRIPT_DIR}/${bin}" >/dev/null;
 
             chmod +x "${TMP_SCRIPT_DIR}/${bin}";
@@ -105,8 +63,7 @@ generate_all_script_impl() {
     if test -n "${bin}" && ! test -f "${TMP_SCRIPT_DIR}/${bin}"; then
         (
             cat - \
-          | envsubst '$NAMES
-                      $SCRIPT' \
+          | envsubst '$NAME $NAMES $SCRIPT' \
           | tee "${TMP_SCRIPT_DIR}/${bin}" >/dev/null;
 
             chmod +x "${TMP_SCRIPT_DIR}/${bin}";
@@ -262,6 +219,7 @@ generate_scripts() {
             done
 
             if [[ -d ~/"${!repo_path:-}/.git" ]]; then
+                NAME="${repo_name:-}"        \
                 SRC_PATH=~/"${!repo_path:-}" \
                 BIN_DIR="${bin_dir}"         \
                 CPP_LIB="${cpp_name:-}"      \
@@ -302,6 +260,7 @@ generate_scripts() {
             py_libs+=("${!py_name}");
 
             if [[ -d ~/"${!repo_path:-}/.git" ]]; then
+                NAME="${repo_name:-}"                     \
                 BIN_DIR="${bin_dir}"                      \
                 SRC_PATH=~/"${!repo_path:-}"              \
                 PY_SRC="${py_path}"                       \
@@ -317,10 +276,10 @@ generate_scripts() {
         done;
 
         if [[ -d ~/"${!repo_path:-}/.git" ]]; then
-            NAME="${repo_name:-}"    \
-            PY_LIB="${py_libs[*]}"   \
-            CPP_LIB="${cpp_libs[*]}" \
-            generate_repo_scripts    ;
+            NAME="${repo_name:-}"      \
+            PY_LIB="${py_libs[*]@Q}"   \
+            CPP_LIB="${cpp_libs[*]@Q}" \
+            generate_repo_scripts      ;
         fi
 
         # Generate a clone script for each repo
@@ -337,27 +296,44 @@ generate_scripts() {
         generate_clone_script             ;
     done
 
-    sudo find /opt/rapids-build-utils \
-        \( -type d -exec chmod 0775 {} \; \
-        -o -type f -exec chmod 0755 {} \; \);
-
     unset cpp_name_to_path;
 
-    for script in "clone" "clean" "configure" "build" "cpack" "install" "uninstall"; do
-        # Generate a script to run a script for all repos
-        NAMES="${repo_names[*]}" \
-        SCRIPT="${script}"       \
-        generate_all_script      ;
-    done;
+    if ((${#repo_names[@]} > 0)); then
+        for script in "clone" "clean" "configure" "build" "cpack" "install" "uninstall"; do
+            # Generate a script to run a script for all repos
+            NAME="${repo_names[0]}"    \
+            NAMES="${repo_names[*]@Q}" \
+            SCRIPT="${script}"         \
+            generate_all_script        ;
+        done;
+    fi
 }
 
-clean_completions;
-clean_scripts;
+_generate() {
+    local -;
+    set -euo pipefail;
 
-for pid in $(generate_scripts "$@"); do
-    while [[ -e "/proc/$pid" ]]; do
-        sleep 0.1
+    echo "Generating RAPIDS build scripts in ${ALT_SCRIPT_DIR}";
+
+    mkdir -p "${TMP_SCRIPT_DIR}";
+
+    # Clean the cached parsed docstrings
+    rm -rf /tmp/rapids-build-utils/.docstrings-cache/;
+    # Bash completions
+    rm -f "$(realpath -m "${COMPLETION_FILE}")";
+    # Clean existing scripts and aliases
+    clean_scripts_and_aliases;
+
+    # Generate new scripts
+    local pid;
+    for pid in $(generate_scripts "$@"); do
+        while test -e "/proc/${pid}"; do
+            sleep 0.1;
+        done
     done
-done
 
-generate_completions;
+    # Generate new bash completions
+    generate_completions;
+}
+
+_generate "$@";

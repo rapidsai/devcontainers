@@ -6,14 +6,17 @@
 # Clean the ${CPP_LIB} build dirs.
 #
 # Boolean options:
-#  -h,--help          print this text
+#  -h,--help  Print this text.
+
+# shellcheck disable=SC1091
+. rapids-generate-docstring;
 
 clean_${CPP_LIB}_cpp() {
     local -;
     set -euo pipefail;
 
+    eval "$(_parse_args --take '-h,--help' "$@" <&0)";
 
-    eval "$(devcontainer-utils-parse-args "$0" - <<< "${@@Q}")";
     # shellcheck disable=SC1091
     . devcontainer-utils-debug-output 'rapids_build_utils_debug' 'clean-all clean-${NAME} clean-${CPP_LIB}-cpp';
 
@@ -27,4 +30,4 @@ clean_${CPP_LIB}_cpp() {
         2>/dev/null || true;
 }
 
-clean_${CPP_LIB}_cpp "$@";
+clean_${CPP_LIB}_cpp "$@" <&0;

@@ -6,74 +6,71 @@
 # Clone the ${NAME} repository if it doesn't already exist.
 #
 # Boolean options:
-#  -h,--help                    print this text
-#  -q,--quiet                   Operate quietly. Progress is not reported to the standard error stream.
-#  --no-fork                    don't prompt the user to fork the repo if a user fork isn't found
-#                               (default: false)
-#  --no-update-env              don't update the Python env with the repo's dependencies after cloning
-#                               (default: false)
-#  --clone-upstream             always clone the upstream, not the user's fork
+# @_include_bool_options /usr/bin/devcontainer-utils-clone-github-repo -h | tail -n+2 | head -n-1;
+#  --no-update-env              Don't update the Python env with the repo's dependencies after cloning.
 #                               (default: false)
 #
 # Options that require values:
-#  -b,--branch <branch_or_tag>  check the repo out to <branch_or_tag>
-#                               (default: `${NAME}.git.tag` in manifest.yaml)
-#  -d,--directory <dir>         clone the repo into <dir>
+# @_include_value_options /usr/bin/devcontainer-utils-clone-github-repo -h | tail -n+2 | head -n-1;
+#  -d,--directory <dir>         Clone the repo into <dir>.
 #                               (default: `${NAME}.path` in manifest.yaml)
-#  -j,--parallel <num>          Clone <num> submodules in parallel
-#                               (default: $(nproc --ignore=1))
-#  -u,--upstream <upstream>     set <upstream> as the `upstream` remote
+#  -u,--upstream <upstream>     Set <upstream> as the `upstream` remote.
 #                               (default: `${NAME}.git.upstream` in manifest.yaml)
+
+# shellcheck disable=SC1091
+. rapids-generate-docstring;
 
 clone_${NAME}() {
     local -;
     set -euo pipefail;
 
+    eval "$(_parse_args --take '
+        --no-update-env
+        -b,--branch
+        -d,--directory
+        -u,--upstream
+    ' "$@" <&0)";
 
-    eval "$(devcontainer-utils-parse-args "$0" --skip '
-        -q,--quiet
-        --no-fork
-        --clone-upstream
-    ' - <<< "${@@Q}")";
+    eval "$(rapids-get-num-archs-jobs-and-load "$@")";
 
-    if [[ ! -d "${SRC_PATH}"/.git ]]; then
     # shellcheck disable=SC1091
     . devcontainer-utils-debug-output 'rapids_build_utils_debug' 'clone-all clone-${NAME}';
 
-        eval "$(rapids-get-num-archs-jobs-and-load "$@")";
+    if [[ -d "${SRC_PATH}"/.git ]]; then
+        return;
+    fi
 
-        branch="${b:-"${GIT_TAG}"}";
-        directory="${d:-"${SRC_PATH}"}";
-        upstream="${u:-"${GIT_UPSTREAM}/${GIT_REPO}"}";
+    branch="${b:-"${GIT_TAG}"}";
+    directory="${d:-"${SRC_PATH}"}";
+    upstream="${u:-"${GIT_UPSTREAM}/${GIT_REPO}"}";
 
-        echo 'Cloning ${NAME}' 1>&2;
+    echo 'Cloning ${NAME}' 1>&2;
 
-        devcontainer-utils-clone-${GIT_HOST}-repo \
-            --tags                                \
-            --branch "${branch}"                  \
-            --recurse-submodules                  \
-            -j ${n_jobs:-$(nproc --ignore=1)}     \
-            -c checkout.defaultRemote=upstream    \
-            "${OPTS[@]}"                          \
-            --                                    \
-            "${upstream}"                         \
-            "${directory}"                        \
-        ;
+    devcontainer-utils-clone-${GIT_HOST}-repo \
+        --tags                                \
+        --branch "${branch}"                  \
+        --recurse-submodules                  \
+        -j ${n_jobs:-$(nproc --ignore=1)}     \
+        -c checkout.defaultRemote=upstream    \
+        "${OPTS[@]}"                          \
+        --                                    \
+        "${upstream}"                         \
+        "${directory}"                        \
+    ;
 
-        git -C "${SRC_PATH}" config --add remote.upstream.fetch '^refs/heads/pull-request/*';
+    git -C "${SRC_PATH}" config --add remote.upstream.fetch '^refs/heads/pull-request/*';
 
-        local upstream_branches="$(git -C "${SRC_PATH}" branch --remotes --list 'upstream/pull-request/*')";
-        if test -n "${upstream_branches:-}"; then
-            git -C "${SRC_PATH}" branch --remotes -d ${upstream_branches};
-        fi
+    local upstream_branches="$(git -C "${SRC_PATH}" branch --remotes --list 'upstream/pull-request/*')";
+    if test -n "${upstream_branches:-}"; then
+        git -C "${SRC_PATH}" branch --remotes -d ${upstream_branches};
+    fi
 
-        git -C "${SRC_PATH}" remote prune upstream;
+    git -C "${SRC_PATH}" remote prune upstream;
 
-        if test -z "${no_update_env}"; then
-            rapids-update-content-command;
-            rapids-post-attach-command;
-        fi
+    if test -z "${no_update_env}"; then
+        rapids-update-content-command;
+        rapids-post-attach-command;
     fi
 }
 
-clone_${NAME} "$@";
+clone_${NAME} "$@" <&0;

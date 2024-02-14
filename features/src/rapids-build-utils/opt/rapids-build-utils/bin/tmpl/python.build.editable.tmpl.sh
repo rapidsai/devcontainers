@@ -5,22 +5,14 @@
 #
 # Build ${PY_LIB} in editable mode.
 #
-# Boolean options:
-#  -h,--help                              print this text
-#  -v,--verbose                           verbose output
-#
-# Options that require values:
-#  -a,--archs <num>                       Build <num> CUDA archs in parallel
-#                                         (default: 1)
-#  -j,--parallel <num>                    Run <num> parallel compilation jobs
-#                                         (default: $(nproc))
-#  -m,--max-device-obj-memory-usage <num> An upper-bound on the amount of memory each CUDA device object compilation
-#                                         is expected to take. This is used to estimate the number of parallel device
-#                                         object compilations that can be launched without hitting the system memory
-#                                         limit.
-#                                         Higher values yield fewer parallel CUDA device object compilations.
-#                                         (default: 1)
-#  -D* <var>[:<type>]=<value>             Create or update a cmake cache entry.
+# @_include_value_options rapids-get-num-archs-jobs-and-load -h;
+# @_include_cmake_options;
+# @_include_pip_install_options;
+# @_include_pip_package_index_options;
+# @_include_pip_general_options;
+
+# shellcheck disable=SC1091
+. rapids-generate-docstring;
 
 is_using_scikit_build_core() {
     local -;
@@ -33,7 +25,7 @@ build_${PY_LIB}_python_editable() {
     local -;
     set -euo pipefail;
 
-    eval "$(devcontainer-utils-parse-args "$0" - <<< "${@@Q}")";
+    eval "$(_parse_args "$@" <&0)";
 
     if [[ ! -d "${PY_SRC}" ]]; then
         exit 1;
@@ -44,22 +36,24 @@ build_${PY_LIB}_python_editable() {
         rapids-get-num-archs-jobs-and-load "$@" \
     )";
 
-    local cmake_args=(${PY_CMAKE_ARGS});
     # shellcheck disable=SC1091
     . devcontainer-utils-debug-output 'rapids_build_utils_debug' 'build-all build-${NAME} build-${PY_LIB}-python build-${PY_LIB}-python-editable';
 
-    cmake_args+=(${CMAKE_ARGS:-});
-    cmake_args+=(${CPP_DEPS});
-    cmake_args+=(${CPP_ARGS});
-    cmake_args+=(${v:+--log-level=VERBOSE});
-    cmake_args+=("${OPTS[@]}");
+    local -a cmake_args_=(
+        ${PY_CMAKE_ARGS}
+        ${CMAKE_ARGS:-}
+        ${CPP_DEPS}
+        ${CPP_ARGS}
+        ${v:+--log-level=VERBOSE}
+    );
 
-    local ninja_args=();
-    local pip_args=(${PIP_INSTALL_ARGS});
+    local -a cmake_args="(
+        ${cmake_args_+"${cmake_args_[*]@Q}"}
+        $(rapids-select-cmake-args "${ARGS[@]}")
+    )";
 
     if test -n "${v}"; then
         ninja_args+=("-v");
-        pip_args+=("-vv");
     fi
 
     if test -n "${n_jobs}"; then
@@ -70,8 +64,16 @@ build_${PY_LIB}_python_editable() {
         ninja_args+=("-l${n_load}");
     fi
 
+    local -a pip_args_=(${PIP_INSTALL_ARGS});
+    local -a pip_args="(
+        ${pip_args_+"${pip_args_[*]@Q}"}
+        $(rapids-select-pip-wheel-args "${ARGS[@]}")
+    )";
+
     if is_using_scikit_build_core; then
-        pip_args+=("--config-settings=build-dir=$(rapids-get-cmake-build-dir "${PY_SRC}" "${cmake_args[@]}")");
+        pip_args+=(-C "build-dir=$(rapids-get-cmake-build-dir "${PY_SRC}" "${cmake_args[@]}")");
+    else
+        export SETUPTOOLS_ENABLE_FEATURES="legacy-editable";
     fi
 
     pip_args+=("--no-build-isolation");
@@ -95,11 +97,10 @@ build_${PY_LIB}_python_editable() {
         CMAKE_ARGS="${cmake_args[*]}"                \
         SKBUILD_BUILD_OPTIONS="${ninja_args[*]}"     \
         NVCC_APPEND_FLAGS="${nvcc_append_flags}"     \
-        SETUPTOOLS_ENABLE_FEATURES="legacy-editable" \
             python -m pip install "${pip_args[@]}"   \
         ;
         { set +x; } 2>/dev/null; echo -n "${PY_LIB} install time:";
     ) 2>&1;
 }
 
-build_${PY_LIB}_python_editable "$@";
+build_${PY_LIB}_python_editable "$@" <&0;

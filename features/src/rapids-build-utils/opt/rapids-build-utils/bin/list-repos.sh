@@ -6,24 +6,24 @@
 # Query the `manifest.yaml` in a shell-friendly format, optionally filtering results by repository name.
 #
 # Boolean options:
-#  -h,--help             print this text
+#  -h,--help             Print this text.
 #
 # Options that require values:
-#  -m,--manifest <file>  Use a specific manifest.json
-#                        (default: ${PROJECT_MANIFEST_YML:-"/opt/rapids-build-utils/manifest.yaml"})
+# @_include_value_options rapids-query-manifest -h | tail -n+2 | head -n-1;
 #  -o,--omit <repo>      Filter the results to exclude <repo> entries.
 #                        (default: none)
 #  -r,--repo <repo>      Filter the results to include <repo> entries.
 #                        (default: all repositories)
 
+# shellcheck disable=SC1091
+. rapids-generate-docstring;
+
 list_repos() {
     local -;
     set -euo pipefail;
 
+    eval "$(_parse_args --skip '-m,--manifest' "$@" <&0)";
 
-    eval "$(devcontainer-utils-parse-args "$0" --skip '
-        -m,--manifest
-    ' - <<< "${@@Q}")";
     # shellcheck disable=SC1091
     . devcontainer-utils-debug-output 'rapids_build_utils_debug' 'list-repos';
 
@@ -53,4 +53,4 @@ list_repos() {
     rapids-query-manifest "${OPTS[@]}" -- "${query}";
 }
 
-list_repos "$@";
+list_repos "$@" <&0;

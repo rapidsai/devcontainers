@@ -6,40 +6,44 @@
 # CPack ${CPP_LIB}.
 #
 # Boolean options:
-#  -h,--help                                    print this text
-#  -v,--verbose                                 verbose output
+#  -h,--help                                     Print this text.
+# @_include_bool_options rapids-select-cmake-install-args -h | tail -n-3 | head -n-1;
 #
 # Options that require values:
-#  -j,--parallel <num>                          Use <num> to compress in parallel
-#                                               (default: $(nproc))
-#  --component <comp>                           Component-based install. Only install component <comp>.
-#                                               (default: all)
-#  --config    <cfg>                            For multi-configuration generators, choose configuration <cfg>
-#                                               (default: none)
-#  --default-directory-permissions <permission> Default install permission. Use default permission <permission>.
-#  -o,--out-dir <dir>                           copy cpack'd TGZ file into <dir>
-#                                               (default: none)
+#  -j,--parallel <num>                           Use <num> threads to compress in parallel
+#                                                (default: $(nproc))
+#  -o,--out-dir <dir>                            copy cpack'd TGZ file into <dir>
+#                                                (default: none)
+# @_include_value_options rapids-select-cmake-install-args -h | tail -n-5 | head -n-2;
+
+# shellcheck disable=SC1091
+. rapids-generate-docstring;
 
 cpack_${CPP_LIB}_cpp() {
     local -;
     set -euo pipefail;
 
-    eval "$(devcontainer-utils-parse-args "$0" --skip '
-        -v,--verbose
-        --strip
-        --config
-        --default-directory-permissions
-    ' - <<< "${@@Q}")";
+    eval "$(_parse_args --take '
+        -j,--parallel
+        -o,--out-dir
+        --component
+    ' "$@" <&0)";
 
     if ! test -f "${CPP_SRC}/${BIN_DIR}/CMakeCache.txt"; then
         exit 0;
     fi
 
-    eval "$(rapids-get-num-archs-jobs-and-load -a1 "$@")";
+    eval "$(                                    \
+    PARALLEL_LEVEL=${PARALLEL_LEVEL:-$(nproc)}  \
+        rapids-get-num-archs-jobs-and-load "$@" \
+    )";
+
     # shellcheck disable=SC1091
     . devcontainer-utils-debug-output 'rapids_build_utils_debug' 'cpack-all cpack-${NAME} cpack-${CPP_LIB}-cpp';
 
-    test ${#component[@]} -eq 0 && component=(all);
+    out_dir="${o:+$(realpath -ms "${o}")}";
+
+    ((${#component[@]})) || component=(all);
 
     time (
         local comp;
@@ -78,7 +82,7 @@ cpack_${CPP_LIB}_cpp() {
             fi
         fi
 
-        if test -z "${name:-}" || test -z "${vers:-}"; then
+        if test -z "${name:-}"; then
             exit 1;
         fi
 
@@ -88,17 +92,18 @@ cpack_${CPP_LIB}_cpp() {
                 then comp="";
             fi
 
-            slug="${name}-${vers}${comp:+-$comp}-${kernel}";
+            slug="${name}${vers:+-$vers}${comp:+-$comp}-${kernel}";
             outd="${CPP_SRC}/${BIN_DIR}/_CPack_Packages/${kernel}/TGZ";
 
-            install-${CPP_LIB}-cpp -p "${outd}/${slug}" ${comp:+--component "${comp}"} "${OPTS[@]}";
+            install-${CPP_LIB}-cpp --prefix "${outd}/${slug}" ${comp:+--component "${comp}"} "${OPTS[@]}";
 
             if test -d "${outd}/${slug}"; then
                 tar -C "${outd}" -c ${v:+-v} -f "${outd}/${slug}.tar.gz" -I "pigz -p ${n_jobs}" "${slug}";
                 cp -a "${outd}/${slug}.tar.gz" "${CPP_SRC}/${BIN_DIR}/";
-                if test -d "${out_dir}"/ \
+                if test -n "${out_dir}" \
                 && test -f "${CPP_SRC}/${BIN_DIR}/${slug}.tar.gz"; then
-                    cp -a "${CPP_SRC}/${BIN_DIR}/${slug}.tar.gz" "${out_dir}"/;
+                    mkdir -p "${out_dir}/";
+                    cp -a "${CPP_SRC}/${BIN_DIR}/${slug}.tar.gz" "${out_dir}/";
                 fi
             fi
         done
@@ -107,4 +112,4 @@ cpack_${CPP_LIB}_cpp() {
     ) 2>&1;
 }
 
-cpack_${CPP_LIB}_cpp "$@";
+cpack_${CPP_LIB}_cpp "$@" <&0;

@@ -8,22 +8,22 @@
 # If the user doesn't have a fork of the repository, notify the user and ask whether they would like to fork it.
 #
 # Boolean options:
-#  -h,--help                    print this text
+#  -h,--help                    Print this text.
 #  -q,--quiet                   Operate quietly. Progress is not reported to the standard error stream.
-#  --no-fork                    don't prompt the user to fork the repo if a user fork isn't found
+#  --no-fork                    Don't prompt the user to fork the repo if a user fork isn't found.
 #                               (default: false)
-#  --no-update-env              don't update the Python env with the repo's dependencies after cloning
+#  --no-update-env              Don't update the Python env with the repo's dependencies after cloning.
 #                               (default: false)
-#  --clone-upstream             always clone the upstream, not the user's fork
+#  --clone-upstream             Always clone the upstream, not the user's fork.
 #                               (default: false)
 #
 # Options that require values:
-#  -b,--branch <branch_or_tag>  check the repo out to <branch_or_tag>
-#  -j,--jobs,--parallel <num>   Clone <num> submodules in parallel
+#  -b,--branch <branch_or_tag>  Check the repo out to <branch_or_tag>.
+#  -j,--jobs,--parallel <num>   Clone <num> submodules in parallel.
 #
 # Positional arguments:
-#  upstream                     set <upstream> as the `upstream` remote
-#  directory                    clone the repo into <directory>
+#  upstream                     Set <upstream> as the `upstream` remote.
+#  directory                    Clone the repo into <directory>.
 
 get_default_branch() {
     local repo="${1}";
@@ -88,7 +88,7 @@ clone_github_repo() {
     eval "$(devcontainer-utils-parse-args "$0" --skip '
         -q,--quiet
         -j,--jobs,--parallel
-    ' - <<< "${@@Q}")";
+    ' "$@" <&0)";
 
     # shellcheck disable=SC1091
     . devcontainer-utils-debug-output 'devcontainer_utils_debug' 'clone clone-github-repo';
@@ -169,4 +169,4 @@ clone_github_repo() {
         ;
 }
 
-clone_github_repo "$@";
+clone_github_repo "$@" <&0;

@@ -5,33 +5,24 @@
 #
 # Configure and build ${CPP_LIB}, then build an editable install or wheel of ${PY_LIB}.
 #
-# Boolean options:
-#  -h,--help                              print this text
-#  -v,--verbose                           verbose output
+# Forwards relevant arguments to each underlying script.
 #
-# Options that require values:
-#  -t,--type (editable|wheel)             The type of Python build to run (editable or wheel)
-#                                         (default: editable)
-#  -a,--archs <num>                       Build <num> CUDA archs in parallel
-#                                         (default: 1)
-#  -j,--parallel <num>                    Run <num> parallel compilation jobs
-#                                         (default: $(nproc))
-#  -m,--max-device-obj-memory-usage <num> An upper-bound on the amount of memory each CUDA device object compilation
-#                                         is expected to take. This is used to estimate the number of parallel device
-#                                         object compilations that can be launched without hitting the system memory
-#                                         limit.
-#                                         Higher values yield fewer parallel CUDA device object compilations.
-#                                         (default: 1)
-#  -D* <var>[:<type>]=<value>             Create or update a cmake cache entry.
+# @_include_value_options rapids-get-num-archs-jobs-and-load -h;
+# @_include_cmake_options;
+# @_include_cmake_install_options;
+# @_include_pip_wheel_options;
+# @_include_pip_package_index_options;
+# @_include_pip_general_options;
+
+# shellcheck disable=SC1091
+. rapids-generate-docstring;
 
 build_${NAME}() {
     local -;
     set -euo pipefail;
 
+    eval "$(_parse_args --take '-t,--type' "$@" <&0)";
 
-    eval "$(devcontainer-utils-parse-args "$0" --take '
-        -t,--type
-    ' - <<< "${@@Q}")";
     # shellcheck disable=SC1091
     . devcontainer-utils-debug-output 'rapids_build_utils_debug' 'build-all build-${NAME}';
 
@@ -48,4 +39,4 @@ build_${NAME}() {
     done
 }
 
-build_${NAME} "$@";
+build_${NAME} "$@" <&0;

@@ -9,21 +9,19 @@
 # conda env.
 #
 # Boolean options:
-#  -h,--help             print this text
+#  -h,--help             Print this text.
 #
 # Options that require values:
-#  -m,--manifest <file>  Use a specific manifest.json
-#                        (default: ${PROJECT_MANIFEST_YML:-"/opt/rapids-build-utils/manifest.yaml"})
-#  -o,--omit <repo>      Filter the results to exclude <repo> entries.
-#                        (default: none)
-#  -r,--repo <repo>      Filter the results to only include <repo> entries.
-#                        (default: all repositories)
+# @_include_value_options rapids-list-repos -h | tail -n+2 | head -n-1;
+
+# shellcheck disable=SC1091
+. rapids-generate-docstring;
 
 python_conda_pkg_names() {
     local -;
     set -euo pipefail;
 
-    eval "$(devcontainer-utils-parse-args "$0" - <<< "${@@Q}")";
+    eval "$(_parse_args "$@" <&0)";
 
     eval "$(rapids-list-repos "$@")";
 
@@ -53,4 +51,4 @@ python_conda_pkg_names() {
     done
 }
 
-python_conda_pkg_names "$@";
+python_conda_pkg_names "$@" <&0;

@@ -6,16 +6,16 @@
 # Generate a combined conda environment YAML file for all repos.
 #
 # Boolean options:
-#  -h,--help             print this text
+#  -h,--help             Print this text.
 #
 # Options that require values:
 #  -k,--key <key>        Only include the key(s)
-#  -m,--manifest <file>  Use a specific manifest.json
-#                        (default: ${PROJECT_MANIFEST_YML:-"/opt/rapids-build-utils/manifest.yaml"})
-#  -o,--omit <repo>      Omit dependencies for repo(s).
-#                        (default: none)
+# @_include_value_options rapids-list-repos -h | tail -n+2 | head -n-3;
 #  --repo <repo>         Only include dependencies for repo(s).
 #                        (default: all repositories)
+
+# shellcheck disable=SC1091
+. rapids-generate-docstring;
 
 generate_env_yaml() {
     (
@@ -29,12 +29,10 @@ make_conda_dependencies() {
     local -;
     set -euo pipefail;
 
+    eval "$(_parse_args --skip '-m,--manifest -o,--omit --repo' "$@" <&0)";
 
-    eval "$(devcontainer-utils-parse-args "$0" --skip '
-        -m,--manifest
-        -o,--omit
-        --repo
-    ' - <<< "${@@Q}")";
+    eval "$(rapids-list-repos "${OPTS[@]}")";
+
     # shellcheck disable=SC1091
     . devcontainer-utils-debug-output 'rapids_build_utils_debug' 'make-conda-env make-conda-dependencies';
 
@@ -47,8 +45,6 @@ make_conda_dependencies() {
     python_version="$(cut -d'.' -f3 --complement <<< "${python_version}")";
 
     local conda_env_yamls=();
-
-    eval "$(rapids-list-repos "${OPTS[@]}")";
 
     local i;
 
@@ -106,4 +102,4 @@ make_conda_dependencies() {
     fi
 }
 
-make_conda_dependencies "$@";
+make_conda_dependencies "$@" <&0;

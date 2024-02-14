@@ -6,18 +6,18 @@
 # Generate a combined pip requirements file for all repos.
 #
 # Boolean options:
-#  -h,--help               print this text
-#  --no-dedupe             don't sort and dedupe the combined requirements.txt
+#  -h,--help               Print this text.
+#  --no-dedupe             Don't sort and dedupe the combined requirements.txt.
 #
 # Options that require values:
 #  -k,--key <key>          Only include the key(s)
-#  -m,--manifest <file>    Use a specific manifest.json
-#                          (default: ${PROJECT_MANIFEST_YML:-"/opt/rapids-build-utils/manifest.yaml"})
-#  -o,--omit <repo>        Omit dependencies for repo(s).
-#                          (default: none)
+# @_include_value_options rapids-list-repos -h | tail -n+2 | head -n-3;
 #  --repo <repo>           Only include dependencies for repo(s).
 #                          (default: all repositories)
 #  -r,--requirement <file> Path(s) to additional requirement files to include.
+
+# shellcheck disable=SC1091
+. rapids-generate-docstring;
 
 generate_requirements() {
     (
@@ -31,12 +31,8 @@ make_pip_dependencies() {
     local -;
     set -euo pipefail;
 
+    eval "$(_parse_args --skip '-m,--manifest -o,--omit --repo' "$@" <&0)";
 
-    eval "$(devcontainer-utils-parse-args "$0" --skip '
-        -m,--manifest
-        -o,--omit
-        --repo
-    ' - <<< "${@@Q}")";
     # shellcheck disable=SC1091
     . devcontainer-utils-debug-output 'rapids_build_utils_debug' 'make-pip-env make-pip-dependencies';
 
@@ -124,4 +120,4 @@ make_pip_dependencies() {
     fi
 }
 
-make_pip_dependencies "$@";
+make_pip_dependencies "$@" <&0;

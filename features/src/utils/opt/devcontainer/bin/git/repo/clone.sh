@@ -6,13 +6,13 @@
 # Clone a git repository, optionally checking out a branch or tag, and optionally setting the upstream remote.
 #
 # Boolean options:
-#  -h,--help                    print this text
+#  -h,--help                    Print this text
 #  -q,--quiet                   Operate quietly. Progress is not reported to the standard error stream.
 #
 # Options that require values:
-#  -b,--branch <branch_or_tag>  check the repo out to <branch_or_tag>
+#  -b,--branch <branch_or_tag>  Check the repo out to <branch_or_tag>
 #  -j,--jobs,--parallel <num>   Clone <num> submodules in parallel
-#  -u,--upstream <upstream>     set <upstream> as the `upstream` remote
+#  -u,--upstream <upstream>     Set <upstream> as the `upstream` remote
 #
 # Positional arguments:
 #  repository                   The (possibly remote) repository to clone
@@ -22,8 +22,8 @@ clone_git_repo() {
     local -;
     set -euo pipefail;
 
+    eval "$(devcontainer-utils-parse-args "$0" "$@" <&0)";
 
-    eval "$(devcontainer-utils-parse-args "$0" - <<< "${@@Q}")";
     # shellcheck disable=SC1091
     . devcontainer-utils-debug-output 'devcontainer_utils_debug' 'clone clone-git-repo';
 
@@ -103,4 +103,4 @@ clone_git_repo() {
     git -C "${directory}" submodule update --init --recursive ${j} ${q};
 }
 
-clone_git_repo "$@";
+clone_git_repo "$@" <&0;

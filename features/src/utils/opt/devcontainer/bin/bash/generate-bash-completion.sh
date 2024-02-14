@@ -10,10 +10,10 @@
 #  -v,--verbose                 verbose output
 #
 # Options that require values:
-#  -c,--command  <name>         Name of the command for which to generate the bash completion.
-#  -o,--out-dir  <path>         Path to the completion script output directory
-#                               (default: ${HOME}/.bash_completion.d)
-#  -t,--template <path>         Path to the bash completion script template file
+#  -c,--command  <name>         Command name(s) for which to generate bash completions.
+#  -o,--out-file <file>         Path to write the completion script file
+#                               (default: ${HOME}/.bash_completion.d/devcontainer-utils-completions)
+#  -t,--template <file>         Path to the bash completion script template file
 #                               (default: `which devcontainer-utils-bash-completion.tmpl`)
 
 generate_bash_completion() {
@@ -27,22 +27,22 @@ generate_bash_completion() {
     # shellcheck disable=SC1091
     . "${utils}/debug-output.sh" 'devcontainer_utils_debug' 'generate-bash-completion';
 
-    command="${c:?-c|--command is required}";
-    out_dir="$(realpath -m "${o:-"${HOME}/.bash_completion.d"}")";
+    : "${command:?-c|--command is required}";
+    out_file="$(realpath -m "${o:-"${HOME}/.bash_completion.d/devcontainer-utils-completions"}")";
     template="${t:-${COMPLETION_TMPL:-"$(which devcontainer-utils-bash-completion.tmpl)"}}";
 
     if test -f "${template}"; then
-        mkdir -p "${out_dir}";
-        local file="${out_dir}/devcontainer-utils-completions";
-        if ! test -f "${file}"; then
-            cp "${template}" "${file}";
-        fi
-
-        local str="complete -F _devcontainer_utils_completions ${command};";
-        if ! grep -q "${str}" "${file}"; then
-            echo "${str}" >> "${file}";
-        fi
+        mkdir -p "$(dirname "${out_file}")";
+        local file="${out_file}";
+        cp -n "${template}" "${out_file}";
+        local cmd;
+        for cmd in "${command[@]}"; do
+            local str="complete -F _devcontainer_utils_completions ${cmd};";
+            if ! grep -q "${str}" "${out_file}"; then
+                echo "${str}" >> "${out_file}";
+            fi
+        done
     fi
 }
 
-generate_bash_completion "$@";
+generate_bash_completion "$@" <&0;

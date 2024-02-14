@@ -3,40 +3,33 @@
 # Usage:
 #  cpack-all [OPTION]...
 #
-# Runs cpack-<repo> for each repo in "${NAMES}".
+# Runs cpack-<repo> for each repo in ${NAMES}.
 #
-# Forwards all arguments to each underlying script.
+# Forwards relevant arguments to each underlying script.
 #
 # Boolean options:
-#  -h,--help                                    print this text
-#  -v,--verbose                                 verbose output
-#  --strip                                      Strip before installing.
+#  -h,--help                                     Print this text.
+# @_include_bool_options rapids-select-cmake-install-args -h | tail -n-3 | head -n-1;
 #
 # Options that require values:
-#  -j,--parallel <num>                          CPack <num> repos in parallel
-#                                               (default: 1)
-#  --component <comp>                           Component-based install. Only install component <comp>.
-#                                               (default: all)
-#  --config    <cfg>                            For multi-configuration generators, choose configuration <cfg>
-#                                               (default: none)
-#  --default-directory-permissions <permission> Default install permission. Use default permission <permission>.
-#  -o,--out-dir <dir>                           copy cpack'd TGZ file into <dir>
-#                                               (default: none)
+#  -j,--parallel <num>                           CPack <num> repos in parallel.
+#                                                (default: 1)
+#  -o,--out-dir <dir>                            Copy cpack'd TGZ file into <dir>.
+#                                                (default: none)
+# @_include_value_options rapids-select-cmake-install-args -h | tail -n-5 | head -n-2;
+
+# shellcheck disable=SC1091
+. rapids-generate-docstring;
 
 cpack_all() {
     local -;
     set -euo pipefail;
 
-    eval "$(devcontainer-utils-parse-args "$0" --skip '
-        -v,--verbose
-        --component
-        --config
-        --default-directory-permissions
-        -o,--out-dir
-    ' - <<< "${@@Q}")";
+    eval "$(_parse_args --take '-j,--parallel' "$@" <&0)";
 
     j=${j:-1};
-    local -r n_repos=$(wc -w <<< "${NAMES}");
+
+    local -r n_repos=$(echo ${NAMES} | wc -w);
     local k=$((n_repos / j));
 
     eval "$(rapids-get-num-archs-jobs-and-load -j "${j}" -a "${k}" --max-archs "${k}")";
@@ -53,4 +46,4 @@ cpack_all() {
     ";
 }
 
-cpack_all "$@";
+cpack_all "$@" <&0;

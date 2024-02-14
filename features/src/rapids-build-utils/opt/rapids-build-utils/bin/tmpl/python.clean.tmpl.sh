@@ -6,14 +6,17 @@
 # Clean the ${PY_LIB} build dirs.
 #
 # Boolean options:
-#  -h,--help                    print this text
+#  -h,--help  Print this text.
+
+# shellcheck disable=SC1091
+. rapids-generate-docstring;
 
 clean_${PY_LIB}_python() {
     local -;
     set -euo pipefail;
 
+    eval "$(_parse_args "$@" <&0)";
 
-    eval "$(devcontainer-utils-parse-args "$0" - <<< "${@@Q}")";
     # shellcheck disable=SC1091
     . devcontainer-utils-debug-output 'rapids_build_utils_debug' 'clean-all clean-${NAME} clean-${PY_LIB}-python';
 
@@ -51,4 +54,4 @@ clean_${PY_LIB}_python() {
     fi
 }
 
-clean_${PY_LIB}_python "$@";
+clean_${PY_LIB}_python "$@" <&0;

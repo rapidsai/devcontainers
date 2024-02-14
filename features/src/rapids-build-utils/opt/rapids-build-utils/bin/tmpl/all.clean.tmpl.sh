@@ -3,24 +3,25 @@
 # Usage:
 #  clean-all [OPTION]...
 #
-# Runs clean-<repo> for each repo in "${NAMES}".
+# Runs clean-<repo> for each repo in ${NAMES}.
 #
-# Forwards all arguments to each underlying script.
+# Forwards relevant arguments to each underlying script.
 #
 # Boolean options:
-#  -h,--help                    print this text
-#  -v,--verbose                 verbose output
+#  -h,--help            Print this text.
+#  -v,--verbose         verbose output
 #
 # Options that require values:
-#  -j,--parallel <num>          Clone <num> repos in parallel
+#  -j,--parallel <num>  Clean <num> repos in parallel
+
+# shellcheck disable=SC1091
+. rapids-generate-docstring;
 
 clean_all() {
     local -;
     set -euo pipefail;
 
-    eval "$(devcontainer-utils-parse-args "$0" --skip '
-        -v,--verbose
-    ' - <<< "${@@Q}")";
+    eval "$(_parse_args --take '-j,--parallel' "$@" <&0)";
 
     eval "$(rapids-get-num-archs-jobs-and-load -a1 "$@")";
 
@@ -36,4 +37,4 @@ clean_all() {
     ";
 }
 
-clean_all "$@";
+clean_all "$@" <&0;

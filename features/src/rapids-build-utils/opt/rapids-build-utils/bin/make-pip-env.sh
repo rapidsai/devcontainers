@@ -6,38 +6,33 @@
 # Make a combined pip virtual environment for all repos.
 #
 # Boolean options:
-#  -h,--help               print this text
+#  -h,--help               Print this text.
 #  -f,--force              Delete the existing pip venv and recreate it from scratch.
-#  --no-dedupe             don't sort and dedupe the combined requirements.txt
+# @_include_bool_options rapids-make-pip-dependencies -h | tail -n+2 | head -n-3;
 #
-# Options that require values:
-#  -k,--key <key>          Only include the key(s)
-#  -m,--manifest <file>    Use a specific manifest.json
-#                          (default: ${PROJECT_MANIFEST_YML:-"/opt/rapids-build-utils/manifest.yaml"})
-#  -o,--omit <repo>        Omit dependencies for repo(s).
-#                          (default: none)
-#  --repo <repo>           Only include dependencies for repo(s).
-#                          (default: all repositories)
-#  -r,--requirement <file> Path(s) to additional requirement files to include.
+# @_include_value_options rapids-make-pip-dependencies -h;
+
+# shellcheck disable=SC1091
+. rapids-generate-docstring;
 
 make_pip_env() {
     local -;
     set -euo pipefail;
 
-    local env_name="${1}"; shift;
-    local env_file_name="${env_name}.requirements.txt";
-
-    eval "$(devcontainer-utils-parse-args "$0" --skip '
+    eval "$(_parse_args --skip '
         --no-dedupe
         -k,--key
         -m,--manifest
         -o,--omit
         --repo
         -r,--requirement
-    ' - <<< "${@@Q}")";
+    ' "${@:2}" <&0)";
 
     # shellcheck disable=SC1091
     . devcontainer-utils-debug-output 'rapids_build_utils_debug' 'make-pip-env';
+
+    local env_name="${1}"; shift;
+    local env_file_name="${env_name}.requirements.txt";
 
     # Remove the current virtual env if called with `-f|--force`
     if test -n "${force:-}"; then
@@ -88,7 +83,7 @@ make_pip_env() {
     fi
 }
 
-make_pip_env "${DEFAULT_VIRTUAL_ENV:-rapids}" "$@";
+make_pip_env "${DEFAULT_VIRTUAL_ENV:-rapids}" "$@" <&0;
 
 if test -f "${HOME}/.local/share/venvs/${DEFAULT_VIRTUAL_ENV:-rapids}/bin/activate"; then
     # shellcheck disable=SC1090

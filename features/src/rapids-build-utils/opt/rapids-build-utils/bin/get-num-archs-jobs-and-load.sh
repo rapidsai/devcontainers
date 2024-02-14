@@ -10,7 +10,7 @@
 # note: This wouldn't be necessary if `nvcc` interacted with the POSIX jobserver.
 #
 # Boolean options:
-#  -h,--help                    print this text
+#  -h,--help                              Print this text.
 #
 # Options that require values:
 #  -a,--archs <num>                       Build <num> CUDA archs in parallel
@@ -25,12 +25,15 @@
 #                                         Higher values yield fewer parallel CUDA device object compilations.
 #                                         (default: 1)
 
+# shellcheck disable=SC1091
+. rapids-generate-docstring;
+
 get_num_archs_jobs_and_load() {
     local -;
     set -euo pipefail
 
+    eval "$(_parse_args "$@" <&0)";
 
-    eval "$(devcontainer-utils-parse-args "$0" - <<< "${@@Q}")";
     # shellcheck disable=SC1091
     . devcontainer-utils-debug-output 'rapids_build_utils_debug' 'get-num-archs-jobs-and-load';
 
@@ -46,7 +49,7 @@ get_num_archs_jobs_and_load() {
 
     if test -z "${archs:-}" \
     && test -n "${INFER_NUM_DEVICE_ARCHITECTURES:-}"; then
-        archs="$(rapids-parse-cmake-define CMAKE_CUDA_ARCHITECTURES "${OPTS[@]}" || echo)";
+        archs="$(rapids-select-cmake-define CMAKE_CUDA_ARCHITECTURES "${OPTS[@]}" || echo)";
         archs="${archs:-${CMAKE_CUDA_ARCHITECTURES:-${CUDAARCHS:-}}}";
 
         case "${archs:-}" in
@@ -90,9 +93,9 @@ ____EOF
     n_jobs=$((n_jobs < 1 ? 1 : n_jobs));
     n_jobs=$((n_arch > 1 ? n_jobs : n_load));
 
-    echo "declare n_arch; n_arch=${n_arch}";
-    echo "declare n_jobs; n_jobs=${n_jobs}";
-    echo "declare n_load; n_load=${n_load}";
+    echo "declare n_arch=${n_arch}";
+    echo "declare n_jobs=${n_jobs}";
+    echo "declare n_load=${n_load}";
 }
 
-get_num_archs_jobs_and_load "$@";
+get_num_archs_jobs_and_load "$@" <&0;

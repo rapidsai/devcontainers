@@ -44,7 +44,7 @@ cpp_lib_dirs() {
 
         local j=0;
         for ((j=0; j < ${!cpp_length:-0}; j+=1)); do
-            local cpp_name="${repo}_cpp_${j}_name";
+            # local cpp_name="${repo}_cpp_${j}_name";
             local cpp_sub_dir="${repo}_cpp_${j}_sub_dir";
             echo ~/"${!repo_path:-}/${!cpp_sub_dir:-}";
         done
@@ -95,7 +95,7 @@ EOF
 }
 
 if echo "$@" | grep -qE '(\-u|\-\-update)'; then
-    (make_vscode_workspace "$@" > /tmp/workspace.code-workspace);
+    make_vscode_workspace "$@" > /tmp/workspace.code-workspace;
     if ! diff -BNqw ~/workspace.code-workspace /tmp/workspace.code-workspace >/dev/null 2>&1; then
         cp /tmp/workspace.code-workspace ~/workspace.code-workspace;
     fi
