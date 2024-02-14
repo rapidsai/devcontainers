@@ -62,7 +62,7 @@ VAULT_HOST="https://vault.ops.k8s.rapids.ai"
 VAULT_GITHUB_ORGS="nvidia nv-morpheus nv-legate rapids"
 
 # The TTL for the generated AWS credentials
-VAULT_S3_TTL=43200
+VAULT_S3_TTL=28800
 
 # The URI to the Vault API that generates AWS credentials
 # The full URL expands to `$VAULT_HOST/$VAULT_S3_URI?ttl=$VAULT_S3_TTL`

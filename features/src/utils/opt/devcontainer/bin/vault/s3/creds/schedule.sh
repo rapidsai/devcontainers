@@ -13,7 +13,7 @@ schedule_s3_creds_refresh() {
     fi
 
     local -r now="$(date '+%s')";
-    local ttl="${VAULT_S3_TTL:-"43200"}";
+    local ttl="${VAULT_S3_TTL:-"28800"}";
     ttl="${ttl%s}";
 
     local -r stamp="$(cat ~/.aws/stamp 2>/dev/null || echo "${now}")";

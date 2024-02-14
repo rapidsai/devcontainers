@@ -19,7 +19,7 @@ test_aws_creds() {
     if test -f ~/.aws/stamp; then
         local -r now="$(date '+%s')";
         local -r stamp="$(cat ~/.aws/stamp)";
-        local ttl="${VAULT_S3_TTL:-"43200"}";
+        local ttl="${VAULT_S3_TTL:-"28800"}";
         if [ $((now - stamp)) -ge "${ttl%s}" ]; then
             exit 1;
         fi

@@ -53,9 +53,9 @@ generate_s3_creds() {
     fi
 
     echo ""
+    echo "$(date)";
     echo "Attempting to use your GitHub account to authenticate";
     echo "with vault at '${VAULT_HOST}'.";
-    echo ""
 
     local vault_token="null";
 
@@ -70,7 +70,7 @@ generate_s3_creds() {
     echo "Successfully authenticated with vault!";
 
     local -r generated_at="$(date '+%s')";
-    local ttl="${VAULT_S3_TTL:-"43200"}";
+    local ttl="${VAULT_S3_TTL:-"28800"}";
     local uri="${VAULT_S3_URI:-"v1/aws/creds/devs"}";
 
     if grep -qE '^[0-9]$' <<< "${ttl}"; then
