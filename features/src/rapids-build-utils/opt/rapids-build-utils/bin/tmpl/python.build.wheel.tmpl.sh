@@ -14,13 +14,6 @@
 # shellcheck disable=SC1091
 . rapids-generate-docstring;
 
-is_using_scikit_build_core() {
-    local -;
-    set -euo pipefail;
-    test -f "${PY_SRC}/pyproject.toml";
-    test "scikit_build_core.build" = "$(python -c "import toml; print(toml.load('${PY_SRC}/pyproject.toml')['build-system']['build-backend'])")";
-}
-
 build_${PY_LIB}_python_wheel() {
     local -;
     set -euo pipefail;
@@ -74,8 +67,8 @@ build_${PY_LIB}_python_wheel() {
 
     case "${no_build_isolation:-$(pip config get wheel.no-build-isolation 2>/dev/null || echo)}" in
         True|true|yes|1)
-            if is_using_scikit_build_core; then
-                pip_args+=(-C "build-dir=$(rapids-get-cmake-build-dir "${PY_SRC}" "${cmake_args[@]}")");
+            if rapids-python-uses-scikit-build-core "${PY_SRC}"; then
+                pip_args+=(-C "build-dir=$(rapids-get-cmake-build-dir -- "${PY_SRC}" "${cmake_args[@]}")");
             fi
             ;;
     esac

@@ -58,6 +58,7 @@ declare -a commands=(
     python-conda-pkg-names
     python-pkg-names
     python-pkg-roots
+    python-uses-scikit-build-core
     query-manifest
     select-cmake-args
     select-cmake-build-args
@@ -67,6 +68,7 @@ declare -a commands=(
     select-cmd-args
     select-pip-install-args
     select-pip-wheel-args
+    update-build-dir-links
     update-content-command
 );
 

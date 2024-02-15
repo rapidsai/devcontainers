@@ -21,6 +21,8 @@ query_manifest() {
 
     eval "$(_parse_args "$@" <&0)";
 
+    if test "${REST[0]:-}" == --; then REST=("${REST[@]:1}"); fi;
+
     # shellcheck disable=SC1091
     . devcontainer-utils-debug-output 'rapids_build_utils_debug' 'query-manifest';
 

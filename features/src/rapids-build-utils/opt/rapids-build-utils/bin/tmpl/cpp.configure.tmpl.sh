@@ -41,7 +41,7 @@ configure_${CPP_LIB}_cpp() {
         $(rapids-select-cmake-args "${ARGS[@]}")
     )";
 
-    local -r bin_dir="$(rapids-get-cmake-build-dir "${CPP_SRC}" "${cmake_args[@]}")";
+    local -r bin_dir="$(rapids-get-cmake-build-dir -- "${CPP_SRC}" "${cmake_args[@]}")";
 
     # Reconfigure if previous configure failed
     if [[ ! -f "${bin_dir}/build.ninja" ]]; then

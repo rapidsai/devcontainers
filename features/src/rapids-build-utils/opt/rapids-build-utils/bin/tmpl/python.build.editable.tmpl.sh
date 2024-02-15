@@ -14,13 +14,6 @@
 # shellcheck disable=SC1091
 . rapids-generate-docstring;
 
-is_using_scikit_build_core() {
-    local -;
-    set -euo pipefail;
-    test -f "${PY_SRC}/pyproject.toml";
-    test "scikit_build_core.build" = "$(python -c "import toml; print(toml.load('${PY_SRC}/pyproject.toml')['build-system']['build-backend'])")";
-}
-
 build_${PY_LIB}_python_editable() {
     local -;
     set -euo pipefail;
@@ -70,8 +63,8 @@ build_${PY_LIB}_python_editable() {
         $(rapids-select-pip-wheel-args "${ARGS[@]}")
     )";
 
-    if is_using_scikit_build_core; then
-        pip_args+=(-C "build-dir=$(rapids-get-cmake-build-dir "${PY_SRC}" "${cmake_args[@]}")");
+    if rapids-python-uses-scikit-build-core "${PY_SRC}"; then
+        pip_args+=(-C "build-dir=$(rapids-get-cmake-build-dir -- "${PY_SRC}" "${cmake_args[@]}")");
     else
         export SETUPTOOLS_ENABLE_FEATURES="legacy-editable";
     fi

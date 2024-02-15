@@ -170,7 +170,7 @@ generate_scripts() {
     local k;
 
     local repo_names=();
-    local -r bin_dir="$(dirname "$(rapids-get-cmake-build-dir)")/latest";
+    local -r bin_dir="$(rapids-get-cmake-build-dir --skip-build-type)";
 
     for ((i=0; i < ${repos_length:-0}; i+=1)); do
 

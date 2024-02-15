@@ -124,6 +124,13 @@ _parse_args_for_file() {
             continue;
         fi
 
+        # If the first arg is `--`, break.
+        if [[ "${1:-}" == -- ]]; then
+            rest=("${@}");
+            set --;
+            break;
+        fi
+
         while getopts ":${optstring}${longoptstring:-}" opt; do
 
             arg=();
