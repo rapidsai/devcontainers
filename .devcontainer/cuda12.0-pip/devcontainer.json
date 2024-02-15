@@ -11,7 +11,7 @@
   "hostRequirements": {"gpu": "optional"},
   "features": {
     "./features/src/ucx": {"version": "1.14.1"},
-    "./features/src/cuda": {"installcuDNN": true},
+    "./features/src/cuda": {"version": "12.0", "installcuBLAS": true, "installcuDNN": true, "installcuSOLVER": true, "installcuRAND": true, "installcuSPARSE": true},
     "./features/src/rapids-build-utils": {}
   },
   "overrideFeatureInstallOrder": [
