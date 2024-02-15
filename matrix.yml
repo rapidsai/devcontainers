@@ -39,7 +39,7 @@ x-mambaforge: &conda { name: "mambaforge" }
 x-python: &python { name: "ghcr.io/devcontainers/features/python:1", version: "os-provided", installTools: "false", hide: true }
 x-cccl_dev: &cccl_dev { name: "cccl-dev", hide: true }
 x-cccl-clang-tools: &cccl_clang_tools {name: "llvm", version: "17", packages: "clang-format clangd", hide: true}
-x-rapids-clang-tools: &rapids_clang_tools {name: "llvm", version: "16", packages: "clang-format clangd", hide: false}
+x-rapids-clang-tools: &rapids_clang_tools {name: "llvm", version: "16", packages: "clang-format clangd", hide: true}
 
 # CCCL only needs a subset of the full CTK:
 x-cccl-cuda-opts: &cccl_cuda_opts {
