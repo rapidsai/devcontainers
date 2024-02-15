@@ -13,7 +13,7 @@ get_repos() {
     join \
       <(echo "${repos}" | sort -k 1b,1)                           \
       <(find ~ -maxdepth 1 -mindepth 1 -type d ! -name '.*' -exec \
-        bash -c "echo '${repos}' | grep \$(basename {})" \; \
+        bash -c "echo '${repos}' | grep \$(basename \$0)" {} \; \
       | sort -k 1b,1 | uniq) \
   | cut -d' ' -f3;
 }
@@ -75,8 +75,10 @@ make_vscode_workspace() {
     local -;
     set -euo pipefail;
 
-    # shellcheck disable=SC1091
-    . devcontainer-utils-debug-output 'rapids_build_utils_debug' 'make-vscode-workspace';
+    if type devcontainer-utils-debug-output >/dev/null 2>&1; then
+        # shellcheck disable=SC1091
+        . devcontainer-utils-debug-output 'rapids_build_utils_debug' 'make-vscode-workspace';
+    fi
 
     cat<<EOF
 {

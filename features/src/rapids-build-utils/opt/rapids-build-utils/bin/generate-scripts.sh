@@ -12,24 +12,28 @@ generate_completions() {
     local -;
     set -euo pipefail;
 
-    # shellcheck disable=SC1091
-    . devcontainer-utils-debug-output 'rapids_build_utils_debug' 'generate-scripts';
+    if type devcontainer-utils-debug-output >/dev/null 2>&1; then
+        # shellcheck disable=SC1091
+        . devcontainer-utils-debug-output 'rapids_build_utils_debug' 'generate-scripts';
 
-    readarray -t commands < <(find "${TMP_SCRIPT_DIR}"/ -maxdepth 1 -type f -exec basename {} \;);
+        readarray -t commands < <(find "${TMP_SCRIPT_DIR}"/ -maxdepth 1 -type f -exec basename {} \;);
 
-    devcontainer-utils-generate-bash-completion          \
-        --out-file "$(realpath -m "${COMPLETION_FILE}")" \
-        --template "$(realpath -m "${COMPLETION_TMPL}")" \
-        ${commands[@]/#/--command }                      \
-    ;
+        devcontainer-utils-generate-bash-completion          \
+            --out-file "$(realpath -m "${COMPLETION_FILE}")" \
+            --template "$(realpath -m "${COMPLETION_TMPL}")" \
+            ${commands[@]/#/--command }                      \
+        ;
+    fi
 }
 
 clean_scripts_and_aliases() {
     local -;
     set -euo pipefail;
 
-    # shellcheck disable=SC1091
-    . devcontainer-utils-debug-output 'rapids_build_utils_debug' 'generate-scripts';
+    if type devcontainer-utils-debug-output >/dev/null 2>&1; then
+        # shellcheck disable=SC1091
+        . devcontainer-utils-debug-output 'rapids_build_utils_debug' 'generate-scripts';
+    fi
 
     readarray -t commands < <(find "${TMP_SCRIPT_DIR}"/ -maxdepth 1 -type f -exec basename {} \;);
     sudo rm -f -- \
@@ -154,8 +158,10 @@ generate_scripts() {
 
     eval "$(rapids-list-repos "$@")";
 
-    # shellcheck disable=SC1091
-    . devcontainer-utils-debug-output 'rapids_build_utils_debug' 'generate-scripts';
+    if type devcontainer-utils-debug-output >/dev/null 2>&1; then
+        # shellcheck disable=SC1091
+        . devcontainer-utils-debug-output 'rapids_build_utils_debug' 'generate-scripts';
+    fi
 
     local -A cpp_name_to_path;
 
