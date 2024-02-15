@@ -122,6 +122,7 @@ include:
   # cuda
   - features: {[*python, *rapids_clang_tools, *cuda_prev_max], env: *gcc_env}
   - features: {[*python, *rapids_clang_tools, *cuda_curr_min], env: *gcc_env}
+  - features: {[*python, *rapids_clang_tools, *cuda_curr_max], env: *gcc_env}
   - features: {[*python, *rapids_clang_tools, *cuda_curr_max_rapids], env: *gcc_env}
 
   # mambaforge
