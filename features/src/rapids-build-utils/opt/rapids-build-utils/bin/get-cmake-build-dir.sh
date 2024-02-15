@@ -33,16 +33,23 @@ get_cmake_build_dir() {
     local -r type="$(rapids-select-cmake-build-type "$@" <&0 | tr '[:upper:]' '[:lower:]')";
     local -r cuda="$(grep -o '^[0-9]*.[0-9]*' <<< "${CUDA_VERSION:-${CUDA_VERSION_MAJOR:-12}.${CUDA_VERSION_MINOR:-0}}")";
 
-    bin+="${PYTHON_PACKAGE_MANAGER:+/${PYTHON_PACKAGE_MANAGER}}${cuda:+/cuda-${cuda}}";
+    bin+="${PYTHON_PACKAGE_MANAGER:+/${PYTHON_PACKAGE_MANAGER}}${cuda:+/cuda-${cuda}}/${type}";
 
     if test -n "${src:-}" && test -d "${src:-}"; then
         mkdir -p "${src}/${bin}";
-        (
-            cd "${src}/${bin}" || exit 1;
-            ln -sfn "${type}" latest;
-        );
+        local prefix;
+        local component;
+        for component in "build" "${PYTHON_PACKAGE_MANAGER:-}" "${cuda:+cuda-${cuda}}"; do
+            if test -n "${component:-}"; then
+                prefix+="${component}/";
+            (
+                cd "${src}/${prefix}" || exit 1;
+                ln -sfn "${bin#"${prefix}"}" latest;
+            )
+            fi
+        done
     fi
-    echo "${src:+${src}/}${bin}/${type}";
+    echo "$(realpath -m "${src:+${src}/}${bin}")";
 }
 
 get_cmake_build_dir "$@" <&0;
