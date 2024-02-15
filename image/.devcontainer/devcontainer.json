@@ -50,6 +50,7 @@
   "customizations": {
     "vscode": {
       "extensions": [
+        "augustocdias.tasks-shell-input",
         "llvm-vs-code-extensions.vscode-clangd",
         "mutantdino.resourcemonitor",
         "ms-vscode.cpptools",
