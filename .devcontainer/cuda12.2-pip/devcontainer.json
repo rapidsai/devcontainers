@@ -5,13 +5,13 @@
     "args": {
       "CUDA": "12.2",
       "PYTHON_PACKAGE_MANAGER": "pip",
-      "BASE": "rapidsai/devcontainers:24.04-cpp-llvm16-cuda12.2-ubuntu22.04"
+      "BASE": "rapidsai/devcontainers:24.04-cpp-cuda12.2-ubuntu22.04"
     }
   },
   "hostRequirements": {"gpu": "optional"},
   "features": {
     "./features/src/ucx": {"version": "1.14.1"},
-    "./features/src/cuda": {"installcuDNN": true},
+    "./features/src/cuda": {"version": "12.2", "installcuBLAS": true, "installcuDNN": true, "installcuSOLVER": true, "installcuRAND": true, "installcuSPARSE": true},
     "./features/src/rapids-build-utils": {}
   },
   "overrideFeatureInstallOrder": [

@@ -12,14 +12,27 @@ run_devcontainer() {
     # Generate the devcontainer
     eval "$(./scripts/generate.sh "$@" | xargs -r -d'\n' -I% echo -n local %\;)";
 
+    echo "tag=${tag-}" >&2;
+    echo "workspace=${workspace-}" >&2;
+
+    if ! test -n "${workspace-}" || ! test -n "${tag-}"; then exit 1; fi;
+
+    # Print the generated devcontainer JSON
+    cat "${workspace}/.devcontainer/devcontainer.json" >&2;
+
     # Build and tag the devcontainer
 
-    trap "$(cat <<________
-        code=\$?;
+    # shellcheck disable=SC2317
+    cleanup_1() {
+        code=$?;
+        set -x;
         find ./features/src -maxdepth 1 -type d -name '*\.[0-9]' -exec rm -r "{}" \;
-        exit \$code;
-________
-)" EXIT;
+        rm -rf "${1}";
+        exit "${code}";
+    }
+
+    # shellcheck disable=SC2064
+    trap "cleanup_1 '${workspace}'" EXIT;
 
     devcontainer build \
         --workspace-folder "${workspace}" \
@@ -48,7 +61,7 @@ ________
     vars+=("SCCACHE_BUCKET=${sccache_bucket}");
     vars+=("SCCACHE_REGION=${sccache_region}");
 
-    local remote_envs="$(echo "${vars[@]}" | xargs -r -d' ' -I% echo -n '--remote-env % ')";
+    local -r remote_envs="$(echo "${vars[@]}" | xargs -r -d' ' -I% echo -n '--remote-env % ')";
 
     # Start the devcontainer
     devcontainer up \
@@ -69,20 +82,28 @@ ________
         --mount "type=bind,source=$(pwd)/features/src/rapids-build-utils/opt/rapids-build-utils,target=/opt/rapids-build-utils" \
         ;
 
-    local container_id="$(docker ps | grep -P "vsc-${workspace#"${TMPDIR:-/tmp}/"}-[0-9a-z]{64}-uid" | cut -d' ' -f1)";
-    local image_tag="$(docker image inspect --format '{{index (split (index .RepoTags 0) ":") 0}}' \
-        "$(docker inspect "${container_id}" --format '{{index (split .Image ":") 1}}')")";
+    local -r container_id="$(docker ps | grep -P "vsc-${workspace#"${TMPDIR:-/tmp}/"}-[0-9a-z]{64}-uid" | cut -d' ' -f1)";
+    local -r image_tag="$(
+        docker image inspect --format '{{index (split (index .RepoTags 0) ":") 0}}' "$(
+            docker inspect "${container_id}" --format '{{index (split .Image ":") 1}}'
+        )"
+    )";
 
-    trap "$(cat <<________
-        code=\$?;
-        echo "Removing ${container_id}";
-        docker rm -f '${container_id}' >/dev/null 2>&1 || true;
-        docker rmi -f '${image_tag}' >/dev/null 2>&1 || true;
-        docker rmi -f '${image_tag%%-uid*}' >/dev/null 2>&1 || true;
+    # shellcheck disable=SC2317
+    cleanup_2() {
+        code=$?;
+        set -x;
         find ./features/src -maxdepth 1 -type d -name '*\.[0-9]' -exec rm -r "{}" \;
-        exit \$code;
-________
-)" EXIT;
+        echo "Removing ${container_id}";
+        docker rm -f "${container_id}" >/dev/null 2>&1 || true;
+        docker rmi -f "${image_tag}" >/dev/null 2>&1 || true;
+        docker rmi -f "${image_tag%%-uid*}" >/dev/null 2>&1 || true;
+        rm -rf "${1}";
+        exit "${code}";
+    }
+
+    # shellcheck disable=SC2064
+    trap "cleanup_2 '${workspace}'" EXIT;
 
     local cmds="${@:4}";
 
