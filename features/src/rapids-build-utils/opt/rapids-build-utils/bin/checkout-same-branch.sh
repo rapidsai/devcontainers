@@ -125,7 +125,7 @@ checkout_same_branch() {
         fi
 
         local remote="${branch_name/\/*}";
-        local branch="${branch_name/*\/}";
+        local branch="${branch_name/#"${remote}/"}";
 
         git -C ~/${!repo_path} fetch "${remote}" "refs/heads/${branch}";
 
