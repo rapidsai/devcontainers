@@ -132,18 +132,20 @@ gitlab.com ecdsa-sha2-nistp256 AAAAE2VjZHNhLXNoYTItbmlzdHAyNTYAAAAIbmlzdHAyNTYAA
 EOF
 )";
 
+# shellcheck disable=SC2174
 for dir in $(for_each_user_bashrc 'echo "$(dirname "$(realpath -m "$0")")"'); do
     # Copy in default git config
     rm -f "${dir}"/.gitconfig;
     cp .gitconfig "${dir}"/.gitconfig.default;
     # Copy in default .bash_completion
     cp .bash_completion "${dir}"/.bash_completion;
-    # Create ~/.cache, i.e. $XDG_CACHE_HOME
-    mkdir -p -m 0755 "${dir}"/.cache;
-    # Create ~/.cache, i.e. $XDG_CONFIG_HOME
-    mkdir -p -m 0755 "${dir}"/.config/{clangd,pip};
-    # Create ~/.local/state, i.e. $XDG_STATE_HOME
-    mkdir -p -m 0755 "${dir}"/.local/state;
+    mkdir -p -m 0755                                    \
+        `# Create ~/.cache, i.e. $XDG_CACHE_HOME`       \
+        "${dir}"/.cache                                 \
+        `# Create ~/.config, i.e. $XDG_CONFIG_HOME`     \
+        "${dir}"/.config "${dir}"/.config/{clangd,pip}  \
+        `# Create ~/.local/state, i.e. $XDG_STATE_HOME` \
+        "${dir}"/.local "${dir}"/.local/{bin,state}     \
     # Create or update ~/.ssh/known_hosts
     mkdir -p -m 0700 "${dir}"/.ssh;
     touch "${dir}"/.ssh/known_hosts;
@@ -160,19 +162,15 @@ rm -rf /root/.config/{clangd,pip};
 # Find the non-root user
 find_non_root_user;
 
-USERHOME="$(bash -c "echo ~${USERNAME}")";
-
-# Add user to the crontab group
-usermod -aG crontab "${USERNAME}";
-
-# Allow user to edit the crontab
-echo "${USERNAME}" >> /etc/cron.allow;
-
-# Create ~/.cache, i.e. $XDG_CONFIG_HOME
-mkdir -p -m 0755 "${USERHOME}"/.local/bin;
-
-# Ensure the user owns their homedir
-chown -R "${USERNAME}:${USERNAME}" "${USERHOME}";
+if test -n "${USERNAME-}"; then
+    USERHOME="$(bash -c "echo ~${USERNAME-}")";
+    # Add user to the crontab group
+    usermod -aG crontab "${USERNAME}";
+    # Allow user to edit the crontab
+    echo "${USERNAME}" >> /etc/cron.allow;
+    # Ensure the user owns their homedir
+    chown -R "${USERNAME}:${USERNAME}" "${USERHOME}";
+fi
 
 # Generate bash completions
 if dpkg -s bash-completion >/dev/null 2>&1; then
