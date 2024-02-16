@@ -42,6 +42,7 @@ jobs:
         build-all \
           --verbose \
           -j$(nproc --ignore=1) \
+          -DBUILD_SHARED_LIBS=ON \
           -DBUILD_TESTS=ON \
           -DBUILD_BENCHMARKS=ON \
           -DBUILD_ANN_BENCH=ON \
