@@ -81,7 +81,7 @@ done
 if type devcontainer-utils-generate-bash-completion >/dev/null 2>&1; then
     devcontainer-utils-generate-bash-completion                          \
         --out-file /etc/bash_completion.d/rapids-build-utils-completions \
-        ${commands[@]/#/--command }                                      \
+        ${commands[@]/#/--command rapids-}                               \
     ;
 fi
 

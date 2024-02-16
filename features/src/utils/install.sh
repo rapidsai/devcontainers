@@ -100,7 +100,7 @@ declare -a commands="($(for pair in "${commands_and_sources[@]}"; do cut -d' ' -
 # Install bash_completion script
 devcontainer-utils-generate-bash-completion                          \
     --out-file /etc/bash_completion.d/devcontainer-utils-completions \
-    ${commands[@]/#/--command }                                      \
+    ${commands[@]/#/--command devcontainer-utils-}                   \
 ;
 
 find /opt/devcontainer \
