@@ -37,9 +37,11 @@ x-rust: &rust { name: "rust" }
 x-mambaforge: &conda { name: "mambaforge" }
 
 x-python: &python { name: "ghcr.io/devcontainers/features/python:1", version: "os-provided", installTools: "false", hide: true }
-x-cccl_dev: &cccl_dev { name: "cccl-dev", hide: true }
+x-cccl-dev: &cccl_dev { name: "cccl-dev", hide: true }
 x-cccl-clang-tools: &cccl_clang_tools {name: "llvm", version: "17", packages: "clang-format clangd", hide: true}
-x-rapids-clang-tools: &rapids_clang_tools {name: "llvm", version: "16", packages: "clang-format clang-tidy clangd", hide: true}
+
+x-rapids-clangd: &rapids_clangd {name: "llvm", version: "dev", packages: "clangd", hide: true}
+x-rapids-clang-format: &rapids_clang_format {name: "llvm", version: "16", packages: "clang-format", hide: true}
 
 # CCCL only needs a subset of the full CTK:
 x-cccl-cuda-opts: &cccl_cuda_opts {
@@ -120,10 +122,10 @@ include:
 - os: "ubuntu:22.04"
   images:
   # cuda
-  - {features: [*python, *rapids_clang_tools, *cuda_prev_max], env: *gcc_env}
-  - {features: [*python, *rapids_clang_tools, *cuda_curr_min], env: *gcc_env}
-  - {features: [*python, *rapids_clang_tools, *cuda_curr_max], env: *gcc_env}
-  - {features: [*python, *rapids_clang_tools, *cuda_curr_max_rapids], env: *gcc_env}
+  - {features: [*python, *rapids_clang_format, *rapids_clangd, *cuda_prev_max], env: *gcc_env}
+  - {features: [*python, *rapids_clang_format, *rapids_clangd, *cuda_curr_min], env: *gcc_env}
+  - {features: [*python, *rapids_clang_format, *rapids_clangd, *cuda_curr_max], env: *gcc_env}
+  - {features: [*python, *rapids_clang_format, *rapids_clangd, *cuda_curr_max_rapids], env: *gcc_env}
 
   # mambaforge
   - features: [*conda]
