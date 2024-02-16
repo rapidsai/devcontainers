@@ -2,6 +2,7 @@ x-cuda-prev-min: &cuda_prev_min { name: "cuda", version: "11.1" }
 x-cuda-prev-max: &cuda_prev_max { name: "cuda", version: "11.8" }
 x-cuda-curr-min: &cuda_curr_min { name: "cuda", version: "12.0" }
 x-cuda-curr-max: &cuda_curr_max { name: "cuda", version: "12.3" }
+x-cuda-curr-max: &cuda_curr_max_rapids { name: "cuda", version: "12.2" }
 
 x-gcc-6: &gcc_6 { name: "gcc", version: "6" }
 x-gcc-7: &gcc_7 { name: "gcc", version: "7" }
@@ -36,8 +37,11 @@ x-rust: &rust { name: "rust" }
 x-mambaforge: &conda { name: "mambaforge" }
 
 x-python: &python { name: "ghcr.io/devcontainers/features/python:1", version: "os-provided", installTools: "false", hide: true }
-x-cccl_dev: &cccl_dev { name: "cccl-dev", hide: true }
+x-cccl-dev: &cccl_dev { name: "cccl-dev", hide: true }
 x-cccl-clang-tools: &cccl_clang_tools {name: "llvm", version: "17", packages: "clang-format clangd", hide: true}
+
+x-rapids-clangd: &rapids_clangd {name: "llvm", version: "dev", packages: "clangd", hide: true}
+x-rapids-clang-format: &rapids_clang_format {name: "llvm", version: "16", packages: "clang-format", hide: true}
 
 # CCCL only needs a subset of the full CTK:
 x-cccl-cuda-opts: &cccl_cuda_opts {
@@ -118,18 +122,10 @@ include:
 - os: "ubuntu:22.04"
   images:
   # cuda
-  - features: [*python, *cuda_prev_max]
-  - features: [*python, *cuda_curr_max]
-
-  # llvm
-  - features: [*python, *llvm_prev]
-  - features: [*python, *llvm_curr]
-
-  # llvm-cuda
-  - features: [*python, *llvm_prev, *cuda_prev_max]
-  - features: [*python, *llvm_prev, *cuda_curr_min]
-  - features: [*python, *llvm_curr, *cuda_prev_max]
-  - features: [*python, *llvm_curr, *cuda_curr_min]
+  - {features: [*python, *rapids_clang_format, *rapids_clangd, *cuda_prev_max], env: *gcc_env}
+  - {features: [*python, *rapids_clang_format, *rapids_clangd, *cuda_curr_min], env: *gcc_env}
+  - {features: [*python, *rapids_clang_format, *rapids_clangd, *cuda_curr_max], env: *gcc_env}
+  - {features: [*python, *rapids_clang_format, *rapids_clangd, *cuda_curr_max_rapids], env: *gcc_env}
 
   # mambaforge
   - features: [*conda]
@@ -143,19 +139,24 @@ include:
   # cuda-mambaforge
   - features: [*cuda_prev_max, *conda]
 
+###
+# Removed to cut down on total image count.
+# Can add them back if Legate needs them.
+###
+
 # Legate devcontainers
 
-- os: "ubuntu:22.04"
-  images:
+# - os: "ubuntu:22.04"
+#   images:
 
-  # llvm-rust
-  - features: [*python, *llvm_prev, *rust]
-  - features: [*python, *llvm_curr, *rust]
+#   # llvm-rust
+#   - features: [*python, *llvm_prev, *rust]
+#   - features: [*python, *llvm_curr, *rust]
 
-  # llvm-rust-cuda
-  - features: [*python, *llvm_prev, *rust, *cuda_prev_max]
-  - features: [*python, *llvm_prev, *rust, *cuda_curr_min]
-  - features: [*python, *llvm_prev, *rust, *cuda_curr_max]
-  - features: [*python, *llvm_curr, *rust, *cuda_prev_max]
-  - features: [*python, *llvm_curr, *rust, *cuda_curr_min]
-  - features: [*python, *llvm_curr, *rust, *cuda_curr_max]
+#   # llvm-rust-cuda
+#   - features: [*python, *llvm_prev, *rust, *cuda_prev_max]
+#   - features: [*python, *llvm_prev, *rust, *cuda_curr_min]
+#   - features: [*python, *llvm_prev, *rust, *cuda_curr_max]
+#   - features: [*python, *llvm_curr, *rust, *cuda_prev_max]
+#   - features: [*python, *llvm_curr, *rust, *cuda_curr_min]
+#   - features: [*python, *llvm_curr, *rust, *cuda_curr_max]

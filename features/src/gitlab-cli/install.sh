@@ -60,6 +60,8 @@ echo "Downloading gitlab CLI...";
 
 install_deb_using_gitlab;
 
+glab config set -g check_update false;
+
 if dpkg -s bash-completion >/dev/null 2>&1; then
     if type glab >/dev/null 2>&1; then
         glab completion -s bash | tee /etc/bash_completion.d/glab >/dev/null;
