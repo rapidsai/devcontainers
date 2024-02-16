@@ -12,12 +12,24 @@ build_devcontainer() {
     # Generate the devcontainer
     eval "$(./scripts/generate.sh "$@" | xargs -r -d'\n' -I% echo -n local %\;)";
 
-    trap "$(cat <<________
-        code=\$?;
+    echo "tag=${tag-}" >&2;
+    echo "workspace=${workspace-}" >&2;
+
+    if ! test -n "${workspace-}" || ! test -n "${tag-}"; then exit 1; fi;
+
+    # Print the generated devcontainer JSON
+    cat "${workspace}/.devcontainer/devcontainer.json" >&2;
+
+    cleanup() {
+        code=$?;
+        set -x;
         find ./features/src -maxdepth 1 -type d -name '*\.[0-9]' -exec rm -r "{}" \;
-        exit \$code;
-________
-)" EXIT;
+        rm -rf "${1}";
+        exit "${code}";
+    }
+
+    # shellcheck disable=SC2064
+    trap "cleanup '${workspace}'" EXIT;
 
     # Build the devcontainer
     devcontainer build \
