@@ -167,30 +167,35 @@ clone_gitlab_repo() {
         done
     fi
 
+    local origin_;
+    local upstream_;
+
     if ! glab auth status 2>&1 | grep -q "No token provided"; then
         if [ "$(glab config get git_protocol)" = "ssh" ]; then
-            origin="$(get_repo_ssh_url "${origin}")";
-            upstream="$(get_repo_ssh_url "${upstream}")";
+            origin_="$(get_repo_ssh_url "${origin}")";
+            upstream_="$(get_repo_ssh_url "${upstream}")";
         else
-            origin="$(get_repo_git_url "${origin}")";
-            upstream="$(get_repo_git_url "${upstream}")";
-        fi
-    else
-        if [ "$(glab config get git_protocol)" = "ssh" ]; then
-            origin="git@${GITLAB_HOST:-gitlab.com}:${origin}.git";
-            upstream="git@${GITLAB_HOST:-gitlab.com}:${upstream}.git";
-        else
-            origin="https://${GITLAB_HOST:-gitlab.com}/${origin}.git";
-            upstream="https://${GITLAB_HOST:-gitlab.com}/${upstream}.git";
+            origin_="$(get_repo_git_url "${origin}")";
+            upstream_="$(get_repo_git_url "${upstream}")";
         fi
     fi
 
-    devcontainer-utils-clone-git-repo         \
-        ${branch:+--branch "${branch}"}       \
-        ${upstream:+--upstream "${upstream}"} \
-        "${OPTS[@]}"                          \
-        --                                    \
-        "${origin}" "${REST[@]}"              \
+    if test -z "${origin_:-}" || test -z "${upstream_:-}"; then
+        if [ "$(glab config get git_protocol)" = "ssh" ]; then
+            origin_="${origin_:-"git@${GITLAB_HOST:-gitlab.com}:${origin}.git"}";
+            upstream_="${upstream_:-"git@${GITLAB_HOST:-gitlab.com}:${upstream}.git"}";
+        else
+            origin_="${origin_:-"https://${GITLAB_HOST:-gitlab.com}/${origin}.git"}";
+            upstream_="${upstream_:-"https://${GITLAB_HOST:-gitlab.com}/${upstream}.git"}";
+        fi
+    fi
+
+    devcontainer-utils-clone-git-repo          \
+        ${branch:+--branch "${branch}"}        \
+        ${upstream:+--upstream "${upstream_}"} \
+        "${OPTS[@]}"                           \
+        --                                     \
+        "${origin_}" "${REST[@]}"              \
         ;
 }
 

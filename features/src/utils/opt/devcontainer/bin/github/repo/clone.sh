@@ -142,30 +142,35 @@ clone_github_repo() {
         done
     fi
 
+    local origin_;
+    local upstream_;
+
     if gh auth status >/dev/null 2>&1; then
         if [ "$(gh config get git_protocol)" = "ssh" ]; then
-            origin="$(get_repo_ssh_url "${origin}")";
-            upstream="$(get_repo_ssh_url "${upstream}")";
+            origin_="$(get_repo_ssh_url "${origin}")";
+            upstream_="$(get_repo_ssh_url "${upstream}")";
         else
-            origin="$(get_repo_git_url "${origin}")";
-            upstream="$(get_repo_git_url "${upstream}")";
-        fi
-    else
-        if [ "$(gh config get git_protocol)" = "ssh" ]; then
-            origin="git@${GITHUB_HOST:-github.com}:${origin}.git";
-            upstream="git@${GITHUB_HOST:-github.com}:${upstream}.git";
-        else
-            origin="https://${GITHUB_HOST:-github.com}/${origin}.git";
-            upstream="https://${GITHUB_HOST:-github.com}/${upstream}.git";
+            origin_="$(get_repo_git_url "${origin}")";
+            upstream_="$(get_repo_git_url "${upstream}")";
         fi
     fi
 
-    devcontainer-utils-clone-git-repo         \
-        ${branch:+--branch "${branch}"}       \
-        ${upstream:+--upstream "${upstream}"} \
-        "${OPTS[@]}"                          \
-        --                                    \
-        "${origin}" "${REST[@]}"              \
+    if test -z "${origin_:-}" || test -z "${upstream_:-}"; then
+        if [ "$(gh config get git_protocol)" = "ssh" ]; then
+            origin_="${origin_:-"git@${GITHUB_HOST:-github.com}:${origin}.git"}";
+            upstream_="${upstream_:-"git@${GITHUB_HOST:-github.com}:${upstream}.git"}";
+        else
+            origin_="${origin_:-"https://${GITHUB_HOST:-github.com}/${origin}.git"}";
+            upstream_="${upstream_:-"https://${GITHUB_HOST:-github.com}/${upstream}.git"}";
+        fi
+    fi
+
+    devcontainer-utils-clone-git-repo          \
+        ${branch:+--branch "${branch}"}        \
+        ${upstream:+--upstream "${upstream_}"} \
+        "${OPTS[@]}"                           \
+        --                                     \
+        "${origin_}" "${REST[@]}"              \
         ;
 }
 
