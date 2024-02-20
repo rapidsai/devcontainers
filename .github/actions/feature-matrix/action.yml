@@ -30,6 +30,9 @@ runs:
         files: |
           features/src/**
           features/test/**
+          .github/workflows/test.yml
+          .github/actions/feature-matrix/action.sh
+          .github/actions/feature-matrix/action.yml
           .github/workflows/build-and-test-feature.yml
           .github/actions/build-and-test-feature/action.yml
 

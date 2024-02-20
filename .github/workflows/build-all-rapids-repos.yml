@@ -36,6 +36,7 @@ jobs:
       extra-repo-deploy-key-2: CUGRAPH_OPS_SSH_PRIVATE_DEPLOY_KEY
       build_command: |
         sccache -z;
+        sccache --show-adv-stats;
         clone-all --verbose --clone-upstream --no-update-env;
         rapids-generate-scripts;
         rapids-make-${PYTHON_PACKAGE_MANAGER}-env;
@@ -49,4 +50,4 @@ jobs:
           -DBUILD_PRIMS_BENCH=ON \
           $([ "pip" = ${PYTHON_PACKAGE_MANAGER} ] && echo -DUSE_LIBARROW_FROM_PYARROW=ON || echo) \
           ;
-        sccache -s;
+        sccache --show-adv-stats;
