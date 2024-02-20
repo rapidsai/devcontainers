@@ -1,0 +1,53 @@
+name: Build all RAPIDS repositories
+
+on:
+  schedule:
+    - cron: '0 0 * * *'
+  workflow_call:
+
+jobs:
+  check-event:
+    name: Check GH Event
+    runs-on: ubuntu-latest
+    outputs:
+      ok: ${{ steps.check_gh_event.outputs.ok }}
+    steps:
+      - id: check_gh_event
+        name: Check GH Event
+        shell: bash
+        run: |
+          [[ '${{ github.event_name }}' == 'push' && '${{ github.repository }}' == 'rapidsai/devcontainers' ]] || \
+          [[ '${{ github.event_name }}' == 'schedule' && '${{ github.repository }}' == 'rapidsai/devcontainers' ]] || \
+          [[ '${{ github.event_name }}' == 'pull_request' && '${{ github.repository }}' != 'rapidsai/devcontainers' ]] \
+          && echo "ok=true"  | tee -a $GITHUB_OUTPUT \
+          || echo "ok=false" | tee -a $GITHUB_OUTPUT;
+
+  build-all-rapids-repos:
+    name: Build all RAPIDS repos
+    if: needs.check-event.outputs.ok == 'true'
+    needs: check-event
+    secrets: inherit
+    uses: rapidsai/shared-workflows/.github/workflows/build-in-devcontainer.yaml@fix/devcontainer-json-location
+    with:
+      arch: '["amd64"]'
+      cuda: '["12.0", "12.2"]'
+      node_type: cpu32
+      extra-repo-deploy-key: CUMLPRIMS_SSH_PRIVATE_DEPLOY_KEY
+      extra-repo-deploy-key-2: CUGRAPH_OPS_SSH_PRIVATE_DEPLOY_KEY
+      build_command: |
+        sccache -z;
+        sccache --show-adv-stats;
+        clone-all --verbose --clone-upstream --no-update-env;
+        rapids-generate-scripts;
+        rapids-make-${PYTHON_PACKAGE_MANAGER}-env;
+        build-all \
+          --verbose \
+          -j$(nproc --ignore=1) \
+          -DBUILD_SHARED_LIBS=ON \
+          -DBUILD_TESTS=ON \
+          -DBUILD_BENCHMARKS=ON \
+          -DBUILD_ANN_BENCH=ON \
+          -DBUILD_PRIMS_BENCH=ON \
+          $([ "pip" = ${PYTHON_PACKAGE_MANAGER} ] && echo -DUSE_LIBARROW_FROM_PYARROW=ON || echo) \
+          ;
+        sccache --show-adv-stats;

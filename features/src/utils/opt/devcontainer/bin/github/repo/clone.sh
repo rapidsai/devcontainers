@@ -59,8 +59,6 @@ clone_github_repo() {
 
     set -euo pipefail;
 
-    source devcontainer-utils-init-github-cli;
-
     local branch=;
     local no_fork=;
     local clone_upstream=;
@@ -92,7 +90,17 @@ clone_github_repo() {
     local fork=;
     local owner=;
 
-    if test -z "${clone_upstream:-}"; then
+    if test -z "${no_fork:-}" && \
+       test -z "${clone_upstream:-}" && \
+       devcontainer-utils-shell-is-interactive; then
+        # shellcheck disable=SC1091
+        . devcontainer-utils-init-github-cli;
+        user="${GITHUB_USER:-}";
+    fi
+
+    if test -n "${clone_upstream:-}"; then
+        fork="${upstream}";
+    else
         name="$(get_repo_name "${upstream}")";
         owner="$(get_repo_owner "${upstream}")";
         user="${GITHUB_USER:-"${owner}"}";
@@ -106,7 +114,7 @@ clone_github_repo() {
          devcontainer-utils-shell-is-interactive; then
         while true; do
             local CHOICE;
-            read -p "'${GITHUB_HOST:-github.com}/${user}/${name}.git' not found.
+            read -rp "'${GITHUB_HOST:-github.com}/${user}/${name}.git' not found.
     Fork '${upstream}' into '${user}/${name}' now (y/n)? " CHOICE <$(tty)
             case "${CHOICE:-}" in
                 [Nn]* ) origin="${upstream}"; break;;
@@ -118,12 +126,17 @@ clone_github_repo() {
         done
     fi
 
-    if [ "$(gh config get git_protocol)" = "ssh" ]; then
-        origin="$(get_repo_ssh_url "${origin}")";
-        upstream="$(get_repo_ssh_url "${upstream}")";
+    if gh auth status >/dev/null 2>&1; then
+        if [ "$(gh config get git_protocol)" = "ssh" ]; then
+            origin="$(get_repo_ssh_url "${origin}")";
+            upstream="$(get_repo_ssh_url "${upstream}")";
+        else
+            origin="$(get_repo_git_url "${origin}")";
+            upstream="$(get_repo_git_url "${upstream}")";
+        fi
     else
-        origin="$(get_repo_git_url "${origin}")";
-        upstream="$(get_repo_git_url "${upstream}")";
+        origin="https://${GITHUB_HOST:-github.com}/${origin}.git";
+        upstream="https://${GITHUB_HOST:-github.com}/${upstream}.git";
     fi
 
     devcontainer-utils-clone-git-repo \
