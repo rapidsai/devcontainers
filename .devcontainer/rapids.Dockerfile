@@ -19,6 +19,7 @@ RUN apt update -y \
     libblas-dev \
     liblapack-dev \
     # needed by libcuspatial
+    libgdal-dev \
     sqlite3 \
     libsqlite3-dev \
     libtiff-dev \

@@ -38,10 +38,10 @@ runs:
           windows/**
           matrix.yml
           .github/**/*windows*
-          .github/workflows/test.yml
           .github/actions/build-linux-image/action.yml
           .github/actions/image-matrix/action.sh
           .github/actions/image-matrix/action.yml
+          .github/workflows/test.yml
           .github/workflows/build-and-test-image.yml
 
     - name: Report changes
