@@ -12,11 +12,13 @@
   "features": {
     "./features/src/ucx": {"version": "1.14.1"},
     "./features/src/cuda": {"version": "12.2", "installcuBLAS": true, "installcuDNN": true, "installcuSOLVER": true, "installcuRAND": true, "installcuSPARSE": true},
+    "./features/src/utils": {},
     "./features/src/rapids-build-utils": {}
   },
   "overrideFeatureInstallOrder": [
     "./features/src/ucx",
     "./features/src/cuda",
+    "./features/src/utils",
     "./features/src/rapids-build-utils"
   ],
   "initializeCommand": ["/bin/bash", "-c", "mkdir -m 0755 -p ${localWorkspaceFolder}/../.{aws,cache,config/pip,local/share/${localWorkspaceFolderBasename}-cuda12.2-venvs} ${localWorkspaceFolder}/../{rmm,kvikio,ucxx,cudf,raft,cumlprims_mg,cuml,cugraph-ops,wholegraph,cugraph,cuspatial}"],
