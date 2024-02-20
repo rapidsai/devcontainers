@@ -36,7 +36,7 @@ build_devcontainer() {
         --workspace-folder "${workspace}" \
         --cache-from "docker.io/rapidsai/devcontainers:${tag}" \
         --image-name "docker.io/rapidsai/devcontainers:${tag}" \
-        ;
+        "${@:3}";
 }
 
 build_devcontainer "$@";
