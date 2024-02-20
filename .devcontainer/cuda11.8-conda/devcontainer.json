@@ -44,6 +44,7 @@
   "customizations": {
     "vscode": {
       "extensions": [
+        "augustocdias.tasks-shell-input",
         "ms-python.flake8",
         "nvidia.nsight-vscode-edition"
       ],
