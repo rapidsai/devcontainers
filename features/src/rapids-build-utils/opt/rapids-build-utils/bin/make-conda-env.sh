@@ -37,7 +37,7 @@ make_conda_env() {
 
     rapids-make-conda-dependencies "${OPTS[@]}" > "${new_env_path}";
 
-    if test -f "${new_env_path}"; then
+    if test -f "${new_env_path}" && test "$(wc -l "${new_env_path}" | cut -d' ' -f1)" -gt 0; then
 
         # If the conda env doesn't exist, make one
         if ! conda info -e | grep -qE "^${env_name} "; then
