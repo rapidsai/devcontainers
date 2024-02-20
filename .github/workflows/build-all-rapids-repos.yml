@@ -37,9 +37,7 @@ jobs:
       build_command: |
         sccache -z;
         sccache --show-adv-stats;
-        clone-all --verbose --clone-upstream --no-update-env;
-        rapids-generate-scripts;
-        rapids-make-${PYTHON_PACKAGE_MANAGER}-env;
+        clone-all --verbose --quiet --clone-upstream --single-branch --shallow-submodules;
         build-all \
           --verbose \
           -j$(nproc --ignore=1) \
