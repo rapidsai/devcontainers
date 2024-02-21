@@ -166,21 +166,33 @@ repos:
     - name: nx-cugraph
       sub_dir: python/nx-cugraph
       <<: *python_wheel_no_build_isolation
+      env: |
+        SETUPTOOLS_ENABLE_FEATURES=legacy-editable
     - name: cugraph-dgl
       sub_dir: python/cugraph-dgl
       <<: *python_wheel_no_build_isolation
+      env: |
+        SETUPTOOLS_ENABLE_FEATURES=legacy-editable
     - name: cugraph-equivariant
       sub_dir: python/cugraph-equivariant
+      env: |
+        SETUPTOOLS_ENABLE_FEATURES=legacy-editable
       <<: *python_wheel_no_build_isolation
     - name: cugraph_pyg
       sub_dir: python/cugraph-pyg
       <<: *python_wheel_no_build_isolation
+      env: |
+        SETUPTOOLS_ENABLE_FEATURES=legacy-editable
     - name: cugraph-service-client
       sub_dir: python/cugraph-service/client
       <<: *python_wheel_no_build_isolation
+      env: |
+        SETUPTOOLS_ENABLE_FEATURES=legacy-editable
     - name: cugraph-service-server
       sub_dir: python/cugraph-service/server
       <<: *python_wheel_no_build_isolation
+      env: |
+        SETUPTOOLS_ENABLE_FEATURES=legacy-editable
 
 - name: cuspatial
   path: cuspatial
