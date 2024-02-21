@@ -312,10 +312,10 @@ generate_scripts() {
     if ((${#repo_names[@]} > 0)); then
         for script in "clone" "clean" "configure" "build" "cpack" "install" "uninstall"; do
             # Generate a script to run a script for all repos
-            NAME="${cloned_repos[0]}"  \
-            NAMES="${repo_names[*]@Q}" \
-            SCRIPT="${script}"         \
-            generate_all_script        ;
+            NAME="${cloned_repos[0]:-${repo_names[0]:-}}" \
+            NAMES="${repo_names[*]@Q}"  \
+            SCRIPT="${script}"          \
+            generate_all_script         ;
         done;
     fi
 }
