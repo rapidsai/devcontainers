@@ -20,7 +20,10 @@ build_${PY_LIB}_python_wheel() {
 
     eval "$(_parse_args "$@" <&0)";
 
-    if [[ ! -d "${PY_SRC}" ]]; then
+    local py_lib="${PY_LIB}";
+    local py_src="${PY_SRC}";
+
+    if [[ ! -d "${py_src}" ]]; then
         exit 1;
     fi
 
@@ -67,15 +70,15 @@ build_${PY_LIB}_python_wheel() {
 
     case "${no_build_isolation:-$(pip config get wheel.no-build-isolation 2>/dev/null || echo)}" in
         True|true|yes|1)
-            if rapids-python-uses-scikit-build-core "${PY_SRC}"; then
-                pip_args+=(-C "build-dir=$(rapids-get-cmake-build-dir -- "${PY_SRC}" "${cmake_args[@]}")");
+            if rapids-python-uses-scikit-build-core "${py_src}"; then
+                pip_args+=(-C "build-dir=$(rapids-get-cmake-build-dir -- "${py_src}" "${cmake_args[@]}")");
             fi
             ;;
     esac
 
-    pip_args+=("${PY_SRC}");
+    pip_args+=("${py_src}");
 
-    trap "rm -rf '${PY_SRC}/$(echo "${PY_LIB}" | tr '-' '_').egg-info'" EXIT;
+    trap "rm -rf '${py_src}/${py_lib//"-"/"_"}.egg-info'" EXIT;
 
     time (
         export ${PY_ENV} PATH="$PATH";
@@ -91,7 +94,7 @@ build_${PY_LIB}_python_wheel() {
         NVCC_APPEND_FLAGS="${nvcc_append_flags}" \
             python -m pip wheel "${pip_args[@]}" \
         ;
-        { set +x; } 2>/dev/null; echo -n "${PY_LIB} wheel build time:";
+        { set +x; } 2>/dev/null; echo -n "${py_lib} wheel build time:";
     ) 2>&1;
 }
 

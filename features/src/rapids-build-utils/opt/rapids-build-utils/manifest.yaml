@@ -3,82 +3,77 @@ x-git-defaults: &git_defaults
     tag: branch-24.04
     upstream: rapidsai
 
+x-python-wheel-no-build-isolation: &python_wheel_no_build_isolation
+  args:
+    wheel: --no-build-isolation
+
 repos:
 
 - name: rmm
   path: rmm
+  git: {<<: *git_defaults, repo: rmm}
   cpp:
     - name: rmm
       sub_dir: ""
-      depends: []
   python:
     - name: rmm
       sub_dir: python
-      depends: []
-  git:
-    repo: rmm
-    <<: *git_defaults
+      <<: *python_wheel_no_build_isolation
 
 - name: ucxx
   path: ucxx
-  git:
-    repo: ucxx
-    <<: *git_defaults
-    tag: branch-0.37
+  git: {<<: *git_defaults, repo: ucxx, tag: branch-0.37}
   cpp:
     - name: ucxx
-      sub_dir: "cpp"
+      sub_dir: cpp
       depends: [rmm]
       args: |
         -DUCXX_ENABLE_PYTHON=ON
         -DUCXX_ENABLE_RMM=ON
   python:
     - name: ucxx
-      sub_dir: "python"
-      depends: [rmm]
+      sub_dir: python
+      <<: *python_wheel_no_build_isolation
 
 - name: kvikio
   path: kvikio
+  git: {<<: *git_defaults, repo: kvikio}
   cpp:
     - name: KvikIO
       sub_dir: cpp
-      depends: []
+      depends: [rmm]
   python:
     - name: kvikio
       sub_dir: python
-      depends: []
-  git:
-    repo: kvikio
-    <<: *git_defaults
+      <<: *python_wheel_no_build_isolation
 
 - name: cudf
   path: cudf
+  git: {<<: *git_defaults, repo: cudf}
   cpp:
     - name: cudf
       sub_dir: cpp
       depends: [rmm, KvikIO]
     - name: cudf_kafka
       sub_dir: cpp/libcudf_kafka
-      depends: [KvikIO, cudf]
+      depends: [rmm, KvikIO, cudf]
   python:
     - name: cudf
       sub_dir: python/cudf
-      depends: [rmm]
+      <<: *python_wheel_no_build_isolation
     - name: dask_cudf
       sub_dir: python/dask_cudf
-      depends: [cudf]
+      <<: *python_wheel_no_build_isolation
     - name: cudf_kafka
       sub_dir: python/cudf_kafka
-      depends: [cudf]
+      <<: *python_wheel_no_build_isolation
     - name: custreamz
       sub_dir: python/custreamz
-      depends: [cudf, cudf_kafka]
-  git:
-    repo: cudf
-    <<: *git_defaults
+      <<: *python_wheel_no_build_isolation
 
 - name: raft
   path: raft
+  git: {<<: *git_defaults, repo: raft}
   cpp:
     - name: raft
       sub_dir: cpp
@@ -86,26 +81,22 @@ repos:
   python:
     - name: pylibraft
       sub_dir: python/pylibraft
-      depends: [rmm]
+      <<: *python_wheel_no_build_isolation
     - name: raft-dask
       sub_dir: python/raft-dask
-      depends: [pylibraft]
-  git:
-    repo: raft
-    <<: *git_defaults
+      <<: *python_wheel_no_build_isolation
 
 - name: cumlprims_mg
   path: cumlprims_mg
+  git: {<<: *git_defaults, repo: cumlprims_mg}
   cpp:
     - name: cumlprims_mg
       sub_dir: cpp
       depends: [rmm, raft]
-  git:
-    repo: cumlprims_mg
-    <<: *git_defaults
 
 - name: cuml
   path: cuml
+  git: {<<: *git_defaults, repo: cuml}
   cpp:
     - name: cuml
       sub_dir: cpp
@@ -113,13 +104,11 @@ repos:
   python:
     - name: cuml
       sub_dir: python
-      depends: [rmm, cudf, dask-cudf, pylibraft, raft-dask]
-  git:
-    repo: cuml
-    <<: *git_defaults
+      <<: *python_wheel_no_build_isolation
 
 - name: cugraph-ops
   path: cugraph-ops
+  git: {<<: *git_defaults, repo: cugraph-ops}
   cpp:
     - name: cugraph-ops
       sub_dir: cpp
@@ -130,16 +119,18 @@ repos:
   python:
     - name: pylibcugraphops
       sub_dir: pylibcugraphops
-      depends: []
+      <<: *python_wheel_no_build_isolation
+      env: |
+        SETUPTOOLS_ENABLE_FEATURES=legacy-editable
     - name: pylibcugraphops_internal
       sub_dir: pylibcugraphops_internal
-      depends: [pylibcugraphops]
-  git:
-    repo: cugraph-ops
-    <<: *git_defaults
+      <<: *python_wheel_no_build_isolation
+      env: |
+        SETUPTOOLS_ENABLE_FEATURES=legacy-editable
 
 - name: wholegraph
   path: wholegraph
+  git: {<<: *git_defaults, repo: wholegraph}
   cpp:
     - name: wholegraph
       sub_dir: cpp
@@ -147,51 +138,49 @@ repos:
   python:
     - name: wholegraph
       sub_dir: python/pylibwholegraph
-      depends: [rmm, raft]
-  git:
-    repo: wholegraph
-    <<: *git_defaults
+      <<: *python_wheel_no_build_isolation
+      env: |
+        SETUPTOOLS_ENABLE_FEATURES=legacy-editable
 
 - name: cugraph
   path: cugraph
+  git: {<<: *git_defaults, repo: cugraph}
   cpp:
     - name: cugraph
       sub_dir: cpp
       depends: [rmm, raft, cugraph-ops]
     - name: cugraph_etl
       sub_dir: cpp/libcugraph_etl
-      depends: [cugraph, cudf]
+      depends: [rmm, raft, cudf, cugraph-ops, cugraph]
   python:
     - name: pylibcugraph
       sub_dir: python/pylibcugraph
-      depends: [rmm, pylibraft]
+      <<: *python_wheel_no_build_isolation
     - name: cugraph
       sub_dir: python/cugraph
-      depends: [pylibraft, pylibcugraph]
+      <<: *python_wheel_no_build_isolation
     - name: nx-cugraph
       sub_dir: python/nx-cugraph
-      depends: [pylibcugraph]
+      <<: *python_wheel_no_build_isolation
     - name: cugraph-dgl
       sub_dir: python/cugraph-dgl
-      depends: [cugraph]
+      <<: *python_wheel_no_build_isolation
     - name: cugraph-equivariant
       sub_dir: python/cugraph-equivariant
-      depends: [cugraph]
+      <<: *python_wheel_no_build_isolation
     - name: cugraph_pyg
       sub_dir: python/cugraph-pyg
-      depends: [cugraph]
+      <<: *python_wheel_no_build_isolation
     - name: cugraph-service-client
       sub_dir: python/cugraph-service/client
-      depends: []
+      <<: *python_wheel_no_build_isolation
     - name: cugraph-service-server
       sub_dir: python/cugraph-service/server
-      depends: [cudf, dask-cudf, cugraph, cugraph-service-client]
-  git:
-    repo: cugraph
-    <<: *git_defaults
+      <<: *python_wheel_no_build_isolation
 
 - name: cuspatial
   path: cuspatial
+  git: {<<: *git_defaults, repo: cuspatial}
   cpp:
     - name: cuspatial
       sub_dir: cpp
@@ -199,10 +188,7 @@ repos:
   python:
     - name: cuproj
       sub_dir: python/cuproj
-      depends: [rmm]
+      <<: *python_wheel_no_build_isolation
     - name: cuspatial
       sub_dir: python/cuspatial
-      depends: [rmm, cudf]
-  git:
-    repo: cuspatial
-    <<: *git_defaults
+      <<: *python_wheel_no_build_isolation

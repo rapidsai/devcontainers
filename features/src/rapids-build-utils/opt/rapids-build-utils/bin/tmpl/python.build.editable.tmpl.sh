@@ -20,7 +20,10 @@ build_${PY_LIB}_python_editable() {
 
     eval "$(_parse_args "$@" <&0)";
 
-    if [[ ! -d "${PY_SRC}" ]]; then
+    local py_lib="${PY_LIB}";
+    local py_src="${PY_SRC}";
+
+    if [[ ! -d "${py_src}" ]]; then
         exit 1;
     fi
 
@@ -63,20 +66,18 @@ build_${PY_LIB}_python_editable() {
         $(rapids-select-pip-wheel-args "${ARGS[@]}")
     )";
 
-    if rapids-python-uses-scikit-build-core "${PY_SRC}"; then
-        pip_args+=(-C "build-dir=$(rapids-get-cmake-build-dir -- "${PY_SRC}" "${cmake_args[@]}")");
-    else
-        export SETUPTOOLS_ENABLE_FEATURES="legacy-editable";
+    if rapids-python-uses-scikit-build-core "${py_src}"; then
+        pip_args+=(-C "build-dir=$(rapids-get-cmake-build-dir -- "${py_src}" "${cmake_args[@]}")");
     fi
 
     pip_args+=("--no-build-isolation");
     pip_args+=("--no-deps");
     pip_args+=("--editable");
-    pip_args+=("${PY_SRC}");
+    pip_args+=("${py_src}");
 
     cmake_args+=("-DCMAKE_INSTALL_RPATH_USE_LINK_PATH=ON");
 
-    trap "rm -rf '${PY_SRC}/$(echo "${PY_LIB}" | tr '-' '_').egg-info'" EXIT;
+    trap "rm -rf '${py_src}/${py_lib//"-"/"_"}.egg-info'" EXIT;
 
     time (
         export ${PY_ENV} PATH="$PATH";
@@ -92,7 +93,7 @@ build_${PY_LIB}_python_editable() {
         NVCC_APPEND_FLAGS="${nvcc_append_flags}"     \
             python -m pip install "${pip_args[@]}"   \
         ;
-        { set +x; } 2>/dev/null; echo -n "${PY_LIB} install time:";
+        { set +x; } 2>/dev/null; echo -n "${py_lib} install time:";
     ) 2>&1;
 }
 
