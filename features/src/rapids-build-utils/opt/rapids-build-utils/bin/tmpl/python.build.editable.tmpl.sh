@@ -68,6 +68,8 @@ build_${PY_LIB}_python_editable() {
 
     if rapids-python-uses-scikit-build-core "${py_src}"; then
         pip_args+=(-C "build-dir=$(rapids-get-cmake-build-dir -- "${py_src}" "${cmake_args[@]}")");
+    else
+        export SETUPTOOLS_ENABLE_FEATURES=legacy-editable;
     fi
 
     pip_args+=("--no-build-isolation");
