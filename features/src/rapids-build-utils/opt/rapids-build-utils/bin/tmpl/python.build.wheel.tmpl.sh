@@ -68,6 +68,10 @@ build_${PY_LIB}_python_wheel() {
         $(rapids-select-pip-wheel-args "${ARGS[@]}")
     )";
 
+    if [[ " ${pip_args_[*]} " == *" --no-build-isolation "* ]]; then
+        no_build_isolation=true;
+    fi
+
     case "${no_build_isolation:-$(pip config get wheel.no-build-isolation 2>/dev/null || echo)}" in
         True|true|yes|1)
             if rapids-python-uses-scikit-build-core "${py_src}"; then
