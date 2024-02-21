@@ -68,7 +68,7 @@ build_${PY_LIB}_python_wheel() {
         $(rapids-select-pip-wheel-args "${ARGS[@]}")
     )";
 
-    if [[ " ${pip_args_[*]} " == *" --no-build-isolation "* ]]; then
+    if [[ " ${pip_args[*]} " == *" --no-build-isolation "* ]]; then
         no_build_isolation=true;
     fi
 
