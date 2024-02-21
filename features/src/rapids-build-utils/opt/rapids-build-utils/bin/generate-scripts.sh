@@ -170,6 +170,7 @@ generate_scripts() {
     local k;
 
     local repo_names=();
+    local cloned_repos=();
     local -r bin_dir="$(rapids-get-cmake-build-dir --skip-build-type)";
 
     for ((i=0; i < ${repos_length:-0}; i+=1)); do
@@ -186,6 +187,10 @@ generate_scripts() {
 
         repo_name="${!repo_name,,}";
         repo_names+=("${repo_name}");
+
+        if [[ -d ~/"${!repo_path:-}/.git" ]]; then
+            cloned_repos+=("${repo_name}");
+        fi
 
         local deps=();
         local cpp_libs=();
@@ -307,7 +312,7 @@ generate_scripts() {
     if ((${#repo_names[@]} > 0)); then
         for script in "clone" "clean" "configure" "build" "cpack" "install" "uninstall"; do
             # Generate a script to run a script for all repos
-            NAME="${repo_names[0]}"    \
+            NAME="${cloned_repos[0]}"  \
             NAMES="${repo_names[*]@Q}" \
             SCRIPT="${script}"         \
             generate_all_script        ;
