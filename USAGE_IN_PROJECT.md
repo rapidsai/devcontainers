@@ -89,7 +89,7 @@ blue box in the lower left of the VS Code window should now read `Dev Container
 @ <hostname>`. You're done! Any terminal you open will have the build
 environment activated appropriately.
 
-7. The devcontainers adds build scripts that fit general usage. Type `build-` and hit
+7. The devcontainers add build scripts that fit general usage. Type `build-` and hit
 `TAB` to see options for your project. Check the contributing guide in your repo
 for further instructions.
 
@@ -142,7 +142,7 @@ You can also provide devcontainer label (folder name) directly:
 4. The devcontainer will be built, and you'll be dropped at a shell prompt
 inside the container. You're done!
 
-5. The devcontainers adds build scripts that fit general usage. Type `build-`
+5. The devcontainers add build scripts that fit general usage. Type `build-`
 and hit `TAB` to see options for the project. Check the contributing guide in
 your repo for further instructions.
 
