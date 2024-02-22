@@ -3,23 +3,19 @@
     "context": "${localWorkspaceFolder}/.devcontainer",
     "dockerfile": "${localWorkspaceFolder}/.devcontainer/rapids.Dockerfile",
     "args": {
-      "CUDA": "12.0",
-      "PYTHON_PACKAGE_MANAGER": "pip",
-      "BASE": "rapidsai/devcontainers:24.04-cpp-cuda12.0-ubuntu22.04"
+      "CUDA": "12.2",
+      "PYTHON_PACKAGE_MANAGER": "conda",
+      "BASE": "rapidsai/devcontainers:24.04-cpp-mambaforge-ubuntu22.04"
     }
   },
   "hostRequirements": {"gpu": "optional"},
   "features": {
-    "./features/src/ucx": {"version": "1.14.1"},
-    "./features/src/cuda": {"version": "12.0", "installcuBLAS": true, "installcuDNN": true, "installcuSOLVER": true, "installcuRAND": true, "installcuSPARSE": true},
     "./features/src/rapids-build-utils": {}
   },
   "overrideFeatureInstallOrder": [
-    "./features/src/ucx",
-    "./features/src/cuda",
     "./features/src/rapids-build-utils"
   ],
-  "initializeCommand": ["/bin/bash", "-c", "mkdir -m 0755 -p ${localWorkspaceFolder}/../.{aws,cache,config/pip,local/share/${localWorkspaceFolderBasename}-cuda12.0-venvs} ${localWorkspaceFolder}/../{rmm,kvikio,ucxx,cudf,raft,cumlprims_mg,cuml,cugraph-ops,wholegraph,cugraph,cuspatial}"],
+  "initializeCommand": ["/bin/bash", "-c", "mkdir -m 0755 -p ${localWorkspaceFolder}/../.{aws,cache,config,conda/pkgs,conda/${localWorkspaceFolderBasename}-cuda12.2-envs} ${localWorkspaceFolder}/../{rmm,kvikio,ucxx,cudf,raft,cumlprims_mg,cuml,cugraph-ops,wholegraph,cugraph,cuspatial}"],
   "postAttachCommand": ["/bin/bash", "-c", "if [ ${CODESPACES:-false} = 'true' ]; then . devcontainer-utils-post-attach-command; . rapids-post-attach-command; fi"],
   "workspaceFolder": "/home/coder",
   "workspaceMount": "source=${localWorkspaceFolder},target=/home/coder/devcontainers,type=bind,consistency=consistent",
@@ -38,9 +34,10 @@
     "source=${localWorkspaceFolder}/../.aws,target=/home/coder/.aws,type=bind,consistency=consistent",
     "source=${localWorkspaceFolder}/../.cache,target=/home/coder/.cache,type=bind,consistency=consistent",
     "source=${localWorkspaceFolder}/../.config,target=/home/coder/.config,type=bind,consistency=consistent",
-    "source=${localWorkspaceFolder}/../.local/share/${localWorkspaceFolderBasename}-cuda12.0-venvs,target=/home/coder/.local/share/venvs,type=bind,consistency=consistent",
-    "source=${localWorkspaceFolder}/.devcontainer/cuda12.0-pip/features/src/utils/opt/devcontainer/bin,target=/opt/devcontainer/bin,type=bind,consistency=consistent",
-    "source=${localWorkspaceFolder}/.devcontainer/cuda12.0-pip/features/src/rapids-build-utils/opt/rapids-build-utils,target=/opt/rapids-build-utils,type=bind,consistency=consistent"
+    "source=${localWorkspaceFolder}/../.conda/pkgs,target=/home/coder/.conda/pkgs,type=bind,consistency=consistent",
+    "source=${localWorkspaceFolder}/../.conda/${localWorkspaceFolderBasename}-cuda12.2-envs,target=/home/coder/.conda/envs,type=bind,consistency=consistent",
+    "source=${localWorkspaceFolder}/.devcontainer/cuda12.2-conda/features/src/utils/opt/devcontainer/bin,target=/opt/devcontainer/bin,type=bind,consistency=consistent",
+    "source=${localWorkspaceFolder}/.devcontainer/cuda12.2-conda/features/src/rapids-build-utils/opt/rapids-build-utils,target=/opt/rapids-build-utils,type=bind,consistency=consistent"
   ],
   "customizations": {
     "vscode": {

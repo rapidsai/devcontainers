@@ -99,6 +99,6 @@ make_conda_env() {
 . /opt/conda/etc/profile.d/conda.sh;
 . /opt/conda/etc/profile.d/mamba.sh;
 
-(make_conda_env "${DEFAULT_CONDA_ENV:-rapids}" "$@");
+make_conda_env "${DEFAULT_CONDA_ENV:-rapids}" "$@";
 
 . /etc/profile.d/*-mambaforge.sh;

@@ -9,12 +9,13 @@ generate_devcontainer() {
     # cd to the repo root
     cd "$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )/..";
 
-    local workspace="${TMPDIR:-/tmp}/rapidsai-devcontainers-tmp";
+    # shellcheck disable=SC2155
+    local workspace="$(mktemp -d)";
 
-    rm -rf "${workspace}";
-    cp -ar image "${workspace}";
-    rm "${workspace}/.devcontainer/features";
-    ln -s "$(realpath ./features)" "${workspace}/.devcontainer/features";
+    # rm -rf "${workspace}";
+    cp -ar image/.devcontainer "${workspace}/";
+    # rm "${workspace}/.devcontainer/features";
+    ln -sfn "$(realpath ./features)" "${workspace}/.devcontainer/features";
 
     # Generate tag and devcontainer.json
     .github/actions/devcontainer-json/action.sh           \
@@ -25,9 +26,6 @@ generate_devcontainer() {
 
     # Report the workspace path
     echo "workspace=${workspace}";
-
-    # Print the generated devcontainer JSON
-    cat "${workspace}/.devcontainer/devcontainer.json" >&2;
 }
 
 generate_devcontainer "$@";
