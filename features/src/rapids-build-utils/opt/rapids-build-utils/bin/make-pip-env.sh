@@ -45,7 +45,7 @@ make_pip_env() {
 
     rapids-make-pip-dependencies "${OPTS[@]}" > "${new_env_path}";
 
-    if test -f "${new_env_path}" && test "$(wc -l "${new_env_path}" | cut -d' ' -f1)" -gt 0; then
+    if test -f "${new_env_path}"; then
 
         # If the venv doesn't exist, make one
         if [ ! -d "${HOME}/.local/share/venvs/${env_name}" ]; then
