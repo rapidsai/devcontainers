@@ -78,7 +78,7 @@ get_num_archs_jobs_and_load() {
     # Clamp between 1 and ${max_archs} threads per nvcc job
     n_arch=$(( n_arch < 1 ? 1 : n_arch > max_archs ? max_archs : n_arch ));
 
-    local -r free_mem=$(free --giga | grep -E '^Mem:' | tr -s '[:space:]' | cut -d' ' -f4 || echo '0');
+    local -r free_mem=$(free --giga | grep -E '^Mem:' | tr -s '[:space:]' | cut -d' ' -f7 || echo '0');
     local -r freeswap=$(free --giga | grep -E '^Swap:' | tr -s '[:space:]' | cut -d' ' -f4 || echo '0');
     local all_cpus="${parallel}";
     local n_load="${all_cpus}";
