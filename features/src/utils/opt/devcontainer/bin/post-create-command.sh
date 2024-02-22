@@ -9,7 +9,7 @@ fi
 
 # If SSH_AUTH_SOCK exists and isn't owned by the coder user, use socat to proxy
 # between a socket owned by the coder user and the one mounted in from the host
-if test -n "${SSH_AUTH_SOCK}" \
+if test -n "${SSH_AUTH_SOCK:-}" \
 && test "${SSH_AUTH_SOCK}" != ~/.ssh/socket \
 && test "$(stat -c "%u:%g" "${SSH_AUTH_SOCK}")" != "$(id -u):$(id -g)"; then
     # shellcheck disable=SC1091
