@@ -23,9 +23,9 @@ checkout_same_branch() {
 
     eval "$(_parse_args "$@" <&0)";
 
-    eval "$(                                        \
-    PARALLEL_LEVEL=${PARALLEL_LEVEL:-$(nproc)}      \
-        rapids-get-num-archs-jobs-and-load -a1 "$@" \
+    eval "$(                                              \
+    PARALLEL_LEVEL=${PARALLEL_LEVEL:-$(nproc)}            \
+        rapids-get-num-archs-jobs-and-load --archs 1 "$@" \
     )";
 
     eval "$(rapids-list-repos "$@")";

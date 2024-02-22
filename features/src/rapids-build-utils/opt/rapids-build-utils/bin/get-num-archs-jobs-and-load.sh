@@ -13,12 +13,12 @@
 #  -h,--help                              Print this text.
 #
 # Options that require values:
-#  -a,--archs <num>                       Build <num> CUDA archs in parallel
+#  --archs <num>                          Build <num> CUDA archs in parallel
 #                                         (default: 1)
 #  --max-archs <num>                      Build at most <num> CUDA archs in parallel
 #                                         (default: 3)
 #  -j,--parallel <num>                    Run <num> parallel compilation jobs
-#  -m,--max-device-obj-memory-usage <num> An upper-bound on the amount of memory each CUDA device object compilation
+#  --max-device-obj-memory-usage <num>    An upper-bound on the amount of memory each CUDA device object compilation
 #                                         is expected to take. This is used to estimate the number of parallel device
 #                                         object compilations that can be launched without hitting the system memory
 #                                         limit.
@@ -41,8 +41,8 @@ get_num_archs_jobs_and_load() {
         j=$(nproc);
     fi
 
-    max_archs="${max_archs:-3}";
     parallel="${j:-${JOBS:-${PARALLEL_LEVEL:-1}}}";
+    max_archs="${max_archs:-${MAX_DEVICE_OBJ_TO_COMPILE_IN_PARALLEL:-3}}";
     max_device_obj_memory_usage="${m:-${MAX_DEVICE_OBJ_MEMORY_USAGE:-1}}";
 
     local n_arch=${archs:-1};
@@ -69,8 +69,7 @@ get_num_archs_jobs_and_load() {
                 ;;
             *)
                 # Otherwise if explicitly defined, count the number of archs in the list
-                n_arch="$(echo "${archs}" | grep -o ';' | wc -l)";
-                n_arch="$(((n_arch + 1) / 2))";
+                n_arch="$(tr ';' ' ' <<< "${archs} " | tr -s '[:blank:]' | grep -o ' ' | wc -l)";
                 ;;
         esac
     fi

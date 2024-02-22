@@ -23,7 +23,7 @@ clean_all() {
 
     eval "$(_parse_args --take '-j,--parallel' "$@" <&0)";
 
-    eval "$(rapids-get-num-archs-jobs-and-load -a1 "$@")";
+    eval "$(rapids-get-num-archs-jobs-and-load --archs 1 "$@")";
 
     # shellcheck disable=SC1091
     . devcontainer-utils-debug-output 'rapids_build_utils_debug' 'clean-all';
