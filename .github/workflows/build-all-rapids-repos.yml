@@ -38,7 +38,7 @@ jobs:
         sccache -z;
         sccache --show-adv-stats;
         clone-all --verbose --quiet --clone-upstream --single-branch --shallow-submodules --no-update-env;
-        rapids-make-${PYTHON_PACKAGE_MANAGER}-env -f;
+        . rapids-make-${PYTHON_PACKAGE_MANAGER}-env -f;
         rapids-generate-scripts;
         build-all \
           --verbose \
