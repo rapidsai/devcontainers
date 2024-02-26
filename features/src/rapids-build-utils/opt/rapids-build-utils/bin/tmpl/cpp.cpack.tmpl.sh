@@ -33,9 +33,9 @@ cpack_${CPP_LIB}_cpp() {
         exit 0;
     fi
 
-    eval "$(                                    \
-    PARALLEL_LEVEL=${PARALLEL_LEVEL:-$(nproc)}  \
-        rapids-get-num-archs-jobs-and-load "$@" \
+    eval "$(                                              \
+    PARALLEL_LEVEL=${PARALLEL_LEVEL:-$(nproc)}            \
+        rapids-get-num-archs-jobs-and-load --archs 1 "$@" \
     )";
 
     # shellcheck disable=SC1091
