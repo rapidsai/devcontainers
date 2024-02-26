@@ -21,7 +21,7 @@ clean_${CPP_LIB}_cpp() {
     . devcontainer-utils-debug-output 'rapids_build_utils_debug' 'clean-all clean-${NAME} clean-${CPP_LIB}-cpp';
 
     if [[ ! -d "${CPP_SRC}" ]]; then
-        exit 1;
+        return;
     fi
 
     rm -rf -- \

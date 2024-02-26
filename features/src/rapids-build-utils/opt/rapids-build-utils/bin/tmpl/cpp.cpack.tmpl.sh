@@ -82,9 +82,7 @@ cpack_${CPP_LIB}_cpp() {
             fi
         fi
 
-        if test -z "${name:-}"; then
-            exit 1;
-        fi
+        name="${name:-${CPP_LIB}}";
 
         for comp in "${component[@]}"; do
 

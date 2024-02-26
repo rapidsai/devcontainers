@@ -21,7 +21,7 @@ clean_${PY_LIB}_python() {
     . devcontainer-utils-debug-output 'rapids_build_utils_debug' 'clean-all clean-${NAME} clean-${PY_LIB}-python';
 
     if [[ ! -d "${PY_SRC}" ]]; then
-        exit 1;
+        return;
     fi
 
     local py_lib="${PY_LIB}";
