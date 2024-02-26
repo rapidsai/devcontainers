@@ -27,7 +27,7 @@ cpack_${CPP_LIB}_cpp() {
         -j,--parallel
         -o,--out-dir
         --component
-    ' "$@" <&0)";
+    ' "$@" ${CPP_CPACK_ARGS} <&0)";
 
     if ! test -f "${CPP_SRC}/${BIN_DIR}/CMakeCache.txt"; then
         exit 0;
@@ -41,12 +41,10 @@ cpack_${CPP_LIB}_cpp() {
     # shellcheck disable=SC1091
     . devcontainer-utils-debug-output 'rapids_build_utils_debug' 'cpack-all cpack-${NAME} cpack-${CPP_LIB}-cpp';
 
-    out_dir="${o:+$(realpath -ms "${o}")}";
-
     ((${#component[@]})) || component=(all);
 
     time (
-        local comp;
+        local i;
         local name;
         local slug;
         local outd;
@@ -84,7 +82,9 @@ cpack_${CPP_LIB}_cpp() {
 
         name="${name:-${CPP_LIB}}";
 
-        for comp in "${component[@]}"; do
+        for ((i=0; i < ${#component[@]}; i+=1)); do
+
+            local comp="${component[$i]}";
 
             if test "all" = "${comp}";
                 then comp="";
@@ -93,15 +93,23 @@ cpack_${CPP_LIB}_cpp() {
             slug="${name}${vers:+-$vers}${comp:+-$comp}-${kernel}";
             outd="${CPP_SRC}/${BIN_DIR}/_CPack_Packages/${kernel}/TGZ";
 
-            install-${CPP_LIB}-cpp --prefix "${outd}/${slug}" ${comp:+--component "${comp}"} "${OPTS[@]}";
+            install-${CPP_LIB}-cpp --prefix "${outd}/${slug}" ${comp:+--component "${comp}"} "${OPTS[@]}" >/dev/null 2>&1;
 
             if test -d "${outd}/${slug}"; then
                 tar -C "${outd}" -c ${v:+-v} -f "${outd}/${slug}.tar.gz" -I "pigz -p ${n_jobs}" "${slug}";
                 cp -a "${outd}/${slug}.tar.gz" "${CPP_SRC}/${BIN_DIR}/";
-                if test -n "${out_dir}" \
-                && test -f "${CPP_SRC}/${BIN_DIR}/${slug}.tar.gz"; then
-                    mkdir -p "${out_dir}/";
-                    cp -a "${CPP_SRC}/${BIN_DIR}/${slug}.tar.gz" "${out_dir}/";
+
+                if test -z "${out_dir-}" || test "${#out_dir[@]}" -eq 0; then
+                    continue;
+                elif test "${i}" -lt "${#out_dir[@]}"; then
+                    outd="$(realpath -ms "${out_dir[$i]}")";
+                else
+                    outd="$(realpath -ms "${out_dir[${#out_dir[@]}-1]}")";
+                fi
+
+                if test -n "${outd:-}"; then
+                    mkdir -p "${outd}/";
+                    cp -a "${CPP_SRC}/${BIN_DIR}/${slug}.tar.gz" "${outd}/";
                 fi
             fi
         done
