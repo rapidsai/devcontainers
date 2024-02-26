@@ -301,9 +301,6 @@ _parse_args_for_file() {
 
             # If the next arg is `--`, break so we handle it below instead of getopts eating it.
             if [[ "${!OPTIND:-}" == -- ]]; then
-                rest=("${@:$((OPTIND+1))}");
-                OPTIND=1;
-                set --;
                 break;
             fi
         done # end getopts loop
@@ -318,8 +315,8 @@ _parse_args_for_file() {
                 rest=("${@}");
                 set --;
             elif [[ "${val}" != -* ]]; then
-                rest+=("${val}");
-                shift;
+                rest=("${@}");
+                set --;
             else
                 break;
             fi

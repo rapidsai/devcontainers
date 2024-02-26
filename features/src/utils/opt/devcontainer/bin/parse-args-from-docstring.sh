@@ -18,9 +18,13 @@ _print_usage() {
 }
 
 _parse_args_to_names() {
-    cat -                           \
-  | sed -r 's/--?([^ ,]+)+/\1/g'    \
-  | sed -r 's/(,|\|)/ /g'           \
+    cat -                                              \
+    `# take the first char of short names i.e. -DFOO ` \
+  | sed -r 's/^-([a-zA-Z0-9]{1})[^ ,*].*/\1/g'         \
+    `# remove the leading --`                          \
+  | sed -r 's/--?([^ ,=]+)+/\1/g'                      \
+    `# translate ,| to spaces`                         \
+  | sed -r 's/(,|\|)/ /g'                              \
   ;
 }
 
@@ -34,25 +38,25 @@ _squeeze_spaces_in_options() {
 }
 
 _parse_all_names_from_usage() {
-    cat -                                    \
-  | _squeeze_spaces_in_options               \
-  | sed -rn 's/^[ ]*(--?[^ *]+)+[^*]*$/\1/p' \
-  | sed -r 's/(,|\|)/ /g'                    \
+    cat -                                  \
+  | _squeeze_spaces_in_options             \
+  | sed -rn 's/^[ ]*(--?[^ <(*]+).*$/\1/p' \
+  | sed -r 's/(,|\|)/ /g'                  \
   ;
 }
 
 _parse_value_names_from_usage() {
-    cat -                                                         \
-  | _squeeze_spaces_in_options                                    \
-  | sed -rn 's/^([ ]*)(--?[^ *]+|,|_)+[ ]*[<(](.[^)>]*).*$/\2/p'  \
-  | sed -r 's/(,|\|)/ /g'                                         \
+    cat -                                                     \
+  | _squeeze_spaces_in_options                                \
+  | sed -rn 's/^[ ]*(--?[^ <(*]+)+[ *]*[<(](.[^)>]*).*$/\1/p' \
+  | sed -r 's/(,|\|)/ /g'                                     \
   ;
 }
 
 _parse_value_types_from_usage() {
     cat -                      \
   | _squeeze_spaces_in_options \
-  | sed -rn 's/^[ ]*(--?[^ *]+|,|_)+[ ]*([<(].[^)>]*)([)>]).*$/\2\3/p';
+  | sed -rn -rn 's/^[ ]*(--?[^ <(*]+)+[ *]*([<(].[^)>]*)([)>]).*$/\2\3/p';
 }
 
 _parse_bool_names_from_usage() {
@@ -83,7 +87,7 @@ _listify() {
 _take_short_opts() {
     cat -                                   \
   `# skip the long opts`                    \
-  | sed -r 's/([ ]?--[^ ,]+)+,?//g'         \
+  | sed -r 's/([ ]?--[^ ,=]+)+,?//g'        \
   | _listify                                \
     ;
 }
@@ -94,19 +98,21 @@ _parse_short_names() {
   | _take_short_opts                        \
   `# remove the leading -`                  \
   | sed -r 's/-([^ ,*]+)+[,*]?/\1/g'        \
+  `# take the first character`              \
+  | sed -e 's/^\(.\{1\}\).*/\1/'            \
     ;
 }
 
 _parse_long_names() {
     # long opts are the complement of `all opts` \ `short opts`
-    tee >(_listify)              \
-        >(_take_short_opts)      \
-        1>/dev/null              \
-  | sort -s                      \
-  | uniq -u                      \
-  `# remove the leading --`      \
-  | sed -r 's/--?([^ ,]+)+/\1/g' \
-  | _listify                     \
+    tee >(_listify)               \
+        >(_take_short_opts)       \
+        1>/dev/null               \
+  | sort -s                       \
+  | uniq -u                       \
+  `# remove the leading --`       \
+  | sed -r 's/--?([^ ,=]+)+/\1/g' \
+  | _listify                      \
     ;
 }
 

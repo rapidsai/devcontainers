@@ -70,10 +70,10 @@ _devcontainer_utils_completions() {
             local -a pair;
             read -a pair -r <<< "${name_and_type}";
             local name_="${pair[0]}";
-            local type_="${pair[1]}";
+            local type_="${pair[*]:1}";
             if [[ ${name_} == "${prev}" ]]; then
                 case "${type_}" in
-                    "<num>"|"<number>")
+                    "<num>"|"<number>"|"<sec>"|"<retries>")
                         # shellcheck disable=SC2207
                         COMPREPLY=($(grep -P "^[0-9]+$" <<< "${cur}"));
                         return;
@@ -82,19 +82,22 @@ _devcontainer_utils_completions() {
                         _filedir -d;
                         return;
                         ;;
-                    "<file>"|"<path>")
+                    "<file>"|"<path>"|"<path/url>")
                         _filedir;
                         return;
                         ;;
                     \(*\))
-                        local -a list=();
                         IFS=$'|' read -a list -r <<< "${type_:1:-1}";
                         if test ${#cur} -eq 0; then
                             COMPREPLY=("${list[@]}");
                         else
                             for item in "${list[@]}"; do
-                                if [[ ${item} =~ ^${cur} ]]; then
-                                    COMPREPLY+=("${item}");
+                                if [[ "${item}" =~ ^${cur} ]]; then
+                                    if [[ "${item}" == *" "* ]]; then
+                                        COMPREPLY+=("${item@Q}");
+                                    else
+                                        COMPREPLY+=("${item}");
+                                    fi
                                 fi
                             done
                         fi
