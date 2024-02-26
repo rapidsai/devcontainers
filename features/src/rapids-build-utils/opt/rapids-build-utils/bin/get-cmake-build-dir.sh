@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 # Usage:
-#  rapids-get-cmake-build-dir [OPTIONS] [--] <source_path> [cmake_args]...
+#  rapids-get-cmake-build-dir [OPTIONS] [-DCMAKE_BUILD_TYPE=(Release|Debug)] [--] <source_path>...
 #
 # Build a path to the build directory for a C++ or scikit-build-core Python library.
 # If the <source_path> is not null and a valid directory, retarget the `build/(pip|conda)/cuda-X.Y.Z/latest` symlink
@@ -16,13 +16,12 @@
 # meaning they don't need to do a clean build if switching between devcontainers or build types.
 #
 # Boolean options:
-#  -h,--help          Print this text.
-#  --skip-build-type  Don't update the symlink pointing to the last component of
-#                     the build dir path, i.e. "latest -> (debug|release)".
+#  -h,--help                           Print this text.
+#  --skip-build-type                   Don't update the symlink pointing to the last component of
+#                                      the build dir path, i.e. "latest -> (debug|release)".
 #
 # Positional arguments:
-# source_path      The C++ or Python project source path
-# [cmake_args]...  The list of CMake arguments to search for the CMAKE_BUILD_TYPE
+# source_path                          The C++ or Python project source path
 
 # shellcheck disable=SC1091
 . rapids-generate-docstring;
@@ -66,7 +65,6 @@ get_cmake_build_dir() {
     else
         echo "${src:+${src}/}${bin}/${type}";
     fi
-    # echo "$(realpath -m "${src:+${src}/}${bin}/${type}")";
 }
 
 get_cmake_build_dir "$@" <&0;
