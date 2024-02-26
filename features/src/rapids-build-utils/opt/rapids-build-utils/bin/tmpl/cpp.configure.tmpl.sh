@@ -5,6 +5,10 @@
 #
 # Configure ${CPP_LIB}.
 #
+# Boolean options:
+#  -h,--help     Print this text.
+#  -v,--verbose  Verbose output.
+#
 # @_include_value_options rapids-get-num-archs-jobs-and-load -h;
 # @_include_cmake_options;
 
@@ -15,41 +19,37 @@ configure_${CPP_LIB}_cpp() {
     local -;
     set -euo pipefail;
 
-    eval "$(_parse_args "$@" <&0)";
-
-    if [[ ! -d "${CPP_SRC}" ]]; then
-        exit 1;
-    fi
-
     eval "$(                                    \
     PARALLEL_LEVEL=${PARALLEL_LEVEL:-$(nproc)}  \
         rapids-get-num-archs-jobs-and-load "$@" \
     )";
 
+    local -a cmake_args_="(${CMAKE_ARGS:-})";
+    cmake_args_+=(${CPP_CMAKE_ARGS});
+
+    eval "$(_parse_args --take '-G, -v,--verbose' "$@" "${cmake_args_[@]}" <&0)";
+
+    if [[ ! -d "${CPP_SRC}" ]]; then
+        echo "configure-${CPP_LIB}-cpp: cannot access '${CPP_SRC}': No such directory" >&2;
+        exit 1;
+    fi
+
     # shellcheck disable=SC1091
     . devcontainer-utils-debug-output 'rapids_build_utils_debug' 'configure-all configure-${NAME} configure-${CPP_LIB}-cpp';
 
-    local -a cmake_args_=(
-        -GNinja
-        ${CMAKE_ARGS:-}
-        ${CPP_DEPS}
-        ${CPP_ARGS}
-        ${v:+--log-level=VERBOSE}
-    );
     local -a cmake_args="(
-        ${cmake_args_+"${cmake_args_[*]@Q}"}
-        $(rapids-select-cmake-args "${ARGS[@]}")
+        -G \"${G:-Ninja}\"
+        ${cmake_args_[*]@Q}
+        ${CPP_DEPS}
+        ${v:+--log-level=VERBOSE}
+        $(rapids-select-cmake-args "$@")
     )";
 
-    local -r bin_dir="$(rapids-get-cmake-build-dir -- "${CPP_SRC}" "${cmake_args[@]}")";
-
     # Reconfigure if previous configure failed
-    if [[ ! -f "${bin_dir}/build.ninja" ]]; then
-        rm -rf "${bin_dir}";
-    fi
+    local -r bin_dir="$(rapids-maybe-clean-build-dir "${cmake_args[@]}" --  "${CPP_SRC}")";
 
     cmake_args+=(-S "${CPP_SRC}");
-    cmake_args+=(-B "${bin_dir}");
+    cmake_args+=(-B "${bin_dir:-${CPP_SRC}/${BIN_DIR}}");
 
     time (
         CUDAFLAGS="${CUDAFLAGS:+$CUDAFLAGS }-t=${n_arch}" \

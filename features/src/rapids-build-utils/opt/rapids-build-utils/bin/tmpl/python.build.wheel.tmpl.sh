@@ -18,34 +18,34 @@ build_${PY_LIB}_python_wheel() {
     local -;
     set -euo pipefail;
 
-    eval "$(_parse_args "$@" <&0)";
-
-    local py_lib="${PY_LIB}";
-    local py_src="${PY_SRC}";
-
-    if [[ ! -d "${py_src}" ]]; then
-        exit 1;
-    fi
-
     eval "$(                                    \
     PARALLEL_LEVEL=${PARALLEL_LEVEL:-$(nproc)}  \
         rapids-get-num-archs-jobs-and-load "$@" \
     )";
 
+    local py_lib="${PY_LIB}";
+
+    local -a cmake_args_="(${CMAKE_ARGS:-})";
+    cmake_args_+=(${CPP_CMAKE_ARGS});
+
+    local -a pip_args_=(${PIP_WHEEL_ARGS});
+
+    eval "$(_parse_args --take '-G -v,--verbose' "$@" "${cmake_args_[@]}" "${pip_args_[@]}" <&0)";
+
+    if [[ ! -d "${PY_SRC}" ]]; then
+        echo "build-${PY_LIB}-python-wheel: cannot access '${PY_SRC}': No such directory" >&2;
+        exit 1;
+    fi
+
     # shellcheck disable=SC1091
     . devcontainer-utils-debug-output 'rapids_build_utils_debug' 'build-all build-${NAME} build-${PY_LIB}-python build-${PY_LIB}-python-wheel';
 
-    local -a cmake_args_=(
-        ${PY_CMAKE_ARGS}
-        ${CMAKE_ARGS:-}
-        ${CPP_DEPS}
-        ${CPP_ARGS}
-        ${v:+--log-level=VERBOSE}
-    );
-
     local -a cmake_args="(
-        ${cmake_args_+"${cmake_args_[*]@Q}"}
-        $(rapids-select-cmake-args "${ARGS[@]}")
+        -G \"${G:-Ninja}\"
+        ${cmake_args_[*]@Q}
+        ${CPP_DEPS}
+        ${v:+--log-level=VERBOSE}
+        $(rapids-select-cmake-args "$@")
     )";
 
     local ninja_args=();
@@ -62,27 +62,18 @@ build_${PY_LIB}_python_wheel() {
         ninja_args+=("-l${n_load}");
     fi
 
-    local -a pip_args_=(${PIP_WHEEL_ARGS});
     local -a pip_args="(
         ${pip_args_+"${pip_args_[*]@Q}"}
-        $(rapids-select-pip-wheel-args "${ARGS[@]}")
+        $(rapids-select-pip-wheel-args "$@")
     )";
 
-    if [[ " ${pip_args[*]} " == *" --no-build-isolation "* ]]; then
-        no_build_isolation=true;
+    if rapids-python-uses-scikit-build-core "${PY_SRC}"; then
+        pip_args+=(-C "build-dir=$(rapids-maybe-clean-build-dir "${cmake_args[@]}" -- "${PY_SRC}")");
     fi
 
-    case "${no_build_isolation:-$(pip config get wheel.no-build-isolation 2>/dev/null || echo)}" in
-        True|true|yes|1)
-            if rapids-python-uses-scikit-build-core "${py_src}"; then
-                pip_args+=(-C "build-dir=$(rapids-get-cmake-build-dir -- "${py_src}" "${cmake_args[@]}")");
-            fi
-            ;;
-    esac
+    pip_args+=("${PY_SRC}");
 
-    pip_args+=("${py_src}");
-
-    trap "rm -rf '${py_src}/${py_lib//"-"/"_"}.egg-info'" EXIT;
+    trap "rm -rf '${PY_SRC}/${py_lib//"-"/"_"}.egg-info'" EXIT;
 
     time (
         export ${PY_ENV} PATH="$PATH";
@@ -91,14 +82,14 @@ build_${PY_LIB}_python_wheel() {
         local nvcc_append_flags="${NVCC_APPEND_FLAGS:+$NVCC_APPEND_FLAGS }-t=${n_arch}";
 
         CUDAFLAGS="${cudaflags}"                 \
-        CMAKE_GENERATOR="Ninja"                  \
+        CMAKE_GENERATOR="${G:-Ninja}"            \
         PARALLEL_LEVEL="${n_jobs}"               \
         CMAKE_ARGS="${cmake_args[*]}"            \
         SKBUILD_BUILD_OPTIONS="${ninja_args[*]}" \
         NVCC_APPEND_FLAGS="${nvcc_append_flags}" \
             python -m pip wheel "${pip_args[@]}" \
         ;
-        { set +x; } 2>/dev/null; echo -n "${py_lib} wheel build time:";
+        { set +x; } 2>/dev/null; echo -n "${PY_LIB} wheel build time:";
     ) 2>&1;
 }
 

@@ -40,6 +40,7 @@ cp -ar ./opt/rapids-build-utils /opt/;
 
 declare -a commands=(
     checkout-same-branch
+    maybe-clean-build-dir
     generate-docstring
     generate-scripts
     get-cmake-build-dir
