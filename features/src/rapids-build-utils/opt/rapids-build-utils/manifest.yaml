@@ -3,10 +3,6 @@ x-git-defaults: &git_defaults
     tag: branch-24.04
     upstream: rapidsai
 
-x-python-wheel-no-build-isolation: &python_wheel_no_build_isolation
-  args:
-    wheel: --no-build-isolation
-
 repos:
 
 - name: rmm
@@ -18,7 +14,8 @@ repos:
   python:
     - name: rmm
       sub_dir: python
-      <<: *python_wheel_no_build_isolation
+      depends: [rmm]
+      args: {cmake: -DFIND_RMM_CPP=ON}
 
 - name: ucxx
   path: ucxx
@@ -27,13 +24,15 @@ repos:
     - name: ucxx
       sub_dir: cpp
       depends: [rmm]
-      args: |
-        -DUCXX_ENABLE_PYTHON=ON
-        -DUCXX_ENABLE_RMM=ON
+      args:
+        cmake: |
+          -DUCXX_ENABLE_PYTHON=ON
+          -DUCXX_ENABLE_RMM=ON
   python:
     - name: ucxx
       sub_dir: python
-      <<: *python_wheel_no_build_isolation
+      depends: [ucxx]
+      args: {cmake: -DFIND_UCXX_CPP=ON}
 
 - name: kvikio
   path: kvikio
@@ -45,7 +44,8 @@ repos:
   python:
     - name: kvikio
       sub_dir: python
-      <<: *python_wheel_no_build_isolation
+      depends: [KvikIO]
+      args: {cmake: -DFIND_KVIKIO_CPP=ON}
 
 - name: cudf
   path: cudf
@@ -53,23 +53,22 @@ repos:
   cpp:
     - name: cudf
       sub_dir: cpp
-      depends: [rmm, KvikIO]
+      depends: [KvikIO]
     - name: cudf_kafka
       sub_dir: cpp/libcudf_kafka
-      depends: [rmm, KvikIO, cudf]
+      depends: [cudf]
   python:
     - name: cudf
       sub_dir: python/cudf
-      <<: *python_wheel_no_build_isolation
+      depends: [cudf]
+      args: {cmake: -DFIND_CUDF_CPP=ON}
     - name: dask_cudf
       sub_dir: python/dask_cudf
-      <<: *python_wheel_no_build_isolation
     - name: cudf_kafka
       sub_dir: python/cudf_kafka
-      <<: *python_wheel_no_build_isolation
+      depends: [cudf_kafka]
     - name: custreamz
       sub_dir: python/custreamz
-      <<: *python_wheel_no_build_isolation
 
 - name: raft
   path: raft
@@ -81,10 +80,12 @@ repos:
   python:
     - name: pylibraft
       sub_dir: python/pylibraft
-      <<: *python_wheel_no_build_isolation
+      depends: [raft]
+      args: {cmake: -DFIND_RAFT_CPP=ON}
     - name: raft-dask
       sub_dir: python/raft-dask
-      <<: *python_wheel_no_build_isolation
+      depends: [raft]
+      args: {cmake: -DFIND_RAFT_CPP=ON}
 
 - name: cumlprims_mg
   path: cumlprims_mg
@@ -92,7 +93,7 @@ repos:
   cpp:
     - name: cumlprims_mg
       sub_dir: cpp
-      depends: [rmm, raft]
+      depends: [raft]
 
 - name: cuml
   path: cuml
@@ -100,11 +101,12 @@ repos:
   cpp:
     - name: cuml
       sub_dir: cpp
-      depends: [rmm, raft, cumlprims_mg]
+      depends: [cumlprims_mg]
   python:
     - name: cuml
       sub_dir: python
-      <<: *python_wheel_no_build_isolation
+      depends: [cuml]
+      args: {cmake: -DFIND_CUML_CPP=ON}
 
 - name: cugraph-ops
   path: cugraph-ops
@@ -112,17 +114,17 @@ repos:
   cpp:
     - name: cugraph-ops
       sub_dir: cpp
-      depends: [rmm, raft]
+      depends: [raft]
     - name: cugraph-ops-internal
       sub_dir: cpp_internal
-      depends: [rmm, raft, cugraph-ops]
+      depends: [cugraph-ops]
   python:
     - name: pylibcugraphops
       sub_dir: pylibcugraphops
-      <<: *python_wheel_no_build_isolation
+      depends: [cugraph-ops]
     - name: pylibcugraphops_internal
       sub_dir: pylibcugraphops_internal
-      <<: *python_wheel_no_build_isolation
+      depends: [cugraph-ops-internal]
 
 - name: wholegraph
   path: wholegraph
@@ -130,11 +132,11 @@ repos:
   cpp:
     - name: wholegraph
       sub_dir: cpp
-      depends: [rmm, raft]
+      depends: [raft]
   python:
     - name: wholegraph
       sub_dir: python/pylibwholegraph
-      <<: *python_wheel_no_build_isolation
+      depends: [wholegraph]
 
 - name: cugraph
   path: cugraph
@@ -142,35 +144,31 @@ repos:
   cpp:
     - name: cugraph
       sub_dir: cpp
-      depends: [rmm, raft, cugraph-ops]
+      depends: [cugraph-ops]
     - name: cugraph_etl
       sub_dir: cpp/libcugraph_etl
-      depends: [rmm, raft, cudf, cugraph-ops, cugraph]
+      depends: [cudf, cugraph]
   python:
     - name: pylibcugraph
       sub_dir: python/pylibcugraph
-      <<: *python_wheel_no_build_isolation
+      depends: [cugraph]
+      args: {cmake: -DFIND_CUGRAPH_CPP=ON}
     - name: cugraph
       sub_dir: python/cugraph
-      <<: *python_wheel_no_build_isolation
+      depends: [cugraph]
+      args: {cmake: -DFIND_CUGRAPH_CPP=ON}
     - name: nx-cugraph
       sub_dir: python/nx-cugraph
-      <<: *python_wheel_no_build_isolation
     - name: cugraph-dgl
       sub_dir: python/cugraph-dgl
-      <<: *python_wheel_no_build_isolation
     - name: cugraph-equivariant
       sub_dir: python/cugraph-equivariant
-      <<: *python_wheel_no_build_isolation
     - name: cugraph_pyg
       sub_dir: python/cugraph-pyg
-      <<: *python_wheel_no_build_isolation
     - name: cugraph-service-client
       sub_dir: python/cugraph-service/client
-      <<: *python_wheel_no_build_isolation
     - name: cugraph-service-server
       sub_dir: python/cugraph-service/server
-      <<: *python_wheel_no_build_isolation
 
 - name: cuspatial
   path: cuspatial
@@ -178,11 +176,20 @@ repos:
   cpp:
     - name: cuspatial
       sub_dir: cpp
-      depends: [rmm, cudf]
+      depends: [cudf]
   python:
     - name: cuproj
       sub_dir: python/cuproj
-      <<: *python_wheel_no_build_isolation
+      depends: [rmm]
+      # cuproj is only built by cuspatial's CMake via add_subdirectory(cuproj),
+      # it doesn't have a build dir of its own. That means we can't list it as
+      # a cpp repo after cuspatial (above), and we have to manually point CMake
+      # to the cuspatial build dir here.
+      args:
+        cmake: |
+          -DFIND_CUPROJ_CPP=ON
+          -Dcuproj_ROOT="${HOME}/cuspatial/cpp/build/${PYTHON_PACKAGE_MANAGER}/cuda-${CUDA_VERSION}/latest"
     - name: cuspatial
       sub_dir: python/cuspatial
-      <<: *python_wheel_no_build_isolation
+      depends: [cuspatial]
+      args: {cmake: -DFIND_CUSPATIAL_CPP=ON}

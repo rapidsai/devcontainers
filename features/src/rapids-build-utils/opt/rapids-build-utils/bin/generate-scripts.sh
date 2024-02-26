@@ -46,7 +46,7 @@ generate_script() {
     if test -n "${bin}"; then
         (
             cat - \
-          | envsubst '$HOME $NAME $SRC_PATH $PY_ENV $PY_SRC $PY_LIB $BIN_DIR $CPP_LIB $CPP_SRC $CPP_ARGS $CPP_DEPS $GIT_TAG $GIT_REPO $GIT_HOST $GIT_UPSTREAM $PY_CMAKE_ARGS $PIP_WHEEL_ARGS $PIP_INSTALL_ARGS' \
+          | envsubst '$HOME $NAME $SRC_PATH $PY_ENV $PY_SRC $PY_LIB $BIN_DIR $CPP_LIB $CPP_SRC $CPP_CMAKE_ARGS $CPP_CPACK_ARGS $CPP_DEPS $GIT_TAG $GIT_REPO $GIT_HOST $GIT_UPSTREAM $PIP_WHEEL_ARGS $PIP_INSTALL_ARGS' \
           | tee "${TMP_SCRIPT_DIR}/${bin}" >/dev/null;
 
             chmod +x "${TMP_SCRIPT_DIR}/${bin}";
@@ -129,7 +129,7 @@ generate_cpp_scripts() {
 
 generate_python_scripts() {
     local script_name;
-    for script_name in "build" "clean" "uninstall"; do
+    for script_name in "build" "clean" "install" "uninstall"; do
         if test -f "${TEMPLATES}/python.${script_name}.tmpl.sh"; then (
             # shellcheck disable=SC2002
             cat "${TEMPLATES}/python.${script_name}.tmpl.sh" \
@@ -163,27 +163,67 @@ generate_scripts() {
         . devcontainer-utils-debug-output 'rapids_build_utils_debug' 'generate-scripts';
     fi
 
-    local -A cpp_name_to_path;
-
     local i;
     local j;
     local k;
 
-    local repo_names=();
-    local cloned_repos=();
+    local repo;
+    local repo_name;
+    local repo_path;
+    local cpp_length;
+    local py_length;
+    local git_repo;
+    local git_host;
+    local git_tag;
+    local git_upstream;
+
+    local cpp_name;
+    local cpp_path;
+    local cpp_sub_dir;
+    local cpp_cmake_args;
+    local cpp_cpack_args;
+    local cpp_depends_length;
+
+    local py_env;
+    local py_path;
+    local py_name;
+    local py_cmake_args;
+    local pip_wheel_args;
+    local pip_install_args;
+    local py_sub_dir;
+    local py_depends_length;
+
+    local dep;
+    local dep_name;
+    local dep_path;
+
+    local -A cpp_name_to_path;
+    local -A cpp_name_to_deps;
+
+    local -a py_libs=()
+    local -a py_dirs=()
+    local -a cpp_libs=();
+    local -a cpp_dirs=();
+    local -a cpp_deps=();
+
+    local -a repo_names=();
+    local -a cloned_repos=();
+    local -a immediate_cpp_deps=();
+    local -a inherited_cpp_deps=();
+
     local -r bin_dir="$(rapids-get-cmake-build-dir --skip-build-type)";
 
     for ((i=0; i < ${repos_length:-0}; i+=1)); do
 
-        local repo="repos_${i}";
-        local repo_name="${repo}_name";
-        local repo_path="${repo}_path";
-        local cpp_length="${repo}_cpp_length";
-        local py_length="${repo}_python_length";
-        local git_repo="${repo}_git_repo";
-        local git_host="${repo}_git_host";
-        local git_tag="${repo}_git_tag";
-        local git_upstream="${repo}_git_upstream";
+        repo="repos_${i}";
+        repo_name="${repo}_name";
+        repo_path="${repo}_path";
+        cpp_length="${repo}_cpp_length";
+        py_length="${repo}_python_length";
+        git_repo="${repo}_git_repo";
+        git_host="${repo}_git_host";
+        git_tag="${repo}_git_tag";
+        git_upstream="${repo}_git_upstream";
 
         repo_name="${!repo_name,,}";
         repo_names+=("${repo_name}");
@@ -192,20 +232,19 @@ generate_scripts() {
             cloned_repos+=("${repo_name}");
         fi
 
-        local deps=();
-        local cpp_libs=();
-        local cpp_dirs=();
-
-        local py_libs=()
-        local py_dirs=()
+        py_libs=()
+        py_dirs=()
+        cpp_libs=();
+        cpp_dirs=();
 
         for ((j=0; j < ${!cpp_length:-0}; j+=1)); do
 
-            local cpp_name="${repo}_cpp_${j}_name";
-            local cpp_args="${repo}_cpp_${j}_args";
-            local cpp_sub_dir="${repo}_cpp_${j}_sub_dir";
-            local cpp_depends_length="${repo}_cpp_${j}_depends_length";
-            local cpp_path=~/"${!repo_path:-}${!cpp_sub_dir:+/${!cpp_sub_dir}}";
+            cpp_name="${repo}_cpp_${j}_name";
+            cpp_sub_dir="${repo}_cpp_${j}_sub_dir";
+            cpp_cmake_args="${repo}_cpp_${j}_args_cmake";
+            cpp_cpack_args="${repo}_cpp_${j}_args_cpack";
+            cpp_depends_length="${repo}_cpp_${j}_depends_length";
+            cpp_path=~/"${!repo_path:-}${!cpp_sub_dir:+/${!cpp_sub_dir}}";
 
             cpp_dirs+=("${cpp_path}");
             cpp_libs+=("${!cpp_name:-}");
@@ -213,59 +252,67 @@ generate_scripts() {
 
             cpp_name_to_path["${cpp_name}"]="${cpp_path}";
 
-            local cpp_deps=();
+            immediate_cpp_deps=();
+            inherited_cpp_deps=();
 
             for ((k=0; k < ${!cpp_depends_length:-0}; k+=1)); do
-                local dep="${repo}_cpp_${j}_depends_${k}";
-                local dep_cpp_name="${!dep}";
-                if ! test -v cpp_name_to_path["${dep_cpp_name}"]; then
-                    continue;
+                dep="${repo}_cpp_${j}_depends_${k}";
+                dep_name="${!dep}";
+                if test -v cpp_name_to_path["${dep_name}"]; then
+                    dep_path="${cpp_name_to_path["${dep_name}"]}";
+                    immediate_cpp_deps+=("-D${dep_name}_ROOT=${dep_path}/${bin_dir}");
+                    if test -v cpp_name_to_deps["${dep_name}"]; then
+                        eval "inherited_cpp_deps+=(${cpp_name_to_deps["${dep_name}"]});"
+                    fi
                 fi
-                local dep_cpp_path="${cpp_name_to_path["${dep_cpp_name}"]}";
-
-                cpp_deps+=("-D${!dep}_ROOT=\"${dep_cpp_path}/${bin_dir}\"");
-                cpp_deps+=("-D${!dep,,}_ROOT=\"${dep_cpp_path}/${bin_dir}\"");
-                cpp_deps+=("-D${!dep^^}_ROOT=\"${dep_cpp_path}/${bin_dir}\"");
-                deps+=("${cpp_deps[@]}");
             done
 
+            # shellcheck disable=SC2206
+            cpp_deps=(${inherited_cpp_deps[@]@Q} ${immediate_cpp_deps[@]@Q});
+
+            cpp_name_to_deps["${cpp_name}"]="${cpp_deps[*]}";
+
             if [[ -d ~/"${!repo_path:-}/.git" ]]; then
-                NAME="${repo_name:-}"        \
-                SRC_PATH=~/"${!repo_path:-}" \
-                BIN_DIR="${bin_dir}"         \
-                CPP_LIB="${cpp_name:-}"      \
-                CPP_SRC="${!cpp_sub_dir:-}"  \
-                CPP_ARGS="${!cpp_args:-}"    \
-                CPP_DEPS="${cpp_deps[*]}"    \
-                generate_cpp_scripts         ;
+                NAME="${repo_name:-}"                 \
+                SRC_PATH=~/"${!repo_path:-}"          \
+                BIN_DIR="${bin_dir}"                  \
+                CPP_LIB="${cpp_name:-}"               \
+                CPP_SRC="${!cpp_sub_dir:-}"           \
+                CPP_DEPS="${cpp_deps[*]}"             \
+                CPP_CMAKE_ARGS="${!cpp_cmake_args:-}" \
+                CPP_CPACK_ARGS="${!cpp_cpack_args:-}" \
+                generate_cpp_scripts                  ;
             fi
         done
 
-        local args=();
-
-        for ((k=0; k < ${#cpp_libs[@]}; k+=1)); do
-            # Define both lowercase and uppercase
-            # `-DFIND_<lib>_CPP=ON` and `-DFIND_<LIB>_CPP=ON` because the RAPIDS
-            # scikit-build CMakeLists.txt's aren't 100% consistent in the casing
-            local cpp_dir="${cpp_dirs[$k]}";
-            local cpp_lib="${cpp_libs[$k]}";
-            args+=("-DFIND_${cpp_lib}_CPP=ON");
-            args+=("-DFIND_${cpp_lib,,}_CPP=ON");
-            args+=("-DFIND_${cpp_lib^^}_CPP=ON");
-            deps+=("-D${cpp_lib}_ROOT=\"${cpp_dir}/${bin_dir}\"");
-            deps+=("-D${cpp_lib,,}_ROOT=\"${cpp_dir}/${bin_dir}\"");
-            deps+=("-D${cpp_lib^^}_ROOT=\"${cpp_dir}/${bin_dir}\"");
-        done
-
         for ((j=0; j < ${!py_length:-0}; j+=1)); do
-            local py_env="${repo}_python_${j}_env";
-            local py_name="${repo}_python_${j}_name";
-            local py_cmake_args="${repo}_python_${j}_args_cmake";
-            local pip_wheel_args="${repo}_python_${j}_args_wheel";
-            local pip_install_args="${repo}_python_${j}_args_install";
-            local py_sub_dir="${repo}_python_${j}_sub_dir";
-            # local py_depends_length="${repo}_python_${j}_depends_length";
-            local py_path=~/"${!repo_path:-}${!py_sub_dir:+/${!py_sub_dir}}";
+            py_env="${repo}_python_${j}_env";
+            py_name="${repo}_python_${j}_name";
+            py_cmake_args="${repo}_python_${j}_args_cmake";
+            pip_wheel_args="${repo}_python_${j}_args_wheel";
+            pip_install_args="${repo}_python_${j}_args_install";
+            py_sub_dir="${repo}_python_${j}_sub_dir";
+            py_depends_length="${repo}_python_${j}_depends_length";
+            py_path=~/"${!repo_path:-}${!py_sub_dir:+/${!py_sub_dir}}";
+
+            immediate_cpp_deps=();
+            inherited_cpp_deps=();
+
+            for ((k=0; k < ${!py_depends_length:-0}; k+=1)); do
+                dep="${repo}_python_${j}_depends_${k}";
+                dep_name="${!dep}";
+                if test -v cpp_name_to_path["${dep_name}"]; then
+                    dep_path="${cpp_name_to_path["${dep_name}"]}";
+                    immediate_cpp_deps+=("-D${dep_name}_ROOT=${dep_path}/${bin_dir}");
+                    if test -v cpp_name_to_deps["${dep_name}"]; then
+                        # shellcheck disable=SC2206
+                        eval "inherited_cpp_deps+=(${cpp_name_to_deps["${dep_name}"]});"
+                    fi
+                fi
+            done
+
+            # shellcheck disable=SC2206
+            cpp_deps=(${inherited_cpp_deps[@]@Q} ${immediate_cpp_deps[@]@Q});
 
             py_dirs+=("${py_path}");
             py_libs+=("${!py_name}");
@@ -277,9 +324,8 @@ generate_scripts() {
                 PY_SRC="${py_path}"                       \
                 PY_LIB="${!py_name}"                      \
                 PY_ENV="${!py_env:-}"                     \
-                CPP_ARGS="${args[*]}"                     \
-                CPP_DEPS="${deps[*]}"                     \
-                PY_CMAKE_ARGS="${!py_cmake_args:-}"       \
+                CPP_DEPS="${cpp_deps[*]}"                 \
+                CPP_CMAKE_ARGS="${!py_cmake_args:-}"      \
                 PIP_WHEEL_ARGS="${!pip_wheel_args:-}"     \
                 PIP_INSTALL_ARGS="${!pip_install_args:-}" \
                 generate_python_scripts                   ;
@@ -324,7 +370,7 @@ _generate() {
     local -;
     set -euo pipefail;
 
-    echo "Generating RAPIDS build scripts in ${ALT_SCRIPT_DIR}";
+    echo "Generating RAPIDS build scripts in ${ALT_SCRIPT_DIR}" >&2;
 
     mkdir -p "${TMP_SCRIPT_DIR}";
 
