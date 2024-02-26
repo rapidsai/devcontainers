@@ -43,7 +43,7 @@ get_num_archs_jobs_and_load() {
 
     parallel="${j:-${JOBS:-${PARALLEL_LEVEL:-1}}}";
     max_archs="${max_archs:-${MAX_DEVICE_OBJ_TO_COMPILE_IN_PARALLEL:-3}}";
-    max_device_obj_memory_usage="${m:-${MAX_DEVICE_OBJ_MEMORY_USAGE:-1}}";
+    max_device_obj_memory_usage="${max_device_obj_memory_usage:-${MAX_DEVICE_OBJ_MEMORY_USAGE:-1}}";
 
     local n_arch=${archs:-1};
 
