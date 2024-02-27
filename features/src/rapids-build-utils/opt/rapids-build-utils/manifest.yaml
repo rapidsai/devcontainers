@@ -118,16 +118,28 @@ repos:
     - name: cugraph-ops
       sub_dir: cpp
       depends: [raft]
+      args:
+        cmake: |
+          -DCMAKE_CUDA_ARCHITECTURES="${CUDAARCHS}"
     - name: cugraph-ops-internal
       sub_dir: cpp_internal
       depends: [cugraph-ops]
+      args:
+        cmake: |
+          -DCMAKE_CUDA_ARCHITECTURES="${CUDAARCHS}"
   python:
     - name: pylibcugraphops
       sub_dir: pylibcugraphops
       depends: [cugraph-ops]
+      args:
+        cmake: |
+          -DCMAKE_CUDA_ARCHITECTURES="${CUDAARCHS}"
     - name: pylibcugraphops_internal
       sub_dir: pylibcugraphops_internal
       depends: [cugraph-ops-internal]
+      args:
+        cmake: |
+          -DCMAKE_CUDA_ARCHITECTURES="${CUDAARCHS}"
 
 - name: wholegraph
   path: wholegraph
@@ -136,6 +148,9 @@ repos:
     - name: wholegraph
       sub_dir: cpp
       depends: [raft]
+      args:
+        cmake: |
+          -DCMAKE_CUDA_ARCHITECTURES="${CUDAARCHS}"
   python:
     - name: wholegraph
       sub_dir: python/pylibwholegraph
