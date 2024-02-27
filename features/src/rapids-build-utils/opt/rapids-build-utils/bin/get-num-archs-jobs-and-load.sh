@@ -13,11 +13,15 @@
 #  -h,--help                              Print this text.
 #
 # Options that require values:
-#  --archs <num>                          Build <num> CUDA archs in parallel
+#  --archs <num>                          Build <num> CUDA archs in parallel.
 #                                         (default: 1)
-#  --max-archs <num>                      Build at most <num> CUDA archs in parallel
+#  -j,--parallel <num>                    Run <num> parallel compilation jobs.
+#  --max-archs <num>                      Build at most <num> CUDA archs in parallel.
 #                                         (default: 3)
-#  -j,--parallel <num>                    Run <num> parallel compilation jobs
+#  --max-total-system-memory <num>        An upper-bound on the amount of total system memory (in GiB) to use during
+#                                         C++ and CUDA device compilations.
+#                                         Smaller values yield fewer parallel C++ and CUDA device compilations.
+#                                         (default: all available memory)
 #  --max-device-obj-memory-usage <num>    An upper-bound on the amount of memory each CUDA device object compilation
 #                                         is expected to take. This is used to estimate the number of parallel device
 #                                         object compilations that can be launched without hitting the system memory
@@ -77,15 +81,16 @@ get_num_archs_jobs_and_load() {
     # Clamp between 1 and ${max_archs} threads per nvcc job
     n_arch=$(( n_arch < 1 ? 1 : n_arch > max_archs ? max_archs : n_arch ));
 
-    local -r free_mem=$(free --gibi | grep -E '^Mem:' | tr -s '[:space:]' | cut -d' ' -f7 || echo '0');
-    local -r freeswap=$(free --gibi | grep -E '^Swap:' | tr -s '[:space:]' | cut -d' ' -f4 || echo '0');
+    local -r free_mem="$(free --gibi | grep -E '^Mem:' | tr -s '[:space:]' | cut -d' ' -f7 || echo '0')";
+    local -r freeswap="$(free --gibi | grep -E '^Swap:' | tr -s '[:space:]' | cut -d' ' -f4 || echo '0')";
+    local -r mem_total="${max_total_system_memory:-${MAX_TOTAL_SYSTEM_MEMORY:-$((free_mem + freeswap))}}";
     local all_cpus="${parallel}";
     local n_load="${all_cpus}";
     # shellcheck disable=SC2155
     local n_jobs="$(cat<<____EOF | bc
 scale=0
 max_cpu=(${all_cpus} / ${n_arch} / 2 * 3)
-max_mem=((${free_mem} + ${freeswap}) / ${n_arch} / ${max_device_obj_memory_usage})
+max_mem=(${mem_total} / ${n_arch} / ${max_device_obj_memory_usage})
 if(max_cpu < max_mem) max_cpu else max_mem
 ____EOF
     )";
