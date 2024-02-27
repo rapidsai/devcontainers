@@ -139,13 +139,13 @@ for dir in $(for_each_user_bashrc 'echo "$(dirname "$(realpath -m "$0")")"'); do
     cp .gitconfig "${dir}"/.gitconfig.default;
     # Copy in default .bash_completion
     cp .bash_completion "${dir}"/.bash_completion;
-    mkdir -p -m 0755                                    \
-        `# Create ~/.cache, i.e. $XDG_CACHE_HOME`       \
-        "${dir}"/.cache                                 \
-        `# Create ~/.config, i.e. $XDG_CONFIG_HOME`     \
-        "${dir}"/.config "${dir}"/.config/{clangd,pip}  \
-        `# Create ~/.local/state, i.e. $XDG_STATE_HOME` \
-        "${dir}"/.local "${dir}"/.local/{bin,state}     \
+    mkdir -p -m 0755                                      \
+        `# Create ~/.cache, i.e. $XDG_CACHE_HOME`         \
+        "${dir}"/.cache                                   \
+        `# Create ~/.config, i.e. $XDG_CONFIG_HOME`       \
+        "${dir}"/.config "${dir}"/.config/{clangd,pip}    \
+        `# Create ~/.local/state, i.e. $XDG_STATE_HOME`   \
+        "${dir}"/.local "${dir}"/.local/{bin,state,share} \
     # Create or update ~/.ssh/known_hosts
     mkdir -p -m 0700 "${dir}"/.ssh;
     touch "${dir}"/.ssh/known_hosts;
@@ -156,7 +156,7 @@ ____EOF
 done
 
 rm -rf /root/.cache;
-rm -rf /root/.local/{bin,state};
+rm -rf /root/.local/{bin,state,share};
 rm -rf /root/.config/{clangd,pip};
 
 # Find the non-root user
