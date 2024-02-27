@@ -58,21 +58,7 @@ try {
     Write-Output "ENV:CUDA_VER           $ENV:CUDA_VER"
     Write-Output "ENV:ROOT_IMAGE         $ENV:ROOT_IMAGE"
 
-    # Docker Desktop includes the compose command while CE installations will only have the standalone plugin.
-
-    $compose = "docker compose"
-    try {
-        docker compose
-        TestReturnCode
-    }
-    catch {
-        $compose = "docker-compose.exe"
-    }
-
-    Write-Output "Using $compose for building"
-    $compose = "$compose -f .\docker-compose.yml build windows"
-
-    Invoke-Expression $compose
+    docker build --file .\windows.Dockerfile --tag "$ENV:IMAGE_NAME" --isolation "$ENV:ISOLATION" --build-arg MSVC_VER="$ENV:MSVC_VER" --build-arg MSVC_COMPILER_VER="$ENV:MSVC_COMPILER_VER" --build-arg CUDA_VER="$ENV:CUDA_VER" --build-arg ROOT_IMAGE="$ENV:ROOT_IMAGE" .\image
 }
 catch {
     Pop-Location
