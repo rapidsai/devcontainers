@@ -112,8 +112,8 @@ make_pip_dependencies() {
       | ( if test -n "${no_dedupe:-}"; then cat -; else tr -s "[:blank:]" | LC_ALL=C sort -u; fi )              \
       | (grep -v -P "^($(tr -d '[:blank:]' <<< "${pip_noinstall[@]/%/|}"))(=.*|>.*|<.*)?$" || [ "$?" == "1" ])  \
       | sed -E "s/-cu([0-9]+)/-cu${cuda_version_major}/g"                                                       \
-      | sed -E "s/cupy-cuda[0-9]+x/cupy-cuda${cuda_version_major}x/g"                                           \
-      | sed -E "s/cuda-python.*/cuda-python>=${cuda_version}.0,<$((cuda_version_major+1)).0a0/g"                \
+      | sed -E "s/^cupy-cuda[0-9]+x/cupy-cuda${cuda_version_major}x/g"                                          \
+      | sed -E "s/^cuda-python.*/cuda-python>=${cuda_version}.0,<$((cuda_version_major+1)).0a0/g"               \
         ;
 
         rm -f "${pip_reqs_txts[@]}";
