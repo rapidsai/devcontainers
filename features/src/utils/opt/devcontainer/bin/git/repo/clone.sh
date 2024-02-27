@@ -100,7 +100,7 @@ clone_git_repo() {
     fi
 
     # shellcheck disable=SC2086
-    git -C "${directory}" submodule update --init --recursive ${j} ${q};
+    git -C "${directory}" submodule update --recursive ${j} ${q};
 }
 
 clone_git_repo "$@" <&0;

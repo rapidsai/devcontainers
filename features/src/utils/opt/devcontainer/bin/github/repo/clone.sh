@@ -20,6 +20,8 @@
 # Options that require values:
 #  -b,--branch <branch_or_tag>  Check the repo out to <branch_or_tag>.
 #  -j,--jobs,--parallel <num>   Clone <num> submodules in parallel.
+#  --ssh-url <url>              FQDN of the GitHub instance when cloning via SSH.
+#  --https-url <url>            FQDN of the GitHub instance when cloning via HTTPS.
 #
 # Positional arguments:
 #  upstream                     Set <upstream> as the `upstream` remote.
@@ -157,11 +159,11 @@ clone_github_repo() {
 
     if test -z "${origin_:-}" || test -z "${upstream_:-}"; then
         if [ "$(gh config get git_protocol)" = "ssh" ]; then
-            origin_="${origin_:-"git@${GITHUB_HOST:-github.com}:${origin}.git"}";
-            upstream_="${upstream_:-"git@${GITHUB_HOST:-github.com}:${upstream}.git"}";
+            origin_="${origin_:-"ssh://git@${ssh_url:-${GITHUB_HOST:-github.com}}/${origin}.git"}";
+            upstream_="${upstream_:-"ssh://git@${ssh_url:-${GITHUB_HOST:-github.com}}/${upstream}.git"}";
         else
-            origin_="${origin_:-"https://${GITHUB_HOST:-github.com}/${origin}.git"}";
-            upstream_="${upstream_:-"https://${GITHUB_HOST:-github.com}/${upstream}.git"}";
+            origin_="${origin_:-"https://${https_url:-${GITHUB_HOST:-github.com}}/${origin}.git"}";
+            upstream_="${upstream_:-"https://${https_url:-${GITHUB_HOST:-github.com}}/${upstream}.git"}";
         fi
     fi
 

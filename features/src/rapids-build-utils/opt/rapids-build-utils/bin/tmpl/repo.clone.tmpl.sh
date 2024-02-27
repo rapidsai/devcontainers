@@ -42,6 +42,8 @@ clone_${NAME}() {
 
     branch="${b:-"${GIT_TAG}"}";
     directory="${d:-"${SRC_PATH}"}";
+    ssh_url="${ssh_url:-${GIT_SSH_URL}}";
+    https_url="${https_url:-${GIT_HTTPS_URL}}";
     upstream="${u:-"${GIT_UPSTREAM}/${GIT_REPO}"}";
 
     echo 'Cloning ${NAME}' 1>&2;
@@ -49,6 +51,8 @@ clone_${NAME}() {
     devcontainer-utils-clone-${GIT_HOST}-repo \
         --tags                                \
         --branch "${branch}"                  \
+        --ssh-url "${ssh_url}"                \
+        --https-url "${https_url}"            \
         --recurse-submodules                  \
         -j ${n_jobs:-$(nproc --ignore=1)}     \
         -c checkout.defaultRemote=upstream    \

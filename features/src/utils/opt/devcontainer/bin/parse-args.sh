@@ -175,7 +175,7 @@ _parse_args_for_file() {
                         # Peek at the next argument.
                         # If it begins with `-`, leave it for getopts.
                         # Otherwise, push it onto the skipped list and splice it out of $@.
-                        if [[ "${!OPTIND:--}" != -* ]]; then
+                        if [[ ${OPTIND} -le ${#@} && "${!OPTIND:-}" != -* ]]; then
                             opts+=("${!OPTIND}");
                             # Splice the argument at index `OPTIND` out of $@
                             set -- "${@:1:$((OPTIND-1))}" "${@:$((OPTIND+1))}";
@@ -205,7 +205,7 @@ _parse_args_for_file() {
                             typ="value";
                             key="${OPTARG}";
                             arg+=("--${key}");
-                            if [[ "${!OPTIND:--}" != -* ]]; then
+                            if [[ ${OPTIND} -le ${#@} && "${!OPTIND:-}" != -* ]]; then
                                 val="${!OPTIND}";
                                 arg+=("${val}");
                                 OPTIND=$((OPTIND + 1));
@@ -230,7 +230,7 @@ _parse_args_for_file() {
                                 arg+=("--${key}");
                             else
                                 opts+=("--${OPTARG}");
-                                if [[ "${!OPTIND:--}" != -* ]]; then
+                                if [[ ${OPTIND} -le ${#@} && "${!OPTIND:-}" != -* ]]; then
                                     opts+=("${!OPTIND}");
                                     OPTIND=$((OPTIND + 1));
                                 fi

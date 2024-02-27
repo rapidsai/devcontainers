@@ -46,7 +46,7 @@ generate_script() {
     if test -n "${bin}"; then
         (
             cat - \
-          | envsubst '$HOME $NAME $SRC_PATH $PY_ENV $PY_SRC $PY_LIB $BIN_DIR $CPP_LIB $CPP_SRC $CPP_CMAKE_ARGS $CPP_CPACK_ARGS $CPP_DEPS $GIT_TAG $GIT_REPO $GIT_HOST $GIT_UPSTREAM $PIP_WHEEL_ARGS $PIP_INSTALL_ARGS' \
+          | envsubst '$HOME $NAME $SRC_PATH $PY_ENV $PY_SRC $PY_LIB $BIN_DIR $CPP_LIB $CPP_SRC $CPP_CMAKE_ARGS $CPP_CPACK_ARGS $CPP_DEPS $GIT_TAG $GIT_SSH_URL $GIT_HTTPS_URL $GIT_REPO $GIT_HOST $GIT_UPSTREAM $PIP_WHEEL_ARGS $PIP_INSTALL_ARGS' \
           | tee "${TMP_SCRIPT_DIR}/${bin}" >/dev/null;
 
             chmod +x "${TMP_SCRIPT_DIR}/${bin}";
@@ -176,6 +176,8 @@ generate_scripts() {
     local git_host;
     local git_tag;
     local git_upstream;
+    local git_ssh_url;
+    local git_https_url;
 
     local cpp_name;
     local cpp_path;
@@ -224,6 +226,8 @@ generate_scripts() {
         git_host="${repo}_git_host";
         git_tag="${repo}_git_tag";
         git_upstream="${repo}_git_upstream";
+        git_ssh_url="${repo}_git_ssh_url";
+        git_https_url="${repo}_git_https_url";
 
         repo_name="${!repo_name,,}";
         repo_names+=("${repo_name}");
@@ -340,17 +344,19 @@ generate_scripts() {
         fi
 
         # Generate a clone script for each repo
-        NAME="${repo_name:-}"             \
-        SRC_PATH=~/"${!repo_path:-}"      \
-        PY_LIB="${py_libs[*]@Q}"          \
-        PY_SRC="${py_dirs[*]@Q}"          \
-        CPP_LIB="${cpp_libs[*]@Q}"        \
-        CPP_SRC="${cpp_dirs[*]@Q}"        \
-        GIT_TAG="${!git_tag:-}"           \
-        GIT_REPO="${!git_repo:-}"         \
-        GIT_HOST="${!git_host:-}"         \
-        GIT_UPSTREAM="${!git_upstream:-}" \
-        generate_clone_script             ;
+        NAME="${repo_name:-}"               \
+        SRC_PATH=~/"${!repo_path:-}"        \
+        PY_LIB="${py_libs[*]@Q}"            \
+        PY_SRC="${py_dirs[*]@Q}"            \
+        CPP_LIB="${cpp_libs[*]@Q}"          \
+        CPP_SRC="${cpp_dirs[*]@Q}"          \
+        GIT_TAG="${!git_tag:-}"             \
+        GIT_REPO="${!git_repo:-}"           \
+        GIT_HOST="${!git_host:-}"           \
+        GIT_UPSTREAM="${!git_upstream:-}"   \
+        GIT_SSH_URL="${!git_ssh_url:-}"     \
+        GIT_HTTPS_URL="${!git_https_url:-}" \
+        generate_clone_script               ;
     done
 
     unset cpp_name_to_path;
