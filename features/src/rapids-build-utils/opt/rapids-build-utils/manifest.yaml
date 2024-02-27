@@ -54,6 +54,9 @@ repos:
     - name: cudf
       sub_dir: cpp
       depends: [KvikIO]
+      args:
+        cmake: |
+          $([ "pip" = ${PYTHON_PACKAGE_MANAGER} ] && echo -DUSE_LIBARROW_FROM_PYARROW=ON || echo)
     - name: cudf_kafka
       sub_dir: cpp/libcudf_kafka
       depends: [cudf]
