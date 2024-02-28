@@ -1,6 +1,6 @@
 #! /usr/bin/env bash
 
-if (exec < /dev/tty) && [ "${CODESPACES:-false}" != "true" ]; then
+if tty >/dev/null 2>&1 && (exec </dev/tty) && [ "${CODESPACES:-false}" != "true" ]; then
     exit 0;
 fi
 
