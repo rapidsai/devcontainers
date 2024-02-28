@@ -108,6 +108,7 @@ make_pip_dependencies() {
         # Generate a combined requirements.txt file
         # shellcheck disable=SC2154
         cat "${requirement[@]}" "${pip_reqs_txts[@]}"                                                           \
+      | (grep -v '^#' || [ "$?" == "1" ])                                                                       \
       | (grep -v -E '^$' || [ "$?" == "1" ])                                                                    \
       | ( if test -n "${no_dedupe:-}"; then cat -; else tr -s "[:blank:]" | LC_ALL=C sort -u; fi )              \
       | (grep -v -P "^($(tr -d '[:blank:]' <<< "${pip_noinstall[@]/%/|}"))(=.*|>.*|<.*)?$" || [ "$?" == "1" ])  \
