@@ -132,7 +132,7 @@ clone_github_repo() {
          devcontainer-utils-shell-is-interactive; then
         while true; do
             local CHOICE;
-            read -rp "'${GITHUB_HOST:-github.com}/${user}/${name}.git' not found.
+            read -rsp "'${GITHUB_HOST:-github.com}/${user}/${name}.git' not found.
     Fork '${upstream}' into '${user}/${name}' now (y/n)? " CHOICE <"$(tty)"
             case "${CHOICE:-}" in
                 [Nn]* ) origin="${upstream}"; break;;

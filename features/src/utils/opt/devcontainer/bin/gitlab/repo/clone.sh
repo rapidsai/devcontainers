@@ -157,7 +157,7 @@ clone_gitlab_repo() {
          devcontainer-utils-shell-is-interactive; then
         while true; do
             local CHOICE;
-            read -rp "'${GITLAB_HOST:-gitlab.com}/${user}/${name}.git' not found.
+            read -rsp "'${GITLAB_HOST:-gitlab.com}/${user}/${name}.git' not found.
     Fork '${upstream}' into '${user}/${name}' now (y/n)? " CHOICE <"$(tty)"
             case "${CHOICE:-}" in
                 [Nn]* ) origin="${upstream}"; break;;
