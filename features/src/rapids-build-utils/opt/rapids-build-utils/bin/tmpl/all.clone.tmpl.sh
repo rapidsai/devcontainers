@@ -28,11 +28,16 @@ clone_all() {
     # shellcheck disable=SC1091
     . devcontainer-utils-debug-output 'rapids_build_utils_debug' 'clone-all';
 
+    local _o=;
+    if devcontainer-utils-shell-is-interactive; then
+        _o="<$(tty)";
+    fi
+
     echo ${NAMES} \
   | tr '[:space:]' '\0' \
   | xargs ${v:+-t} -r -0 -P${n_jobs} -I% bash -c "
     if type clone-% >/dev/null 2>&1; then
-        clone-% -j ${n_arch} --no-update-env ${OPTS[*]} || exit 255;
+        clone-% -j ${n_arch} --no-update-env ${OPTS[*]} ${_o} || exit 255;
     fi
     ";
 
