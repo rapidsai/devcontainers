@@ -52,8 +52,6 @@ declare -a commands=(
     make-pip-env
     make-vscode-workspace
     merge-compile-commands-json
-    post-attach-command
-    post-attach-command-entrypoint
     post-start-command
     pull-repositories
     push-repositories

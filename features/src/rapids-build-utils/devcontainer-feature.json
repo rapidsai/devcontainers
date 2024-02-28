@@ -12,12 +12,5 @@
     "+o",
     "history",
     "rapids-post-start-command"
-  ],
-  "postAttachCommand": [
-    "/bin/bash",
-    "-li",
-    "+o",
-    "history",
-    "rapids-post-attach-command"
   ]
 }

@@ -43,7 +43,6 @@ clone_all() {
 
     if test -z "${no_update_env-}"; then
         rapids-post-start-command;
-        rapids-post-attach-command;
     fi
 }
 
