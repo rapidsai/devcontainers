@@ -32,7 +32,7 @@ cpack_all() {
     local -r n_repos=$(echo ${NAMES} | wc -w);
     local k=$((n_repos / j));
 
-    eval "$(rapids-get-num-archs-jobs-and-load --archs "${k}" --parallel "${j}" --max-archs "${k}")";
+    eval "$(rapids-get-num-archs-jobs-and-load --archs "${k}" --parallel "${j}" --max-archs "${k}" --max-device-obj-memory-usage 1)";
 
     # shellcheck disable=SC1091
     . devcontainer-utils-debug-output 'rapids_build_utils_debug' 'cpack-all';

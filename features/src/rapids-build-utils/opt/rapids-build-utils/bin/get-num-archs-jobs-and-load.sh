@@ -41,15 +41,17 @@ get_num_archs_jobs_and_load() {
     # shellcheck disable=SC1091
     . devcontainer-utils-debug-output 'rapids_build_utils_debug' 'get-num-archs-jobs-and-load';
 
+    local -r n_cpus="$(nproc)";
+
     if test ${#j[@]} -gt 0 && test -z "${j:-}"; then
-        j=$(nproc);
+        j="${n_cpus}";
     fi
 
     parallel="${j:-${JOBS:-${PARALLEL_LEVEL:-1}}}";
     max_archs="${max_archs:-${MAX_DEVICE_OBJ_TO_COMPILE_IN_PARALLEL:-3}}";
     max_device_obj_memory_usage="${max_device_obj_memory_usage:-${MAX_DEVICE_OBJ_MEMORY_USAGE:-1}}";
 
-    local n_arch=${archs:-1};
+    local n_arch=${archs:-0};
 
     if test -z "${archs:-}" \
     && test -n "${INFER_NUM_DEVICE_ARCHITECTURES:-}"; then
@@ -63,12 +65,12 @@ get_num_archs_jobs_and_load() {
                 n_arch=1;
                 ;;
             all | all-major)
-                # Max out at 3 threads per object
+                # Max out at ${max_archs} threads per job
                 n_arch=${max_archs};
                 ;;
             ALL | RAPIDS)
                 # currently: 60-real;70-real;75-real;80-real;86-real;90
-                # see: https://github.com/rapidsai/rapids-cmake/blob/branch-23.10/rapids-cmake/cuda/set_architectures.cmake#L54
+                # see: https://github.com/rapidsai/rapids-cmake/blob/branch-24.04/rapids-cmake/cuda/set_architectures.cmake#L54
                 n_arch=6;
                 ;;
             *)
@@ -78,22 +80,29 @@ get_num_archs_jobs_and_load() {
         esac
     fi
 
-    # Clamp between 1 and ${max_archs} threads per nvcc job
-    n_arch=$(( n_arch < 1 ? 1 : n_arch > max_archs ? max_archs : n_arch ));
+    local mem_for_device_objs=1;
+
+    if test ${n_arch} -le 0; then
+        n_arch=1;
+    else
+        # Clamp to `min(n_arch, max_archs)` threads per job
+        n_arch=$((n_arch > max_archs ? max_archs : n_arch));
+        mem_for_device_objs="$((n_arch * max_device_obj_memory_usage))";
+    fi
 
     local -r free_mem="$(free --gibi | grep -E '^Mem:' | tr -s '[:space:]' | cut -d' ' -f7 || echo '0')";
     local -r freeswap="$(free --gibi | grep -E '^Swap:' | tr -s '[:space:]' | cut -d' ' -f4 || echo '0')";
     local -r mem_total="${max_total_system_memory:-${MAX_TOTAL_SYSTEM_MEMORY:-$((free_mem + freeswap))}}";
-    local all_cpus="${parallel}";
-    local n_load="${all_cpus}";
+    local n_load=$((parallel > n_cpus ? n_cpus : parallel));
     # shellcheck disable=SC2155
-    local n_jobs="$(cat<<____EOF | bc
+    local n_jobs="$(
+        echo "
 scale=0
-max_cpu=(${all_cpus} / ${n_arch} / 2 * 3)
-max_mem=(${mem_total} / ${n_arch} / ${max_device_obj_memory_usage})
+max_cpu=(${n_load} / ${n_arch} / 2 * 3)
+max_mem=(${mem_total} / ${mem_for_device_objs})
 if(max_cpu < max_mem) max_cpu else max_mem
-____EOF
-    )";
+" | bc
+    )"
     n_jobs=$((n_jobs < 1 ? 1 : n_jobs));
     n_jobs=$((n_arch > 1 ? n_jobs : n_load));
 

@@ -23,7 +23,7 @@ clone_all() {
 
     eval "$(_parse_args --take '-j,--parallel --no-update-env' "$@" <&0)";
 
-    eval "$(rapids-get-num-archs-jobs-and-load --archs 3 "$@")";
+    eval "$(rapids-get-num-archs-jobs-and-load --archs 3 --max-device-obj-memory-usage 1 "$@")";
 
     # shellcheck disable=SC1091
     . devcontainer-utils-debug-output 'rapids_build_utils_debug' 'clone-all';
