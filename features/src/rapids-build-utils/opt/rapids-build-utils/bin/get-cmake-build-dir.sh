@@ -17,6 +17,7 @@
 #
 # Boolean options:
 #  -h,--help                           Print this text.
+#  --skip-links                        Don't update any symlinks
 #  --skip-build-type                   Don't update the symlink pointing to the last component of
 #                                      the build dir path, i.e. "latest -> (debug|release)".
 #
@@ -46,20 +47,23 @@ get_cmake_build_dir() {
 
     if test -n "${src:-}" && test -d "${src:-}"; then
         mkdir -p "${src}/${bin}";
-        if test -z "${skip_build_type-}"; then
-            mkdir -p "${src}/${bin}/${type}";
-            cd "${src}/${bin}/" || exit 1;
-            ln -sfn "${type}" latest;
-        fi
-        cd "${src}/build" || exit 1;
-        local component;
-        for component in "${PYTHON_PACKAGE_MANAGER:-}" "${cuda:+cuda-${cuda}}"; do
-            if test -n "${component:-}"; then
-                ln -sfn "${component}/latest" latest;
-                cd "${component}" || exit 1;
+        if  test -z "${skip_links-}"; then
+            if test -z "${skip_build_type-}"; then
+                mkdir -p "${src}/${bin}/${type}";
+                cd "${src}/${bin}/" || exit 1;
+                ln -sfn "${type}" latest;
             fi
-        done
+            cd "${src}/build" || exit 1;
+            local component;
+            for component in "${PYTHON_PACKAGE_MANAGER:-}" "${cuda:+cuda-${cuda}}"; do
+                if test -n "${component:-}"; then
+                    ln -sfn "${component}/latest" latest;
+                    cd "${component}" || exit 1;
+                fi
+            done
+        fi
     fi
+
     if test -n "${skip_build_type-}"; then
         echo "${src:+${src}/}${bin}/latest";
     else

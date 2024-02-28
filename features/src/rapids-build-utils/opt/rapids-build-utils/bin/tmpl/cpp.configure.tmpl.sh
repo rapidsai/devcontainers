@@ -65,6 +65,8 @@ configure_${CPP_LIB}_cpp() {
             "${CPP_SRC}/compile_commands.json" \
             ;
     fi
+
+    rapids-merge-compile-commands-json > ~/compile_commands.json;
 }
 
 configure_${CPP_LIB}_cpp "$@" <&0;
