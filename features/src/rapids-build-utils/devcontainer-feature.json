@@ -6,13 +6,6 @@
   "containerEnv": {
     "BASH_ENV": "/etc/bash.bash_env"
   },
-  "updateContentCommand": [
-    "/bin/bash",
-    "-li",
-    "+o",
-    "history",
-    "rapids-update-content-command"
-  ],
   "postStartCommand": [
     "/bin/bash",
     "-li",

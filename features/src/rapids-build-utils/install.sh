@@ -70,7 +70,6 @@ declare -a commands=(
     select-pip-install-args
     select-pip-wheel-args
     update-build-dir-links
-    update-content-command
 );
 
 # Install alternatives
