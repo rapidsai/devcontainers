@@ -55,7 +55,7 @@ merge_compile_commands_json() {
         _list_repo_paths                                               \
       | xargs -r -I% -P$(nproc)                                        \
         rapids-get-cmake-build-dir --skip-links --skip-build-type -- % \
-      | xargs -r -I% echo %/                                           \
+      | xargs -r -I% sh -c 'if test -e %; then echo %/; fi'            \
     );
 
     if test ${#dirs[@]} -gt 0; then

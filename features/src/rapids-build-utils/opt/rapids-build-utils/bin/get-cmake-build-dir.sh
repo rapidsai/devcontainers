@@ -48,7 +48,7 @@ get_cmake_build_dir() {
     if test -n "${src:-}" && test -d "${src:-}"; then
         mkdir -p "${src}/${bin}";
         if  test -z "${skip_links-}"; then
-            if test -z "${skip_build_type-}"; then
+            if test -z "${skip_build_type-}" || ! test -L "${src}/${bin}/latest"; then
                 mkdir -p "${src}/${bin}/${type}";
                 cd "${src}/${bin}/" || exit 1;
                 ln -sfn "${type}" latest;
