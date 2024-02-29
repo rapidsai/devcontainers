@@ -35,7 +35,7 @@ build_${CPP_LIB}_cpp() {
     . devcontainer-utils-debug-output 'rapids_build_utils_debug' 'build-all build-${NAME} build-${CPP_LIB}-cpp';
 
     # Reconfigure if not configured or previous configure failed
-    local -r bin_dir="$(rapids-maybe-clean-build-dir "${G:-Ninja}" "$@" -- "${CPP_SRC}")";
+    local -r bin_dir="$(rapids-maybe-clean-build-dir -G"${G:-Ninja}" "$@" -- "${CPP_SRC}")";
     test -e "${bin_dir:-${CPP_SRC}/${BIN_DIR}}" || configure-${CPP_LIB}-cpp "$@" <&0;
 
     # Build C++ lib
