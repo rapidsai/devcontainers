@@ -36,10 +36,6 @@ clone_${NAME}() {
     # shellcheck disable=SC1091
     . devcontainer-utils-debug-output 'rapids_build_utils_debug' 'clone-all clone-${NAME}';
 
-    if [[ -d "${SRC_PATH}"/.git ]]; then
-        return;
-    fi
-
     branch="${b:-"${GIT_TAG}"}";
     directory="${d:-"${SRC_PATH}"}";
     ssh_url="${ssh_url:-${GIT_SSH_URL}}";
