@@ -147,7 +147,9 @@ clone_github_repo() {
     local origin_;
     local upstream_;
 
-    if gh auth status >/dev/null 2>&1; then
+    if test -z "${no_fork:-}" && \
+       test -z "${clone_upstream:-}" && \
+       gh auth status >/dev/null 2>&1; then
         if [ "$(gh config get git_protocol)" = "ssh" ]; then
             origin_="$(get_repo_ssh_url "${origin}")";
             upstream_="$(get_repo_ssh_url "${upstream}")";

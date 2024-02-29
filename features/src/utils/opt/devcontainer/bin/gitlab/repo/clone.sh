@@ -172,7 +172,9 @@ clone_gitlab_repo() {
     local origin_;
     local upstream_;
 
-    if ! glab auth status 2>&1 | grep -q "No token provided"; then
+    if test -z "${no_fork:-}" && \
+       test -z "${clone_upstream:-}" && \
+     ! glab auth status 2>&1 | grep -q "No token provided"; then
         if [ "$(glab config get git_protocol)" = "ssh" ]; then
             origin_="$(get_repo_ssh_url "${origin}")";
             upstream_="$(get_repo_ssh_url "${upstream}")";
