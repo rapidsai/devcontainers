@@ -9,7 +9,7 @@
 #
 # Boolean options:
 #  -h,--help            Print this text.
-#  -v,--verbose         verbose output
+#  -v,--verbose         Verbose output.
 #
 # Options that require values:
 #  -j,--parallel <num>  Clean <num> repos in parallel

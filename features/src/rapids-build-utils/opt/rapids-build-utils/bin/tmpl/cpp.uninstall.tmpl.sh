@@ -7,7 +7,7 @@
 #
 # Boolean options:
 #  -h,--help          Print this text.
-#  -v,--verbose       verbose output
+#  -v,--verbose       Verbose output.
 
 # shellcheck disable=SC1091
 . rapids-generate-docstring;
