@@ -36,7 +36,7 @@ build_${CPP_LIB}_cpp() {
 
     # Reconfigure if not configured or previous configure failed
     local -r bin_dir="$(rapids-maybe-clean-build-dir "${G:-Ninja}" "$@" -- "${CPP_SRC}")";
-    test -d "${bin_dir:-${CPP_SRC}/${BIN_DIR}}" || configure-${CPP_LIB}-cpp "$@" <&0;
+    test -e "${bin_dir:-${CPP_SRC}/${BIN_DIR}}" || configure-${CPP_LIB}-cpp "$@" <&0;
 
     # Build C++ lib
     time (
