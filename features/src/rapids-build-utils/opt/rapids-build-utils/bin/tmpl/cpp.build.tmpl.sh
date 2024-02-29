@@ -7,7 +7,8 @@
 #
 # @_include_bool_options /usr/bin/configure-${CPP_LIB}-cpp -h;
 # @_include_value_options /usr/bin/configure-${CPP_LIB}-cpp -h;
-# @_include_cmake_build_options
+# @_include_cmake_options;
+# @_include_cmake_build_options;
 
 # shellcheck disable=SC1091
 . rapids-generate-docstring;
@@ -16,20 +17,20 @@ build_${CPP_LIB}_cpp() {
     local -;
     set -euo pipefail;
 
-    eval "$(                                    \
-    PARALLEL_LEVEL=${PARALLEL_LEVEL:-$(nproc)}  \
-        rapids-get-num-archs-jobs-and-load "$@" \
-    )";
-
     local -a cmake_args_="(${CMAKE_ARGS:-})";
     cmake_args_+=(${CPP_CMAKE_ARGS});
 
-    eval "$(_parse_args --take '-G -j,--parallel' "$@" "${cmake_args_[@]}" <&0)";
+    eval "$(_parse_args --take '-G' "$@" "${cmake_args_[@]}" <&0)";
 
     if [[ ! -d "${CPP_SRC}" ]]; then
         echo "build-${CPP_LIB}-cpp: cannot access '${CPP_SRC}': No such directory" >&2;
         exit 1;
     fi
+
+    eval "$(                                    \
+    PARALLEL_LEVEL=${PARALLEL_LEVEL:-$(nproc)}  \
+        rapids-get-num-archs-jobs-and-load "$@" \
+    )";
 
     # shellcheck disable=SC1091
     . devcontainer-utils-debug-output 'rapids_build_utils_debug' 'build-all build-${NAME} build-${CPP_LIB}-cpp';

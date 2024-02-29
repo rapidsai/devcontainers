@@ -18,11 +18,6 @@ install_${PY_LIB}_python() {
     local -;
     set -euo pipefail;
 
-    eval "$(                                    \
-    PARALLEL_LEVEL=${PARALLEL_LEVEL:-$(nproc)}  \
-        rapids-get-num-archs-jobs-and-load "$@" \
-    )";
-
     local py_lib="${PY_LIB}";
 
     local -a cmake_args_="(${CMAKE_ARGS:-})";
@@ -36,6 +31,11 @@ install_${PY_LIB}_python() {
         echo "install-${PY_LIB}-python: cannot access '${PY_SRC}': No such directory" >&2;
         exit 1;
     fi
+
+    eval "$(                                    \
+    PARALLEL_LEVEL=${PARALLEL_LEVEL:-$(nproc)}  \
+        rapids-get-num-archs-jobs-and-load "$@" \
+    )";
 
     # shellcheck disable=SC1091
     . devcontainer-utils-debug-output 'rapids_build_utils_debug' 'build-all build-${NAME} build-${PY_LIB}-python build-${PY_LIB}-python-editable install-all install-${NAME} install-${PY_LIB}-python';
