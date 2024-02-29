@@ -7,6 +7,7 @@
 #
 # Boolean options:
 #  -h,--help                    Print this text
+#  -f,--force                   Force overwrite of local reference.
 #  -q,--quiet                   Operate quietly. Progress is not reported to the standard error stream.
 #
 # Options that require values:
@@ -59,48 +60,52 @@ clone_git_repo() {
         fi
     fi
 
-    j="${j:+-j ${j}}";
-    q="${q:+--quiet}";
+    local -a qj=("${q[@]}" ${j:+-j $j});
+    local -a fqj=("${f[@]}" "${qj[@]}");
+
     upstream="${upstream:-"${origin}"}";
     directory="$(realpath -m "${directory}")";
 
-    # shellcheck disable=SC2086
     if ! test -d "${directory}"/.git; then
-        git clone ${j} ${q} "${OPTS[@]}" -- "${origin}" "${directory}";
+        git clone "${qj[@]}" "${OPTS[@]}" -- "${origin}" "${directory}";
         git -C "${directory}" remote add upstream "${upstream}" || true;
         git -C "${directory}" remote set-url upstream "${upstream}" || true;
         git -C "${directory}" remote set-url --push upstream read_only || true;
         if test "${upstream}" == "${origin}"; then
             git -C "${directory}" remote set-url --push origin read_only || true;
         fi
-        git -C "${directory}" fetch ${j} ${q} upstream;
     fi
 
-    # shellcheck disable=SC2086
+    git -C "${directory}" fetch "${fqj[@]}" --all;
+
     if test -n "${branch:-}"; then
         local remote;
         for remote in upstream origin; do
             # if remote has branch
-            if git -C "${directory}" ls-remote -q --exit-code -h "${remote}" "${branch}"; then
+            if git -C "${directory}" ls-remote -q --exit-code --heads "${remote}" "${branch}"; then
                 # fetch, checkout, and track the remote branch
-                git -C "${directory}" fetch ${j} ${q} "${remote}" "refs/heads/${branch}";
-                if ! git -C "${directory}" checkout ${q} -b "${branch}" -t "${remote}/${branch}" 2>/dev/null; then
-                    git -C "${directory}" checkout ${q} "${branch}";
+                git -C "${directory}" fetch "${fqj[@]}" "${remote}" "refs/heads/${branch}";
+                if ! git -C "${directory}" checkout "${q[@]}" -b "${branch}" -t "${remote}/${branch}" 2>/dev/null; then
+                    git -C "${directory}" checkout "${q[@]}" "${branch}";
                     git -C "${directory}" branch "${branch}" -u "${remote}/${branch}";
                 fi
                 git -C "${directory}" pull "${remote}" "${branch}";
                 break;
             # if remote has tag
-            elif git -C "${directory}" ls-remote -q --exit-code -t "${remote}" "${branch}"; then
-                # make a local branch for the tag
-                git -C "${directory}" checkout ${q} -m -b "${remote}/${branch}" "${branch}";
+            elif git -C "${directory}" ls-remote -q --exit-code --tags "${remote}" "${branch}"; then
+                # fetch, checkout, and make a local branch for the tag
+                git -C "${directory}" fetch "${fqj[@]}" "${remote}" "refs/tags/${branch}";
+                if ! git -C "${directory}" checkout "${q[@]}" -m -b "${remote}/tag/${branch}" "${branch}" 2>/dev/null; then
+                    # local branch already exists, just check it out
+                    git -C "${directory}" checkout "${q[@]}" "${remote}/tag/${branch}";
+                fi
                 break;
             fi
         done
     fi
 
     # shellcheck disable=SC2086
-    git -C "${directory}" submodule update --recursive ${j} ${q};
+    git -C "${directory}" submodule update --recursive "${qj[@]}";
 }
 
 clone_git_repo "$@" <&0;
