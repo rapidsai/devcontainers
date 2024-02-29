@@ -16,7 +16,6 @@ _parse_args_for_file() {
 
     local idx;
     local key;
-    local typ;
     local val;
     local -a arg;
 
@@ -59,7 +58,6 @@ _parse_args_for_file() {
     local -A _map=();
     local -a args=();
     local -a opts=();
-    local -A typs=();
     local -a rest=();
 
     local -A reverse_alias_map=();
@@ -77,8 +75,6 @@ _parse_args_for_file() {
     fi
 
     # Always include the -h,--help flags
-    typs["h"]="bool";
-    typs["help"]="bool";
     take_map["h"]=1;
     take_map["help"]=1;
 
@@ -90,8 +86,6 @@ _parse_args_for_file() {
         done
     done
 
-    for key in "${long_bools[@]}" "${short_bools[@]}"; do typs[${key}]="bool"; done
-    for key in "${long_value[@]}" "${short_value[@]}"; do typs[${key}]="value"; done
 
     local -r optstring="$(                                                                               \
         cat <(_parse_bool_names_from_usage  <<< "${usage}" | _parse_short_names | xargs -r -I% echo -n %)  \
@@ -142,15 +136,14 @@ _parse_args_for_file() {
             case "${opt}" in
                 # short opt is specified but missing a value
                 :)
-                    typ="value";
                     key="${OPTARG}";
                     arg+=("-${key}");
                     ;;
                 # unknown short opt
                 \?)
                     if test "${OPTARG}" == "h"; then
-                        typ="bool";
                         key="${OPTARG}";
+                        val="-${key}";
                         arg+=("-${key}");
                     # Compare ${OPTARG} to ${!idx} with its leading `-`.
                     # This only works when getopts is in silent mode, i.e. when `:` is at the front of the optstring.
@@ -188,21 +181,18 @@ _parse_args_for_file() {
                     case "${OPTARG}" in
                         # known bool opt
                         $long_bools1)
-                            typ="bool";
-                            val="true";
                             key="${OPTARG}";
+                            val="--${key}";
                             arg+=("--${key}");
                             ;;
                         # known bool opt with value after =
                         $long_bools2)
-                            typ="bool";
                             key="${OPTARG%=*}";
-                            val="${OPTARG#*=}";
-                            arg+=("--${key}=${val}");
+                            val="--${OPTARG}";
+                            arg+=("--${OPTARG}");
                             ;;
                         # known value opt with value following
                         $long_value1)
-                            typ="value";
                             key="${OPTARG}";
                             arg+=("--${key}");
                             if [[ ${OPTIND} -le ${#@} && "${!OPTIND:-}" != -* ]]; then
@@ -213,7 +203,6 @@ _parse_args_for_file() {
                             ;;
                         # known value opt with value after =
                         $long_value2)
-                            typ="value";
                             key="${OPTARG%=*}";
                             val="${OPTARG#*=}";
                             arg+=("--${key}=${val}");
@@ -225,8 +214,8 @@ _parse_args_for_file() {
                         # unknown long opt with value following
                         *)
                             if test "${OPTARG}" == "help"; then
-                                typ="bool";
                                 key="${OPTARG}";
+                                val="--${key}";
                                 arg+=("--${key}");
                             else
                                 opts+=("--${OPTARG}");
@@ -240,14 +229,12 @@ _parse_args_for_file() {
                     ;;
                 # known bool opt
                 $short_bools1)
-                    typ="bool";
                     key="${opt}";
-                    val="true";
+                    val="-${key}";
                     arg+=("-${key}");
                     ;;
                 # known value opt with value following
                 $short_value1)
-                    typ="value";
                     key="${opt}";
                     idx=$((OPTIND-1));
                     case "${OPTARG:-}" in
@@ -289,9 +276,7 @@ _parse_args_for_file() {
                     if test -v reverse_alias_map["${key}"]; then
                         key="${reverse_alias_map["${key}"]}";
                     fi
-                    if test "${typ}" = bool; then
-                        _map["${key}"]="${val@Q}";
-                    elif test -z "${_map["${key}"]}"; then
+                    if test -z "${_map["${key}"]}"; then
                         _map["${key}"]="${val@Q}";
                     else
                         _map["${key}"]+=" ${val@Q}";
@@ -341,11 +326,7 @@ _parse_args_for_file() {
             local k_="${key}";
             k_="${k_//-/_}";
             k_="${k_//./_}";
-            if test "${typs["${key}"]}" = bool; then
-                echo "declare ${k_}=${_map["${key}"]}";
-            else
-                echo "declare -a ${k_}=(${_map["${key}"]})";
-            fi
+            echo "declare -a ${k_}=(${_map["${key}"]})";
             local -a aliases="(${alias_map["${key}"]})";
             for alias in "${aliases[@]}"; do
                 local a_="${alias}";
