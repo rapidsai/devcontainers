@@ -93,7 +93,15 @@ cpack_${CPP_LIB}_cpp() {
             slug="${name}${vers:+-$vers}${comp:+-$comp}-${kernel}";
             outd="${CPP_SRC}/${BIN_DIR}/_CPack_Packages/${kernel}/TGZ";
 
+            if test -f "${CPP_SRC}/${BIN_DIR}/install_manifest${comp:+_$comp}.txt"; then
+                mv "${CPP_SRC}/${BIN_DIR}/install_manifest${comp:+_$comp}.txt"{,.bak};
+            fi
+
             install-${CPP_LIB}-cpp --prefix "${outd}/${slug}" ${comp:+--component "${comp}"} "${OPTS[@]}" >/dev/null 2>&1;
+
+            if test -f "${CPP_SRC}/${BIN_DIR}/install_manifest${comp:+_$comp}.txt.bak"; then
+                mv "${CPP_SRC}/${BIN_DIR}/install_manifest${comp:+_$comp}.txt"{.bak,};
+            fi
 
             if test -d "${outd}/${slug}"; then
                 tar -C "${outd}" -c ${v:+-v} -f "${outd}/${slug}.tar.gz" -I "pigz -p ${n_jobs}" "${slug}";
