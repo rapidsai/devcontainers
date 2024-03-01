@@ -17,6 +17,12 @@ build_${CPP_LIB}_cpp() {
     local -;
     set -euo pipefail;
 
+    eval "$(                                    \
+    PARALLEL_LEVEL=${PARALLEL_LEVEL:-$(nproc)}  \
+        rapids-get-num-archs-jobs-and-load "$@" \
+        2>/dev/null                             \
+    )";
+
     local -a cmake_args_="(${CMAKE_ARGS:-})";
     cmake_args_+=(${CPP_CMAKE_ARGS});
 
@@ -26,11 +32,6 @@ build_${CPP_LIB}_cpp() {
         echo "build-${CPP_LIB}-cpp: cannot access '${CPP_SRC}': No such directory" >&2;
         exit 1;
     fi
-
-    eval "$(                                    \
-    PARALLEL_LEVEL=${PARALLEL_LEVEL:-$(nproc)}  \
-        rapids-get-num-archs-jobs-and-load "$@" \
-    )";
 
     # shellcheck disable=SC1091
     . devcontainer-utils-debug-output 'rapids_build_utils_debug' 'build-all build-${NAME} build-${CPP_LIB}-cpp';
