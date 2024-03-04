@@ -52,7 +52,7 @@ persist_s3_creds() {
         echo "${stamp:-}" > ~/.aws/stamp;
     fi
 
-    if ! grep -qE "^$" <<< "${no_bucket:-}"; then
+    if ! grep -qE "^$" <<< "${no_bucket-}"; then
         unset_envvar "SCCACHE_BUCKET";
     elif ! grep -qE "^$" <<< "${bucket:-}"; then
         export_envvar "SCCACHE_BUCKET" "${bucket}";
@@ -61,7 +61,7 @@ bucket=${bucket:-}
 ________EOF
     fi
 
-    if ! grep -qE "^$" <<< "${no_region:-}"; then
+    if ! grep -qE "^$" <<< "${no_region-}"; then
         unset_envvar "SCCACHE_REGION";
     elif ! grep -qE "^$" <<< "${region:-}"; then
         export_envvar "SCCACHE_REGION" "${region}";

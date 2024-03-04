@@ -34,8 +34,8 @@ make_pip_env() {
     local env_name="${1}"; shift;
     local env_file_name="${env_name}.requirements.txt";
 
-    # Remove the current virtual env if called with `-f|--force`
-    if test -n "${force:-}"; then
+    # Remove the current virtual env if called with `-f,--force`
+    if test -n "${f-}"; then
         rm -rf "${HOME}/.local/share/venvs/${env_name}" \
                "${HOME}/.local/share/venvs/${env_file_name}";
     fi

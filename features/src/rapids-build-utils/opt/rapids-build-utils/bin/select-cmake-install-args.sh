@@ -8,7 +8,7 @@
 # CMake Install Options:
 # Boolean options:
 #  --strip                                       Strip before installing.
-#  -v --verbose                                  Enable verbose output.
+#  -v,--verbose                                  Enable verbose output.
 #
 # Options that require values:
 #  --config <cfg>                                For multi-configuration tools, choose <cfg>.
