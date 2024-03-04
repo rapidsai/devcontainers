@@ -51,8 +51,8 @@ $(cat .bashrc)
 EOF
 )";
 # export envvars in /etc/profile.d
-ln -s /opt/conda/etc/profile.d/conda.sh /etc/profile.d/$(($(find /etc/profile.d/ -maxdepth 1 -type f -name '*.sh' | wc -l) + 20))-conda.sh;
-ln -s /opt/conda/etc/profile.d/mamba.sh /etc/profile.d/$(($(find /etc/profile.d/ -maxdepth 1 -type f -name '*.sh' | wc -l) + 20))-mamba.sh;
+ln -s /opt/conda/etc/profile.d/conda.sh /etc/profile.d/$(($(ls -1q /etc/profile.d/*.sh | wc -l) + 20))-conda.sh;
+ln -s /opt/conda/etc/profile.d/mamba.sh /etc/profile.d/$(($(ls -1q /etc/profile.d/*.sh | wc -l) + 20))-mamba.sh;
 add_etc_profile_d_script mambaforge "$(cat .bashrc)";
 
 # Update the devcontainers/features/common-utils __bash_prompt fn
