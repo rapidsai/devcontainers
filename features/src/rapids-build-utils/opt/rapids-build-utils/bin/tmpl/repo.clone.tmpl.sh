@@ -67,7 +67,7 @@ clone_${NAME}() {
 
     git -C "${SRC_PATH}" remote prune upstream;
 
-    if test -z "${no_update_env}"; then
+    if test -z "${no_update_env-}"; then
         rapids-post-start-command;
     fi
 }

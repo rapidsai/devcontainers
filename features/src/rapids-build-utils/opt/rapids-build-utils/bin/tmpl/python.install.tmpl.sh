@@ -49,15 +49,15 @@ install_${PY_LIB}_python() {
         $(rapids-select-cmake-args "$@")
     )";
 
-    if test -n "${v}"; then
+    if test -n "${v-}"; then
         ninja_args+=("-v");
     fi
 
-    if test -n "${n_jobs}"; then
+    if test -n "${n_jobs-}"; then
         ninja_args+=("-j${n_jobs}");
     fi
 
-    if test -n "${n_load}"; then
+    if test -n "${n_load-}"; then
         ninja_args+=("-l${n_load}");
     fi
 

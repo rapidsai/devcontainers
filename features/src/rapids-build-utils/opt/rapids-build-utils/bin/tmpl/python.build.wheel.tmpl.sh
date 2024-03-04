@@ -51,7 +51,7 @@ build_${PY_LIB}_python_wheel() {
 
     local ninja_args=();
 
-    if test -n "${v}"; then
+    if test -n "${v-}"; then
         ninja_args+=("-v");
     fi
 
