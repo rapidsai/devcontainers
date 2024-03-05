@@ -27,7 +27,12 @@ schedule_s3_creds_refresh() {
 
         crontab -u "$(whoami)" -r 2>/dev/null || true;
 
-        cat <<________EOF | tee -a /var/log/devcontainer-utils-vault-s3-creds-refresh.log
+        sudo mkdir -m 0775 -p /var/log/devcontainer-utils;
+        sudo touch /var/log/devcontainer-utils/vault-s3-creds-refresh.log;
+        sudo chmod 0664 /var/log/devcontainer-utils/vault-s3-creds-refresh.log;
+        sudo chgrp crontab /var/log/devcontainer-utils/vault-s3-creds-refresh.log;
+
+        cat <<________EOF | tee -a /var/log/devcontainer-utils/vault-s3-creds-refresh.log
 $(date --date="@${now}")
 Scheduling cron to regerate S3 creds $(date -u --date="@$((then - now))" '+%T') from now.
 ________EOF
@@ -46,7 +51,7 @@ $(date --date="@${then}" '+%M %H %d %m %w') \
 devcontainer-utils-vault-s3-creds-schedule
 ________EOF
 
-        sudo /etc/init.d/cron restart >/dev/null 2>&1;
+        sudo /etc/init.d/cron restart >>/var/log/devcontainer-utils/vault-s3-creds-refresh.log 2>&1;
     fi
 }
 

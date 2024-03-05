@@ -47,7 +47,12 @@ generate_s3_creds() {
         exit 1;
     fi
 
-    cat <<____EOF | tee -a /var/log/devcontainer-utils-vault-s3-creds-refresh.log
+    sudo mkdir -m 0775 -p /var/log/devcontainer-utils;
+    sudo touch /var/log/devcontainer-utils/vault-s3-creds-refresh.log;
+    sudo chmod 0664 /var/log/devcontainer-utils/vault-s3-creds-refresh.log;
+    sudo chgrp crontab /var/log/devcontainer-utils/vault-s3-creds-refresh.log;
+
+    cat <<____EOF | tee -a /var/log/devcontainer-utils/vault-s3-creds-refresh.log
 $(date)
 Attempting to use your GitHub account to authenticate with vault at:
 '${VAULT_HOST}'.
@@ -59,13 +64,13 @@ ____EOF
     eval "$(devcontainer-utils-vault-auth-github "${VAULT_HOST}" "${user_orgs}")";
 
     if [ "${vault_token:-null}" = "null" ]; then
-        cat <<________EOF | tee -a /var/log/devcontainer-utils-vault-s3-creds-refresh.log >&2
+        cat <<________EOF | tee -a /var/log/devcontainer-utils/vault-s3-creds-refresh.log >&2
 Your GitHub user was not recognized by vault. Skipping.
 ________EOF
         exit 1;
     fi
 
-    cat <<____EOF | tee -a /var/log/devcontainer-utils-vault-s3-creds-refresh.log
+    cat <<____EOF | tee -a /var/log/devcontainer-utils/vault-s3-creds-refresh.log
 Successfully authenticated with vault!
 ____EOF
 
@@ -91,20 +96,20 @@ ____EOF
     local -r aws_secret_access_key="$(jq -r '.secret_key' <<< "${aws_creds}" || echo)";
 
     if grep -qE "^null$" <<< "${aws_access_key_id:-null}"; then
-        cat <<________EOF | tee -a /var/log/devcontainer-utils-vault-s3-creds-refresh.log >&2
+        cat <<________EOF | tee -a /var/log/devcontainer-utils/vault-s3-creds-refresh.log >&2
 Failed to retrieve AWS S3 credentials. Skipping.
 ________EOF
         exit 1;
     fi
 
     if grep -qE "^null$" <<< "${aws_secret_access_key:-null}"; then
-        cat <<________EOF | tee -a /var/log/devcontainer-utils-vault-s3-creds-refresh.log >&2
+        cat <<________EOF | tee -a /var/log/devcontainer-utils/vault-s3-creds-refresh.log >&2
 Failed to retrieve AWS S3 credentials. Skipping.
 ________EOF
         exit 1;
     fi
 
-    cat <<____EOF | tee -a /var/log/devcontainer-utils-vault-s3-creds-refresh.log
+    cat <<____EOF | tee -a /var/log/devcontainer-utils/vault-s3-creds-refresh.log
 Successfully generated temporary AWS S3 credentials!
 ____EOF
 
@@ -113,7 +118,7 @@ ____EOF
         SCCACHE_REGION="${SCCACHE_REGION:-}" \
         AWS_ACCESS_KEY_ID="${aws_access_key_id:-}"         \
         AWS_SECRET_ACCESS_KEY="${aws_secret_access_key:-}" \
-        devcontainer-utils-vault-s3-creds-propagate | tee -a /var/log/devcontainer-utils-vault-s3-creds-refresh.log; then
+        devcontainer-utils-vault-s3-creds-propagate | tee -a /var/log/devcontainer-utils/vault-s3-creds-refresh.log; then
         # Store creds in ~/.aws dir
         devcontainer-utils-vault-s3-creds-persist - <<<         \
             --stamp="${generated_at:-}"                         \

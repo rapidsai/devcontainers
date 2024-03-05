@@ -49,12 +49,14 @@ fi
 # rm -rf /etc/crontab /etc/cron.*;
 
 # Allow crond to be run by users in the "crontab" group
-chgrp crontab "$(realpath -m $(which cron))";
-chmod u+s "$(realpath -m $(which cron))";
+chgrp crontab "$(realpath -m "$(which cron)")";
+chmod u+s "$(realpath -m "$(which cron)")";
 
-touch /var/log/devcontainer-utils-vault-s3-creds-refresh.log;
-chmod 0664 /var/log/devcontainer-utils-vault-s3-creds-refresh.log;
-chgrp crontab /var/log/devcontainer-utils-vault-s3-creds-refresh.log;
+# shellcheck disable=SC2174
+mkdir -m 0775 -p /var/log/devcontainer-utils;
+touch /var/log/devcontainer-utils/vault-s3-creds-refresh.log;
+chmod 0664 /var/log/devcontainer-utils/vault-s3-creds-refresh.log;
+chgrp crontab /var/log/devcontainer-utils/vault-s3-creds-refresh.log;
 
 # Install Devcontainer utility scripts to /opt/devcontainer
 cp -ar ./opt/devcontainer /opt/;
