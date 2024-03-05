@@ -92,10 +92,10 @@ make_conda_dependencies() {
         # shellcheck disable=SC2207
         local conda_noinstall=($(rapids-python-pkg-names) $(rapids-python-conda-pkg-names));
         # Generate a combined conda env yaml file.
-        conda-merge "${conda_env_yamls[@]}"                                                              \
-          | grep -v '^name:'                                                                             \
-          | grep -v -P '^[ ]*?\- (\.git\@[^(main|master)])(.*?)$'                                        \
-          | grep -v -P "^[ ]*?\- ($(tr -d '[:blank:]' <<< "${conda_noinstall[@]/%/ |}"))(=.*|>.*|<.*)?$" \
+        conda-merge "${conda_env_yamls[@]}"                                                                                   \
+          | (grep -v '^name:'                                                                             || [ "$?" == "1" ]) \
+          | (grep -v -P '^[ ]*?\- (\.git\@[^(main|master)])(.*?)$'                                        || [ "$?" == "1" ]) \
+          | (grep -v -P "^[ ]*?\- ($(tr -d '[:blank:]' <<< "${conda_noinstall[@]/%/ |}"))(=.*|>.*|<.*)?$" || [ "$?" == "1" ]) \
           ;
 
         rm -f "${conda_env_yamls[@]}";
