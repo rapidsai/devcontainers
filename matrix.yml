@@ -1,7 +1,7 @@
 x-cuda-prev-min: &cuda_prev_min { name: "cuda", version: "11.1" }
 x-cuda-prev-max: &cuda_prev_max { name: "cuda", version: "11.8" }
 x-cuda-curr-min: &cuda_curr_min { name: "cuda", version: "12.0" }
-x-cuda-curr-max: &cuda_curr_max { name: "cuda", version: "12.3" }
+x-cuda-curr-max: &cuda_curr_max { name: "cuda", version: "12.4" }
 x-cuda-curr-max: &cuda_curr_max_rapids { name: "cuda", version: "12.2" }
 
 x-gcc-6: &gcc_6 { name: "gcc", version: "6" }
