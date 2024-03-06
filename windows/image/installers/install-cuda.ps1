@@ -39,7 +39,9 @@ $componentTag = @{
     "12.2.0" = "12.2"
     "12.3"   = "12.3"
     "12.3.0" = "12.3"
-    "latest" = "12.3"
+    "12.4"   = "12.4"
+    "12.4.0" = "12.4"
+    "latest" = "12.4"
 }[$cudaVersion]
 
 $cudaVersionUrl = "https://developer.download.nvidia.com/compute/cuda/$cudaUri"
