@@ -19,7 +19,9 @@ $cudaUri = @{
     "12.2.0" = "12.2.0/network_installers/cuda_12.2.0_windows_network.exe"
     "12.3"   = "12.3.0/network_installers/cuda_12.3.0_windows_network.exe"
     "12.3.0" = "12.3.0/network_installers/cuda_12.3.0_windows_network.exe"
-    "latest" = "12.3.0/network_installers/cuda_12.3.0_windows_network.exe"
+    "12.4"   = "12.4.0/network_installers/cuda_12.4.0_windows_network.exe"
+    "12.4.0" = "12.4.0/network_installers/cuda_12.4.0_windows_network.exe"
+    "latest" = "12.4.0/network_installers/cuda_12.4.0_windows_network.exe"
 }[$cudaVersion]
 
 # The component tags don't include patch, so we need to map input to major.minor
