@@ -12,10 +12,10 @@ get_repos() {
     local repos="$(get_repos_ordered)";
 
     join \
-      <(echo "${repos}")                                          \
+      <(echo "${repos}" | sort -k 1b,1)                                          \
       <(find ~ -maxdepth 1 -mindepth 1 -type d ! -name '.*' -exec \
         bash -c "echo '${repos}' | grep \$(basename {})" \; \
-      | sort -h | uniq) \
+      | sort -k 1b,1 | uniq) \
   | cut -d' ' -f3;
 }
 
