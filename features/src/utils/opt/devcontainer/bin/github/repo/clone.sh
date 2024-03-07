@@ -1,4 +1,31 @@
-#! /usr/bin/env bash
+#!/usr/bin/env bash
+
+# Usage:
+#  devcontainer-utils-clone-github-repo [OPTION]... [--] <upstream> [<directory>]
+#
+# Clone a GitHub repository for the logged in user (as reported by `gh auth status`).
+#
+# If the user doesn't have a fork of the repository, notify the user and ask whether they would like to fork it.
+#
+# Boolean options:
+#  -h,--help                    Print this text.
+#  -q,--quiet                   Operate quietly. Progress is not reported to the standard error stream.
+#  --no-fork                    Don't prompt the user to fork the repo if a user fork isn't found.
+#                               (default: false)
+#  --no-update-env              Don't update the Python env with the repo's dependencies after cloning.
+#                               (default: false)
+#  --clone-upstream             Always clone the upstream, not the user's fork.
+#                               (default: false)
+#
+# Options that require values:
+#  -b,--branch <branch_or_tag>  Check the repo out to <branch_or_tag>.
+#  -j,--jobs,--parallel <num>   Clone <num> submodules in parallel.
+#  --ssh-url <url>              FQDN of the GitHub instance when cloning via SSH.
+#  --https-url <url>            FQDN of the GitHub instance when cloning via HTTPS.
+#
+# Positional arguments:
+#  upstream                     Set <upstream> as the `upstream` remote.
+#  directory                    Clone the repo into <directory>.
 
 get_default_branch() {
     local repo="${1}";
@@ -32,7 +59,7 @@ get_user_fork_name() {
     if [ "${user}" = "${owner}" ]; then
         echo "${owner}/${name}";
     else
-        local query="$(cat <<________EOF | tr -s '[:space:]'
+        local -r query="$(cat <<________EOF | tr -s '[:space:]'
             | map(select(
                 .parent.name == "${name}"
                 and
@@ -41,7 +68,8 @@ get_user_fork_name() {
             | map(.nameWithOwner)[]
 ________EOF
         )";
-        local nameWithOwner="$(gh repo list "${user}" --fork --json nameWithOwner --json parent --jq ". ${query}" 2>/dev/null || echo "err")";
+        local nameWithOwner;
+        nameWithOwner="$(gh repo list "${user}" --fork --json nameWithOwner --json parent --jq ". ${query}" 2>/dev/null || echo "err")";
         if [ "${nameWithOwner}" = "err" ]; then
             nameWithOwner="";
             for repo in $(gh repo list "${user}" --fork --json name --jq 'map(.name)[]'); do
@@ -56,33 +84,22 @@ ________EOF
 }
 
 clone_github_repo() {
-
+    local -;
     set -euo pipefail;
 
-    local branch=;
-    local no_fork=;
-    local clone_upstream=;
+    eval "$(devcontainer-utils-parse-args "$0" --skip '
+        -q,--quiet
+        -j,--jobs,--parallel
+    ' "$@" <&0)";
 
-    eval "$(                                  \
-        devcontainer-utils-parse-args --names '
-            b|branch                          |
-            no-fork                           |
-            clone-upstream                    |
-        ' - <<< "$@"                          \
-      | xargs -r -d'\n' -I% echo -n local %\; \
-    )";
+    # shellcheck disable=SC1091
+    . devcontainer-utils-debug-output 'devcontainer_utils_debug' 'clone clone-github-repo';
 
-    local nargs="${#__rest__[@]}";
-    local upstream="${__rest__[$((nargs - 2))]}";
-    upstream="${upstream:?upstream is required}";
+    if test "${REST[0]:-}" == --; then REST=("${REST[@]:1}"); fi;
 
-    branch="${b:-"${branch:-"$(get_default_branch "${upstream}")"}"}";
+    local upstream="${REST[0]:?"fatal: missing required positional argument <upstream>"}";
 
-    local directory="${__rest__[$((nargs - 1))]}";
-    directory="${directory:?directory is required}";
-
-    __rest__=("${__rest__[@]/"${upstream}"}");
-    __rest__=("${__rest__[@]/"${directory}"}");
+    if test "${#REST[@]}" -gt 1; then REST=("${REST[@]:1}"); fi
 
     local origin="${upstream}";
     local name=;
@@ -104,6 +121,7 @@ clone_github_repo() {
         name="$(get_repo_name "${upstream}")";
         owner="$(get_repo_owner "${upstream}")";
         user="${GITHUB_USER:-"${owner}"}";
+        branch="${branch:-"$(get_default_branch "${upstream}")"}";
         fork="$(get_user_fork_name "${owner}" "${name}" "${user}")";
     fi
 
@@ -114,8 +132,8 @@ clone_github_repo() {
          devcontainer-utils-shell-is-interactive; then
         while true; do
             local CHOICE;
-            read -rp "'${GITHUB_HOST:-github.com}/${user}/${name}.git' not found.
-    Fork '${upstream}' into '${user}/${name}' now (y/n)? " CHOICE <$(tty)
+            read -rsp "'${GITHUB_HOST:-github.com}/${user}/${name}.git' not found.
+    Fork '${upstream}' into '${user}/${name}' now (y/n)? " CHOICE <"$(tty)"
             case "${CHOICE:-}" in
                 [Nn]* ) origin="${upstream}"; break;;
                 [Yy]* ) origin="${user}/${name}";
@@ -126,28 +144,38 @@ clone_github_repo() {
         done
     fi
 
-    if gh auth status >/dev/null 2>&1; then
+    local origin_;
+    local upstream_;
+
+    if test -z "${no_fork:-}" && \
+       test -z "${clone_upstream:-}" && \
+       gh auth status >/dev/null 2>&1; then
         if [ "$(gh config get git_protocol)" = "ssh" ]; then
-            origin="$(get_repo_ssh_url "${origin}")";
-            upstream="$(get_repo_ssh_url "${upstream}")";
+            origin_="$(get_repo_ssh_url "${origin}")";
+            upstream_="$(get_repo_ssh_url "${upstream}")";
         else
-            origin="$(get_repo_git_url "${origin}")";
-            upstream="$(get_repo_git_url "${upstream}")";
+            origin_="$(get_repo_git_url "${origin}")";
+            upstream_="$(get_repo_git_url "${upstream}")";
         fi
-    else
-        origin="https://${GITHUB_HOST:-github.com}/${origin}.git";
-        upstream="https://${GITHUB_HOST:-github.com}/${upstream}.git";
     fi
 
-    devcontainer-utils-clone-git-repo \
-        --upstream "${upstream}"      \
-        --branch "${branch}"          \
-        ${__rest__[@]}                \
-        "${origin}" "${directory}"    ;
+    if test -z "${origin_:-}" || test -z "${upstream_:-}"; then
+        if [ "$(gh config get git_protocol)" = "ssh" ]; then
+            origin_="${origin_:-"ssh://git@${ssh_url:-${GITHUB_HOST:-github.com}}/${origin}.git"}";
+            upstream_="${upstream_:-"ssh://git@${ssh_url:-${GITHUB_HOST:-github.com}}/${upstream}.git"}";
+        else
+            origin_="${origin_:-"https://${https_url:-${GITHUB_HOST:-github.com}}/${origin}.git"}";
+            upstream_="${upstream_:-"https://${https_url:-${GITHUB_HOST:-github.com}}/${upstream}.git"}";
+        fi
+    fi
+
+    devcontainer-utils-clone-git-repo          \
+        ${branch:+--branch "${branch}"}        \
+        ${upstream:+--upstream "${upstream_}"} \
+        "${OPTS[@]}"                           \
+        --                                     \
+        "${origin_}" "${REST[@]}"              \
+        ;
 }
 
-if test -n "${devcontainer_utils_debug:-}"; then
-    PS4="+ ${BASH_SOURCE[0]}:\${LINENO} "; set -x;
-fi
-
-clone_github_repo "$@";
+clone_github_repo "$@" <&0;

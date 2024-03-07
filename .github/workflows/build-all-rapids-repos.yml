@@ -37,17 +37,14 @@ jobs:
       build_command: |
         sccache -z;
         sccache --show-adv-stats;
-        clone-all --verbose --clone-upstream --no-update-env;
-        rapids-generate-scripts;
-        rapids-make-${PYTHON_PACKAGE_MANAGER}-env;
+        clone-all -j$(nproc) -v -q --clone-upstream --single-branch --shallow-submodules;
         build-all \
-          --verbose \
+          -v \
           -j$(nproc --ignore=1) \
-          -DBUILD_SHARED_LIBS=ON \
           -DBUILD_TESTS=ON \
           -DBUILD_BENCHMARKS=ON \
           -DBUILD_ANN_BENCH=ON \
           -DBUILD_PRIMS_BENCH=ON \
-          $([ "pip" = ${PYTHON_PACKAGE_MANAGER} ] && echo -DUSE_LIBARROW_FROM_PYARROW=ON || echo) \
+          -DBUILD_SHARED_LIBS=ON \
           ;
         sccache --show-adv-stats;

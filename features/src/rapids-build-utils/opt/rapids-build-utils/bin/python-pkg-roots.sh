@@ -1,13 +1,29 @@
-#! /usr/bin/env bash
+#!/usr/bin/env bash
 
-# List python package roots as determined by manifest.yaml
+# Usage:
+#  rapids-python-pkg-roots [OPTION]...
+#
+# List python package source dirs as determined by manifest.yaml
+#
+# Boolean options:
+#  -h,--help             Print this text.
+#
+# Options that require values:
+# @_include_value_options rapids-list-repos -h | tail -n+2 | head -n-1;
+
+# shellcheck disable=SC1091
+. rapids-generate-docstring;
+
 python_pkg_roots() {
+    local -;
     set -euo pipefail;
 
-    eval "$(                                  \
-        rapids-list-repos "$@"                \
-      | xargs -r -d'\n' -I% echo -n local %\; \
-    )";
+    eval "$(_parse_args "$@" <&0)";
+
+    eval "$(rapids-list-repos "$@")";
+
+    # shellcheck disable=SC1091
+    . devcontainer-utils-debug-output 'rapids_build_utils_debug' 'python-pkg-roots';
 
     local i;
     local j;
@@ -27,4 +43,4 @@ python_pkg_roots() {
     done
 }
 
-(python_pkg_roots "$@");
+python_pkg_roots "$@" <&0;

@@ -50,4 +50,4 @@ ENV SCCACHE_BUCKET="rapids-sccache-devs"
 ENV VAULT_HOST="https://vault.ops.k8s.rapids.ai"
 ENV HISTFILE="/home/coder/.cache/._bash_history"
 
-ENV LIBCUDF_KERNEL_CACHE_PATH="/home/coder/cudf/cpp/build/latest/jitify_cache"
+ENV LIBCUDF_KERNEL_CACHE_PATH="/home/coder/cudf/cpp/build/${PYTHON_PACKAGE_MANAGER}/cuda-${CUDA_VERSION}/latest/jitify_cache"

@@ -11,6 +11,7 @@
 set -eux
 
 usage() {
+    local -;
     set +x
     echo "Usage: $0 [llvm_major_version] [all] [OPTIONS]" 1>&2
     echo -e "all\t\t\tInstall all packages." 1>&2

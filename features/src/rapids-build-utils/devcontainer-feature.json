@@ -1,30 +1,16 @@
 {
   "name": "NVIDIA RAPIDS devcontainer build utilities",
   "id": "rapids-build-utils",
-  "version": "24.4.1",
+  "version": "24.4.2",
   "description": "A feature to install the RAPIDS devcontainer build utilities",
   "containerEnv": {
     "BASH_ENV": "/etc/bash.bash_env"
   },
-  "updateContentCommand": [
-    "/bin/bash",
-    "-li",
-    "+o",
-    "history",
-    "rapids-update-content-command"
-  ],
   "postStartCommand": [
     "/bin/bash",
     "-li",
     "+o",
     "history",
     "rapids-post-start-command"
-  ],
-  "postAttachCommand": [
-    "/bin/bash",
-    "-li",
-    "+o",
-    "history",
-    "rapids-post-attach-command"
   ]
 }

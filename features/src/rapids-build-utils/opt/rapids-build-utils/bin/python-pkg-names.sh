@@ -1,13 +1,29 @@
-#! /usr/bin/env bash
+#!/usr/bin/env bash
 
+# Usage:
+#  rapids-python-pkg-names [OPTION]...
+#
 # List python package names as determined by manifest.yaml
+#
+# Boolean options:
+#  -h,--help             Print this text.
+#
+# Options that require values:
+# @_include_value_options rapids-list-repos -h | tail -n+2 | head -n-1;
+
+# shellcheck disable=SC1091
+. rapids-generate-docstring;
+
 python_pkg_names() {
+    local -;
     set -euo pipefail;
 
-    eval "$(                                  \
-        rapids-list-repos "$@"                \
-      | xargs -r -d'\n' -I% echo -n local %\; \
-    )";
+    eval "$(_parse_args "$@" <&0)";
+
+    eval "$(rapids-list-repos "$@")";
+
+    # shellcheck disable=SC1091
+    . devcontainer-utils-debug-output 'rapids_build_utils_debug' 'python-pkg-names';
 
     local i;
     local j;
@@ -27,4 +43,4 @@ python_pkg_names() {
     done
 }
 
-(python_pkg_names "$@");
+python_pkg_names "$@" <&0;

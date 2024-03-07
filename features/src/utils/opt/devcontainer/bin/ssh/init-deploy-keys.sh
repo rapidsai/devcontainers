@@ -1,12 +1,16 @@
 #! /usr/bin/env bash
 
 init_ssh_deploy_keys() {
-
+    local -;
     set -euo pipefail;
+
+    # shellcheck disable=SC1091
+    . devcontainer-utils-debug-output 'devcontainer_utils_debug' 'init-deploy-keys';
 
     local re="(ssh:\/\/|https:\/\/)?(git@)?(.*\.com)[:\/](.*)";
     local line;
 
+    # shellcheck disable=SC2155
     ssh-add -L | while read -r line; do
         local key="$(cut -d' ' -f2 <<< "${line}")";
         local url="$(cut -d' ' -f3 <<< "${line}")";
@@ -44,9 +48,5 @@ ____________EOF
     chmod 0700 ~/.ssh;
     chmod 0600 ~/.ssh/*;
 }
-
-if test -n "${devcontainer_utils_debug:-}"; then
-    PS4="+ ${BASH_SOURCE[0]}:\${LINENO} "; set -x;
-fi
 
 init_ssh_deploy_keys "$@";

@@ -3,15 +3,18 @@
 # Test sccache AWS S3 credentials are valid
 
 test_aws_creds() {
-
+    local -;
     set -euo pipefail;
+
+    # shellcheck disable=SC1091
+    . devcontainer-utils-debug-output 'devcontainer_utils_debug' 'vault-s3 vault-s3-creds-test';
 
     if ! type sccache >/dev/null 2>&1; then exit 1; fi
 
     if test -f ~/.aws/stamp; then
-        local now="$(date '+%s')";
-        local stamp="$(cat ~/.aws/stamp)";
-        local ttl="${VAULT_S3_TTL:-"43200"}";
+        local -r now="$(date '+%s')";
+        local -r stamp="$(cat ~/.aws/stamp)";
+        local ttl="${VAULT_S3_TTL:-"28800"}";
         if [ $((now - stamp)) -ge "${ttl%s}" ]; then
             exit 1;
         fi
@@ -38,8 +41,4 @@ test_aws_creds() {
     sccache --show-stats | grep -qE 'Cache location \s+ s3';
 }
 
-if test -n "${devcontainer_utils_debug:-}"; then
-    PS4="+ ${BASH_SOURCE[0]}:\${LINENO} "; set -x;
-fi
-
-(test_aws_creds "$@");
+test_aws_creds "$@";

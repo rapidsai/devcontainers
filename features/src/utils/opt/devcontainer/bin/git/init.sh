@@ -1,10 +1,8 @@
 #! /usr/bin/env bash
 
 init_git_cli_config() {
-
+    local -;
     set -euo pipefail;
-
-    # PS4="+ ${BASH_SOURCE[0]}:\${LINENO} "; set -x;
 
     if ! test -f ~/.gitconfig; then
         if test -f ~/.gitconfig.default; then
@@ -22,7 +20,7 @@ init_git_cli_config() {
         local git_user_name_default="anon";
         local git_user_name="${git_user_name_default}";
         if devcontainer-utils-shell-is-interactive; then
-            read -p "Git user.name (${git_user_name_default}): " git_user_name <$(tty);
+            read -rsp "Git user.name (${git_user_name_default}): " git_user_name <$(tty);
         fi
         git config --global user.name "${git_user_name:-"${git_user_name_default}"}" >/dev/null 2>&1 || true;
     fi
@@ -31,7 +29,7 @@ init_git_cli_config() {
         local git_user_email_default="users.noreply.${GITHUB_HOST:-github.com}";
         local git_user_email="${git_user_email_default}";
         if devcontainer-utils-shell-is-interactive; then
-            read -p "Git user.email (${git_user_email_default}): " git_user_email <$(tty);
+            read -rsp "Git user.email (${git_user_email_default}): " git_user_email <$(tty);
         fi
         git config --global user.email "${git_user_email:-"${git_user_email_default}"}" >/dev/null 2>&1 || true;
     fi
@@ -53,4 +51,4 @@ init_git_cli_config() {
     fi
 }
 
-(init_git_cli_config "$@");
+init_git_cli_config "$@";

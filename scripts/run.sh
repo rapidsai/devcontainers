@@ -1,8 +1,8 @@
 #! /usr/bin/env bash
 
 run_devcontainer() {
-
-    set -Eeuo pipefail;
+    local -
+    set -euo pipefail;
 
     # PS4="+ ${BASH_SOURCE[0]}:\${LINENO} "; set -x;
 
@@ -116,4 +116,4 @@ run_devcontainer() {
         ${cmds:-/bin/bash};
 }
 
-(run_devcontainer "$@");
+run_devcontainer "$@";

@@ -9,7 +9,10 @@ fi
 src="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
 # export bash utility functions
+# shellcheck disable=SC1091
 source "$src/utilities.sh";
+
+rm -f /etc/profile.d/00-restore-env.sh;
 
 # install /etc/skel
 cp -r "$src/etc/skel" /etc/;
@@ -33,12 +36,28 @@ if ! grep -qE '^BASH_ENV=/etc/bash.bash_env$' /etc/environment; then
 fi
 
 # Remove unnecessary "$HOME/.local/bin" at the end of the path
+# shellcheck disable=SC2016
 if grep -qxF 'if [[ "${PATH}" != *"$HOME/.local/bin"* ]]; then export PATH="${PATH}:$HOME/.local/bin"; fi' /etc/bash.bashrc; then
-   cat /etc/bash.bashrc \
- | grep -vxF 'if [[ "${PATH}" != *"$HOME/.local/bin"* ]]; then export PATH="${PATH}:$HOME/.local/bin"; fi' \
- > /etc/bash.bashrc.new \
-&& mv /etc/bash.bashrc{.new,};
+   grep -vxF \
+    'if [[ "${PATH}" != *"$HOME/.local/bin"* ]]; then export PATH="${PATH}:$HOME/.local/bin"; fi' \
+    /etc/bash.bashrc \
+    > /etc/bash.bashrc.new \
+ && mv /etc/bash.bashrc{.new,};
 fi
 
 cp /etc/skel/.profile /root/.profile;
 echo 'mesg n 2> /dev/null || true' >> /root/.profile;
+
+for_each_user_profile "$(cat <<"EOF"
+sed -i 's@if \[ -d "$HOME/bin" \]@if [ -n "${PATH##*"$HOME/bin"*}" ] \&\& [ -d "$HOME/bin" ]@' $0;
+sed -i 's@if \[ -d "$HOME/.local/bin" \]@if [ -n "${PATH##*"$HOME/.local/bin"*}" ] \&\& [ -d "$HOME/.local/bin" ]@' $0;
+EOF
+)";
+
+# Fix the devcontainers/features/common-utils __bash_prompt fn
+# shellcheck disable=SC2016
+for_each_user_bashrc '
+if [[ "$(grep -qE "^__bash_prompt\(\) \{$" "$0"; echo $?)" == 0 ]]; then
+    sed -i "s/\${GITHUB_USER}/\${GITHUB_USER:-}/g" "$0";
+fi
+';

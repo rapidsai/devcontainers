@@ -1,12 +1,36 @@
 #!/usr/bin/env bash
 
-checkout_same_branch() {
+# Usage:
+#  rapids-pull-repositories [OPTION]...
+#
+# Pull the latest commits from each repository's upstream remote.
+#
+# Boolean options:
+#  -h,--help                    Print this text.
+#
+# Options that require values:
+#  --remote            <remote>  The name of the remote from which to pull.
+#                                (default: upstream)
+#  -b,--default-branch <branch>  The name of the branch to use if the current branch isn't found in <remote>.
+#                                (default: none)
+# @_include_value_options rapids-list-repos -h | tail -n+2 | head -n-1;
+
+# shellcheck disable=SC1091
+. rapids-generate-docstring;
+
+pull_repositories() {
+    local -;
     set -euo pipefail;
 
-    eval "$(                                  \
-        rapids-list-repos "$@"                \
-      | xargs -r -d'\n' -I% echo -n local %\; \
-    )";
+    eval "$(_parse_args "$@" <&0)";
+
+    eval "$(rapids-list-repos "$@")";
+
+    # shellcheck disable=SC1091
+    . devcontainer-utils-debug-output 'rapids_build_utils_debug' 'pull-repositories';
+
+    : "${remote:="upstream"}";
+    : "${default_branch:=""}";
 
     for ((i=0; i < ${repos_length:-0}; i+=1)); do
 
@@ -18,37 +42,47 @@ checkout_same_branch() {
             continue;
         fi;
 
-        echo "Pulling ${!repo_name}..."
-        git -C ~/${!repo_path} fetch --no-tags upstream;
-        git -C ~/${!repo_path} fetch --no-tags origin;
+        echo "Fetching ${!repo_name} ${remote} branches...";
 
-        local branch_name=$(git -C ~/${!repo_path} rev-parse --abbrev-ref HEAD);
+        git -C ~/${!repo_path} fetch --no-tags "${remote}";
 
-        while [[ -z "$(git -C ~/${!repo_path} branch -r | grep upstream/$branch_name)" ]]; do
+        local branch="$(git -C ~/${!repo_path} rev-parse --abbrev-ref HEAD)";
 
-            local upstream_info="$(git -C ~/${!repo_path} remote -v show | grep upstream | head -n1)";
+        while true; do
+            if test -n "${branch:-}" \
+            && git -C ~/${!repo_path} branch -r | grep "${remote}/${branch}"; then
+                break;
+            fi
+            if test -n "${default_branch:-}" \
+            && git -C ~/${!repo_path} branch -r | grep "${remote}/${default_branch}"; then
+                branch="${default_branch}";
+                break;
+            fi
 
-            read -p "
+            local remote_info="$(git -C ~/${!repo_path} remote -v show | grep "${remote}" | head -n1)";
+
+            read -rp "
 ############################################################
-Branch \"$branch_name\" not found in:
-${upstream_info}
+Branch \"${branch}\" $(
+if test -n "${default_branch}"; then
+    echo "and \"${default_branch}\"";
+fi
+) not found in:
+${remote_info}
 ############################################################
 
-Please enter a branch name to pull (or leave empty to skip): " branch_name </dev/tty
-        done;
+Please enter a branch name to pull (or leave empty to skip): " branch </dev/tty
+        done
 
-        if [[ -n "$branch_name" ]]; then
-            git -C ~/${!repo_path} pull --no-tags upstream "$branch_name";
+        if test -n "${branch:-}"; then
+            echo "Pulling ${!repo_name} ${remote}/${branch}...";
+            git -C ~/${!repo_path} pull --no-tags "${remote}" "${branch}";
             git -C ~/${!repo_path} submodule update --init --recursive;
         else
             echo "No alternate branch name supplied, skipping";
         fi;
 
-    done;
+    done
 }
 
-if test -n "${rapids_build_utils_debug:-}"; then
-    PS4="+ ${BASH_SOURCE[0]}:\${LINENO} "; set -x;
-fi
-
-(checkout_same_branch "$@");
+pull_repositories "$@" <&0;

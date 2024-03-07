@@ -5,30 +5,32 @@ description: Setup self-hosted runner environment
 runs:
   using: composite
   steps:
-    - name: Dump env
+    - name: Dump environment
       shell: bash -eo pipefail {0}
-      run: echo "${{ toJSON(env) }}"
+      run: |
+        echo "env: ${{ toJSON(env) }}"
+        echo "runner: '${{ toJSON(runner) }}'"
 
-    - if: env.RUNNER_ENVIRONMENT != 'self-hosted'
+    - if: runner.environment != 'self-hosted'
       name: Free up disk space
       uses: ./.github/actions/free-disk-space
       with:
         tool_cache: "${{ runner.tool_cache }}"
 
-    - if: env.RUNNER_ENVIRONMENT == 'self-hosted'
+    - if: runner.environment == 'self-hosted'
       name: Setup self-hosted runner environment
       shell: bash -eo pipefail {0}
       run: |
         echo "HOME=${{ runner.workspace }}" >> $GITHUB_ENV;
         echo "TMPDIR=${{ runner.temp }}" >> $GITHUB_ENV;
 
-    - if: env.RUNNER_ENVIRONMENT == 'self-hosted'
+    - if: runner.environment == 'self-hosted'
       name: Setup Node.js
       uses: actions/setup-node@v3
       with:
         node-version: '16'
 
-    - if: env.RUNNER_ENVIRONMENT != 'self-hosted'
+    - if: runner.environment != 'self-hosted'
       name: Set up QEMU
       uses: docker/setup-qemu-action@v2
 
@@ -36,14 +38,14 @@ runs:
       shell: bash
       run: docker context create builder
 
-    - if: env.RUNNER_ENVIRONMENT != 'self-hosted'
+    - if: runner.environment != 'self-hosted'
       name: Setup docker buildx on github-hosted runners
       uses: docker/setup-buildx-action@v2
       with:
         buildkitd-flags: --debug
         endpoint: builder
 
-    - if: env.RUNNER_ENVIRONMENT == 'self-hosted'
+    - if: runner.environment == 'self-hosted'
       name: Setup docker buildx on self-hosted runners
       uses: docker/setup-buildx-action@v2
       with:
