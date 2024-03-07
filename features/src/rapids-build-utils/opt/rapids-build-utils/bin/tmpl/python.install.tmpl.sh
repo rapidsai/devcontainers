@@ -68,13 +68,13 @@ install_${PY_LIB}_python() {
 
     if rapids-python-uses-scikit-build-core "${PY_SRC}"; then
         pip_args+=(-C "build-dir=$(rapids-maybe-clean-build-dir "${cmake_args[@]}" -- "${PY_SRC}")");
-    elif test -n "${editable:-}"; then
+    elif test ${#editable[@]} -gt 0; then
         export SETUPTOOLS_ENABLE_FEATURES=legacy-editable;
-        cmake_args+=("-DCMAKE_INSTALL_RPATH_USE_LINK_PATH=ON");
     fi
 
     # Put --editable at the end of pip_args
     if test ${#editable[@]} -gt 0; then
+        cmake_args+=("-DCMAKE_INSTALL_RPATH_USE_LINK_PATH=ON");
         local i;
         local n=1;
         test -n "${editable:-}" && n=2;
