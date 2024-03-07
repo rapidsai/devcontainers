@@ -3,7 +3,7 @@
     "image": "ubuntu:22.04",
     "features": {
       "cuda": {
-        "version": "12.2"
+        "version": "12.4"
       },
       "ucx": {
         "version": "1.14.1"
@@ -14,7 +14,7 @@
     "image": "ubuntu:22.04",
     "features": {
       "cuda": {
-        "version": "12.2"
+        "version": "12.4"
       },
       "ucx": {
         "version": "1.15.0-rc3"
