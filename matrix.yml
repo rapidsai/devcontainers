@@ -24,8 +24,9 @@ x-llvm-12: &llvm_12 { name: "llvm", version: "12" }
 x-llvm-13: &llvm_13 { name: "llvm", version: "13" }
 x-llvm-14: &llvm_14 { name: "llvm", version: "14" }
 x-llvm-15: &llvm_15 { name: "llvm", version: "15" }
-x-llvm-prev: &llvm_prev { name: "llvm", version: "16" }
-x-llvm-curr: &llvm_curr { name: "llvm", version: "17" }
+x-llvm-16: &llvm_15 { name: "llvm", version: "15" }
+x-llvm-prev: &llvm_prev { name: "llvm", version: "17" }
+x-llvm-curr: &llvm_curr { name: "llvm", version: "18" }
 x-llvm-env: &llvm_env {CC: "clang", CXX: "clang++", CUDAHOSTCXX: "clang++"}
 
 x-nvhpc-prev: &nvhpc_prev { name: "nvhpc", version: "23.11" }
@@ -88,6 +89,7 @@ include:
   - {features: [*python, *gcc_12, {<<: *cuda_curr_max, <<: *cccl_cuda_opts}, *cccl_clang_tools, *cccl_dev], env: *gcc_env}
   - {features: [*python, *gcc_13, {<<: *cuda_curr_max, <<: *cccl_cuda_opts}, *cccl_clang_tools, *cccl_dev], env: *gcc_env}
   - {features: [*python, *llvm_15, {<<: *cuda_curr_max, <<: *cccl_cuda_opts}, *cccl_clang_tools, *cccl_dev], env: *llvm_env}
+  - {features: [*python, *llvm_16, {<<: *cuda_curr_max, <<: *cccl_cuda_opts}, *cccl_clang_tools, *cccl_dev], env: *llvm_env}
   - {features: [*python, *llvm_prev, {<<: *cuda_curr_max, <<: *cccl_cuda_opts}, *cccl_clang_tools, *cccl_dev], env: *llvm_env}
   - {features: [*python, *llvm_curr, {<<: *cuda_curr_max, <<: *cccl_cuda_opts}, *cccl_clang_tools, *cccl_dev], env: *llvm_env}
   - {features: [*python, *oneapi_2022, {<<: *cuda_curr_max, <<: *cccl_cuda_opts}, *cccl_clang_tools, *cccl_dev], env: *onapi_env}
