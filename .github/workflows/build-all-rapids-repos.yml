@@ -27,7 +27,7 @@ jobs:
     if: needs.check-event.outputs.ok == 'true'
     needs: check-event
     secrets: inherit
-    uses: rapidsai/shared-workflows/.github/workflows/build-in-devcontainer.yaml@fix/devcontainer-json-location
+    uses: rapidsai/shared-workflows/.github/workflows/build-in-devcontainer.yaml@branch-24.06
     with:
       arch: '["amd64"]'
       cuda: '["12.0", "12.2"]'
