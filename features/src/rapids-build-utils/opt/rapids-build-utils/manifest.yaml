@@ -19,7 +19,7 @@ repos:
 
 - name: ucxx
   path: ucxx
-  git: {<<: *git_defaults, repo: ucxx, tag: branch-0.38
+  git: {<<: *git_defaults, repo: ucxx, tag: branch-0.38}
   cpp:
     - name: ucxx
       sub_dir: cpp
