@@ -38,7 +38,7 @@ function sed_runner() {
 }
 
 sed_runner "s/devcontainers:.*-cpp/devcontainers:${NEXT_SHORT_TAG}-cpp/g" USAGE.md
-sed_runner "s|features/\([[:alnum:]]\+\):[[:digit:]]\+\.[[:digit:]]\+\"|features/\1:${NEXT_SHORT_TAG}\"|g" USAGE.md
+sed_runner "s|features/\([[:alnum:]]\+\):[[:digit:]]\+\.[[:digit:]]\+\"|features/\1:${NEXT_SHORT_TAG_PEP440}\"|g" USAGE.md
 
 for file in $(find .devcontainer -name devcontainer.json); do
   sed_runner "s|rapidsai/devcontainers:.*-cpp|rapidsai/devcontainers:${NEXT_SHORT_TAG}-cpp|g" "$file"
