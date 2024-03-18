@@ -50,7 +50,7 @@ make_conda_env() {
         # If the conda env does exist but it's different from the generated one,
         # print the diff between the envs and update it
         elif ! diff -BNqw "${old_env_path}" "${new_env_path}" >/dev/null 2>&1; then
-            echo -e "Updating '${env_name}' conda environment\n" 1>&2;
+            echo -e "Creating '${env_name}' conda environment\n" 1>&2;
             echo -e "Environment (${env_file_name}):\n" 1>&2;
 
             # Print the diff to the console for debugging
@@ -60,12 +60,18 @@ make_conda_env() {
              || true                                           \
              && echo "";
 
-            # Update the current conda env + prune libs that were removed
-            # Use conda instead of mamba due to https://github.com/mamba-org/mamba/issues/3059
-            conda env update -n "${env_name}" -f "${new_env_path}" --prune --solver=libmamba;
+            # If the conda env exists, recreate it from scratch.
+            # Most conda issues are due to updating existing envs with new packages.
+            # We mount in the package cache, so this should still be fast in most cases.
+            rm -rf "${HOME}/.conda/envs/${env_name}";
+
+            conda env create -n "${env_name}" -f "${new_env_path}" --solver=libmamba;
         fi
 
         cp -a "${new_env_path}" "${old_env_path}";
+    else
+        rm -f "${new_env_path}" "${old_env_path}";
+        echo -e "Not creating '${env_name}' conda environment because '${env_file_name}' is empty." 1>&2;
     fi
 }
 
