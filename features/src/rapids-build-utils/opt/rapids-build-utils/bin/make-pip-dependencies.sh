@@ -70,7 +70,7 @@ make_pip_dependencies() {
                 local keyi;
 
                 for ((keyi=0; keyi < ${#repo_keys[@]}; keyi+=1)); do
-                    local file="/tmp/${!repo_name}.${!cpp_name}.${repo_keys[$keyi]}.requirements.txt";
+                    local file="/tmp/${!repo_name}.lib${!cpp_name}.${repo_keys[$keyi]}.requirements.txt";
                     pip_reqs_txts+=("${file}");
                     generate_requirements                                                     \
                         "${file}"                                                             \

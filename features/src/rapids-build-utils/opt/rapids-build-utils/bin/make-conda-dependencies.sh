@@ -67,7 +67,7 @@ make_conda_dependencies() {
                 local keyi;
 
                 for ((keyi=0; keyi < ${#repo_keys[@]}; keyi+=1)); do
-                    local file="/tmp/${!repo_name}.${!cpp_name}.${repo_keys[$keyi]}.env.yaml";
+                    local file="/tmp/${!repo_name}.lib${!cpp_name}.${repo_keys[$keyi]}.env.yaml";
                     conda_env_yamls+=("${file}");
                     generate_env_yaml                                                         \
                         "${file}"                                                             \
