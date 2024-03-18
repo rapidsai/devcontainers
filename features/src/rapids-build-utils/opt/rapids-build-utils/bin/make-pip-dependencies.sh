@@ -59,6 +59,29 @@ make_pip_dependencies() {
 
         if [ -f ~/"${!repo_path}/dependencies.yaml" ]; then
 
+            local cpp_length="${repo}_cpp_length";
+
+            for ((j=0; j < ${!cpp_length:-0}; j+=1)); do
+                local cpp_name="${repo}_cpp_${j}_name";
+
+                echo "Generating lib${!cpp_name}'s requirements.txt" 1>&2;
+
+                local repo_keys=("${key[@]}" "${key[@]/%/_lib${!cpp_name//"-"/"_"}}");
+                local keyi;
+
+                for ((keyi=0; keyi < ${#repo_keys[@]}; keyi+=1)); do
+                    local file="/tmp/${!repo_name}.lib${!cpp_name}.${repo_keys[$keyi]}.requirements.txt";
+                    pip_reqs_txts+=("${file}");
+                    generate_requirements                                                     \
+                        "${file}"                                                             \
+                        --file_key "${repo_keys[$keyi]}"                                      \
+                        --output requirements                                                 \
+                        --config ~/"${!repo_path}/dependencies.yaml"                          \
+                        --matrix "arch=$(uname -m);cuda=${cuda_version};py=${python_version}" \
+                        ;
+                done
+            done
+
             local py_length="${repo}_python_length";
 
             for ((j=0; j < ${!py_length:-0}; j+=1)); do
