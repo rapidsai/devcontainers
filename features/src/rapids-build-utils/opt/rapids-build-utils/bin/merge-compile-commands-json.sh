@@ -33,6 +33,11 @@ _list_repo_paths() {
             for ((j=0; j < ${!py_length:-0}; j+=1)); do
                 local py_sub_dir="${repo}_python_${j}_sub_dir";
                 local py_path=~/"${!repo_path:-}${!py_sub_dir:+/${!py_sub_dir}}";
+                # TODO: What are we really checking here? Do we want only
+                # packages built by scikit-build-core, or do we want all
+                # compiled Python packages (by either scikit-build or
+                # scikit-build-core) vs pure Python packages (built by
+                # setuptools)?
                 if rapids-python-uses-scikit-build-core "${py_path}"; then
                     echo "${py_path}";
                 fi

@@ -46,6 +46,7 @@ update_build_dir_links() {
             for ((j=0; j < ${!py_length:-0}; j+=1)); do
                 local py_sub_dir="${repo}_python_${j}_sub_dir";
                 local py_path=~/"${!repo_path:-}${!py_sub_dir:+/${!py_sub_dir}}";
+                # TODO: Should this also preserve the _skbuild directory for scikit-build projects?
                 if rapids-python-uses-scikit-build-core "${py_path}"; then
                     rapids-get-cmake-build-dir --skip-build-type -- "${py_path}" >/dev/null;
                 fi

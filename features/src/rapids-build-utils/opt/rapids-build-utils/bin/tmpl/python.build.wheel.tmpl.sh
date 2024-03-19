@@ -68,6 +68,7 @@ build_${PY_LIB}_python_wheel() {
         $(rapids-select-pip-wheel-args "$@")
     )";
 
+    # TODO: Should this be handling the _skbuild directory from scikit-build differently?
     if rapids-python-uses-scikit-build-core "${PY_SRC}"; then
         pip_args+=(-C "build-dir=$(rapids-maybe-clean-build-dir "${cmake_args[@]}" -- "${PY_SRC}")");
     fi

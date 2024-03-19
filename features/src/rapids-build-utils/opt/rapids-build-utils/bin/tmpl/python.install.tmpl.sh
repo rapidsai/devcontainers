@@ -66,10 +66,14 @@ install_${PY_LIB}_python() {
         $(rapids-select-pip-install-args "$@")
     )";
 
+    # TODO: Should this be handling the _skbuild directory from scikit-build differently?
     if rapids-python-uses-scikit-build-core "${PY_SRC}"; then
         pip_args+=(-C "build-dir=$(rapids-maybe-clean-build-dir "${cmake_args[@]}" -- "${PY_SRC}")");
-    elif test ${#editable[@]} -gt 0; then
-        export SETUPTOOLS_ENABLE_FEATURES=legacy-editable;
+    fi
+    if rapids-python-uses-scikit-build "${PY_SRC}"; then
+        if test ${#editable[@]} -gt 0; then
+            export SETUPTOOLS_ENABLE_FEATURES=legacy-editable;
+        fi
     fi
 
     # Put --editable at the end of pip_args
