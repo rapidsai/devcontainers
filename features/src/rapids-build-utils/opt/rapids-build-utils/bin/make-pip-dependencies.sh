@@ -43,6 +43,16 @@ make_pip_dependencies() {
     test ${#key[@]} -eq 0 && key=(py_build py_run py_test all);
     test ${#requirement[@]} -eq 0 && requirement=();
 
+    local -a _exclude=();
+    local exc; for exc in "${exclude[@]}"; do
+        _exclude+=(-f "${exc}");
+    done
+
+    local -a _include=();
+    local inc; for inc in "${include[@]}"; do
+        _include+=(-f "${inc}");
+    done
+
     local cuda_version="${CUDA_VERSION:-${CUDA_VERSION_MAJOR:-12}.${CUDA_VERSION_MINOR:-0}}";
     cuda_version="$(grep -o '^[0-9]*.[0-9]*' <<< "${cuda_version}")";
     local -r cuda_version_major="$(cut -d'.' -f1 <<< "${cuda_version}")";
@@ -131,16 +141,6 @@ make_pip_dependencies() {
             if test -z "${pkg##*"_"*}"; then
                 pip_noinstall+=("${pkg//"_"/"-"}" "${pkg//"_"/"-"}-cu.*")
             fi
-        done
-
-        local -a _exclude=();
-        local exc; for exc in "${exclude[@]}"; do
-            _exclude+=(-f "${exc}");
-        done
-
-        local -a _include=();
-        local inc; for inc in "${include[@]}"; do
-            _include+=(-f "${inc}");
         done
 
         # Generate a combined requirements.txt file
