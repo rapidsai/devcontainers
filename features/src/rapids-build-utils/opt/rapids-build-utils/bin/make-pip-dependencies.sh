@@ -10,6 +10,8 @@
 #  --no-dedupe             Don't sort and dedupe the combined requirements.txt.
 #
 # Options that require values:
+#  -e,--exclude <file>     Path(s) to requirement files of packages to exclude.
+#  -i,--include <file>     Path(s) to requirement files of packages to include.
 #  -k,--key <key>          Only include the key(s)
 # @_include_value_options rapids-list-repos -h | tail -n+2 | head -n-3;
 #  --repo <repo>           Only include dependencies for repo(s).
@@ -36,7 +38,20 @@ make_pip_dependencies() {
     # shellcheck disable=SC1091
     . devcontainer-utils-debug-output 'rapids_build_utils_debug' 'make-pip-env make-pip-dependencies';
 
+    test ${#exclude[@]} -eq 0 && exclude=();
+    test ${#include[@]} -eq 0 && include=();
     test ${#key[@]} -eq 0 && key=(py_build py_run py_test all);
+    test ${#requirement[@]} -eq 0 && requirement=();
+
+    local -a _exclude=();
+    local exc; for exc in "${exclude[@]}"; do
+        _exclude+=(-f "${exc}");
+    done
+
+    local -a _include=();
+    local inc; for inc in "${include[@]}"; do
+        _include+=(-f "${inc}");
+    done
 
     local cuda_version="${CUDA_VERSION:-${CUDA_VERSION_MAJOR:-12}.${CUDA_VERSION_MINOR:-0}}";
     cuda_version="$(grep -o '^[0-9]*.[0-9]*' <<< "${cuda_version}")";
@@ -107,7 +122,7 @@ make_pip_dependencies() {
         fi
     done
 
-    if test ${#pip_reqs_txts[@]} -gt 0; then
+    if test ${#requirement[@]} -gt 0 || test ${#pip_reqs_txts[@]} -gt 0; then
 
         for ((i=0; i < ${#pip_reqs_txts[@]}; i+=1)); do
             while ! test -f "${pip_reqs_txts[$i]}"; do
@@ -129,12 +144,13 @@ make_pip_dependencies() {
         done
 
         # Generate a combined requirements.txt file
-        # shellcheck disable=SC2154
         cat "${requirement[@]}" "${pip_reqs_txts[@]}"                                                           \
       | (grep -v '^#' || [ "$?" == "1" ])                                                                       \
       | (grep -v -E '^$' || [ "$?" == "1" ])                                                                    \
       | ( if test -n "${no_dedupe-}"; then cat -; else tr -s "[:blank:]" | LC_ALL=C sort -u; fi )               \
       | (grep -v -P "^($(tr -d '[:blank:]' <<< "${pip_noinstall[@]/%/|}"))(=.*|>.*|<.*)?$" || [ "$?" == "1" ])  \
+      | ( if test ${#_exclude[@]} -gt 0; then grep -E -v "${_exclude[@]}" || [ "$?" == "1" ]; else cat -; fi )  \
+      | ( if test ${#_include[@]} -gt 0; then grep -E    "${_include[@]}" || [ "$?" == "1" ]; else cat -; fi )  \
       | sed -E "s/-cu([0-9]+)/-cu${cuda_version_major}/g"                                                       \
       | sed -E "s/^cupy-cuda[0-9]+x/cupy-cuda${cuda_version_major}x/g"                                          \
       | sed -E "s/^cuda-python.*/cuda-python>=${cuda_version}.0,<$((cuda_version_major+1)).0a0/g"               \
