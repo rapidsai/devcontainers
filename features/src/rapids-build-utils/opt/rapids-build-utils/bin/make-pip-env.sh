@@ -36,7 +36,7 @@ make_pip_env() {
     test ${#system_site_packages[@]} -eq 0 && system_site_packages=();
 
     local pre=();
-    if test -n "${no_pre-}"; then
+    if test -z "${no_pre-}"; then
         pre=(--pre);
     fi
 
