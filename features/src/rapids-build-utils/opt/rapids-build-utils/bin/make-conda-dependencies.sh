@@ -9,6 +9,8 @@
 #  -h,--help             Print this text.
 #
 # Options that require values:
+#  -e,--exclude <file>     Path(s) to requirement files of packages to exclude.
+#  -i,--include <file>     Path(s) to requirement files of packages to include.
 #  -k,--key <key>        Only include the key(s)
 # @_include_value_options rapids-list-repos -h | tail -n+2 | head -n-3;
 #  --repo <repo>         Only include dependencies for repo(s).
@@ -36,6 +38,8 @@ make_conda_dependencies() {
     # shellcheck disable=SC1091
     . devcontainer-utils-debug-output 'rapids_build_utils_debug' 'make-conda-env make-conda-dependencies';
 
+    test ${#exclude[@]} -eq 0 && exclude=();
+    test ${#include[@]} -eq 0 && include=();
     test ${#key[@]} -eq 0 && key=(all);
 
     local cuda_version="${CUDA_VERSION:-${CUDA_VERSION_MAJOR:-12}.${CUDA_VERSION_MINOR:-0}}";
@@ -114,11 +118,24 @@ make_conda_dependencies() {
 
         # shellcheck disable=SC2207
         local conda_noinstall=($(rapids-python-pkg-names) $(rapids-python-conda-pkg-names));
+
+        local -a _exclude=();
+        local exc; for exc in "${exclude[@]}"; do
+            _exclude+=(-f "${exc}");
+        done
+
+        local -a _include=();
+        local inc; for inc in "${include[@]}"; do
+            _include+=(-f "${inc}");
+        done
+
         # Generate a combined conda env yaml file.
         conda-merge "${conda_env_yamls[@]}"                                                                                   \
           | (grep -v '^name:'                                                                             || [ "$?" == "1" ]) \
           | (grep -v -P '^[ ]*?\- (\.git\@[^(main|master)])(.*?)$'                                        || [ "$?" == "1" ]) \
           | (grep -v -P "^[ ]*?\- ($(tr -d '[:blank:]' <<< "${conda_noinstall[@]/%/ |}"))(=.*|>.*|<.*)?$" || [ "$?" == "1" ]) \
+          | ( if test ${#_exclude[@]} -gt 0; then grep -E -v "${_exclude[@]}" || [ "$?" == "1" ]; else cat -; fi            ) \
+          | ( if test ${#_include[@]} -gt 0; then grep -E    "${_include[@]}" || [ "$?" == "1" ]; else cat -; fi            ) \
           ;
 
         rm -f "${conda_env_yamls[@]}";
