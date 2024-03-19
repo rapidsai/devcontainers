@@ -8,6 +8,8 @@
 # Boolean options:
 #  -h,--help               Print this text.
 #  -f,--force              Delete the existing pip venv and recreate it from scratch.
+#  --pre                   Include pre-release and development versions. By default, pip only finds
+#                          stable versions.
 #  --no-pre                Don't install pre-release and development versions.
 #  --system-site-packages  Give the virtual environment access to the system site-packages dir.
 # @_include_bool_options rapids-make-pip-dependencies -h | tail -n+2 | head -n-3;
@@ -21,23 +23,16 @@ make_pip_env() {
     local -;
     set -euo pipefail;
 
-    eval "$(_parse_args --skip '
-        --no-dedupe
-        -k,--key
-        -m,--manifest
-        -o,--omit
-        --repo
-        -r,--requirement
-    ' "${@:2}" <&0)";
+    eval "$(_parse_args --take '-f,--force --pre --no-pre --system-site-packages' "${@:2}" <&0)";
 
     # shellcheck disable=SC1091
     . devcontainer-utils-debug-output 'rapids_build_utils_debug' 'make-pip-env';
 
+    test ${#pre[@]} -eq 0 && pre=(--pre);
     test ${#system_site_packages[@]} -eq 0 && system_site_packages=();
 
-    local pre=();
-    if test -z "${no_pre-}"; then
-        pre=(--pre);
+    if test -n "${no_pre-}"; then
+        pre=();
     fi
 
     local env_name="${1}"; shift;

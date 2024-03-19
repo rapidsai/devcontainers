@@ -18,7 +18,7 @@ make_conda_env() {
     local -;
     set -euo pipefail;
 
-    eval "$(_parse_args --skip '-k,--key -m,--manifest -o,--omit --repo' "${@:2}" <&0)";
+    eval "$(_parse_args --take '-f,--force' "${@:2}" <&0)";
 
     # shellcheck disable=SC1091
     . devcontainer-utils-debug-output 'rapids_build_utils_debug' 'make-conda-env';
