@@ -27,12 +27,15 @@ maybe_clean_build_dir() {
 
     local -r bin_dir="$(rapids-get-cmake-build-dir "${OPTS[@]}" "${REST[@]}")";
 
-    case "${G:-Ninja}" in
-        "Unix Makefiles")
-            test -f "${bin_dir}/Makefile" || rm -rf "${bin_dir}";;
-        "Ninja")
-            test -f "${bin_dir}/build.ninja" || rm -rf "${bin_dir}";;
-    esac
+    if test -n "${bin_dir-}" && test -d "${bin_dir}"; then
+        case "${G:-Ninja}" in
+            "Unix Makefiles")
+                test -f "${bin_dir}/Makefile" || rm -rf "${bin_dir}";;
+            "Ninja")
+                test -f "${bin_dir}/build.ninja" || rm -rf "${bin_dir}";;
+        esac
+    fi
+
     echo "${bin_dir}";
 }
 

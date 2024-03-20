@@ -36,38 +36,42 @@ get_cmake_build_dir() {
     # shellcheck disable=SC1091
     . devcontainer-utils-debug-output 'rapids_build_utils_debug' 'get-cmake-build-dir';
 
-    if test "${REST[0]:-}" == --; then REST=("${REST[@]:1}"); fi;
+    if test "${REST[0]:-}" == --; then REST=("${REST[@]:1}"); fi
 
-    local bin="build";
     local src="${REST[0]:-}";
-    local -r type="$(rapids-select-cmake-build-type "${OPTS[@]}" "${REST[@]:1}" | tr '[:upper:]' '[:lower:]')";
-    local -r cuda="$(grep -o '^[0-9]*.[0-9]*' <<< "${CUDA_VERSION:-${CUDA_VERSION_MAJOR:-12}.${CUDA_VERSION_MINOR:-0}}")";
 
-    bin+="${PYTHON_PACKAGE_MANAGER:+/${PYTHON_PACKAGE_MANAGER}}${cuda:+/cuda-${cuda}}";
-
-    if test -n "${src:-}" && test -d "${src:-}"; then
-        mkdir -p "${src}/${bin}";
-        if  test -z "${skip_links-}"; then
-            if test -z "${skip_build_type-}" || ! test -L "${src}/${bin}/latest"; then
-                mkdir -p "${src}/${bin}/${type}";
-                cd "${src}/${bin}/" || exit 1;
-                ln -sfn "${type}" latest;
-            fi
-            cd "${src}/build" || exit 1;
-            local component;
-            for component in "${PYTHON_PACKAGE_MANAGER:-}" "${cuda:+cuda-${cuda}}"; do
-                if test -n "${component:-}"; then
-                    ln -sfn "${component}/latest" latest;
-                    cd "${component}" || exit 1;
-                fi
-            done
-        fi
-    fi
-
-    if test -n "${skip_build_type-}"; then
-        echo "${src:+${src}/}${bin}/latest";
+    if test -n "${src}" && rapids-python-uses-scikit-build "${src}"; then
+        echo "${src:+${src}/}$(python -c 'from skbuild import constants; print(constants.CMAKE_BUILD_DIR())')";
     else
-        echo "${src:+${src}/}${bin}/${type}";
+        local -r type="$(rapids-select-cmake-build-type "${OPTS[@]}" "${REST[@]:1}" | tr '[:upper:]' '[:lower:]')";
+        local -r cuda="$(grep -o '^[0-9]*.[0-9]*' <<< "${CUDA_VERSION:-${CUDA_VERSION_MAJOR:-12}.${CUDA_VERSION_MINOR:-0}}")";
+        local bin="build";
+        bin+="${PYTHON_PACKAGE_MANAGER:+/${PYTHON_PACKAGE_MANAGER}}${cuda:+/cuda-${cuda}}";
+
+        if test -n "${src:-}" && test -d "${src:-}"; then
+            mkdir -p "${src}/${bin}";
+            if  test -z "${skip_links-}"; then
+                if test -z "${skip_build_type-}" || ! test -L "${src}/${bin}/latest"; then
+                    mkdir -p "${src}/${bin}/${type}";
+                    cd "${src}/${bin}/" || exit 1;
+                    ln -sfn "${type}" latest;
+                fi
+                cd "${src}/build" || exit 1;
+                local component;
+                for component in "${PYTHON_PACKAGE_MANAGER:-}" "${cuda:+cuda-${cuda}}"; do
+                    if test -n "${component:-}"; then
+                        ln -sfn "${component}/latest" latest;
+                        cd "${component}" || exit 1;
+                    fi
+                done
+            fi
+        fi
+
+        if test -n "${skip_build_type-}"; then
+            echo "${src:+${src}/}${bin}/latest";
+        else
+            echo "${src:+${src}/}${bin}/${type}";
+        fi
     fi
 }
 

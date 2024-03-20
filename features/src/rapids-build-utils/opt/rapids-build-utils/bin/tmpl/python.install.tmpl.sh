@@ -66,10 +66,16 @@ install_${PY_LIB}_python() {
         $(rapids-select-pip-install-args "$@")
     )";
 
-    if rapids-python-uses-scikit-build-core "${PY_SRC}"; then
+    if rapids-python-uses-scikit-build "${PY_SRC}"; then
+        # Clean the `_skbuild/.../cmake-build` dir if configuration failed before
+        if ! test -d "$(rapids-maybe-clean-build-dir "${cmake_args[@]}" -- "${PY_SRC}")"; then
+            rm -rf "${PY_SRC}/_skbuild";
+        fi
+        if test ${#editable[@]} -gt 0; then
+            export SETUPTOOLS_ENABLE_FEATURES=legacy-editable;
+        fi
+    elif rapids-python-uses-scikit-build-core "${PY_SRC}"; then
         pip_args+=(-C "build-dir=$(rapids-maybe-clean-build-dir "${cmake_args[@]}" -- "${PY_SRC}")");
-    elif test ${#editable[@]} -gt 0; then
-        export SETUPTOOLS_ENABLE_FEATURES=legacy-editable;
     fi
 
     # Put --editable at the end of pip_args
