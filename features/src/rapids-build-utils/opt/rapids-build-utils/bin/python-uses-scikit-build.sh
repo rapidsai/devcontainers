@@ -3,4 +3,4 @@
 set -e;
 
 test -f "${1}/pyproject.toml";
-test "True" = "$(python -c "import toml; from packaging.requirements import Requirement; print(any(Requirement(require).name == 'scikit-build' for require in toml.load('${1}/pyproject.toml')['build-system']['requires']))" 2>/dev/null)"
+test "True" = "$(/usr/local/python/current/bin/python -c "import toml; print(any('scikit-build-core' not in x and 'scikit-build' in x for x in toml.load('${1}/pyproject.toml')['build-system']['requires']))")";
