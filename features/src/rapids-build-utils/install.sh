@@ -59,6 +59,7 @@ declare -a commands=(
     python-conda-pkg-names
     python-pkg-names
     python-pkg-roots
+    python-uses-scikit-build
     python-uses-scikit-build-core
     query-manifest
     select-cmake-args
