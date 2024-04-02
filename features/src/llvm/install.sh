@@ -41,7 +41,7 @@ echo "Installing llvm-${LLVM_VERSION} compilers and tools";
 ./llvm.sh $LLVM_VERSION ${PACKAGES:-all};
 
 if [[ "${PACKAGES:-all}" == "all" ]]; then
-    PACKAGES=("clang" "clangd" "clang++" "clang-format" "clang-tidy" "lldb" "llvm-config" "llvm-cov");
+    PACKAGES=("clang" "clangd" "clang++" "clang-format" "clang-tidy" "lldb" "llvm-config" "llvm-cov" "FileCheck");
 else
     PACKAGES=(${PACKAGES});
 fi
