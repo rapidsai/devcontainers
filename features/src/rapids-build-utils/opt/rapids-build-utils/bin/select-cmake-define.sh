@@ -19,7 +19,7 @@ parse_cmake_define() {
     local val;
     local def="$1"; shift;
 
-    eval "$(devcontainer-utils-parse-args <(echo -e "\n# -D <def>") "$@" <&0)";
+    eval "$(devcontainer-utils-parse-args <(echo -e "\n# -D <def>\n# --D <def>") "$@" <&0)";
 
     # shellcheck disable=SC1091
     . devcontainer-utils-debug-output 'rapids_build_utils_debug' 'select-cmake-define';
