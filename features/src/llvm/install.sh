@@ -38,20 +38,32 @@ fi
 
 echo "Installing llvm-${LLVM_VERSION} compilers and tools";
 
-./llvm.sh $LLVM_VERSION ${PACKAGES:-all};
+declare -a bins=();
+declare -a pkgs=();
+IFS=" " read -r -a pkgs <<< "${PACKAGES:-all}";
 
-if [[ "${PACKAGES:-all}" == "all" ]]; then
-    PACKAGES=("clang" "clangd" "clang++" "clang-format" "clang-tidy" "lldb" "llvm-config" "llvm-cov" "FileCheck");
+./llvm.sh "${LLVM_VERSION}" "${pkgs[@]}";
+
+if [[ "${pkgs[*]}" == "all" ]]; then
+    bins=("clang" "clangd" "clang++" "clang-format" "clang-tidy" "lldb" "llvm-config" "llvm-cov" "FileCheck" "UnicodeNameMappingGenerator");
 else
-    PACKAGES=(${PACKAGES});
+    IFS=" " read -r -a bins <<< "${PACKAGES}";
+    declare -A pkgs_map=();
+    for ((i=0; i < ${#pkgs[@]}; i+=1)); do
+        pkgs_map["${pkgs[i]}"]=1;
+    done
+    if test -v pkgs_map["llvm-tools"] \
+    || test -v pkgs_map["llvm-${LLVM_VERSION}-tools"]; then
+        bins+=("FileCheck" "UnicodeNameMappingGenerator");
+    fi
 fi
 
 # Remove existing, install, and set default clang/llvm alternatives
-for ((i=0; i < ${#PACKAGES[@]}; i+=1)); do
-    x=${PACKAGES[$i]};
-    if type ${x}-${LLVM_VERSION} >/dev/null 2>&1; then
-        (update-alternatives --install /usr/bin/${x} ${x} $(which ${x}-${LLVM_VERSION}) 30);
-        (update-alternatives --set ${x} $(which ${x}-${LLVM_VERSION}));
+for ((i=0; i < ${#bins[@]}; i+=1)); do
+    x=${bins[$i]};
+    if type "${x}-${LLVM_VERSION}" >/dev/null 2>&1; then
+        (update-alternatives --install /usr/bin/"${x}" "${x}" "$(which "${x}-${LLVM_VERSION}")" 30);
+        (update-alternatives --set "${x}" "$(which "${x}-${LLVM_VERSION}")");
     fi
 done
 
