@@ -11,7 +11,6 @@
 #  --pre                   Include pre-release and development versions. By default, pip only finds
 #                          stable versions.
 #  --no-pre                Don't install pre-release and development versions.
-#  --system-site-packages  Give the virtual environment access to the system site-packages dir.
 # @_include_bool_options rapids-make-pip-dependencies -h | tail -n+2 | head -n-3;
 #
 # @_include_value_options rapids-make-pip-dependencies -h;
@@ -23,13 +22,12 @@ make_pip_env() {
     local -;
     set -euo pipefail;
 
-    eval "$(_parse_args --take '-f,--force --pre --no-pre --system-site-packages' "${@:2}" <&0)";
+    eval "$(_parse_args --take '-f,--force --pre --no-pre' "${@:2}" <&0)";
 
     # shellcheck disable=SC1091
     . devcontainer-utils-debug-output 'rapids_build_utils_debug' 'make-pip-env';
 
     test ${#pre[@]} -eq 0 && pre=(--pre);
-    test ${#system_site_packages[@]} -eq 0 && system_site_packages=();
 
     if test -n "${no_pre-}"; then
         pre=();
@@ -58,11 +56,11 @@ make_pip_env() {
             cat "${new_env_path}";
             echo "";
 
-            python -m venv "${system_site_packages[@]}" "${HOME}/.local/share/venvs/${env_name}";
+            python -m venv "${HOME}/.local/share/venvs/${env_name}";
             # shellcheck disable=SC1090
             . "${HOME}/.local/share/venvs/${env_name}/bin/activate";
             python -m pip install -U pip;
-            python -m pip install "${pre[@]}" -I -r "${new_env_path}";
+            python -m pip install "${pre[@]}" -U -r "${new_env_path}";
         # If the venv does exist but it's different from the generated one,
         # print the diff between the envs and update it
         elif ! diff -BNqw "${old_env_path}" "${new_env_path}" >/dev/null 2>&1; then
