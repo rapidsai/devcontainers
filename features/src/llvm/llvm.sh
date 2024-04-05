@@ -162,48 +162,75 @@ EOF
 
 add-apt-repository -n -y "${REPO_NAME}"
 
-if [[ "${PKG[@]}" == "" ]]; then
+if [[ "${PKG[*]}" == "" ]]; then
     PKG=();
-    PKG+=("clang-$LLVM_VERSION");
-    PKG+=("lldb-$LLVM_VERSION");
-    PKG+=("lld-$LLVM_VERSION");
-    PKG+=("clangd-$LLVM_VERSION");
-elif [[ "${PKG[@]}" == "all" ]]; then
+    PKG+=("clang-${LLVM_VERSION}");
+    PKG+=("lldb-${LLVM_VERSION}");
+    PKG+=("lld-${LLVM_VERSION}");
+    PKG+=("clangd-${LLVM_VERSION}");
+elif [[ "${PKG[*]}" == "all" ]]; then
     # same as in test-install.sh
     # No worries if we have dups
     PKG=();
-    PKG+=("clang-tidy-$LLVM_VERSION");
-    PKG+=("clang-format-$LLVM_VERSION");
-    PKG+=("clang-tools-$LLVM_VERSION");
-    PKG+=("clangd-$LLVM_VERSION");
-    PKG+=("llvm-$LLVM_VERSION-dev");
-    PKG+=("lld-$LLVM_VERSION");
-    PKG+=("lldb-$LLVM_VERSION");
-    PKG+=("llvm-$LLVM_VERSION-tools");
-    PKG+=("libomp-$LLVM_VERSION-dev");
-    PKG+=("libc++-$LLVM_VERSION-dev");
-    PKG+=("libc++abi-$LLVM_VERSION-dev");
-    PKG+=("libclang-common-$LLVM_VERSION-dev");
-    PKG+=("libclang-$LLVM_VERSION-dev");
-    if test $LLVM_VERSION -gt 9; then
-        PKG+=("libclang-cpp$LLVM_VERSION-dev");
+    PKG+=("clang-tidy-${LLVM_VERSION}");
+    PKG+=("clang-format-${LLVM_VERSION}");
+    PKG+=("clang-tools-${LLVM_VERSION}");
+    PKG+=("clangd-${LLVM_VERSION}");
+    PKG+=("llvm-${LLVM_VERSION}-dev");
+    PKG+=("lld-${LLVM_VERSION}");
+    PKG+=("lldb-${LLVM_VERSION}");
+    PKG+=("llvm-${LLVM_VERSION}-tools");
+    PKG+=("libomp-${LLVM_VERSION}-dev");
+    PKG+=("libc++-${LLVM_VERSION}-dev");
+    PKG+=("libc++abi-${LLVM_VERSION}-dev");
+    PKG+=("libclang-common-${LLVM_VERSION}-dev");
+    PKG+=("libclang-${LLVM_VERSION}-dev");
+    if test "${LLVM_VERSION}" -gt 9; then
+        PKG+=("libclang-cpp${LLVM_VERSION}-dev");
     fi
-    if test $LLVM_VERSION -gt 11; then
-        PKG+=("libunwind-$LLVM_VERSION-dev");
+    if test "${LLVM_VERSION}" -gt 11; then
+        PKG+=("libunwind-${LLVM_VERSION}-dev");
     fi
-    if test $LLVM_VERSION -gt 14; then
-        PKG+=("libclang-rt-$LLVM_VERSION-dev");
-        PKG+=("libpolly-$LLVM_VERSION-dev");
+    if test "${LLVM_VERSION}" -gt 14; then
+        PKG+=("libclang-rt-${LLVM_VERSION}-dev");
+        PKG+=("libpolly-${LLVM_VERSION}-dev");
     fi
 else
+    declare -A version_middle=(
+        ["llvm-dev"]=1
+        ["llvm-tools"]=1
+        ["libomp-dev"]=1
+        ["libc++-dev"]=1
+        ["libc++abi-dev"]=1
+        ["libclang-common-dev"]=1
+        ["libclang-dev"]=1
+        ["libunwind-dev"]=1
+        ["libclang-rt-dev"]=1
+        ["libpolly-dev"]=1
+    );
+    declare -A version_at_end=(
+        ["clang"]=1
+        ["clang-tidy"]=1
+        ["clang-format"]=1
+        ["clang-tools"]=1
+        ["clangd"]=1
+        ["lld"]=1
+        ["lldb"]=1
+    );
     for ((i=0; i < ${#PKG[@]}; i+=1)); do
-        if ! grep -q ${LLVM_VERSION} <<< "${PKG[$i]}"; then
-            PKG[$i]="${PKG[$i]}-${LLVM_VERSION}";
+        if ! grep -q "${LLVM_VERSION}" <<< "${PKG[$i]}"; then
+            if test -v version_middle["${PKG[i]}"]; then
+                PKG[i]="$(sed -r "s/^(.*)-(.*)$/\1-${LLVM_VERSION}-\2/" <<< "${PKG[i]}")";
+            elif test -v version_at_end["${PKG[i]}"]; then
+                PKG[i]="${PKG[i]}-${LLVM_VERSION}";
+            elif test "${PKG[i]}" = "libclang-cpp-dev"; then
+                PKG[i]="libclang-cpp${LLVM_VERSION}-dev";
+            fi
         fi
     done
 fi
 
 if test ${#PKG[@]} -gt 0; then
     apt-get update;
-    apt-get install -y ${PKG[@]};
+    apt-get install -y "${PKG[@]}";
 fi
