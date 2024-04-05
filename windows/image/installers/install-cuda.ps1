@@ -56,6 +56,7 @@ $cudaComponents =
     "curand_$componentTag",
     "curand_dev_$componentTag",
     "cudart_$componentTag",
+    "cupti_$componentTag",
     "nvrtc_$componentTag",
     "nvrtc_dev_$componentTag",
     "nvml_dev_$componentTag"
