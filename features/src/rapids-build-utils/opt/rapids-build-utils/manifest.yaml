@@ -97,6 +97,7 @@ repos:
     - name: cuvs
       sub_dir: cpp
       depends: [raft]
+      args: {cmake: -DBUILD_C_LIBRARY=ON}
   python:
     - name: cuvs
       sub_dir: python/cuvs
