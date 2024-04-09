@@ -90,6 +90,20 @@ repos:
       depends: [raft]
       args: {cmake: -DFIND_RAFT_CPP=ON}
 
+- name: cuvs
+  path: cuvs
+  git: {<<: *git_defaults, repo: cuvs}
+  cpp:
+    - name: cuvs
+      sub_dir: cpp
+      depends: [raft]
+      args: {cmake: -DBUILD_C_LIBRARY=ON}
+  python:
+    - name: cuvs
+      sub_dir: python/cuvs
+      depends: [cuvs]
+      args: {cmake: -DFIND_CUVS_CPP=ON}
+
 - name: cumlprims_mg
   path: cumlprims_mg
   git: {<<: *git_defaults, repo: cumlprims_mg}
