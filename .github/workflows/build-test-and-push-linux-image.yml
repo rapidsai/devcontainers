@@ -69,13 +69,27 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           retention-days: 1
-          name: ${{ steps.json.outputs.tag }}
+          name: ${{ steps.json.outputs.tag }}-${{ matrix.arch }}
           path: ${{ runner.temp }}/${{ matrix.arch }}.tar
+
+  merge-artifacts:
+    if: inputs.push == 'true'
+    name: Merge image artifacts
+    needs: build-test-and-upload
+    runs-on: ubuntu-latest
+    steps:
+      - name: Merge image artifacts
+        uses: actions/upload-artifact/merge@v4
+        with:
+          name: ${{ needs.build-test-and-upload.outputs.tag }}
+          pattern: ${{ needs.build-test-and-upload.outputs.tag }}-*
 
   push-to-dockerhub:
     if: inputs.push == 'true'
     name: Push to Docker Hub
-    needs: build-test-and-upload
+    needs:
+      - build-test-and-upload
+      - merge-artifacts
     runs-on: ubuntu-latest
     steps:
       - name: Checkout ${{ github.repository }}
@@ -94,7 +108,7 @@ jobs:
           name: ${{ needs.build-test-and-upload.outputs.tag }}
           path: ${{ runner.temp }}
 
-      - name: Print contents of download dir
+      - name: Print artifact paths
         shell: bash --noprofile --norc -x -eo pipefail {0}
         env:
           name: "${{ inputs.repo }}:${{ needs.build-test-and-upload.outputs.tag }}"
