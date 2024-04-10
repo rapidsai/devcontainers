@@ -108,22 +108,13 @@ jobs:
           name: ${{ needs.build-test-and-upload.outputs.tag }}
           path: ${{ runner.temp }}
 
-      - name: Print artifact paths
-        shell: bash --noprofile --norc -x -eo pipefail {0}
-        env:
-          name: "${{ inputs.repo }}:${{ needs.build-test-and-upload.outputs.tag }}"
-        run: |
-          find "${{ runner.temp }}/" -type f -name '*.tar';
-
-      - if: false
-        name: Login to Docker Hub
+      - name: Login to Docker Hub
         uses: docker/login-action@v2
         with:
           username: ${{ secrets.GPUCIBOT_DOCKERHUB_USER }}
           password: ${{ secrets.GPUCIBOT_DOCKERHUB_TOKEN }}
 
-      - if: false
-        name: Push multiarch manifest to Docker Hub
+      - name: Push multiarch manifest to Docker Hub
         shell: bash --noprofile --norc -x -eo pipefail {0}
         env:
           name: "${{ inputs.repo }}:${{ needs.build-test-and-upload.outputs.tag }}"
