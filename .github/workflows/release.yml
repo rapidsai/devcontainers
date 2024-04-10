@@ -35,7 +35,7 @@ jobs:
     uses: ./.github/workflows/build-test-and-push-linux-image.yml
     strategy:
       fail-fast: false
-      matrix: ${{ fromJSON([needs.image-matrix.outputs.linux[0]]) }}
+      matrix: ${{ fromJSON(format('[{0}]', toJSON(fromJSON(needs.image-matrix.outputs.linux)[0]))) }}
     with:
       push: 'true'
       os: "${{ matrix.os }}"
