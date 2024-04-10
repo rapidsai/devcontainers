@@ -66,7 +66,7 @@ jobs:
 
       - if: inputs.push == 'true'
         name: Upload ${{ steps.json.outputs.tag }}-${{ matrix.arch }}
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           retention-days: 1
           name: ${{ steps.json.outputs.tag }}
@@ -89,7 +89,7 @@ jobs:
           tool_cache: "${{ runner.tool_cache }}"
 
       - name: Download ${{ needs.build-test-and-upload.outputs.tag }}
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v4
         with:
           name: ${{ needs.build-test-and-upload.outputs.tag }}
           path: ${{ runner.temp }}
