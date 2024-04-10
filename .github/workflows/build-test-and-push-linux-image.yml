@@ -81,6 +81,7 @@ jobs:
       - name: Merge image artifacts
         uses: actions/upload-artifact/merge@v4
         with:
+          delete-merged: true
           name: ${{ needs.build-test-and-upload.outputs.tag }}
           pattern: ${{ needs.build-test-and-upload.outputs.tag }}-*
 
