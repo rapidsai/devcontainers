@@ -13,7 +13,7 @@ repos:
       sub_dir: ""
   python:
     - name: rmm
-      sub_dir: python
+      sub_dir: python/rmm
       depends: [rmm]
       args: {cmake: -DFIND_RMM_CPP=ON}
 
