@@ -40,6 +40,7 @@ fi
 CC=gcc CXX=g++ python -m pip install $BREAK_PACKAGES --upgrade pip
 CC=gcc CXX=g++ python -m pip install $BREAK_PACKAGES wheel setuptools;
 CC=gcc CXX=g++ python -m pip install $BREAK_PACKAGES psutil $LIT_VERSION_TO_INSTALL;
+CC=gcc CXX=g++ python -m pip install $BREAK_PACKAGES pre-commit;
 
 export LIT_VERSION="$(lit --version | grep -o -e '[0-9].*')";
 
