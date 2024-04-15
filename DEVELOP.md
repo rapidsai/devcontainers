@@ -124,9 +124,10 @@ Base images are composed from individual features in [matrix.yml](./matrix.yml)
 using [YAML
 anchors](https://support.atlassian.com/bitbucket-cloud/docs/yaml-anchors/).
 These get built on Github Actions as described
-[above](#github-actions-automations) The devcontainers repo does not contain
-scripts to facilitate building one particular image. Some downstream repos have
-such scripts for their reduced subspace of the matrix. An example is CCCL's
+[above](#github-actions-automations) The devcontainers repo has some generic
+scripts for generating, building and launch devcontainers in the scripts folder.
+Some downstream repos have related, but more specialized scripts to facilitate
+working with their subspace of the configuration matrix. An example is CCCL's
 [make_devcontainers.sh](https://github.com/NVIDIA/cccl/blob/main/.devcontainer/make_devcontainers.sh)
 script.
 
