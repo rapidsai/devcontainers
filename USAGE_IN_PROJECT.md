@@ -112,17 +112,17 @@ better.
 
 **Steps**
 
-1. Download the [launch-devcontainer.sh script](./scripts/launch-devcontainer.sh) and
-  put it somewhere on PATH. If your project has its own launch script, use it
+1. Download the [launch-devcontainer script](./bin/launch-devcontainer) and
+  [put it somewhere on PATH](https://phoenixnap.com/kb/linux-add-to-path). If your project has its own launch script, use it
   here instead.
 
 2. Set your current working directory to the root of your repo containing the
 .devcontainer folder
 
-3. Run the launch-container.sh script. Called without arguments, you'll get a menu of containers to choose from:
+3. Run the launch-devcontainer script. Called without arguments, you'll get a menu of containers to choose from:
 
 ```
-$ ./launch-devcontainer.sh
+$ launch-devcontainer
 Using devcontainers in /workspaces/devcontainers.
 Select a container (or provide it as a positional argument):
 1) cuda11.8-conda
@@ -136,7 +136,7 @@ Select a container (or provide it as a positional argument):
 You can also provide devcontainer label (folder name) directly:
 
 ```
-./launch-devcontainer.sh cuda12.0-conda
+launch-devcontainer cuda12.0-conda
 ```
 
 4. The devcontainer will be built, and you'll be dropped at a shell prompt
