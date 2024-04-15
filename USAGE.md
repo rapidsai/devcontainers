@@ -121,17 +121,17 @@ See the list of `rapidsai/devcontainers` tags [on DockerHub](https://hub.docker.
 
 The pre-built images can be used as the `"image"`, or as the base of a Dockerfile in `"build"`, in `devcontainer.json`:
 
-<details><summary>devcontainer.json using pre-built image</summary><pre>{<br/>  "image": "rapidsai/devcontainers:24.02-cpp-llvm16-cuda12.0-nvhpc23.5-ubuntu22.04",<br/>  "hostRequirements": { "gpu": true },<br/>  "workspaceFolder": "/home/coder/${localWorkspaceFolderBasename}",<br/>  "workspaceMount": "source=${localWorkspaceFolder},target=/home/coder/${localWorkspaceFolderBasename},type=bind"<br/>}</pre></details>
+<details><summary>devcontainer.json using pre-built image</summary><pre>{<br/>  "image": "rapidsai/devcontainers:24.06-cpp-llvm16-cuda12.0-nvhpc23.5-ubuntu22.04",<br/>  "hostRequirements": { "gpu": true },<br/>  "workspaceFolder": "/home/coder/${localWorkspaceFolderBasename}",<br/>  "workspaceMount": "source=${localWorkspaceFolder},target=/home/coder/${localWorkspaceFolderBasename},type=bind"<br/>}</pre></details>
 
 ### Custom devcontainers
 
 Custom devcontainers can be specified by composing individual features:
 
-<details><summary>devcontainer.json using individual features</summary><pre>{<br/>  "image": "ubuntu:22.04",<br/>  "features": {<br/>    "ghcr.io/rapidsai/devcontainers/features/cmake:24.02": {},<br/>    "ghcr.io/rapidsai/devcontainers/features/ninja:24.02": {},<br/>    "ghcr.io/rapidsai/devcontainers/features/sccache:24.02": {<br/>      "version": "0.5.4"<br/>    }<br/>  },<br/>  "overrideFeatureInstallOrder": [<br/>    "ghcr.io/rapidsai/devcontainers/features/cmake",<br/>    "ghcr.io/rapidsai/devcontainers/features/ninja",<br/>    "ghcr.io/rapidsai/devcontainers/features/sccache"<br/>  ],<br/>  "workspaceFolder": "/home/coder/${localWorkspaceFolderBasename}",<br/>  "workspaceMount": "source=${localWorkspaceFolder},target=/home/coder/${localWorkspaceFolderBasename},type=bind"<br/>}</pre></details>
+<details><summary>devcontainer.json using individual features</summary><pre>{<br/>  "image": "ubuntu:22.04",<br/>  "features": {<br/>    "ghcr.io/rapidsai/devcontainers/features/cmake:24.6": {},<br/>    "ghcr.io/rapidsai/devcontainers/features/ninja:24.6": {},<br/>    "ghcr.io/rapidsai/devcontainers/features/sccache:24.6": {<br/>      "version": "0.5.4"<br/>    }<br/>  },<br/>  "overrideFeatureInstallOrder": [<br/>    "ghcr.io/rapidsai/devcontainers/features/cmake",<br/>    "ghcr.io/rapidsai/devcontainers/features/ninja",<br/>    "ghcr.io/rapidsai/devcontainers/features/sccache"<br/>  ],<br/>  "workspaceFolder": "/home/coder/${localWorkspaceFolderBasename}",<br/>  "workspaceMount": "source=${localWorkspaceFolder},target=/home/coder/${localWorkspaceFolderBasename},type=bind"<br/>}</pre></details>
 
 Similarly, any base conatiner can be extended by adding additional features:
 
-<details><summary>devcontainer.json extending base image with additional features</summary><pre>{<br/>  "rapidsai/devcontainers:24.02-cpp-llvm16-cuda12.0-nvhpc23.5-ubuntu22.04",<br/>  "features": {<br/>    "ghcr.io/rapidsai/devcontainers/features/cmake:24.02": {},<br/>    "ghcr.io/rapidsai/devcontainers/features/ninja:24.02": {},<br/>    "ghcr.io/rapidsai/devcontainers/features/sccache:24.02": {<br/>      "version": "0.5.4"<br/>    }<br/>  },<br/>  "overrideFeatureInstallOrder": [<br/>    "ghcr.io/rapidsai/devcontainers/features/cmake",<br/>    "ghcr.io/rapidsai/devcontainers/features/ninja",<br/>    "ghcr.io/rapidsai/devcontainers/features/sccache"<br/>  ],<br/>  "workspaceFolder": "/home/coder/${localWorkspaceFolderBasename}",<br/>  "workspaceMount": "source=${localWorkspaceFolder},target=/home/coder/${localWorkspaceFolderBasename},type=bind"<br/>}</pre></details>
+<details><summary>devcontainer.json extending base image with additional features</summary><pre>{<br/>  "rapidsai/devcontainers:24.06-cpp-llvm16-cuda12.0-nvhpc23.5-ubuntu22.04",<br/>  "features": {<br/>    "ghcr.io/rapidsai/devcontainers/features/cmake:24.02": {},<br/>    "ghcr.io/rapidsai/devcontainers/features/ninja:24.02": {},<br/>    "ghcr.io/rapidsai/devcontainers/features/sccache:24.02": {<br/>      "version": "0.5.4"<br/>    }<br/>  },<br/>  "overrideFeatureInstallOrder": [<br/>    "ghcr.io/rapidsai/devcontainers/features/cmake",<br/>    "ghcr.io/rapidsai/devcontainers/features/ninja",<br/>    "ghcr.io/rapidsai/devcontainers/features/sccache"<br/>  ],<br/>  "workspaceFolder": "/home/coder/${localWorkspaceFolderBasename}",<br/>  "workspaceMount": "source=${localWorkspaceFolder},target=/home/coder/${localWorkspaceFolderBasename},type=bind"<br/>}</pre></details>
 
 This example is contrived, because base images already all include common build tools such as CMake, ninja and sccache.
 
@@ -140,3 +140,45 @@ This example is contrived, because base images already all include common build 
 invalidate the docker image layer cache, meaning it can take the [devcontainers
 CLI](https://github.com/devcontainers/cli) longer to initialize containers
 composed from individual features.
+
+## Caching
+
+The main cache tool in use is sccache. Sccache is configured to use S3 as a
+backend. If you're using a [GitHub
+action](https://github.com/aws-actions/configure-aws-credentials) to assume AWS
+roles in CI, or are comfortable distributing and managing S3 credentials, you
+can define the `SCCACHE_BUCKET`, `AWS_ACCESS_KEY_ID`, and
+`AWS_SECRET_ACCESS_KEY` variables in the container environment.
+
+### Using GitHub OAuth to issue S3 credentials via Hashicorp Vault
+
+The [`devcontainer-utils`](features/src/utils/) feature includes a `devcontainer-utils-vault-s3-init` script that uses GitHub OAuth and Hashicorp Vault to issue temporary S3 credentials to authorized users.
+
+> **NOTE:** This script runs in the devcontainer's [`postAttachCommand`](https://containers.dev/implementors/json_reference/#lifecycle-scripts), but it does nothing unless `SCCACHE_BUCKET` and `VAULT_HOST` are in the container environment.
+
+The `devcontainer-utils-vault-s3-init` script performs the following actions, exiting early if any step is unsuccessful:
+
+1. Log in via the [GitHub CLI](https://cli.github.com/)
+2. Authenticate via [Vault's GitHub auth method](https://developer.hashicorp.com/vault/docs/auth/github#authentication)
+3. Use Vault to [generate temporary AWS credentials](https://developer.hashicorp.com/vault/api-docs/secret/aws#generate-credentials)
+4. Store results in `~/.aws` and install crontab to re-authenticate
+
+The above steps can be customized via the following environment variables:
+```
+# The hostname of the Vault instance to use
+VAULT_HOST="https://vault.ops.k8s.rapids.ai"
+
+# List of GitHub organizations for which Vault can generate credentials.
+# The scripts assumes the Vault instance exposes an authentication endpoint
+# for each org at `$VAULT_HOST/v1/auth/github-$org/login`.
+# https://developer.hashicorp.com/vault/docs/auth/github#authentication
+VAULT_GITHUB_ORGS="nvidia nv-morpheus nv-legate rapids"
+
+# The TTL for the generated AWS credentials
+VAULT_S3_TTL=28800
+
+# The URI to the Vault API that generates AWS credentials
+# The full URL expands to `$VAULT_HOST/$VAULT_S3_URI?ttl=$VAULT_S3_TTL`
+# https://developer.hashicorp.com/vault/api-docs/secret/aws#generate-credentials
+VAULT_S3_URI="v1/aws/creds/devs"
+```

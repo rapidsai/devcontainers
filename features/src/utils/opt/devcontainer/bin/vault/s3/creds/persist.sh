@@ -1,60 +1,42 @@
-#! /usr/bin/env bash
+#!/usr/bin/env bash
 
-export_envvar() {
-    if [ -n "${1:-}" ]; then
-        for file in ~/.bashrc /etc/profile.d/*-devcontainer-utils.sh; do
-            echo "export ${1}=\"${2:-}\";" | sudo tee -a "${file}" >/dev/null;
-        done;
-    fi
-}
+# Usage:
+#  devcontainer-utils-vault-s3-creds-persist [OPTION]...
+#
+# Set, unset, or reset the S3 bucket, region, and credentials in the environment.
+#
+# Boolean options:
+#  -h,--help                      print this text
+#  --no-bucket                    Unset the $SCCACHE_BUCKET environment variable for all shells.
+#                                 (default: false)
+#  --no-region                    Unset the $SCCACHE_REGION environment variable for all shells.
+#                                 (default: false)
+#
+# Options that require values:
+#  --stamp <stamp>                Timestamp when the S3 credentials were generated.
+#                                 (default: none)
+#  --bucket <bucket>              Set the $SCCACHE_BUCKET environment variable for all shells to <bucket> and persist in ~/.aws/config.
+#                                 (default: none)
+#  --region <region>              Set the $SCCACHE_REGION environment variable for all shells to <region> and persist in ~/.aws/config.
+#                                 (default: none)
+#  --aws-access-key-id <id>       Set the $AWS_ACCESS_KEY_ID environment variable for all shells to <id> and persist in ~/.aws/credentials.
+#                                 (default: none)
+#  --aws-session-token <token>    Set the $AWS_SESSION_TOKEN environment variable for all shells to <token> and persist in ~/.aws/credentials.
+#                                 (default: none)
+#  --aws-secret-access-key <key>  Set the $AWS_SECRET_ACCESS_KEY environment variable for all shells to <key> and persist in ~/.aws/credentials.
+#                                 (default: none)
 
-unset_envvar() {
-    if [ -n "${1:-}" ]; then
-        for file in ~/.bashrc /etc/profile.d/*-devcontainer-utils.sh; do
-            echo "unset ${1};" | sudo tee -a "${file}" >/dev/null;
-        done;
-    fi
-}
+# shellcheck disable=SC1091
+. "$(dirname "$(realpath -m "${BASH_SOURCE[0]}")")/../../../update-envvars.sh";
 
-reset_envvar() {
-    if [ -n "${1:-}" ]; then
-        for file in ~/.bashrc /etc/profile.d/*-devcontainer-utils.sh; do
-            if grep -q -E "^unset ${1};\$" "${file}"; then
-                sudo sed -Ei "/^unset ${1};\$/d" "${file}";
-            fi
-            if grep -q -E "^export ${1}=.*$" "${file}"; then
-                sudo sed -Ei "/^export ${1}=.*\$/d" "${file}";
-            fi
-        done
-    fi
-}
-
-store_s3_creds() {
-
+persist_s3_creds() {
+    local -;
     set -euo pipefail;
 
-    local stamp=;
-    local bucket=;
-    local region=;
-    local no_bucket=;
-    local no_region=;
-    local aws_access_key_id=;
-    local aws_session_token=;
-    local aws_secret_access_key=;
+    eval "$(devcontainer-utils-parse-args "$0" "$@" <&0)";
 
-    eval "$(                                  \
-        devcontainer-utils-parse-args --names '
-            stamp                             |
-            bucket                            |
-            region                            |
-            no_bucket                         |
-            no_region                         |
-            aws_access_key_id                 |
-            aws_session_token                 |
-            aws_secret_access_key             |
-        ' - <&0                               \
-      | xargs -r -d'\n' -I% echo -n local %\; \
-    )";
+    # shellcheck disable=SC1091
+    . devcontainer-utils-debug-output 'devcontainer_utils_debug' 'vault-s3 vault-s3-creds-persist';
 
     # Reset envvars
     reset_envvar "SCCACHE_BUCKET";
@@ -70,7 +52,7 @@ store_s3_creds() {
         echo "${stamp:-}" > ~/.aws/stamp;
     fi
 
-    if ! grep -qE "^$" <<< "${no_bucket:-}"; then
+    if ! grep -qE "^$" <<< "${no_bucket-}"; then
         unset_envvar "SCCACHE_BUCKET";
     elif ! grep -qE "^$" <<< "${bucket:-}"; then
         export_envvar "SCCACHE_BUCKET" "${bucket}";
@@ -79,7 +61,7 @@ bucket=${bucket:-}
 ________EOF
     fi
 
-    if ! grep -qE "^$" <<< "${no_region:-}"; then
+    if ! grep -qE "^$" <<< "${no_region-}"; then
         unset_envvar "SCCACHE_REGION";
     elif ! grep -qE "^$" <<< "${region:-}"; then
         export_envvar "SCCACHE_REGION" "${region}";
@@ -94,7 +76,6 @@ ________EOF
 $(cat ~/.aws/config)
 ________EOF
     fi
-
 
     if ! grep -qE "^$" <<< "${aws_access_key_id:-}"; then
         cat <<________EOF >> ~/.aws/credentials
@@ -123,8 +104,6 @@ ________EOF
     fi
 }
 
-if test -n "${devcontainer_utils_debug:-}"; then
-    PS4="+ ${BASH_SOURCE[0]}:\${LINENO} "; set -x;
+if [ "$(basename "${BASH_SOURCE[${#BASH_SOURCE[@]}-1]}")" = devcontainer-utils-vault-s3-creds-persist ]; then
+    persist_s3_creds "$@" <&0;
 fi
-
-(store_s3_creds "$@");

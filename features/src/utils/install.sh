@@ -13,6 +13,7 @@ check_packages      \
     curl            \
     sudo            \
     wget            \
+    socat           \
     tzdata          \
     gettext-base    \
     openssh-client  \
@@ -22,7 +23,7 @@ check_packages      \
 source /etc/lsb-release;
 
 if [[ ! "23.04" > "${DISTRIB_RELEASE}" ]]; then
-  BREAK_PACKAGES="--break-system-packages"
+  BREAK_PACKAGES="--break-system-packages";
 fi
 
 # upgrade pip
@@ -48,49 +49,65 @@ fi
 # rm -rf /etc/crontab /etc/cron.*;
 
 # Allow crond to be run by users in the "crontab" group
-chgrp crontab "$(realpath -m $(which cron))";
-chmod u+s "$(realpath -m $(which cron))";
+chgrp crontab "$(realpath -m "$(which cron)")";
+chmod u+s "$(realpath -m "$(which cron)")";
 
-touch /var/log/devcontainer-utils-vault-s3-creds-refresh.log;
-chmod 0664 /var/log/devcontainer-utils-vault-s3-creds-refresh.log;
-chgrp crontab /var/log/devcontainer-utils-vault-s3-creds-refresh.log;
+# shellcheck disable=SC2174
+mkdir -m 0775 -p /var/log/devcontainer-utils;
+touch /var/log/devcontainer-utils/vault-s3-creds-refresh.log;
+chmod 0664 /var/log/devcontainer-utils/vault-s3-creds-refresh.log;
+chgrp crontab /var/log/devcontainer-utils/vault-s3-creds-refresh.log;
 
 # Install Devcontainer utility scripts to /opt/devcontainer
 cp -ar ./opt/devcontainer /opt/;
 
+declare -a commands_and_sources=(
+    "debug-output                       debug-output.sh"
+    "parse-args                         parse-args.sh"
+    "parse-args-from-docstring          parse-args-from-docstring.sh"
+    "bash-completion.tmpl               bash/completion.tmpl.sh"
+    "generate-bash-completion           bash/generate-bash-completion.sh"
+    "shell-is-interactive               shell-is-interactive.sh"
+    "post-create-command                post-create-command.sh"
+    "post-attach-command                post-attach-command.sh"
+    "post-attach-command-entrypoint     post-attach-command-entrypoint.sh"
+    "python-repl-startup                python-repl-startup.py"
+    "init-git                           git/init.sh"
+    "clone-git-repo                     git/repo/clone.sh"
+    "init-ssh-deploy-keys               ssh/init-deploy-keys.sh"
+    "init-github-cli                    github/cli/init.sh"
+    "clone-github-repo                  github/repo/clone.sh"
+    "init-gitlab-cli                    gitlab/cli/init.sh"
+    "clone-gitlab-repo                  gitlab/repo/clone.sh"
+    "print-missing-gitlab-token-warning gitlab/print-missing-token-warning.sh"
+    "vault-auth-github                  vault/auth/github.sh"
+    "vault-s3-init                      vault/s3/init.sh"
+    "vault-s3-creds-generate            vault/s3/creds/generate.sh"
+    "vault-s3-creds-persist             vault/s3/creds/persist.sh"
+    "vault-s3-creds-propagate           vault/s3/creds/propagate.sh"
+    "vault-s3-creds-schedule            vault/s3/creds/schedule.sh"
+    "vault-s3-creds-test                vault/s3/creds/test.sh"
+)
+
+# Install alternatives
+for entry in "${commands_and_sources[@]}"; do
+    declare -a pair=(${entry});
+    declare cmd="devcontainer-utils-${pair[0]}";
+    declare src="/opt/devcontainer/bin/${pair[1]}";
+    update-alternatives --install /usr/bin/${cmd} ${cmd} ${src} 0;
+done
+
+declare -a commands="($(for pair in "${commands_and_sources[@]}"; do cut -d' ' -f1 <<< "${pair}"; done))";
+
+# Install bash_completion script
+devcontainer-utils-generate-bash-completion                          \
+    --out-file /etc/bash_completion.d/devcontainer-utils-completions \
+    ${commands[@]/#/--command devcontainer-utils-}                   \
+;
+
 find /opt/devcontainer \
     \( -type d -exec chmod 0775 {} \; \
     -o -type f -exec chmod 0755 {} \; \);
-
-install_utility() {
-    update-alternatives --install "/usr/bin/$1" "$1" "/opt/devcontainer/bin/$2" 0;
-}
-
-install_utility devcontainer-utils-parse-args parse-args.sh;
-install_utility devcontainer-utils-shell-is-interactive shell-is-interactive.sh;
-install_utility devcontainer-utils-post-attach-command post-attach-command.sh;
-install_utility devcontainer-utils-post-attach-command-entrypoint post-attach-command-entrypoint.sh;
-install_utility devcontainer-utils-python-repl-startup python-repl-startup.py;
-install_utility devcontainer-utils-init-git git/init.sh;
-install_utility devcontainer-utils-clone-git-repo git/repo/clone.sh;
-
-install_utility devcontainer-utils-init-ssh-deploy-keys ssh/init-deploy-keys.sh;
-
-install_utility devcontainer-utils-init-github-cli   github/cli/init.sh;
-install_utility devcontainer-utils-clone-github-repo github/repo/clone.sh;
-
-install_utility devcontainer-utils-init-gitlab-cli                    gitlab/cli/init.sh;
-install_utility devcontainer-utils-clone-gitlab-repo                  gitlab/repo/clone.sh;
-install_utility devcontainer-utils-print-missing-gitlab-token-warning gitlab/print-missing-token-warning.sh;
-
-install_utility devcontainer-utils-vault-auth-github vault/auth/github.sh;
-
-install_utility devcontainer-utils-vault-s3-init            vault/s3/init.sh;
-install_utility devcontainer-utils-vault-s3-creds-generate  vault/s3/creds/generate.sh;
-install_utility devcontainer-utils-vault-s3-creds-persist   vault/s3/creds/persist.sh;
-install_utility devcontainer-utils-vault-s3-creds-propagate vault/s3/creds/propagate.sh;
-install_utility devcontainer-utils-vault-s3-creds-schedule  vault/s3/creds/schedule.sh;
-install_utility devcontainer-utils-vault-s3-creds-test      vault/s3/creds/test.sh;
 
 # Enable GCC colors
 for_each_user_bashrc 'sed -i -re "s/^#(export GCC_COLORS)/\1/g" "$0"';
@@ -117,16 +134,20 @@ gitlab.com ecdsa-sha2-nistp256 AAAAE2VjZHNhLXNoYTItbmlzdHAyNTYAAAAIbmlzdHAyNTYAA
 EOF
 )";
 
+# shellcheck disable=SC2174
 for dir in $(for_each_user_bashrc 'echo "$(dirname "$(realpath -m "$0")")"'); do
     # Copy in default git config
     rm -f "${dir}"/.gitconfig;
     cp .gitconfig "${dir}"/.gitconfig.default;
-    # Create ~/.cache, i.e. $XDG_CACHE_HOME
-    mkdir -p -m 0755 "${dir}"/.cache;
-    # Create ~/.cache, i.e. $XDG_CONFIG_HOME
-    mkdir -p -m 0755 "${dir}"/.config/{clangd,pip};
-    # Create ~/.local/state, i.e. $XDG_STATE_HOME
-    mkdir -p -m 0755 "${dir}"/.local/state;
+    # Copy in default .bash_completion
+    cp .bash_completion "${dir}"/.bash_completion;
+    mkdir -p -m 0755                                      \
+        `# Create ~/.cache, i.e. $XDG_CACHE_HOME`         \
+        "${dir}"/.cache                                   \
+        `# Create ~/.config, i.e. $XDG_CONFIG_HOME`       \
+        "${dir}"/.config "${dir}"/.config/{clangd,pip}    \
+        `# Create ~/.local/state, i.e. $XDG_STATE_HOME`   \
+        "${dir}"/.local "${dir}"/.local/{bin,state,share} \
     # Create or update ~/.ssh/known_hosts
     mkdir -p -m 0700 "${dir}"/.ssh;
     touch "${dir}"/.ssh/known_hosts;
@@ -137,25 +158,21 @@ ____EOF
 done
 
 rm -rf /root/.cache;
-rm -rf /root/.local/{bin,state};
+rm -rf /root/.local/{bin,state,share};
 rm -rf /root/.config/{clangd,pip};
 
 # Find the non-root user
 find_non_root_user;
 
-USERHOME="$(bash -c "echo ~${USERNAME}")";
-
-# Add user to the crontab group
-usermod -aG crontab "${USERNAME}";
-
-# Allow user to edit the crontab
-echo "${USERNAME}" >> /etc/cron.allow;
-
-# Create ~/.cache, i.e. $XDG_CONFIG_HOME
-mkdir -p -m 0755 "${USERHOME}"/.local/bin;
-
-# Ensure the user owns their homedir
-chown -R "${USERNAME}:${USERNAME}" "${USERHOME}";
+if test -n "${USERNAME-}"; then
+    USERHOME="$(bash -c "echo ~${USERNAME-}")";
+    # Add user to the crontab group
+    usermod -aG crontab "${USERNAME}";
+    # Allow user to edit the crontab
+    echo "${USERNAME}" >> /etc/cron.allow;
+    # Ensure the user owns their homedir
+    chown -R "${USERNAME}:${USERNAME}" "${USERHOME}";
+fi
 
 # Generate bash completions
 if dpkg -s bash-completion >/dev/null 2>&1; then

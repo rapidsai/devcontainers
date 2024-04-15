@@ -1,4 +1,31 @@
-#! /usr/bin/env bash
+#!/usr/bin/env bash
+
+# Usage:
+#  devcontainer-utils-clone-gitlab-repo [OPTION]... [--] <upstream> [<directory>]
+#
+# Clone a GitLab repository for the logged in user (as reported by `glab auth status`).
+#
+# If the user doesn't have a fork of the repository, notify the user and ask whether they would like to fork it.
+#
+# Boolean options:
+#  -h,--help                    Print this text.
+#  -q,--quiet                   Operate quietly. Progress is not reported to the standard error stream.
+#  --no-fork                    Don't prompt the user to fork the repo if a user fork isn't found.
+#                               (default: false)
+#  --no-update-env              Don't update the Python env with the repo's dependencies after cloning.
+#                               (default: false)
+#  --clone-upstream             Always clone the upstream, not the user's fork.
+#                               (default: false)
+#
+# Options that require values:
+#  -b,--branch <branch_or_tag>  Check the repo out to <branch_or_tag>.
+#  -j,--jobs,--parallel <num>   Clone <num> submodules in parallel
+#  --ssh-url <url>              FQDN of the GitLab instance when cloning via SSH.
+#  --https-url <url>            FQDN of the GitLab instance when cloning via HTTPS.
+#
+# Positional arguments:
+#  upstream                     Set <upstream> as the `upstream` remote.
+#  directory                    Clone the repo into <directory>.
 
 get_default_branch() {
     local repo="${1}";
@@ -82,35 +109,22 @@ get_user_fork_name() {
 }
 
 clone_gitlab_repo() {
-
+    local -;
     set -euo pipefail;
 
-    source devcontainer-utils-init-gitlab-cli;
+    eval "$(devcontainer-utils-parse-args "$0" --skip '
+        -q,--quiet
+        -j,--jobs,--parallel
+    ' "$@" <&0)";
 
-    local branch=;
-    local no_fork=;
-    local clone_upstream=;
+    # shellcheck disable=SC1091
+    . devcontainer-utils-debug-output 'devcontainer_utils_debug' 'clone clone-gitlab-repo';
 
-    eval "$(                                  \
-        devcontainer-utils-parse-args --names '
-            b|branch                          |
-            no-fork                           |
-            clone-upstream                    |
-        ' - <<< "$@"                          \
-      | xargs -r -d'\n' -I% echo -n local %\; \
-    )";
+    if test "${REST[0]:-}" == --; then REST=("${REST[@]:1}"); fi;
 
-    local nargs="${#__rest__[@]}";
-    local upstream="${__rest__[$((nargs - 2))]}";
-    upstream="${upstream:?upstream is required}";
+    local upstream="${REST[0]:?"fatal: missing required positional argument <upstream>"}";
 
-    branch="${b:-"${branch:-"$(get_default_branch "${upstream}")"}"}";
-
-    local directory="${__rest__[$((nargs - 1))]}";
-    directory="${directory:?directory is required}";
-
-    __rest__=("${__rest__[@]/"${upstream}"}");
-    __rest__=("${__rest__[@]/"${directory}"}");
+    if test "${#REST[@]}" -gt 1; then REST=("${REST[@]:1}"); fi
 
     local origin="${upstream}";
     local fork=;
@@ -118,10 +132,21 @@ clone_gitlab_repo() {
     local user=;
     local owner=;
 
-    if test -z "${clone_upstream:-}"; then
+    if test -z "${no_fork:-}" && \
+       test -z "${clone_upstream:-}" && \
+       devcontainer-utils-shell-is-interactive; then
+        # shellcheck disable=SC1091
+        . devcontainer-utils-init-gitlab-cli;
+        user="${GITLAB_USER:-}";
+    fi
+
+    if test -n "${clone_upstream:-}"; then
+        fork="${upstream}";
+    else
         name="$(get_repo_name "${upstream}")";
         owner="$(get_repo_owner "${upstream}")";
         user="${GITLAB_USER:-"${owner}"}";
+        branch="${branch:-"$(get_default_branch "${upstream}")"}";
         fork="$(get_user_fork_name "${owner}" "${name}" "${user}")";
     fi
 
@@ -132,8 +157,8 @@ clone_gitlab_repo() {
          devcontainer-utils-shell-is-interactive; then
         while true; do
             local CHOICE;
-            read -p "'${GITLAB_HOST:-gitlab.com}/${user}/${name}.git' not found.
-    Fork '${upstream}' into '${user}/${name}' now (y/n)? " CHOICE <$(tty)
+            read -rsp "'${GITLAB_HOST:-gitlab.com}/${user}/${name}.git' not found.
+    Fork '${upstream}' into '${user}/${name}' now (y/n)? " CHOICE <"$(tty)"
             case "${CHOICE:-}" in
                 [Nn]* ) origin="${upstream}"; break;;
                 [Yy]* ) origin="${user}/${name}";
@@ -144,23 +169,38 @@ clone_gitlab_repo() {
         done
     fi
 
-    if [ "$(glab config get git_protocol)" = "ssh" ]; then
-        origin="$(get_repo_ssh_url "${origin}")";
-        upstream="$(get_repo_ssh_url "${upstream}")";
-    else
-        origin="$(get_repo_git_url "${origin}")";
-        upstream="$(get_repo_git_url "${upstream}")";
+    local origin_;
+    local upstream_;
+
+    if test -z "${no_fork:-}" && \
+       test -z "${clone_upstream:-}" && \
+     ! glab auth status 2>&1 | grep -q "No token provided"; then
+        if [ "$(glab config get git_protocol)" = "ssh" ]; then
+            origin_="$(get_repo_ssh_url "${origin}")";
+            upstream_="$(get_repo_ssh_url "${upstream}")";
+        else
+            origin_="$(get_repo_git_url "${origin}")";
+            upstream_="$(get_repo_git_url "${upstream}")";
+        fi
     fi
 
-    devcontainer-utils-clone-git-repo \
-        --upstream "${upstream}"      \
-        --branch "${branch}"          \
-        ${__rest__[@]}                \
-        "${origin}" "${directory}"    ;
+    if test -z "${origin_:-}" || test -z "${upstream_:-}"; then
+        if [ "$(glab config get git_protocol)" = "ssh" ]; then
+            origin_="${origin_:-"ssh://git@${ssh_url:-${GITLAB_HOST:-gitlab.com}}/${origin}.git"}";
+            upstream_="${upstream_:-"ssh://git@${ssh_url:-${GITLAB_HOST:-gitlab.com}}/${upstream}.git"}";
+        else
+            origin_="${origin_:-"https://${https_url:-${GITLAB_HOST:-gitlab.com}}/${origin}.git"}";
+            upstream_="${upstream_:-"https://${https_url:-${GITLAB_HOST:-gitlab.com}}/${upstream}.git"}";
+        fi
+    fi
+
+    devcontainer-utils-clone-git-repo          \
+        ${branch:+--branch "${branch}"}        \
+        ${upstream:+--upstream "${upstream_}"} \
+        "${OPTS[@]}"                           \
+        --                                     \
+        "${origin_}" "${REST[@]}"              \
+        ;
 }
 
-if test -n "${devcontainer_utils_debug:-}"; then
-    PS4="+ ${BASH_SOURCE[0]}:\${LINENO} "; set -x;
-fi
-
-clone_gitlab_repo "$@";
+clone_gitlab_repo "$@" <&0;

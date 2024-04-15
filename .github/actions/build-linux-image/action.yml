@@ -3,18 +3,9 @@ name: build-image
 description: Build Linux image
 
 inputs:
-  tag:
-    type: string
-    required: true
-    description: Image tag
-  arch:
-    type: string
-    required: true
-    description: Image arch
-  repo:
-    type: string
-    required: true
-    description: Image repo
+  tag: {type: string, required: true, description: Image tag}
+  arch: {type: string, required: true, description: Image arch}
+  repo: {type: string, required: true, description: Image repo}
 
 runs:
   using: composite

@@ -50,6 +50,7 @@
   "customizations": {
     "vscode": {
       "extensions": [
+        "augustocdias.tasks-shell-input",
         "llvm-vs-code-extensions.vscode-clangd",
         "mutantdino.resourcemonitor",
         "ms-vscode.cpptools",
@@ -73,9 +74,22 @@
           "**/libcudacxx-src/include/**/*": "cpp"
         },
         "files.watcherExclude": {
+          "**/.cache/**": true,
+          "**/.conda/envs/**": true,
+          "**/.conda/pkgs/**": true,
+          "**/.local/share/**": true,
+          "**/.vscode-server/**": true,
           "**/build/**": true,
-          "**/_skbuild/**": true,
-          "**/target/**": true
+          "**/_skbuild/**": true
+        },
+        "search.exclude": {
+          "**/.cache/**": true,
+          "**/.conda/envs/**": true,
+          "**/.conda/pkgs/**": true,
+          "**/.local/share/**": true,
+          "**/.vscode-server/**": true,
+          "**/build/**": true,
+          "**/_skbuild/**": true
         },
         "[c]": {
           "editor.defaultFormatter": "seaube.clangformat"

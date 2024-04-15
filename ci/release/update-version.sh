@@ -38,14 +38,14 @@ function sed_runner() {
 }
 
 sed_runner "s/devcontainers:.*-cpp/devcontainers:${NEXT_SHORT_TAG}-cpp/g" USAGE.md
-sed_runner "s|features/\([[:alnum:]]\+\):[[:digit:]]\+\.[[:digit:]]\+\"|features/\1:${NEXT_SHORT_TAG}\"|g" USAGE.md
+sed_runner "s|features/\([[:alnum:]]\+\):[[:digit:]]\+\.[[:digit:]]\+\"|features/\1:${NEXT_SHORT_TAG_PEP440}\"|g" USAGE.md
 
 for file in $(find .devcontainer -name devcontainer.json); do
   sed_runner "s|rapidsai/devcontainers:.*-cpp|rapidsai/devcontainers:${NEXT_SHORT_TAG}-cpp|g" "$file"
 done
 
 sed_runner "s/branch-[[:digit:]]\{2\}\.[[:digit:]]\+/branch-${NEXT_SHORT_TAG}/g" ./features/src/rapids-build-utils/opt/rapids-build-utils/manifest.yaml
-sed_runner "s/branch-0.[[:digit:]]\+.*/branch-${NEXT_UCX_PY_VERSION}/g" ./features/src/rapids-build-utils/opt/rapids-build-utils/manifest.yaml
+sed_runner "s/branch-0.[[:digit:]]\+/branch-${NEXT_UCX_PY_VERSION}/g" ./features/src/rapids-build-utils/opt/rapids-build-utils/manifest.yaml
 
 for file in $(find features -name devcontainer-feature.json); do
   tmp=$(mktemp)

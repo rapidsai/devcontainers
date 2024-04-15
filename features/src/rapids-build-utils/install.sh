@@ -7,7 +7,7 @@ cd "$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )";
 # install global/common scripts
 . ./common/install.sh;
 
-check_packages bc jq sudo wget gettext-base bash-completion ca-certificates;
+check_packages bc jq pigz sudo wget gettext-base bash-completion ca-certificates;
 
 # Install yq if not installed
 if ! type yq >/dev/null 2>&1; then
@@ -23,43 +23,75 @@ if ! type yq >/dev/null 2>&1; then
     done
 fi
 
+source /etc/lsb-release;
+
+if [[ ! "23.04" > "${DISTRIB_RELEASE}" ]]; then
+  BREAK_PACKAGES="--break-system-packages";
+fi
+
 # Install the rapids dependency file generator and conda-merge
 if type python >/dev/null 2>&1; then
-    python -m pip install rapids-dependency-file-generator conda-merge toml;
+    python -m pip install $BREAK_PACKAGES rapids-dependency-file-generator conda-merge toml;
 fi
 
 # Install RAPIDS build utility scripts to /opt/
 
 cp -ar ./opt/rapids-build-utils /opt/;
 
-update-alternatives --install /usr/bin/rapids-update-content-command        rapids-update-content-command       /opt/rapids-build-utils/bin/update-content-command.sh       0;
-update-alternatives --install /usr/bin/rapids-post-start-command            rapids-post-start-command           /opt/rapids-build-utils/bin/post-start-command.sh           0;
-update-alternatives --install /usr/bin/rapids-post-attach-command           rapids-post-attach-command          /opt/rapids-build-utils/bin/post-attach-command.sh          0;
-update-alternatives --install /usr/bin/rapids-checkout-same-branch          rapids-checkout-same-branch         /opt/rapids-build-utils/bin/checkout-same-branch.sh         0;
-update-alternatives --install /usr/bin/rapids-pull-repositories             rapids-pull-repositories            /opt/rapids-build-utils/bin/pull-repositories.sh            0;
-update-alternatives --install /usr/bin/rapids-push-repositories             rapids-push-repositories            /opt/rapids-build-utils/bin/push-repositories.sh            0;
-update-alternatives --install /usr/bin/rapids-generate-scripts              rapids-generate-scripts             /opt/rapids-build-utils/bin/generate-scripts.sh             0;
-update-alternatives --install /usr/bin/rapids-join-strings                  rapids-join-strings                 /opt/rapids-build-utils/bin/join-strings.sh                 0;
-update-alternatives --install /usr/bin/rapids-make-conda-env                rapids-make-conda-env               /opt/rapids-build-utils/bin/make-conda-env.sh               0;
-update-alternatives --install /usr/bin/rapids-make-pip-env                  rapids-make-pip-env                 /opt/rapids-build-utils/bin/make-pip-env.sh                 0;
-update-alternatives --install /usr/bin/rapids-make-vscode-workspace         rapids-make-vscode-workspace        /opt/rapids-build-utils/bin/make-vscode-workspace.sh        0;
-update-alternatives --install /usr/bin/rapids-parse-cmake-args              rapids-parse-cmake-args             /opt/rapids-build-utils/bin/parse-cmake-args.sh             0;
-update-alternatives --install /usr/bin/rapids-parse-cmake-build-type        rapids-parse-cmake-build-type       /opt/rapids-build-utils/bin/parse-cmake-build-type.sh       0;
-update-alternatives --install /usr/bin/rapids-parse-cmake-var-from-args     rapids-parse-cmake-var-from-args    /opt/rapids-build-utils/bin/parse-cmake-var-from-args.sh    0;
-update-alternatives --install /usr/bin/rapids-parse-cmake-vars-from-args    rapids-parse-cmake-vars-from-args   /opt/rapids-build-utils/bin/parse-cmake-vars-from-args.sh   0;
-update-alternatives --install /usr/bin/rapids-python-pkg-roots              rapids-python-pkg-roots             /opt/rapids-build-utils/bin/python-pkg-roots.sh             0;
-update-alternatives --install /usr/bin/rapids-python-pkg-names              rapids-python-pkg-names             /opt/rapids-build-utils/bin/python-pkg-names.sh             0;
-update-alternatives --install /usr/bin/rapids-python-conda-pkg-names        rapids-python-conda-pkg-names       /opt/rapids-build-utils/bin/python-conda-pkg-names.sh       0;
-update-alternatives --install /usr/bin/rapids-get-num-archs-jobs-and-load   rapids-get-num-archs-jobs-and-load  /opt/rapids-build-utils/bin/get-num-archs-jobs-and-load.sh  0;
-update-alternatives --install /usr/bin/rapids-list-repos                    rapids-list-repos                   /opt/rapids-build-utils/bin/list-repos.sh                   0;
+declare -a commands=(
+    checkout-same-branch
+    maybe-clean-build-dir
+    generate-docstring
+    generate-scripts
+    get-cmake-build-dir
+    get-num-archs-jobs-and-load
+    list-repos
+    make-conda-dependencies
+    make-conda-env
+    make-pip-dependencies
+    make-pip-env
+    make-vscode-workspace
+    merge-compile-commands-json
+    post-attach-command
+    post-start-command
+    pull-repositories
+    push-repositories
+    python-conda-pkg-names
+    python-pkg-names
+    python-pkg-roots
+    python-uses-scikit-build
+    python-uses-scikit-build-core
+    query-manifest
+    select-cmake-args
+    select-cmake-build-args
+    select-cmake-build-type
+    select-cmake-define
+    select-cmake-install-args
+    select-cmd-args
+    select-pip-install-args
+    select-pip-wheel-args
+    update-build-dir-links
+);
+
+# Install alternatives
+for cmd in "${commands[@]}"; do
+    update-alternatives --install /usr/bin/rapids-${cmd} rapids-${cmd} /opt/rapids-build-utils/bin/${cmd}.sh 0;
+done
+
+# Install bash_completion script
+if type devcontainer-utils-generate-bash-completion >/dev/null 2>&1; then
+    devcontainer-utils-generate-bash-completion                          \
+        --out-file /etc/bash_completion.d/rapids-build-utils-completions \
+        ${commands[@]/#/--command rapids-}                               \
+    ;
+fi
 
 find /opt/rapids-build-utils \
     \( -type d -exec chmod 0775 {} \; \
     -o -type f -exec chmod 0755 {} \; \);
 
-# Copy in bash completions
+# Create bash completions
 mkdir -p /etc/bash_completion.d/;
-cp -ar ./etc/bash_completion.d/* /etc/bash_completion.d/;
 
 yq shell-completion bash | tee /etc/bash_completion.d/yq >/dev/null;
 

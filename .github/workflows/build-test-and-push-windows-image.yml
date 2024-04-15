@@ -34,8 +34,7 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - { runner: windows-2019, edition: "2019" }
-          - { runner: windows-2022, edition: "2022" }
+          - { edition: "2022", runner: "${{ github.repository != 'rapidsai/devcontainers' && 'windows-2022' || 'windows-amd64-cpu4' }}" }
     steps:
       - name: Checkout ${{ github.repository }}
         uses: actions/checkout@v4

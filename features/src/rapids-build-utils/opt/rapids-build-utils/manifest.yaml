@@ -1,84 +1,81 @@
 x-git-defaults: &git_defaults
     host: github
-    tag: branch-24.02
+    tag: branch-24.06
     upstream: rapidsai
 
 repos:
 
 - name: rmm
   path: rmm
+  git: {<<: *git_defaults, repo: rmm}
   cpp:
     - name: rmm
       sub_dir: ""
-      depends: []
   python:
     - name: rmm
-      sub_dir: python
-      depends: []
-  git:
-    repo: rmm
-    <<: *git_defaults
+      sub_dir: python/rmm
+      depends: [rmm]
+      args: {cmake: -DFIND_RMM_CPP=ON}
 
 - name: ucxx
   path: ucxx
-  git:
-    repo: ucxx
-    <<: *git_defaults
-    tag: branch-0.36
+  git: {<<: *git_defaults, repo: ucxx, tag: branch-0.38}
   cpp:
     - name: ucxx
-      sub_dir: "cpp"
+      sub_dir: cpp
       depends: [rmm]
-      args: |
-        -DUCXX_ENABLE_PYTHON=ON
-        -DUCXX_ENABLE_RMM=ON
+      args:
+        cmake: |
+          -DUCXX_ENABLE_PYTHON=ON
+          -DUCXX_ENABLE_RMM=ON
   python:
     - name: ucxx
-      sub_dir: "python"
-      depends: [rmm]
+      sub_dir: python
+      depends: [ucxx]
+      args: {cmake: -DFIND_UCXX_CPP=ON}
 
 - name: kvikio
   path: kvikio
+  git: {<<: *git_defaults, repo: kvikio}
   cpp:
     - name: KvikIO
       sub_dir: cpp
-      depends: []
+      depends: [rmm]
   python:
     - name: kvikio
       sub_dir: python
-      depends: []
-  git:
-    repo: kvikio
-    <<: *git_defaults
+      depends: [KvikIO]
+      args: {cmake: -DFIND_KVIKIO_CPP=ON}
 
 - name: cudf
   path: cudf
+  git: {<<: *git_defaults, repo: cudf}
   cpp:
     - name: cudf
       sub_dir: cpp
-      depends: [rmm, KvikIO]
+      depends: [KvikIO]
+      args:
+        cmake: |
+          $([ "pip" = ${PYTHON_PACKAGE_MANAGER} ] && echo -DUSE_LIBARROW_FROM_PYARROW=ON || echo)
     - name: cudf_kafka
       sub_dir: cpp/libcudf_kafka
-      depends: [KvikIO, cudf]
+      depends: [cudf]
   python:
     - name: cudf
       sub_dir: python/cudf
-      depends: [rmm]
+      depends: [cudf]
+      args: {cmake: -DFIND_CUDF_CPP=ON}
     - name: dask_cudf
       sub_dir: python/dask_cudf
-      depends: [cudf]
     - name: cudf_kafka
       sub_dir: python/cudf_kafka
-      depends: [cudf]
+      depends: [cudf_kafka]
     - name: custreamz
       sub_dir: python/custreamz
-      depends: [cudf, cudf_kafka]
-  git:
-    repo: cudf
-    <<: *git_defaults
 
 - name: raft
   path: raft
+  git: {<<: *git_defaults, repo: raft}
   cpp:
     - name: raft
       sub_dir: cpp
@@ -86,117 +83,145 @@ repos:
   python:
     - name: pylibraft
       sub_dir: python/pylibraft
-      depends: [rmm]
+      depends: [raft]
+      args: {cmake: -DFIND_RAFT_CPP=ON}
     - name: raft-dask
       sub_dir: python/raft-dask
-      depends: [pylibraft]
-  git:
-    repo: raft
-    <<: *git_defaults
+      depends: [raft]
+      args: {cmake: -DFIND_RAFT_CPP=ON}
+
+- name: cuvs
+  path: cuvs
+  git: {<<: *git_defaults, repo: cuvs}
+  cpp:
+    - name: cuvs
+      sub_dir: cpp
+      depends: [raft]
+      args: {cmake: -DBUILD_C_LIBRARY=ON}
+  python:
+    - name: cuvs
+      sub_dir: python/cuvs
+      depends: [cuvs]
+      args: {cmake: -DFIND_CUVS_CPP=ON}
 
 - name: cumlprims_mg
   path: cumlprims_mg
+  git: {<<: *git_defaults, repo: cumlprims_mg}
   cpp:
     - name: cumlprims_mg
       sub_dir: cpp
-      depends: [rmm, raft]
-  git:
-    repo: cumlprims_mg
-    <<: *git_defaults
+      depends: [raft]
 
 - name: cuml
   path: cuml
+  git: {<<: *git_defaults, repo: cuml}
   cpp:
     - name: cuml
       sub_dir: cpp
-      depends: [rmm, raft, cumlprims_mg]
+      depends: [cumlprims_mg]
   python:
     - name: cuml
       sub_dir: python
-      depends: [rmm, cudf, dask-cudf, pylibraft, raft-dask]
-  git:
-    repo: cuml
-    <<: *git_defaults
+      depends: [cuml]
+      args: {cmake: -DFIND_CUML_CPP=ON}
 
 - name: cugraph-ops
   path: cugraph-ops
+  git: {<<: *git_defaults, repo: cugraph-ops}
   cpp:
     - name: cugraph-ops
       sub_dir: cpp
-      depends: [rmm, raft]
+      depends: [raft]
+      args:
+        cmake: |
+          -DCMAKE_CUDA_ARCHITECTURES="${CUDAARCHS}"
     - name: cugraph-ops-internal
       sub_dir: cpp_internal
-      depends: [rmm, raft, cugraph-ops]
+      depends: [cugraph-ops]
+      args:
+        cmake: |
+          -DCMAKE_CUDA_ARCHITECTURES="${CUDAARCHS}"
   python:
     - name: pylibcugraphops
       sub_dir: pylibcugraphops
-      depends: []
+      depends: [cugraph-ops]
+      args:
+        cmake: |
+          -DCMAKE_CUDA_ARCHITECTURES="${CUDAARCHS}"
     - name: pylibcugraphops_internal
       sub_dir: pylibcugraphops_internal
-      depends: [pylibcugraphops]
-  git:
-    repo: cugraph-ops
-    <<: *git_defaults
+      depends: [cugraph-ops-internal]
+      args:
+        cmake: |
+          -DCMAKE_CUDA_ARCHITECTURES="${CUDAARCHS}"
 
 - name: wholegraph
   path: wholegraph
+  git: {<<: *git_defaults, repo: wholegraph}
   cpp:
     - name: wholegraph
       sub_dir: cpp
-      depends: [rmm, raft]
+      depends: [raft]
+      args:
+        cmake: |
+          -DCMAKE_CUDA_ARCHITECTURES="${CUDAARCHS}"
   python:
     - name: wholegraph
       sub_dir: python/pylibwholegraph
-      depends: [rmm, raft]
-  git:
-    repo: wholegraph
-    <<: *git_defaults
+      depends: [wholegraph]
 
 - name: cugraph
   path: cugraph
+  git: {<<: *git_defaults, repo: cugraph}
   cpp:
     - name: cugraph
       sub_dir: cpp
-      depends: [rmm, raft, cugraph-ops]
+      depends: [cugraph-ops]
+    - name: cugraph_etl
+      sub_dir: cpp/libcugraph_etl
+      depends: [cudf, cugraph]
   python:
     - name: pylibcugraph
       sub_dir: python/pylibcugraph
-      depends: [rmm, pylibraft]
+      depends: [cugraph]
+      args: {cmake: -DFIND_CUGRAPH_CPP=ON}
     - name: cugraph
       sub_dir: python/cugraph
-      depends: [pylibraft, pylibcugraph]
+      depends: [cugraph]
+      args: {cmake: -DFIND_CUGRAPH_CPP=ON}
     - name: nx-cugraph
       sub_dir: python/nx-cugraph
-      depends: [pylibcugraph]
     - name: cugraph-dgl
       sub_dir: python/cugraph-dgl
-      depends: [cugraph]
+    - name: cugraph-equivariant
+      sub_dir: python/cugraph-equivariant
     - name: cugraph_pyg
       sub_dir: python/cugraph-pyg
-      depends: [cugraph]
     - name: cugraph-service-client
-      sub_dir: python/cugraph-service/server
-      depends: []
-    - name: cugraph-service-server
       sub_dir: python/cugraph-service/client
-      depends: [cudf, dask-cudf, cugraph, cugraph-service-client]
-  git:
-    repo: cugraph
-    <<: *git_defaults
+    - name: cugraph-service-server
+      sub_dir: python/cugraph-service/server
 
 - name: cuspatial
   path: cuspatial
+  git: {<<: *git_defaults, repo: cuspatial}
   cpp:
     - name: cuspatial
       sub_dir: cpp
-      depends: [rmm, cudf]
+      depends: [cudf]
   python:
     - name: cuproj
       sub_dir: python/cuproj
       depends: [rmm]
+      # cuproj is only built by cuspatial's CMake via add_subdirectory(cuproj),
+      # it doesn't have a build dir of its own. That means we can't list it as
+      # a cpp repo after cuspatial (above), and we have to manually point CMake
+      # to the cuspatial build dir here.
+      args:
+        cmake: |
+          -DFIND_CUPROJ_CPP=ON
+          -Dcuproj_ROOT="${HOME}/cuspatial/cpp/build/${PYTHON_PACKAGE_MANAGER}/cuda-${CUDA_VERSION}/latest"
     - name: cuspatial
       sub_dir: python/cuspatial
-      depends: [rmm, cudf]
-  git:
-    repo: cuspatial
-    <<: *git_defaults
+      depends: [cuspatial]
+      args: {cmake: -DFIND_CUSPATIAL_CPP=ON}

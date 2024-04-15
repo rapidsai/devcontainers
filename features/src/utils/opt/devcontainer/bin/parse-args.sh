@@ -1,116 +1,344 @@
 #! /usr/bin/env bash
 
-parse_args() {
+# shellcheck disable=SC1091
+. "$(dirname "$(realpath -m "${BASH_SOURCE[0]}")")/parse-args-from-docstring.sh";
+
+_parse_args_for_file() {
+    local -;
     set -euo pipefail;
 
-    local keys=();
-    local rest=();
-    declare -A dict;
+    # shellcheck disable=SC1091
+    . "$(dirname "$(realpath -m "${BASH_SOURCE[0]}")")/debug-output.sh" \
+        'devcontainer_utils_debug' 'parse-args';
 
-    local vars="(.*)";
-    local vars_array=();
-    if [ "${1:-}" = "--names" ]; then
-        shift;
-        vars="$(tr -d '[:space:]' <<< "${1}")";
-        vars_array=($(tr '|' ' ' <<< "${vars}"));
-        readarray -t vars_array < <(
-            for str in "${vars_array[@]}"; do
-                printf '%d\t%s\n' "${#str}" "$str"
-            done | sort -k 1,1nr -k 2 | cut -f 2-
-        );
-        vars="(${vars})";
-        shift;
+    local -r usage="$(_print_usage "${1:-}")";
+    shift;
+
+    local idx;
+    local key;
+    local val;
+    local -a arg;
+
+    local -A take_map=();
+    local -A skip_map=();
+
+    for ((idx=0; idx < 2; idx+=1)); do
+        if [ "${1:-}" = "--take" ]; then
+            shift;
+            if test -n "${1:-}"; then
+                local -ar take="($(_parse_args_to_names <<< "${1}" | tr '\n' ' ' | tr -s '[:blank:]'))";
+                for key in "${take[@]}"; do
+                    # shellcheck disable=SC2034
+                    take_map["${key}"]=1;
+                done
+                shift;
+            fi
+        fi
+        if [ "${1:-}" = "--skip" ]; then
+            shift;
+            if test -n "${1:-}"; then
+                local -ar skip="($(_parse_args_to_names <<< "${1}" | tr '\n' ' ' | tr -s '[:blank:]'))";
+                for key in "${skip[@]}"; do
+                    # shellcheck disable=SC2034
+                    skip_map["${key}"]=1;
+                done
+                shift;
+            fi
+        fi
+    done
+
+    # Quick early exit for `-h,--help`
+    if [[ " $* " == *" -h "* ]] || [[ " $* " == *" --help "* ]]; then
+        cat <<< "${usage}" >&2;
+        echo >&2;
+        echo "exit 0";
+        return;
     fi
 
-    while test -n "${1:-}"; do
-        local arg="${1:-}";
-        local key=;
-        local val=;
+    local -A _map=();
+    local -a args=();
+    local -a opts=();
+    local -a rest=();
 
-        if false; then
-            continue;
-        # read args from stdin
-        elif grep -qP '^-$' <<< "${arg:-}"; then
+    local -A reverse_alias_map=();
+    local -Ar alias_map="($(_parse_all_names_from_usage     <<< "${usage}" | _parse_aliases))";
+    local -ar long_bools="($(_parse_bool_names_from_usage   <<< "${usage}" | _parse_long_names))";
+    local -ar long_value="($(_parse_value_names_from_usage  <<< "${usage}" | _parse_long_names))";
+    local -ar short_bools="($(_parse_bool_names_from_usage  <<< "${usage}" | _parse_short_names))";
+    local -ar short_value="($(_parse_value_names_from_usage <<< "${usage}" | _parse_short_names))";
+
+    if test ${#take_map[@]} -eq 0; then
+        for key in "${long_bools[@]}" "${short_bools[@]}" \
+                   "${long_value[@]}" "${short_value[@]}"; do
+            take_map[${key}]=1;
+        done
+    fi
+
+    # Always include the -h,--help flags
+    take_map["h"]=1;
+    take_map["help"]=1;
+
+    for key in "${!alias_map[@]}"; do
+        _map["${key}"]="";
+        local -a aliases="(${alias_map[${key}]})";
+        for alias in "${aliases[@]}"; do
+            reverse_alias_map["${alias}"]="${key}";
+        done
+    done
+
+
+    local -r optstring="$(                                                                               \
+        cat <(_parse_bool_names_from_usage  <<< "${usage}" | _parse_short_names | xargs -r -I% echo -n %)  \
+            <(_parse_value_names_from_usage <<< "${usage}" | _parse_short_names | xargs -r -I% echo -n %:) \
+      | tr -d '[:space:]'                                                                                \
+    )";
+
+    if test ${#long_bools[@]} -gt 0 || test ${#long_value[@]} -gt 0; then
+        local longoptstring="-:";
+    fi
+
+    shopt -s extglob;
+
+    local -r long_bools1="@($(echo -n "${long_bools[@]/%/ |}"   | rev | cut -d'|' -f1 --complement | rev | tr -d '[:space:]'))";
+    local -r long_bools2="@($(echo -n "${long_bools[@]/%/ |}"   | rev | cut -d'|' -f1 --complement | rev | tr -d '[:space:]'))=*";
+    local -r long_value1="@($(echo -n "${long_value[@]/%/ |}"   | rev | cut -d'|' -f1 --complement | rev | tr -d '[:space:]'))";
+    local -r long_value2="@($(echo -n "${long_value[@]/%/ |}"   | rev | cut -d'|' -f1 --complement | rev | tr -d '[:space:]'))=*";
+    local -r short_bools1="@($(echo -n "${short_bools[@]/%/ |}" | rev | cut -d'|' -f1 --complement | rev | tr -d '[:space:]'))";
+    local -r short_value1="@($(echo -n "${short_value[@]/%/ |}" | rev | cut -d'|' -f1 --complement | rev | tr -d '[:space:]'))";
+
+    while test -n "${1:-}"; do
+
+        # read from stdin on hyphen
+        if test "${1:-}" == -; then
             shift;
-            eval set "-- $@ $(cat - | tr -s '[:space:]' | xargs -d'\n' -r echo -n)";
+            set -o noglob;
+            # read and split+glob with glob disabled
+            eval set "-- $* $(cat)";
+            set +o noglob;
             continue;
-        # --
-        elif grep -qP '^--$' <<< "${arg:-}"; then
-            shift;
-            rest+=("${@}");
+        fi
+
+        # If the first arg is `--`, break.
+        if [[ "${1:-}" == -- ]]; then
+            rest=("${@}");
+            set --;
             break;
-        # -foo=bar | --foo=bar
-        elif grep -qP '^--?[^\s]+=.*$' <<< "${arg:-}"; then
-            shift;
-            key="${arg#-}";
-            key="${key#-}";
-            key="${key%=*}";
-            val="${arg#*=}";
-        # -foo bar | --foo bar
-        elif grep -qP '^--?[^\s]+$' <<< "${arg:-}"; then
-            shift;
-            # -fooval
-            local found="";
-            if test "${#vars_array}" -gt 0 \
-            && grep -qP "^--?${vars}([^\s])+$" <<< "${arg:-}"; then
-                for name in ${vars_array[@]}; do
-                    if grep -qP "^--?${name}([0-9]|\.)+$" <<< "${arg:-}"; then
-                        key="${name}";
-                        val="${arg#-}";
-                        val="${val#-}";
-                        val="${val#"${name}"}";
-                        found="1";
+        fi
+
+        while getopts ":${optstring}${longoptstring:-}" opt; do
+
+            arg=();
+            key=;
+            val=;
+            idx=$((OPTIND-1));
+
+            # shellcheck disable=SC2254
+            case "${opt}" in
+                # short opt is specified but missing a value
+                :)
+                    key="${OPTARG}";
+                    arg+=("-${key}");
+                    ;;
+                # unknown short opt
+                \?)
+                    if test "${OPTARG}" == "h"; then
+                        key="${OPTARG}";
+                        val="-${key}";
+                        arg+=("-${key}");
+                    # Compare ${OPTARG} to ${!idx} with its leading `-`.
+                    # This only works when getopts is in silent mode, i.e. when `:` is at the front of the optstring.
+                    # If getopts is not in silent mode, it does not populate `OPTARG`.
+                    elif [[ "-${OPTARG}" != "${!idx:-}" ]]; then
+                        # Special cases:
+                        # -f=foo
+                        # -Wno-dev
+                        opts+=("${!OPTIND:-}");
+                        # Splice the argument at index `OPTIND` out of $@
+                        set -- "${@:1:$((OPTIND-1))}" "${@:$((OPTIND+1))}";
+                        break;
+                    else
+                        # Normal cases:
+                        # -f
+                        # -f foo
+                        opts+=("-${OPTARG}");
+                        OPTIND=$((OPTIND <= 1 ? 1 : OPTIND-1));
+                        # Splice the argument at index `OPTIND` out of $@
+                        set -- "${@:1:$((OPTIND-1))}" "${@:$((OPTIND+1))}";
+
+                        # Peek at the next argument.
+                        # If it begins with `-`, leave it for getopts.
+                        # Otherwise, push it onto the skipped list and splice it out of $@.
+                        if [[ ${OPTIND} -le ${#@} && "${!OPTIND:-}" != -* ]]; then
+                            opts+=("${!OPTIND}");
+                            # Splice the argument at index `OPTIND` out of $@
+                            set -- "${@:1:$((OPTIND-1))}" "${@:$((OPTIND+1))}";
+                        fi
                         break;
                     fi
-                done
-            fi
-            if test -z "${found}"; then
-                key="${arg#-}";
-                key="${key#-}";
-                if ! grep -qE "^$" <<< "${1:-}"; then
-                    if grep -qP '^-.*$' <<< "${1}"; then
-                        val="true";
-                    else
-                        val="${1}";
-                        arg+=" ${val}";
-                        shift;
-                    fi
+                    ;;
+                # long opt
+                -)
+                    case "${OPTARG}" in
+                        # known bool opt
+                        $long_bools1)
+                            key="${OPTARG}";
+                            val="--${key}";
+                            arg+=("--${key}");
+                            ;;
+                        # known bool opt with value after =
+                        $long_bools2)
+                            key="${OPTARG%=*}";
+                            val="--${OPTARG}";
+                            arg+=("--${OPTARG}");
+                            ;;
+                        # known value opt with value following
+                        $long_value1)
+                            key="${OPTARG}";
+                            arg+=("--${key}");
+                            if [[ ${OPTIND} -le ${#@} && "${!OPTIND:-}" != -* ]]; then
+                                val="${!OPTIND}";
+                                arg+=("${val}");
+                                OPTIND=$((OPTIND + 1));
+                            fi
+                            ;;
+                        # known value opt with value after =
+                        $long_value2)
+                            key="${OPTARG%=*}";
+                            val="${OPTARG#*=}";
+                            arg+=("--${key}=${val}");
+                        ;;
+                        # unknown long opt with value after =
+                        *=*)
+                            opts+=("--${OPTARG}");
+                            ;;
+                        # unknown long opt with value following
+                        *)
+                            if test "${OPTARG}" == "help"; then
+                                key="${OPTARG}";
+                                val="--${key}";
+                                arg+=("--${key}");
+                            else
+                                opts+=("--${OPTARG}");
+                                if [[ ${OPTIND} -le ${#@} && "${!OPTIND:-}" != -* ]]; then
+                                    opts+=("${!OPTIND}");
+                                    OPTIND=$((OPTIND + 1));
+                                fi
+                            fi
+                            ;;
+                    esac
+                    ;;
+                # known bool opt
+                $short_bools1)
+                    key="${opt}";
+                    val="-${key}";
+                    arg+=("-${key}");
+                    ;;
+                # known value opt with value following
+                $short_value1)
+                    key="${opt}";
+                    idx=$((OPTIND-1));
+                    case "${OPTARG:-}" in
+                        # If OPTARG arg begins with `-`, leave it for getopts.
+                        -*)
+                            arg+=("-${key}");
+                            OPTIND=$((OPTIND - 1));
+                            ;;
+                        # If the option and value are separated by `=`
+                        =*)
+                            # strip the `=` and use the right-hand side as the value
+                            val="${OPTARG#*=}";
+                            if [ -z "${val}" ] && [[ "${!OPTIND}" != -* ]]; then
+                                # Handle the case where there's an equals sign and a space between the value, e.g. `-v= foo`
+                                val="${!OPTIND}";
+                                OPTIND=$((OPTIND + 1));
+                            fi
+                            arg+=("-${key}=${val}");
+                            ;;
+                        *)
+                            val="${OPTARG:-}";
+                            idx=$((OPTIND-1));
+                            if test "${!idx:-}" != "${val}"; then
+                                arg+=("${!idx:-}");
+                            else
+                                arg+=("-${key}" "${val}");
+                            fi
+                            ;;
+                    esac
+                    ;;
+            esac
+
+            if test -n "${key}"; then
+
+                if test -v skip_map["${key}"] || ! test -v take_map["${key}"]; then
+                    opts+=("${arg[@]}");
                 else
-                    val="true";
+                    args+=("${arg[@]}");
+                    if test -v reverse_alias_map["${key}"]; then
+                        key="${reverse_alias_map["${key}"]}";
+                    fi
+                    if test -z "${_map["${key}"]}"; then
+                        _map["${key}"]="${val@Q}";
+                    else
+                        _map["${key}"]+=" ${val@Q}";
+                    fi
                 fi
             fi
-        else
-            rest+=("${@}");
-            break;
-        fi
 
-        if grep -qP "^${vars}$" <<< "${key}"; then
-            key="${key//-/_}";
-            keys+=("$key");
-            dict[$key]="$(printf %q "${val}")";
-        else
-            rest+=("${arg}");
-        fi
+            # If the next arg is `--`, break so we handle it below instead of getopts eating it.
+            if [[ "${!OPTIND:-}" == -- ]]; then
+                break;
+            fi
+        done # end getopts loop
+
+        shift "$((OPTIND - 1))";
+
+        OPTIND=1;
+
+        while test $# -gt 0; do
+            val="${1}";
+            if [[ "${val}" == -- ]]; then
+                rest=("${@}");
+                set --;
+            elif [[ "${val}" != -* ]]; then
+                rest=("${@}");
+                set --;
+            else
+                break;
+            fi
+        done
     done
 
-    keys+=("__rest__");
-    dict["__rest__"]="(${rest[@]})";
+    if test -n "${_map[h]:-}"; then
+        cat <<< "${usage}" >&2;
+        echo >&2;
+        echo "exit 0";
+    else
+        echo "declare -A ARGS_MAP=(";
+        for key in "${!_map[@]}"; do
+            echo "[${key@Q}]=${_map["${key}"]@Q}";
+        done
+        echo ")";
+        echo "declare -a ARGS=(${args[*]@Q})";
+        echo "declare -a OPTS=(${opts[*]@Q})";
+        echo "declare -a REST=(${rest[*]@Q})";
 
-    keys=($(echo "${keys[@]}" | xargs -r -d' ' -n1 echo -e | sort -s | uniq));
-
-    { set +x; } 2>/dev/null;
-
-    local keyi=1;
-
-    for ((keyi=1; keyi < ${#keys[@]}; keyi+=1)); do
-        echo "${keys[$keyi]}=${dict[${keys[$keyi]}]}";
-    done
-
-    echo "${keys[0]}=${dict[${keys[0]}]}";
+        for key in "${!_map[@]}"; do
+            local k_="${key}";
+            k_="${k_//-/_}";
+            k_="${k_//./_}";
+            echo "declare -a ${k_}=(${_map["${key}"]})";
+            local -a aliases="(${alias_map["${key}"]})";
+            for alias in "${aliases[@]}"; do
+                local a_="${alias}";
+                a_="${a_//-/_}";
+                a_="${a_//./_}";
+                echo "declare -n ${a_}=${k_}";
+            done
+        done
+    fi
 }
 
-if test -n "${devcontainer_utils_debug:-}"; then
-    PS4="+ ${BASH_SOURCE[0]}:\${LINENO} "; set -x;
+if [ "$(basename "${BASH_SOURCE[${#BASH_SOURCE[@]}-1]}")" = parse-args.sh ] \
+|| [ "$(basename "${BASH_SOURCE[${#BASH_SOURCE[@]}-1]}")" = devcontainer-utils-parse-args ]; then
+    _parse_args_for_file "$@" <&0;
 fi
-
-(parse_args "$@");

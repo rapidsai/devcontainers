@@ -66,16 +66,34 @@ jobs:
 
       - if: inputs.push == 'true'
         name: Upload ${{ steps.json.outputs.tag }}-${{ matrix.arch }}
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           retention-days: 1
-          name: ${{ steps.json.outputs.tag }}
+          compression-level: 0
+          name: ${{ steps.json.outputs.tag }}-${{ matrix.arch }}
           path: ${{ runner.temp }}/${{ matrix.arch }}.tar
+
+  merge-artifacts:
+    if: inputs.push == 'true'
+    name: Merge image artifacts
+    needs: build-test-and-upload
+    runs-on: ubuntu-latest
+    steps:
+      - name: Merge image artifacts
+        uses: actions/upload-artifact/merge@v4
+        with:
+          retention-days: 1
+          delete-merged: true
+          compression-level: 0
+          name: ${{ needs.build-test-and-upload.outputs.tag }}
+          pattern: ${{ needs.build-test-and-upload.outputs.tag }}-*
 
   push-to-dockerhub:
     if: inputs.push == 'true'
     name: Push to Docker Hub
-    needs: build-test-and-upload
+    needs:
+      - build-test-and-upload
+      - merge-artifacts
     runs-on: ubuntu-latest
     steps:
       - name: Checkout ${{ github.repository }}
@@ -89,7 +107,7 @@ jobs:
           tool_cache: "${{ runner.tool_cache }}"
 
       - name: Download ${{ needs.build-test-and-upload.outputs.tag }}
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v4
         with:
           name: ${{ needs.build-test-and-upload.outputs.tag }}
           path: ${{ runner.temp }}

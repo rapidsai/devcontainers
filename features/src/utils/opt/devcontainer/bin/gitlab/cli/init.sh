@@ -13,7 +13,7 @@ _remove_warning_from_bashrc() {
 }
 
 init_gitlab_cli() {
-
+    local -;
     set -euo pipefail;
 
     if ! type glab > /dev/null 2>&1; then
@@ -29,7 +29,7 @@ init_gitlab_cli() {
                 export GITLAB_USER=;
                 return;
             else
-                read -s -p "Please enter a GitLab API token (or leave blank to skip): " GITLAB_TOKEN <$(tty);
+                read -rsp "Please enter a GitLab API token (or leave blank to skip): " GITLAB_TOKEN <"$(tty)";
             fi
         fi
 
