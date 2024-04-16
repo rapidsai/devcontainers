@@ -3,7 +3,7 @@ set -e
 
 LIT_VERSION="${LITVERSION:-latest}";
 
-if [ "$LIT_VERSION" -neq "latest" ]; then
+if [ "$LIT_VERSION" != "latest" ]; then
   LIT_VERSION_TO_INSTALL="lit==$LIT_VERSION"
 else
   LIT_VERSION_TO_INSTALL="lit"
@@ -29,18 +29,23 @@ if [[ "$(uname -p)" != "x86_64" ]]; then
     if ! type g++ >/dev/null 2>&1; then PKG_TO_REMOVE+=("g++"); fi
 fi
 
-check_packages ${PKG[@]} ${PKG_TO_REMOVE[@]};
+check_packages "${PKG[@]}" "${PKG_TO_REMOVE[@]}";
 
 source /etc/lsb-release;
 
+# shellcheck disable=SC2072
 if [[ ! "23.04" > "${DISTRIB_RELEASE}" ]]; then
   BREAK_PACKAGES="--break-system-packages"
 fi
 
-CC=gcc CXX=g++ python -m pip install $BREAK_PACKAGES --upgrade pip
-CC=gcc CXX=g++ python -m pip install $BREAK_PACKAGES wheel setuptools;
-CC=gcc CXX=g++ python -m pip install $BREAK_PACKAGES psutil $LIT_VERSION_TO_INSTALL;
-CC=gcc CXX=g++ python -m pip install $BREAK_PACKAGES pre-commit;
+CC=gcc CXX=g++ python -m pip install "${BREAK_PACKAGES}" --upgrade \
+    pip                         \
+    wheel                       \
+    setuptools                  \
+    psutil                      \
+    "${LIT_VERSION_TO_INSTALL}" \
+    pre-commit \
+    ;
 
 export LIT_VERSION="$(lit --version | grep -o -e '[0-9].*')";
 
