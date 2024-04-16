@@ -51,4 +51,4 @@ runs:
       with:
         buildkitd-flags: --debug --config /etc/buildkit/buildkitd.toml
         endpoint: builder
-        config: /etc/buildkit/buildkitd.toml
+        buildkitd-config: /etc/buildkit/buildkitd.toml
