@@ -1,12 +1,12 @@
 #! /usr/bin/env bash
-set -e
+set -ex
 
 LIT_VERSION="${LITVERSION:-latest}";
 
-if [ "$LIT_VERSION" -neq "latest" ]; then
-  LIT_VERSION_TO_INSTALL="lit==$LIT_VERSION"
-else
+if [ "$LIT_VERSION" = "latest" ]; then
   LIT_VERSION_TO_INSTALL="lit"
+else
+  LIT_VERSION_TO_INSTALL="lit==$LIT_VERSION"
 fi;
 
 # Ensure we're in this feature's directory during build
@@ -29,25 +29,39 @@ if [[ "$(uname -p)" != "x86_64" ]]; then
     if ! type g++ >/dev/null 2>&1; then PKG_TO_REMOVE+=("g++"); fi
 fi
 
-check_packages ${PKG[@]} ${PKG_TO_REMOVE[@]};
+check_packages "${PKG[@]}" "${PKG_TO_REMOVE[@]}";
 
-source /etc/lsb-release;
+# Find the non-root user
+find_non_root_user;
+USERNAME="${USERNAME:-root}";
+USERHOME="$(bash -c "echo ~${USERNAME-}")";
 
-if [[ ! "23.04" > "${DISTRIB_RELEASE}" ]]; then
-  BREAK_PACKAGES="--break-system-packages"
-fi
+# shellcheck disable=SC2174
+mkdir -p -m 0755                          \
+    "${USERHOME}/.local"                  \
+    "${USERHOME}/.local/share"            \
+    "${USERHOME}/.local/share/venvs"      \
+    "${USERHOME}/.local/share/venvs/cccl" \
+;
 
-CC=gcc CXX=g++ python -m pip install $BREAK_PACKAGES --upgrade pip
-CC=gcc CXX=g++ python -m pip install $BREAK_PACKAGES wheel setuptools;
-CC=gcc CXX=g++ python -m pip install $BREAK_PACKAGES psutil $LIT_VERSION_TO_INSTALL;
+python -m venv "${USERHOME}/.local/share/venvs/cccl";
+# shellcheck disable=SC1091
+. "${USERHOME}/.local/share/venvs/cccl/bin/activate";
+CC=gcc CXX=g++ python -m pip install -U pip;
+CC=gcc CXX=g++ python -m pip install -U wheel setuptools;
+CC=gcc CXX=g++ python -m pip install -U psutil "${LIT_VERSION_TO_INSTALL}" pre-commit;
 
+# Ensure the user owns their homedir
+chown -R "${USERNAME}:${USERNAME}" "${USERHOME}";
+
+export USERHOME;
 export LIT_VERSION="$(lit --version | grep -o -e '[0-9].*')";
 
 # export envvars in bashrc files
-append_to_etc_bashrc "$(cat .bashrc | envsubst '$LIT_VERSION')";
-append_to_all_bashrcs "$(cat .bashrc | envsubst '$LIT_VERSION')";
+append_to_etc_bashrc "$(cat .bashrc | envsubst '$LIT_VERSION $USERHOME')";
+append_to_all_bashrcs "$(cat .bashrc | envsubst '$LIT_VERSION $USERHOME')";
 # export envvars in /etc/profile.d
-add_etc_profile_d_script cccl-dev "$(cat .bashrc | envsubst '$LIT_VERSION')";
+add_etc_profile_d_script cccl-dev "$(cat .bashrc | envsubst '$LIT_VERSION $USERHOME')";
 
 # Clean up
 # rm -rf /tmp/*;
@@ -56,6 +70,6 @@ rm -rf /var/cache/apt/*;
 rm -rf /var/lib/apt/lists/*;
 
 if [[ ${#PKG_TO_REMOVE[@]} -gt 0 ]]; then
-    DEBIAN_FRONTEND=noninteractive apt-get -y remove ${PKG_TO_REMOVE[@]};
+    DEBIAN_FRONTEND=noninteractive apt-get -y remove "${PKG_TO_REMOVE[@]}";
     DEBIAN_FRONTEND=noninteractive apt-get -y autoremove;
 fi
