@@ -3,10 +3,10 @@ set -e
 
 LIT_VERSION="${LITVERSION:-latest}";
 
-if [ "$LIT_VERSION" != "latest" ]; then
-  LIT_VERSION_TO_INSTALL="lit==$LIT_VERSION"
-else
+if [ "$LIT_VERSION" = "latest" ]; then
   LIT_VERSION_TO_INSTALL="lit"
+else
+  LIT_VERSION_TO_INSTALL="lit==$LIT_VERSION"
 fi;
 
 # Ensure we're in this feature's directory during build
@@ -44,7 +44,7 @@ CC=gcc CXX=g++ python -m pip install "${BREAK_PACKAGES}" --upgrade \
     setuptools                  \
     psutil                      \
     "${LIT_VERSION_TO_INSTALL}" \
-    pre-commit \
+    pre-commit                  \
     ;
 
 export LIT_VERSION="$(lit --version | grep -o -e '[0-9].*')";
