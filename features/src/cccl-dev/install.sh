@@ -1,5 +1,5 @@
 #! /usr/bin/env bash
-set -e
+set -ex
 
 LIT_VERSION="${LITVERSION:-latest}";
 
@@ -38,7 +38,7 @@ if [[ ! "23.04" > "${DISTRIB_RELEASE}" ]]; then
   BREAK_PACKAGES="--break-system-packages"
 fi
 
-CC=gcc CXX=g++ python -m pip install "${BREAK_PACKAGES}" --upgrade \
+CC=gcc CXX=g++ python -m pip install ${BREAK_PACKAGES:-} --upgrade \
     pip                         \
     wheel                       \
     setuptools                  \
