@@ -38,10 +38,9 @@ if [[ ! "23.04" > "${DISTRIB_RELEASE}" ]]; then
   BREAK_PACKAGES="--break-system-packages"
 fi
 
+CC=gcc CXX=g++ python -m pip install ${BREAK_PACKAGES:-} --upgrade pip;
+CC=gcc CXX=g++ python -m pip install ${BREAK_PACKAGES:-} --upgrade wheel setuptools;
 CC=gcc CXX=g++ python -m pip install ${BREAK_PACKAGES:-} --upgrade \
-    pip                         \
-    wheel                       \
-    setuptools                  \
     psutil                      \
     "${LIT_VERSION_TO_INSTALL}" \
     pre-commit                  \
