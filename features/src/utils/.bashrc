@@ -1,4 +1,4 @@
-# Don’t prepend an empty string to sys.path in interactive Python REPLs
+# Don't prepend an empty string to sys.path in interactive Python REPLs
 # https://docs.python.org/3.11/using/cmdline.html#envvar-PYTHONSAFEPATH
 export PYTHONSAFEPATH="${PYTHONSAFEPATH:-1}";
 
