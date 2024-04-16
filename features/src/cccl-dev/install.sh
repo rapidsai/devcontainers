@@ -1,5 +1,5 @@
 #! /usr/bin/env bash
-set -e
+set -ex
 
 LIT_VERSION="${LITVERSION:-latest}";
 
@@ -31,28 +31,37 @@ fi
 
 check_packages "${PKG[@]}" "${PKG_TO_REMOVE[@]}";
 
-source /etc/lsb-release;
+# Find the non-root user
+find_non_root_user;
+USERNAME="${USERNAME:-root}";
+USERHOME="$(bash -c "echo ~${USERNAME-}")";
 
-# shellcheck disable=SC2072
-if [[ ! "23.04" > "${DISTRIB_RELEASE}" ]]; then
-  BREAK_PACKAGES="--break-system-packages"
-fi
+# shellcheck disable=SC2174
+mkdir -p -m 0755                          \
+    "${USERHOME}/.local"                  \
+    "${USERHOME}/.local/share"            \
+    "${USERHOME}/.local/share/venvs"      \
+    "${USERHOME}/.local/share/venvs/cccl" \
+;
 
-CC=gcc CXX=g++ python -m pip install ${BREAK_PACKAGES:-} --upgrade pip;
-CC=gcc CXX=g++ python -m pip install ${BREAK_PACKAGES:-} --upgrade wheel setuptools;
-CC=gcc CXX=g++ python -m pip install ${BREAK_PACKAGES:-} --upgrade \
-    psutil                      \
-    "${LIT_VERSION_TO_INSTALL}" \
-    pre-commit                  \
-    ;
+python -m venv "${USERHOME}/.local/share/venvs/cccl";
+# shellcheck disable=SC1091
+. "${USERHOME}/.local/share/venvs/cccl/bin/activate";
+python -m pip install -U pip;
+python -m pip install -U wheel setuptools;
+python -m pip install -U psutil "${LIT_VERSION_TO_INSTALL}" pre-commit;
 
+# Ensure the user owns their homedir
+chown -R "${USERNAME}:${USERNAME}" "${USERHOME}";
+
+export USERHOME;
 export LIT_VERSION="$(lit --version | grep -o -e '[0-9].*')";
 
 # export envvars in bashrc files
-append_to_etc_bashrc "$(cat .bashrc | envsubst '$LIT_VERSION')";
-append_to_all_bashrcs "$(cat .bashrc | envsubst '$LIT_VERSION')";
+append_to_etc_bashrc "$(cat .bashrc | envsubst '$LIT_VERSION $USERHOME')";
+append_to_all_bashrcs "$(cat .bashrc | envsubst '$LIT_VERSION $USERHOME')";
 # export envvars in /etc/profile.d
-add_etc_profile_d_script cccl-dev "$(cat .bashrc | envsubst '$LIT_VERSION')";
+add_etc_profile_d_script cccl-dev "$(cat .bashrc | envsubst '$LIT_VERSION $USERHOME')";
 
 # Clean up
 # rm -rf /tmp/*;
@@ -61,6 +70,6 @@ rm -rf /var/cache/apt/*;
 rm -rf /var/lib/apt/lists/*;
 
 if [[ ${#PKG_TO_REMOVE[@]} -gt 0 ]]; then
-    DEBIAN_FRONTEND=noninteractive apt-get -y remove ${PKG_TO_REMOVE[@]};
+    DEBIAN_FRONTEND=noninteractive apt-get -y remove "${PKG_TO_REMOVE[@]}";
     DEBIAN_FRONTEND=noninteractive apt-get -y autoremove;
 fi
