@@ -47,9 +47,9 @@ mkdir -p -m 0755                          \
 python -m venv "${USERHOME}/.local/share/venvs/cccl";
 # shellcheck disable=SC1091
 . "${USERHOME}/.local/share/venvs/cccl/bin/activate";
-python -m pip install -U pip;
-python -m pip install -U wheel setuptools;
-python -m pip install -U psutil "${LIT_VERSION_TO_INSTALL}" pre-commit;
+CC=gcc CXX=g++ python -m pip install -U pip;
+CC=gcc CXX=g++ python -m pip install -U wheel setuptools;
+CC=gcc CXX=g++ python -m pip install -U psutil "${LIT_VERSION_TO_INSTALL}" pre-commit;
 
 # Ensure the user owns their homedir
 chown -R "${USERNAME}:${USERNAME}" "${USERHOME}";
