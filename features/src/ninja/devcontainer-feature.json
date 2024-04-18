@@ -1,20 +1,14 @@
 {
   "name": "Ninja build",
   "id": "ninja",
-  "version": "24.6.0",
+  "version": "24.6.1",
   "description": "A feature to install ninja-build",
   "options": {
     "version": {
       "type": "string",
       "proposals": [
         "latest",
-        "1.11.1",
-        "1.11.0",
-        "1.10.2",
-        "1.10.1",
-        "1.10.0",
-        "1.9.0",
-        "1.8.2"
+        "1.12.0"
       ],
       "default": "latest",
       "description": "ninja-build version to install."

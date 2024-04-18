@@ -70,7 +70,7 @@ check "cmake exists and is on path" which cmake;
 check "version" bash -c "cmake --version | grep '$CMAKE_VERSION'";
 
 # Check ninja
-NINJA_VERSION="1.11.1";
+NINJA_VERSION="1.12.0";
 check "ninja exists and is on path" which ninja;
 check "version" bash -c "ninja --version | grep '$NINJA_VERSION'";
 
