@@ -1,14 +1,15 @@
 {
   "name": "UCX",
   "id": "ucx",
-  "version": "24.6.0",
+  "version": "24.6.1",
   "description": "A feature to install UCX",
   "options": {
     "version": {
       "type": "string",
       "proposals": [
         "latest",
-        "1.15.0-rc3",
+        "1.16.0",
+        "1.15.0",
         "1.14.1"
       ],
       "default": "latest",
