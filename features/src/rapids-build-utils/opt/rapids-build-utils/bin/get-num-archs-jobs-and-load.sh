@@ -41,7 +41,10 @@ get_num_archs_jobs_and_load() {
     # shellcheck disable=SC1091
     . devcontainer-utils-debug-output 'rapids_build_utils_debug' 'get-num-archs-jobs-and-load';
 
-    local -r n_cpus="$(nproc)";
+    # The return value of nproc is (who knew!) constrained by the
+    # values of OMP_NUM_THREADS and/or OMP_THREAD_LIMIT
+    # Since we want the physical number of processors here, pass --all
+    local -r n_cpus="$(nproc --all)";
 
     if test ${#j[@]} -gt 0 && test -z "${j:-}"; then
         j="${n_cpus}";

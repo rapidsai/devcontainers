@@ -87,7 +87,7 @@ build_and_install_ucx() {
             --with-rdmacm           \
             ${cuda:+--with-cuda=${CUDA_HOME:-/usr/local/cuda}};
 
-        make -j$(nproc);
+        make -j$(nproc --all);
         make install;
     )
 
