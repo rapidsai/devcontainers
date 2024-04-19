@@ -19,10 +19,10 @@ configure_${CPP_LIB}_cpp() {
     local -;
     set -euo pipefail;
 
-    eval "$(                                    \
-    PARALLEL_LEVEL=${PARALLEL_LEVEL:-$(nproc)}  \
-        rapids-get-num-archs-jobs-and-load "$@" \
-        2>/dev/null                             \
+    eval "$(                                          \
+    PARALLEL_LEVEL=${PARALLEL_LEVEL:-$(nproc --all)}  \
+        rapids-get-num-archs-jobs-and-load "$@"       \
+        2>/dev/null                                   \
     )";
 
     local -a cmake_args_="(${CMAKE_ARGS:-})";

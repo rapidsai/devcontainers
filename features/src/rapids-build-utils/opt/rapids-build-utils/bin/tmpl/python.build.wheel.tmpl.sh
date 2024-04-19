@@ -18,10 +18,10 @@ build_${PY_LIB}_python_wheel() {
     local -;
     set -euo pipefail;
 
-    eval "$(                                    \
-    PARALLEL_LEVEL=${PARALLEL_LEVEL:-$(nproc)}  \
-        rapids-get-num-archs-jobs-and-load "$@" \
-        2>/dev/null                             \
+    eval "$(                                          \
+    PARALLEL_LEVEL=${PARALLEL_LEVEL:-$(nproc --all)}  \
+        rapids-get-num-archs-jobs-and-load "$@"       \
+        2>/dev/null                                   \
     )";
 
     local py_lib="${PY_LIB}";
