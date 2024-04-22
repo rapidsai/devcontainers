@@ -44,18 +44,18 @@ clone_${NAME}() {
 
     echo 'Cloning ${NAME}' 1>&2;
 
-    devcontainer-utils-clone-${GIT_HOST}-repo \
-        --tags                                \
-        --branch "${branch}"                  \
-        --ssh-url "${ssh_url}"                \
-        --https-url "${https_url}"            \
-        --recurse-submodules                  \
-        -j ${n_jobs:-$(nproc --ignore=1)}     \
-        -c checkout.defaultRemote=upstream    \
-        "${OPTS[@]}"                          \
-        --                                    \
-        "${upstream}"                         \
-        "${directory}"                        \
+    devcontainer-utils-clone-${GIT_HOST}-repo   \
+        --tags                                  \
+        --branch "${branch}"                    \
+        --ssh-url "${ssh_url}"                  \
+        --https-url "${https_url}"              \
+        --recurse-submodules                    \
+        -j ${n_jobs:-$(nproc --all --ignore=1)} \
+        -c checkout.defaultRemote=upstream      \
+        "${OPTS[@]}"                            \
+        --                                      \
+        "${upstream}"                           \
+        "${directory}"                          \
     ;
 
     git -C "${SRC_PATH}" config --add remote.upstream.fetch '^refs/heads/pull-request/*';

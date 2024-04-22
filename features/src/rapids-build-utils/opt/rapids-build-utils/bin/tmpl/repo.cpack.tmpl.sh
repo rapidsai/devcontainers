@@ -11,7 +11,7 @@
 #
 # Options that require values:
 #  -j,--parallel <num>                           Use <num> threads to compress in parallel.
-#                                                (default: $(nproc))
+#                                                (default: $(nproc --all))
 #  -o,--out-dir <dir>                            Copy cpack'd TGZ file into <dir>.
 #                                                (default: none)
 # @_include_value_options rapids-select-cmake-install-args -h | tail -n-5 | head -n-2;

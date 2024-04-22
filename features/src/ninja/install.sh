@@ -9,81 +9,28 @@ cd "$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )";
 # install global/common scripts
 . ./common/install.sh;
 
-PKG=();
-PKG+=("jq");
-PKG+=("git");
-PKG+=("make");
-PKG+=("wget");
-PKG+=("file");
-PKG+=("unzip");
-PKG+=("ca-certificates");
-PKG+=("bash-completion");
-PKG_TO_REMOVE=();
-
-if ! type gcc >/dev/null 2>&1; then
-    PKG+=("gcc");
-    PKG_TO_REMOVE+=("gcc");
-fi
-if ! type g++ >/dev/null 2>&1; then
-    PKG+=("g++");
-    PKG_TO_REMOVE+=("g++");
-fi
-
-check_packages ${PKG[@]};
-
-if ! type cmake >/dev/null 2>&1; then
-    CMAKE_VERSION=latest;
-    find_version_from_git_tags CMAKE_VERSION https://github.com/Kitware/CMake;
-
-    while ! wget --no-hsts -q -O /tmp/cmake_${CMAKE_VERSION}.sh https://github.com/Kitware/CMake/releases/download/v${CMAKE_VERSION}/cmake-${CMAKE_VERSION}-linux-$(uname -p).sh; do
-        echo "(!) cmake version ${CMAKE_VERSION} failed to download. Attempting to fall back one version to retry...";
-        find_prev_version_from_git_tags CMAKE_VERSION https://github.com/Kitware/CMake;
-    done
-
-    echo "Installing CMake...";
-
-    # Install CMake
-    mkdir -p /tmp/cmake
-    bash /tmp/cmake_${CMAKE_VERSION}.sh --skip-license --exclude-subdir --prefix=/tmp/cmake;
-    cmake="/tmp/cmake/bin/cmake";
-else
-    cmake="$(which cmake)";
-fi
+check_packages jq wget unzip ca-certificates bash-completion;
 
 echo "Installing ninja-build...";
 
-if [ $NINJA_VERSION == latest ]; then
+if [ "${NINJA_VERSION}" = latest ]; then
     find_version_from_git_tags NINJA_VERSION https://github.com/ninja-build/ninja;
 fi
 
-# Clone Ninja
-git clone \
-    -j$(nproc) \
-    --single-branch \
-    --shallow-submodules \
-    --recurse-submodules \
-    --branch "v$NINJA_VERSION" \
-    https://github.com/ninja-build/ninja \
-    /tmp/ninja;
+_name="ninja-linux";
 
-# Configure Ninja
-$cmake -S /tmp/ninja -B /tmp/ninja/build -DCMAKE_BUILD_TYPE=Release;
-# Build Ninja
-$cmake --build /tmp/ninja/build --parallel --config Release;
+if test "$(uname -p)" = "aarch64"; then
+    _name+="-aarch64";
+fi
+
 # Install Ninja
-strip /tmp/ninja/build/ninja;
-file /tmp/ninja/build/ninja;
-$cmake --install /tmp/ninja/build;
+wget --no-hsts -q -O /tmp/ninja-linux.zip \
+    "https://github.com/ninja-build/ninja/releases/download/v${NINJA_VERSION}/${_name}.zip";
+unzip -d /usr/bin /tmp/ninja-linux.zip;
+chmod +x /usr/bin/ninja;
 
 # Clean up
-# rm -rf /tmp/*;
 rm -rf /var/tmp/*;
 rm -rf /var/cache/apt/*;
 rm -rf /var/lib/apt/lists/*;
-rm -rf /tmp/{cmake,ninja};
-rm -rf /tmp/cmake_${CMAKE_VERSION}.sh;
-
-if [[ ${#PKG_TO_REMOVE[@]} -gt 0 ]]; then
-    DEBIAN_FRONTEND=noninteractive apt-get -y remove ${PKG_TO_REMOVE[@]};
-    DEBIAN_FRONTEND=noninteractive apt-get -y autoremove;
-fi
+rm -rf /tmp/ninja-linux.zip;

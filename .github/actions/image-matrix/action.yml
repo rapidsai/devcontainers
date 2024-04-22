@@ -30,7 +30,7 @@ runs:
     - name: Check if files changed
       if: inputs.full_matrix != 'true'
       id: changes
-      uses: tj-actions/changed-files@v35.4.4
+      uses: tj-actions/changed-files@v44.0.1
       with:
         base_sha: ${{ fromJSON(steps.get-pr-info.outputs.pr-info).base.sha }}
         files: |

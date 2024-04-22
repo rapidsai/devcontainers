@@ -24,7 +24,7 @@ checkout_same_branch() {
     eval "$(_parse_args "$@" <&0)";
 
     eval "$(                                              \
-    PARALLEL_LEVEL=${PARALLEL_LEVEL:-$(nproc)}            \
+    PARALLEL_LEVEL=${PARALLEL_LEVEL:-$(nproc --all)}      \
         rapids-get-num-archs-jobs-and-load --archs 0 "$@" \
     )";
 
