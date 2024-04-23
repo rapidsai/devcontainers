@@ -146,8 +146,8 @@ if [ "${UPDATE_RC}" = "true" ]; then
 fi
 
 # Completion
-rustup completions bash | sudo tee /usr/share/bash-completion/completions/rustup > /dev/null
-rustup completions bash cargo | sudo tee /usr/share/bash-completion/completions/cargo > /dev/null
+rustup completions bash | tee /usr/share/bash-completion/completions/rustup > /dev/null
+rustup completions bash cargo | tee /usr/share/bash-completion/completions/cargo > /dev/null
 
 # Make files writable for rustlang group
 chmod -R g+r+w "${RUSTUP_HOME}" "${CARGO_HOME}";
