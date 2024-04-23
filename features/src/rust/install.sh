@@ -129,7 +129,7 @@ fi
 
 echo "Installing common Rust dependencies...";
 
-rustup component add rls rust-analysis rust-src rustfmt clippy 2>&1;
+rustup component add rust-analyzer rust-src rustfmt clippy 2>&1;
 
 # Add CARGO_HOME, RUSTUP_HOME and bin directory into bashrc/zshrc files (unless disabled)
 if [ "${UPDATE_RC}" = "true" ]; then
@@ -144,6 +144,10 @@ if [ "${UPDATE_RC}" = "true" ]; then
     # export envvars in /etc/profile.d
     add_etc_profile_d_script rust "$(cat .bashrc | envsubst "${vars_%,}")";
 fi
+
+# Completion
+rustup completions bash | sudo tee /usr/share/bash-completion/completions/rustup > /dev/null
+rustup completions bash cargo | sudo tee /usr/share/bash-completion/completions/cargo > /dev/null
 
 # Make files writable for rustlang group
 chmod -R g+r+w "${RUSTUP_HOME}" "${CARGO_HOME}";
