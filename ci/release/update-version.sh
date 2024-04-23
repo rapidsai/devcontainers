@@ -42,6 +42,7 @@ sed_runner "s|features/\([[:alnum:]]\+\):[[:digit:]]\+\.[[:digit:]]\+\"|features
 
 for file in $(find .devcontainer -name devcontainer.json); do
   sed_runner "s|rapidsai/devcontainers:.*-cpp|rapidsai/devcontainers:${NEXT_SHORT_TAG}-cpp|g" "$file"
+  sed_runner "s@rapids-\${localWorkspaceFolderBasename}-${CURRENT_SHORT_TAG}@rapids-\${localWorkspaceFolderBasename}-${NEXT_SHORT_TAG}@g" "${file}"
 done
 
 sed_runner "s/branch-[[:digit:]]\{2\}\.[[:digit:]]\+/branch-${NEXT_SHORT_TAG}/g" ./features/src/rapids-build-utils/opt/rapids-build-utils/manifest.yaml
