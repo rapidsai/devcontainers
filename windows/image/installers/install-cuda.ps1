@@ -59,7 +59,8 @@ $cudaComponents =
     "cupti_$componentTag",
     "nvrtc_$componentTag",
     "nvrtc_dev_$componentTag",
-    "nvml_dev_$componentTag"
+    "nvml_dev_$componentTag",
+    "nvtx_$componentTag"
     
 Invoke-WebRequest -Uri "$cudaVersionUrl" -OutFile "./cuda_network.exe" -UseBasicParsing
 Start-Process -Wait -PassThru -FilePath .\cuda_network.exe -ArgumentList "-s $cudaComponents"
