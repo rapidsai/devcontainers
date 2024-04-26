@@ -1,7 +1,7 @@
 {
   "name": "devcontainer-utils",
   "id": "utils",
-  "version": "24.6.0",
+  "version": "24.6.1",
   "description": "A feature to install RAPIDS devcontainer utility scripts",
   "containerEnv": {
     "BASH_ENV": "/etc/bash.bash_env"
@@ -12,6 +12,13 @@
     "+o",
     "history",
     "devcontainer-utils-post-create-command"
+  ],
+  "postStartCommand": [
+    "/bin/bash",
+    "-li",
+    "+o",
+    "history",
+    "devcontainer-utils-post-start-command"
   ],
   "postAttachCommand": [
     "/bin/bash",
