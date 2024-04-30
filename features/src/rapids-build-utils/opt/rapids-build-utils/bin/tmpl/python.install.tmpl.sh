@@ -7,6 +7,9 @@
 #
 # @_include_value_options rapids-get-num-archs-jobs-and-load -h;
 # @_include_cmake_options;
+# CMake Install Options:
+#  --strip                                       Strip before installing.
+#
 # @_include_pip_install_options;
 # @_include_pip_package_index_options;
 # @_include_pip_general_options;
@@ -103,6 +106,7 @@ install_${PY_LIB}_python() {
         export ${PY_ENV} PATH="$PATH";
 
         local cudaflags="${CUDAFLAGS:+$CUDAFLAGS }-t=${n_arch}";
+        local build_type="$(rapids-select-cmake-build-type "${cmake_args_[@]}")";
         local nvcc_append_flags="${NVCC_APPEND_FLAGS:+$NVCC_APPEND_FLAGS }-t=${n_arch}";
 
         CUDAFLAGS="${cudaflags}"                     \
@@ -110,6 +114,11 @@ install_${PY_LIB}_python() {
         PARALLEL_LEVEL="${n_jobs}"                   \
         CMAKE_ARGS="${cmake_args[*]}"                \
         SKBUILD_BUILD_OPTIONS="${ninja_args[*]}"     \
+        SKBUILD_LOGGING_LEVEL="${v:+VERBOSE}"        \
+        SKBUILD_INSTALL_STRIP="${strip:+True}"       \
+        SKBUILD_CMAKE_VERBOSE="${v:+True}"           \
+        SKBUILD_CMAKE_BUILD_TYPE="${build_type}"     \
+        CMAKE_BUILD_PARALLEL_LEVEL="${n_jobs}"       \
         NVCC_APPEND_FLAGS="${nvcc_append_flags}"     \
             python -m pip install "${pip_args[@]}"   \
         ;
