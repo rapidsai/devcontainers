@@ -8,7 +8,7 @@
 # @_include_value_options rapids-get-num-archs-jobs-and-load -h;
 # @_include_cmake_options;
 # CMake Install Options:
-#  --strip                                       Strip before installing.
+#  --strip  Strip before installing.
 #
 # @_include_pip_wheel_options;
 # @_include_pip_package_index_options;
