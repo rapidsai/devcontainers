@@ -43,7 +43,7 @@ repos:
       depends: [rmm]
   python:
     - name: kvikio
-      sub_dir: python
+      sub_dir: python/kvikio
       depends: [KvikIO]
       args: {cmake: -DFIND_KVIKIO_CPP=ON}
 
