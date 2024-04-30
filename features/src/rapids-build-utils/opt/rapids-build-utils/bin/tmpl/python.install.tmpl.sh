@@ -114,7 +114,7 @@ install_${PY_LIB}_python() {
         PARALLEL_LEVEL="${n_jobs}"                   \
         CMAKE_ARGS="${cmake_args[*]}"                \
         SKBUILD_BUILD_OPTIONS="${ninja_args[*]}"     \
-        SKBUILD_LOGGING_LEVEL="${v:+VERBOSE}"        \
+        SKBUILD_LOGGING_LEVEL="${v:+INFO}"           \
         SKBUILD_INSTALL_STRIP="${strip:+True}"       \
         SKBUILD_CMAKE_VERBOSE="${v:+True}"           \
         SKBUILD_CMAKE_BUILD_TYPE="${build_type}"     \
