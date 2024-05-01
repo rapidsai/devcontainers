@@ -7,18 +7,27 @@ cd "$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )";
 # install global/common scripts
 . ./common/install.sh;
 
-check_packages      \
-    jq              \
-    cron            \
-    curl            \
-    sudo            \
-    wget            \
-    socat           \
-    tzdata          \
-    gettext-base    \
-    openssh-client  \
-    bash-completion \
-    ca-certificates ;
+PKGS=(
+    jq
+    cron
+    curl
+    sudo
+    wget
+    socat
+    tzdata
+    gettext-base
+    openssh-client
+    bash-completion
+    ca-certificates
+);
+
+if ! type /usr/bin/python3 >/dev/null 2>&1; then
+    PKGS+=(python3 python3-pip);
+elif ! /usr/bin/python3 -m pip >/dev/null 2>&1; then
+    PKGS+=(python3-pip);
+fi
+
+check_packages "${PKGS[@]}";
 
 source /etc/lsb-release;
 
@@ -27,9 +36,7 @@ if [[ ! "23.04" > "${DISTRIB_RELEASE}" ]]; then
 fi
 
 # upgrade pip
-if type python >/dev/null 2>&1; then
-    python -m pip install $BREAK_PACKAGES -U pip;
-fi
+/usr/bin/python3 -m pip install $BREAK_PACKAGES -U pip;
 
 # Install yq if not installed
 if ! type yq >/dev/null 2>&1; then

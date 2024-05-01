@@ -7,7 +7,15 @@ cd "$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )";
 # install global/common scripts
 . ./common/install.sh;
 
-check_packages bc jq pigz sudo wget gettext-base bash-completion ca-certificates;
+PKGS=(bc jq pigz sudo wget gettext-base bash-completion ca-certificates);
+
+if ! type /usr/bin/python3 >/dev/null 2>&1; then
+    PKGS+=(python3 python3-pip);
+elif ! /usr/bin/python3 -m pip >/dev/null 2>&1; then
+    PKGS+=(python3-pip);
+fi
+
+check_packages "${PKGS[@]}";
 
 # Install yq if not installed
 if ! type yq >/dev/null 2>&1; then
@@ -30,9 +38,8 @@ if [[ ! "23.04" > "${DISTRIB_RELEASE}" ]]; then
 fi
 
 # Install the rapids dependency file generator and conda-merge
-if type python >/dev/null 2>&1; then
-    python -m pip install $BREAK_PACKAGES rapids-dependency-file-generator conda-merge toml;
-fi
+/usr/bin/python3 -m pip install $BREAK_PACKAGES -U pip;
+/usr/bin/python3 -m pip install $BREAK_PACKAGES rapids-dependency-file-generator conda-merge toml;
 
 # Install RAPIDS build utility scripts to /opt/
 
