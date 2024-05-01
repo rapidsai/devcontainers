@@ -13,6 +13,13 @@
     "history",
     "devcontainer-utils-post-create-command"
   ],
+  "postStartCommand": [
+    "/bin/bash",
+    "-li",
+    "+o",
+    "history",
+    "devcontainer-utils-post-start-command"
+  ],
   "postAttachCommand": [
     "/bin/bash",
     "-li",
