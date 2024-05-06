@@ -18,6 +18,7 @@ Push-location "$PSScriptRoot"
 ./installers/install-cmake.ps1
 ./installers/install-ninja.ps1
 ./installers/install-sccache.ps1
+./installers/install-tbb.ps1
 
 ## Save the current environment without MSVC plugged in
 New-Item -ItemType Directory -Path "$HOME" -Name "build-env"
