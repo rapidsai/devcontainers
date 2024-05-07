@@ -12,6 +12,14 @@
       ],
       "default": "latest",
       "description": "lit version to install."
+    },
+    "tbbVersion": {
+      "type": "string",
+      "proposals": [
+        "2021.12.0"
+      ],
+      "default": "2021.12.0",
+      "description": "TBB version to install."
     }
   }
 }

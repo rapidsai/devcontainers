@@ -1,3 +1,4 @@
+export TBB_ROOT="${TBB_ROOT}";
 export LIT_VERSION="${LIT_VERSION}";
 
 if  [ -f "${USERHOME}/.local/share/venvs/cccl/bin/activate" ] \

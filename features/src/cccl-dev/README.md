@@ -16,6 +16,7 @@ A feature to install NVIDIA CCCL development utilities
 | Options Id | Description | Type | Default Value |
 |-----|-----|-----|-----|
 | litVersion | lit version to install. | string | latest |
+| tbbVersion | TBB version to install. | string | 2021.12.0 |
 
 
 

@@ -20,7 +20,7 @@ if ! type python >/dev/null 2>&1; then
   exit 1;
 fi
 
-PKG=("gettext-base" "libtbb-dev");
+PKG=("gettext-base");
 PKG_TO_REMOVE=();
 
 # Install gcc and g++ because we have to build psutil wheel for non-x86
@@ -57,11 +57,18 @@ chown -R "${USERNAME}:${USERNAME}" "${USERHOME}";
 export USERHOME;
 export LIT_VERSION="$(lit --version | grep -o -e '[0-9].*')";
 
+# Download and install TBB:
+TBB_VERSION="${TBBVERSION:-2021.12.0}";
+wget "https://github.com/oneapi-src/oneTBB/releases/download/v$TBB_VERSION/oneapi-tbb-$TBB_VERSION-lin.tgz" -O /tmp/tbb.tgz;
+tar -xzvf /tmp/tbb.tgz -C /opt/;
+rm /tmp/tbb.tgz;
+export TBB_ROOT="/opt/oneapi-tbb-$TBB_VERSION";
+
 # export envvars in bashrc files
-append_to_etc_bashrc "$(cat .bashrc | envsubst '$LIT_VERSION $USERHOME')";
-append_to_all_bashrcs "$(cat .bashrc | envsubst '$LIT_VERSION $USERHOME')";
+append_to_etc_bashrc "$(cat .bashrc | envsubst '$LIT_VERSION $USERHOME $TBB_ROOT')";
+append_to_all_bashrcs "$(cat .bashrc | envsubst '$LIT_VERSION $USERHOME $TBB_ROOT')";
 # export envvars in /etc/profile.d
-add_etc_profile_d_script cccl-dev "$(cat .bashrc | envsubst '$LIT_VERSION $USERHOME')";
+add_etc_profile_d_script cccl-dev "$(cat .bashrc | envsubst '$LIT_VERSION $USERHOME $TBB_ROOT')";
 
 # Clean up
 # rm -rf /tmp/*;
