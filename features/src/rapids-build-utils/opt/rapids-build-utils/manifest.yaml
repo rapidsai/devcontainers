@@ -91,7 +91,7 @@ repos:
       depends: [raft]
     - name: raft-dask
       sub_dir: python/raft-dask
-      depends: [raft]
+      depends: [ucxx, raft]
 
 - name: cuvs
   path: cuvs

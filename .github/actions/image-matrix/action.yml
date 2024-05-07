@@ -37,12 +37,13 @@ runs:
           image/*
           windows/**
           matrix.yml
-          .github/**/*windows*
-          .github/actions/build-linux-image/action.yml
-          .github/actions/image-matrix/action.sh
-          .github/actions/image-matrix/action.yml
+          .github/actions/build-linux-image/*
+          .github/actions/build-windows-image/*
+          .github/actions/image-matrix/*
+          .github/actions/test-windows-image/*
           .github/workflows/test.yml
-          .github/workflows/build-and-test-image.yml
+          .github/workflows/build-test-and-push-linux-image.yml
+          .github/workflows/build-test-and-push-windows-image.yml
 
     - name: Report changes
       if: inputs.full_matrix != 'true'
