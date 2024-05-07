@@ -1,7 +1,7 @@
-name: Release
+name: Release Windows
 
 concurrency:
-  group: release-on-${{ github.event_name }}-from-${{ github.ref_name }}
+  group: release-windows-on-${{ github.event_name }}-from-${{ github.ref_name }}
   cancel-in-progress: true
 
 on:
@@ -13,7 +13,7 @@ jobs:
     name: Determine image matrix
     runs-on: ubuntu-latest
     outputs:
-      linux: ${{ steps.matrix.outputs.linux }}
+      windows: ${{ steps.matrix.outputs.windows }}
     steps:
       - name: Checkout ${{ github.repository }}
         uses: actions/checkout@v4
@@ -27,23 +27,17 @@ jobs:
         with:
           full_matrix: 'true'
 
-  build-and-push-linux-images:
+  build-and-push-windows-images:
     name: ${{ matrix.name }}
     needs: image-matrix
     secrets: inherit
-    uses: ./.github/workflows/build-test-and-push-linux-image.yml
+    uses: ./.github/workflows/build-test-and-push-windows-image.yml
     strategy:
       fail-fast: false
-      matrix: ${{ fromJSON(needs.image-matrix.outputs.linux) }}
+      matrix: ${{ fromJSON(needs.image-matrix.outputs.windows) }}
     with:
       push: 'true'
       os: "${{ matrix.os }}"
       features: "${{ toJSON(matrix.features) }}"
       container_env: "${{ toJSON(matrix.env) }}"
       repo: "${{ vars.DOCKERHUB_REPOSITORY || github.repository }}"
-
-  release-features:
-    needs: build-and-push-linux-images
-    name: Release Features
-    secrets: inherit
-    uses: ./.github/workflows/release-features.yml
