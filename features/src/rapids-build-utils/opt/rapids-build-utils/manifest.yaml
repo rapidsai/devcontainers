@@ -47,6 +47,9 @@ repos:
     - name: kvikio
       sub_dir: python/kvikio
       depends: [KvikIO]
+    - name: libkvikio
+      sub_dir: python/libkvikio
+      depends: [KvikIO]
 
 - name: cudf
   path: cudf
