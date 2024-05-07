@@ -31,22 +31,24 @@ features="$(echo                        \
 || echo ''                              \
 )";
 
-if `# Include all images if full_matrix is true`                           \
-   [ "${full_matrix}" == "1" ]                                             \
-   `# Include all images if matrix or workflows changed`                   \
-|| grep -q 'matrix\.yml'                                   <<< "${files}"  \
-|| grep -q '\.github/workflows/test\.yml'                   <<< "${files}" \
-|| grep -q '\.github/actions/build-linux-image/action\.yml' <<< "${files}" \
-|| grep -q '\.github/actions/image-matrix/action\.sh'       <<< "${files}" \
-|| grep -q '\.github/actions/image-matrix/action\.yml'      <<< "${files}" \
-|| grep -q '\.github/workflows/build-and-test-image\.yml'   <<< "${files}" \
-   `# Include all images if cmake, ninja, sccache, `                       \
-   `# gitlab-cli, or utils features changed`                               \
-|| grep -qE "(${common_features})"  <<< "${features}"                      \
+if `# Include all images if full_matrix is true`                                      \
+   [ "${full_matrix}" == "1" ]                                                        \
+   `# Include all images if matrix or workflows changed`                              \
+|| grep -q 'matrix\.yml'                                               <<< "${files}" \
+|| grep -q '\.github/actions/build-linux-image/'                       <<< "${files}" \
+|| grep -q '\.github/actions/build-windows-image/'                     <<< "${files}" \
+|| grep -q '\.github/actions/test-windows-image/'                      <<< "${files}" \
+|| grep -q '\.github/actions/image-matrix/'                            <<< "${files}" \
+|| grep -q '\.github/workflows/test\.yml'                              <<< "${files}" \
+|| grep -q '\.github/workflows/build-test-and-push-linux-image\.yml'   <<< "${files}" \
+|| grep -q '\.github/workflows/build-test-and-push-windows-image\.yml' <<< "${files}" \
+   `# Include all images if cmake, ninja, sccache, `                                  \
+   `# gitlab-cli, or utils features changed`                                          \
+|| grep -qE "(${common_features})"  <<< "${features}"                                 \
 ; then
-  features="$(                                                  \
-      find features/src -mindepth 1 -maxdepth 1 -type d -print0 \
-    | xargs -0 -r -I% sh -c 'echo -n "\"$(basename %)\","'      \
+  features="$(                                                                        \
+      find features/src -mindepth 1 -maxdepth 1 -type d -print0                       \
+    | xargs -0 -r -I% sh -c 'echo -n "\"$(basename %)\","'                            \
   )";
   features="[${features%,}]";
 fi
