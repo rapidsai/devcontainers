@@ -7,18 +7,27 @@ cd "$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )";
 # install global/common scripts
 . ./common/install.sh;
 
-check_packages      \
-    jq              \
-    cron            \
-    curl            \
-    sudo            \
-    wget            \
-    socat           \
-    tzdata          \
-    gettext-base    \
-    openssh-client  \
-    bash-completion \
-    ca-certificates ;
+PKGS=(
+    jq
+    cron
+    curl
+    sudo
+    wget
+    socat
+    tzdata
+    gettext-base
+    openssh-client
+    bash-completion
+    ca-certificates
+);
+
+if ! type /usr/bin/python3 >/dev/null 2>&1; then
+    PKGS+=(python3 python3-pip);
+elif ! /usr/bin/python3 -m pip >/dev/null 2>&1; then
+    PKGS+=(python3-pip);
+fi
+
+check_packages "${PKGS[@]}";
 
 source /etc/lsb-release;
 
@@ -27,9 +36,7 @@ if [[ ! "23.04" > "${DISTRIB_RELEASE}" ]]; then
 fi
 
 # upgrade pip
-if type python >/dev/null 2>&1; then
-    python -m pip install $BREAK_PACKAGES -U pip;
-fi
+/usr/bin/python3 -m pip install $BREAK_PACKAGES -U pip;
 
 # Install yq if not installed
 if ! type yq >/dev/null 2>&1; then
@@ -69,10 +76,13 @@ declare -a commands_and_sources=(
     "generate-bash-completion           bash/generate-bash-completion.sh"
     "shell-is-interactive               shell-is-interactive.sh"
     "post-create-command                post-create-command.sh"
+    "post-start-command                 post-start-command.sh"
+    "post-start-command-entrypoint      post-start-command-entrypoint.sh"
     "post-attach-command                post-attach-command.sh"
     "post-attach-command-entrypoint     post-attach-command-entrypoint.sh"
     "python-repl-startup                python-repl-startup.py"
     "init-git                           git/init.sh"
+    "init-git-interactive               git/init-interactive.sh"
     "clone-git-repo                     git/repo/clone.sh"
     "init-ssh-deploy-keys               ssh/init-deploy-keys.sh"
     "init-github-cli                    github/cli/init.sh"

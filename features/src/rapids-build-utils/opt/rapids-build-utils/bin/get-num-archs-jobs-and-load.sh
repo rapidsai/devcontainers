@@ -51,10 +51,10 @@ get_num_archs_jobs_and_load() {
     fi
 
     parallel="${j:-${JOBS:-${PARALLEL_LEVEL:-1}}}";
-    max_archs="${max_archs:-${MAX_DEVICE_OBJ_TO_COMPILE_IN_PARALLEL:-3}}";
+    max_archs="${max_archs:-${MAX_DEVICE_OBJ_TO_COMPILE_IN_PARALLEL:-${archs:-3}}}";
     max_device_obj_memory_usage="${max_device_obj_memory_usage:-${MAX_DEVICE_OBJ_MEMORY_USAGE:-1}}";
 
-    local n_arch=${archs:-0};
+    local n_arch="${archs:-0}";
 
     if test -z "${archs:-}" \
     && test -n "${INFER_NUM_DEVICE_ARCHITECTURES:-}"; then
@@ -85,7 +85,7 @@ get_num_archs_jobs_and_load() {
 
     local mem_for_device_objs=1;
 
-    if test ${n_arch} -le 0; then
+    if test "${n_arch}" -le 0; then
         n_arch=1;
     else
         # Clamp to `min(n_arch, max_archs)` threads per job
