@@ -20,7 +20,7 @@ if ! type python >/dev/null 2>&1; then
   exit 1;
 fi
 
-PKG=("gettext-base");
+PKG=("gettext-base" "wget");
 PKG_TO_REMOVE=();
 
 # Install gcc and g++ because we have to build psutil wheel for non-x86
