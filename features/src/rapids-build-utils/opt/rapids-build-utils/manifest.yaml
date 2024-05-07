@@ -89,7 +89,7 @@ repos:
       args: {cmake: -DFIND_RAFT_CPP=ON}
     - name: raft-dask
       sub_dir: python/raft-dask
-      depends: [raft]
+      depends: [ucxx, raft]
       args: {cmake: -DFIND_RAFT_CPP=ON}
 
 - name: cuvs
