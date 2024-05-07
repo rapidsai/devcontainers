@@ -45,7 +45,6 @@ repos:
     - name: kvikio
       sub_dir: python/kvikio
       depends: [KvikIO]
-      args: {cmake: -DFIND_KVIKIO_CPP=ON}
 
 - name: cudf
   path: cudf
