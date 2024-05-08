@@ -55,25 +55,27 @@
         "ms-python.flake8",
         "nvidia.nsight-vscode-edition"
       ],
-      "files.watcherExclude": {
-        "**/build/**": true,
-        "**/_skbuild/**": true,
-        "**/target/**": true,
-        "/home/coder/.aws/**/*": true,
-        "/home/coder/.cache/**/*": true,
-        "/home/coder/.conda/**/*": true,
-        "/home/coder/.local/share/**/*": true,
-        "/home/coder/.vscode-server/**/*": true
-      },
-      "search.exclude": {
-        "**/build/**": true,
-        "**/_skbuild/**": true,
-        "**/*.code-search": true,
-        "/home/coder/.aws/**/*": true,
-        "/home/coder/.cache/**/*": true,
-        "/home/coder/.conda/**/*": true,
-        "/home/coder/.local/share/**/*": true,
-        "/home/coder/.vscode-server/**/*": true
+      "settings": {
+        "files.watcherExclude": {
+          "**/build/**": true,
+          "**/_skbuild/**": true,
+          "**/target/**": true,
+          "/home/coder/.aws/**/*": true,
+          "/home/coder/.cache/**/*": true,
+          "/home/coder/.conda/**/*": true,
+          "/home/coder/.local/share/**/*": true,
+          "/home/coder/.vscode-server/**/*": true
+        },
+        "search.exclude": {
+          "**/build/**": true,
+          "**/_skbuild/**": true,
+          "**/*.code-search": true,
+          "/home/coder/.aws/**/*": true,
+          "/home/coder/.cache/**/*": true,
+          "/home/coder/.conda/**/*": true,
+          "/home/coder/.local/share/**/*": true,
+          "/home/coder/.vscode-server/**/*": true
+        }
       }
     }
   }
