@@ -9,7 +9,14 @@
 #
 # Boolean options:
 #  -h,--help     Print this text.
-#  -v,--verbose  Verbose output.
+#  -q,--quiet    Less output. Option is additive, and can be
+#                used up to 3 times (corresponding to WARNING,
+#                ERROR, and CRITICAL logging levels).
+#  -v,--verbose  Give more output. Option is additive, and can be
+#                used up to 3 times.
+#
+# Options that require values:
+#  -j,--parallel <num>  Uninstall <num> repos in parallel.
 
 # shellcheck disable=SC1091
 . rapids-generate-docstring;
@@ -18,16 +25,20 @@ uninstall_all() {
     local -;
     set -euo pipefail;
 
-    eval "$(_parse_args --take '-h,--help' "$@" <&0)";
+    eval "$(_parse_args --take '-h,--help -j|--parallel' "$@" <&0)";
+
+    eval "$(rapids-get-num-archs-jobs-and-load --archs 0 "$@")";
 
     # shellcheck disable=SC1091
     . devcontainer-utils-debug-output 'rapids_build_utils_debug' 'uninstall-all';
 
-    for name in ${NAMES}; do
-        if type uninstall-${name} >/dev/null 2>&1; then
-            uninstall-${name} "${OPTS[@]}";
-        fi
-    done
+    echo ${NAMES} \
+  | tr '[:space:]' '\0' \
+  | xargs ${v:+-t} -r -0 -P${n_jobs} -I% bash -c "
+    if type uninstall-% >/dev/null 2>&1; then
+        uninstall-% ${OPTS[*]} || exit 255;
+    fi
+    ";
 }
 
 uninstall_all "$@" <&0;
