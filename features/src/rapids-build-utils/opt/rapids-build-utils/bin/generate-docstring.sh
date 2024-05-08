@@ -163,7 +163,7 @@ _include_pip_wheel_options\
         local -;
         set -euo pipefail;
         eval "$(_parse_args "$@" <&0)";
-        echo "${ARGS[*]}";
+        echo "${ARGS[*]@Q}";
     }
 
     _parse_args() {
