@@ -3,5 +3,7 @@ Invoke-WebRequest -Uri "https://github.com/oneapi-src/oneTBB/releases/download/v
 Expand-Archive .\tbb.zip
 Remove-Item .\tbb.zip
 
+$cwd = Get-Location
+
 # CMake 3.27 or greater can locate packages from this env var:
-$ENV:TBB_ROOT = "$PSScriptRoot\tbb\oneapi-tbb-$TBB_VERSION"
+$ENV:TBB_ROOT = "$cwd\tbb\oneapi-tbb-$TBB_VERSION"
