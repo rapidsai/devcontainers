@@ -85,7 +85,7 @@ repos:
   python:
     - name: libraft
       sub_dir: python/libraft
-      depends: [librmm, raft]
+      depends: [raft]
     - name: pylibraft
       sub_dir: python/pylibraft
       depends: [raft]
