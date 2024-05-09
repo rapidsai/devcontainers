@@ -145,9 +145,6 @@ repos:
         cmake: |
           -DCMAKE_CUDA_ARCHITECTURES="${CUDAARCHS}"
   python:
-    - name: libcugraphops
-      sub_dir: libcugraphops_python
-      depends: [cugraph-ops]
     - name: pylibcugraphops
       sub_dir: pylibcugraphops
       depends: [cugraph-ops]
