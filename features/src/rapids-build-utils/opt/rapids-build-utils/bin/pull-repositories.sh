@@ -63,25 +63,28 @@ pull_repositories() {
 
             read -rp "
 ############################################################
-Branch \"${branch}\" $(
-if test -n "${default_branch}"; then
-    echo "and \"${default_branch}\"";
-fi
-) not found in:
+$(
+    test -z "${default_branch:-}" && \
+    echo "Branch \"${branch}\" " || \
+    echo "Branches \"${branch}\" and \"${default_branch}\" "
+)\
+not found in:
 ${remote_info}
 ############################################################
 
 Please enter a branch name to pull (or leave empty to skip): " branch </dev/tty
+
+            if test -z "${branch:-}"; then
+                echo "No alternate branch name supplied, skipping";
+                break;
+            fi
         done
 
         if test -n "${branch:-}"; then
             echo "Pulling ${!repo_name} ${remote}/${branch}...";
             git -C ~/${!repo_path} pull --no-tags "${remote}" "${branch}";
             git -C ~/${!repo_path} submodule update --init --recursive;
-        else
-            echo "No alternate branch name supplied, skipping";
-        fi;
-
+        fi
     done
 }
 

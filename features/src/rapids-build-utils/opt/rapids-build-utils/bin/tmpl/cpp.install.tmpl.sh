@@ -29,10 +29,11 @@ install_${CPP_LIB}_cpp() {
             comp="";
         fi
         time (
+            local -a cmake_install_args="($(rapids-select-cmake-install-args "${OPTS[@]}"))";
             cmake --install "${CPP_SRC}/${BIN_DIR}/" \
                   --prefix "${prefix}"               \
                   ${comp:+--component "${comp}"}     \
-                  $(rapids-select-cmake-install-args "${OPTS[@]}");
+                  "${cmake_install_args[@]}";
 
             { set +x; } 2>/dev/null; echo -n "lib${CPP_LIB}${component:+ $component} install time:";
         ) 2>&1;
