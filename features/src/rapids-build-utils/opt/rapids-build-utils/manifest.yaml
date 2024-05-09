@@ -83,15 +83,14 @@ repos:
       sub_dir: cpp
       depends: [rmm]
   python:
-    - name: libraft
-      sub_dir: python/libraft
-      depends: [raft]
     - name: pylibraft
       sub_dir: python/pylibraft
       depends: [raft]
+      args: {cmake: -DFIND_RAFT_CPP=ON}
     - name: raft-dask
       sub_dir: python/raft-dask
       depends: [ucxx, raft]
+      args: {cmake: -DFIND_RAFT_CPP=ON}
 
 - name: cuvs
   path: cuvs
@@ -145,9 +144,6 @@ repos:
         cmake: |
           -DCMAKE_CUDA_ARCHITECTURES="${CUDAARCHS}"
   python:
-    - name: libcugraphops
-      sub_dir: libcugraphops_python
-      depends: [cugraph-ops]
     - name: pylibcugraphops
       sub_dir: pylibcugraphops
       depends: [cugraph-ops]
