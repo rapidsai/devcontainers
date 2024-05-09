@@ -112,7 +112,7 @@ install_${PY_LIB}_python() {
         CUDAFLAGS="${cudaflags}"                     \
         CMAKE_GENERATOR="${G:-Ninja}"                \
         PARALLEL_LEVEL="${n_jobs}"                   \
-        CMAKE_ARGS="${cmake_args[*]}"                \
+        CMAKE_ARGS="${cmake_args[*]@Q}"              \
         SKBUILD_BUILD_OPTIONS="${ninja_args[*]}"     \
         SKBUILD_BUILD_TOOL_ARGS="${ninja_args[*]}"   \
         SKBUILD_LOGGING_LEVEL="${v:+INFO}"           \
