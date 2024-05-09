@@ -6,8 +6,12 @@
 # Uninstall ${CPP_LIB} and ${PY_LIB}.
 #
 # Boolean options:
-#  -h,--help          Print this text.
-#  -v,--verbose       Verbose output.
+#  -h,--help     Print this text.
+#  -q,--quiet    Less output. Option is additive, and can be
+#                used up to 3 times (corresponding to WARNING,
+#                ERROR, and CRITICAL logging levels).
+#  -v,--verbose  Give more output. Option is additive, and can be
+#                used up to 3 times.
 
 # shellcheck disable=SC1091
 . rapids-generate-docstring;

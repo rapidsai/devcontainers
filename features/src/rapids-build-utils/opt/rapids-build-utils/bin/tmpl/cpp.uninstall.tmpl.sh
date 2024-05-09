@@ -6,8 +6,8 @@
 # Uninstall ${CPP_LIB}.
 #
 # Boolean options:
-#  -h,--help          Print this text.
-#  -v,--verbose       Verbose output.
+#  -h,--help                                     Print this text.
+#  -v,--verbose                                  Verbose output.
 #
 # Options that require values:
 #  -o,--out-dir <dir>                            Uninstall files from cpack'd TGZ in <dir>
@@ -65,7 +65,7 @@ uninstall_${CPP_LIB}_cpp() {
                 # shellcheck disable=SC2016
                 if test -n "${outd:-}"; then
                     local patt="cudf-.*${comp:+-$comp}-${kernel}";
-                    _list_archive | grep -Ev '^.*/$' | xargs -rd'\n' rm -f ${v:+-v} --;
+                    _list_archive | grep -Ev '^.*/$' | xargs -rd'\n' rm -f ${v:+-v} -- || true;
                     _list_archive | grep -E '^.*/$'  | xargs -rd'\n' rmdir ${v:+-v} --ignore-fail-on-non-empty 2>/dev/null || true;
                 fi
             fi
