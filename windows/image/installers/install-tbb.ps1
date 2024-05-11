@@ -7,3 +7,6 @@ $cwd = Get-Location
 
 # CMake 3.27 or greater can locate packages from this env var:
 $ENV:TBB_ROOT = "$cwd\tbb\oneapi-tbb-$TBB_VERSION"
+
+# Add dlls to path:
+$ENV:PATH="$ENV:PATH;$ENV:TBB_ROOT\redist\intel64\vc14\"
