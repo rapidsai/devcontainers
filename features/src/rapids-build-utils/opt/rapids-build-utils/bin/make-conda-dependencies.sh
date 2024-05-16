@@ -44,12 +44,20 @@ make_conda_dependencies() {
 
     local -a _exclude=(ninja);
     local exc; for exc in "${exclude[@]}"; do
-        _exclude+=(-f "${exc}");
+        if test -f "${exc}"; then
+            _exclude+=(-f "${exc}");
+        else
+            _exclude+=("${exc}");
+        fi
     done
 
     local -a _include=();
     local inc; for inc in "${include[@]}"; do
-        _include+=(-f "${inc}");
+        if test -r "${inc}"; then
+            _include+=(-f "${inc}");
+        else
+            _include+=("${inc}");
+        fi
     done
 
     local cuda_version="${CUDA_VERSION:-${CUDA_VERSION_MAJOR:-12}.${CUDA_VERSION_MINOR:-0}}";
