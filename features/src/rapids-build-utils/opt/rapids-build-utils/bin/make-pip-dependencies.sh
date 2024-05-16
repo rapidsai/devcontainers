@@ -43,7 +43,7 @@ make_pip_dependencies() {
     test ${#key[@]} -eq 0 && key=(py_build py_run py_test all);
     test ${#requirement[@]} -eq 0 && requirement=();
 
-    local -a _exclude=();
+    local -a _exclude=(ninja);
     local exc; for exc in "${exclude[@]}"; do
         _exclude+=(-f "${exc}");
     done

@@ -42,7 +42,7 @@ make_conda_dependencies() {
     test ${#include[@]} -eq 0 && include=();
     test ${#key[@]} -eq 0 && key=(all);
 
-    local -a _exclude=();
+    local -a _exclude=(ninja);
     local exc; for exc in "${exclude[@]}"; do
         _exclude+=(-f "${exc}");
     done
