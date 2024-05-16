@@ -45,7 +45,7 @@ build_${PY_LIB}_python_wheel() {
     . devcontainer-utils-debug-output 'rapids_build_utils_debug' 'build-all build-${NAME} build-${PY_LIB}-python build-${PY_LIB}-python-wheel';
 
     local -a cmake_args="(
-        -G \"${G:-Ninja}\"
+        -G\"${G:-Ninja}\"
         ${cmake_args_[*]@Q}
         ${CPP_DEPS}
         ${v:+--log-level=VERBOSE}

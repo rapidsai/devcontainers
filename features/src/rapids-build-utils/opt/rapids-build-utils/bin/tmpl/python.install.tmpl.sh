@@ -45,7 +45,7 @@ install_${PY_LIB}_python() {
     . devcontainer-utils-debug-output 'rapids_build_utils_debug' 'build-all build-${NAME} build-${PY_LIB}-python build-${PY_LIB}-python-editable install-all install-${NAME} install-${PY_LIB}-python';
 
     local -a cmake_args="(
-        -G \"${G:-Ninja}\"
+        -G\"${G:-Ninja}\"
         ${cmake_args_[*]@Q}
         ${CPP_DEPS}
         ${v:+--log-level=VERBOSE}
