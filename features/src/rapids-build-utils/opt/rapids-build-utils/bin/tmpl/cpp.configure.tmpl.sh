@@ -39,7 +39,7 @@ configure_${CPP_LIB}_cpp() {
     . devcontainer-utils-debug-output 'rapids_build_utils_debug' 'configure-all configure-${NAME} configure-${CPP_LIB}-cpp';
 
     local -a cmake_args="(
-        -G \"${G:-Ninja}\"
+        -G\"${G:-Ninja}\"
         ${cmake_args_[*]@Q}
         ${CPP_DEPS}
         ${v:+--log-level=VERBOSE}
