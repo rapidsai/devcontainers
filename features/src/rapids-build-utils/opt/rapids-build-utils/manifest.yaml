@@ -1,6 +1,6 @@
 x-git-defaults: &git_defaults
     host: github
-    tag: branch-24.06
+    tag: branch-24.08
     upstream: rapidsai
 
 repos:
@@ -21,7 +21,7 @@ repos:
 
 - name: ucxx
   path: ucxx
-  git: {<<: *git_defaults, repo: ucxx, tag: branch-0.38}
+  git: {<<: *git_defaults, repo: ucxx, tag: branch-0.39}
   cpp:
     - name: ucxx
       sub_dir: cpp
