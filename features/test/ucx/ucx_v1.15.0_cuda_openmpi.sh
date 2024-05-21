@@ -25,7 +25,7 @@ ucx_info -v;
 check "ucx version" bash -c "echo '$UCX_VERSION' | grep '$(ucx_info -v | head -n1 | cut -d' ' -f4)'";
 
 echo "OPENMPI_VERSION: $OPENMPI_VERSION";
-check "mpic exists and is on path" which mpic
+check "mpicc exists and is on path" which mpicc
 check "mpicxx exists and is on path" which mpicxx
 
 # Report result
