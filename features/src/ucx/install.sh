@@ -106,14 +106,16 @@ build_and_install_openmpi_for_ucx() {
 
     local cuda="$(read_cuda_version)";
 
-    git clone https://github.com/open-mpi/ompi.git /tmp/ompi --depth 1 --branch "v${OPENMPI_VERSION}";
+    set -x;
+
+    local major_minor="$(grep -o '^[0-9]*.[0-9]*' <<< "${OPENMPI_VERSION}")";
+
+    wget --no-hsts -q -O- "https://download.open-mpi.org/release/open-mpi/v${major_minor}/openmpi-${OPENMPI_VERSION}.tar.gz" \
+  | tar -C /tmp/ompi -zf - --strip-components=1 -x;
 
     (
         cd /tmp/ompi;
-        ./autogen.pl;
-        mkdir build
-        cd build;
-        ../configure \
+        ./configure \
             --prefix=/usr \
             --disable-dependency-tracking \
             --enable-mpi-fortran \
