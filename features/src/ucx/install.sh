@@ -72,7 +72,7 @@ install_build_deps() {
     if ! dpkg -s libibverbs-dev > /dev/null 2>&1; then PKG_TO_REMOVE+=(libibverbs-dev); fi;
     if ! dpkg -s build-essential > /dev/null 2>&1; then PKG_TO_REMOVE+=(build-essential); fi;
 
-    check_packages ${PKG[@]} ${PKG_TO_REMOVE[@]};
+    check_packages ${PKG[@]} ${PKG_TO_REMOVE[@]} >&2;
 
     echo "${PKG_TO_REMOVE[@]}";
 }
