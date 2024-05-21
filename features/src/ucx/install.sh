@@ -60,6 +60,7 @@ install_build_deps() {
     local PKG=(git libevent-dev libibverbs1 librdmacm1 libnuma1 numactl);
     local PKG_TO_REMOVE=();
 
+    if ! dpkg -s gfortran > /dev/null 2>&1; then PKG_TO_REMOVE+=(gfortran); fi;
     if ! dpkg -s libtool > /dev/null 2>&1; then PKG_TO_REMOVE+=(libtool); fi;
     if ! dpkg -s automake > /dev/null 2>&1; then PKG_TO_REMOVE+=(automake); fi;
     if ! dpkg -s zlib1g-dev > /dev/null 2>&1; then PKG_TO_REMOVE+=(zlib1g-dev); fi;
