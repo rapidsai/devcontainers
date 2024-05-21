@@ -56,7 +56,7 @@ install_ucx_release() {
 }
 
 install_build_deps() {
-    local pkg=(git libevent-dev libibverbs1 librdmacm1 libnuma1 numactl);
+    local pkg=(git libevent-2.1-7 libhwloc15 libibverbs1 librdmacm1 libnuma1 numactl);
     local pkg_to_remove=();
 
     if ! dpkg -s gfortran > /dev/null 2>&1; then pkg_to_remove+=(gfortran); fi;
@@ -67,7 +67,6 @@ install_build_deps() {
     if ! dpkg -s libhwloc-dev > /dev/null 2>&1; then pkg_to_remove+=(libhwloc-dev); fi;
     if ! dpkg -s libnuma-dev > /dev/null 2>&1; then pkg_to_remove+=(libnuma-dev); fi;
     if ! dpkg -s librdmacm-dev > /dev/null 2>&1; then pkg_to_remove+=(librdmacm-dev); fi;
-    if ! dpkg -s libibverbs-dev > /dev/null 2>&1; then pkg_to_remove+=(libibverbs-dev); fi;
     if ! dpkg -s libibverbs-dev > /dev/null 2>&1; then pkg_to_remove+=(libibverbs-dev); fi;
     if ! dpkg -s build-essential > /dev/null 2>&1; then pkg_to_remove+=(build-essential); fi;
 
