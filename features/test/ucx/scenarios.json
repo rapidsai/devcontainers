@@ -20,5 +20,18 @@
         "version": "1.15.0-rc3"
       }
     }
+  },
+  "ucx_v1.15.0_cuda_openmpi": {
+    "build": {
+      "dockerfile": "Dockerfile"
+    },
+    "features": {
+      "cuda": {
+        "version": "12.4"
+      },
+      "ucx": {
+        "version": "1.15.0"
+      }
+    }
   }
 }
