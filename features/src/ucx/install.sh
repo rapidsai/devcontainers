@@ -1,5 +1,5 @@
 #! /usr/bin/env bash
-set -e
+set -ex
 
 UCX_VERSION="${VERSION:-latest}";
 
@@ -51,34 +51,34 @@ install_ucx_release() {
     mkdir /tmp/ucx;
     tar -C /tmp/ucx -xvjf /tmp/ucx.tar.bz2;
     apt_get_update;
-    DEBIAN_FRONTEND=noninteractive \
-    apt-get -y install --no-install-recommends /tmp/ucx/*.deb || true;
-    apt-get -y --fix-broken install;
+    DEBIAN_FRONTEND=noninteractive apt-get -y install --no-install-recommends /tmp/ucx/*.deb || true;
+    DEBIAN_FRONTEND=noninteractive apt-get -y --fix-broken install;
 }
 
 install_build_deps() {
-    local PKG=(git libevent-dev libibverbs1 librdmacm1 libnuma1 numactl);
-    local PKG_TO_REMOVE=();
+    local pkg=(git libevent-dev libibverbs1 librdmacm1 libnuma1 numactl);
+    local pkg_to_remove=();
 
-    if ! dpkg -s gfortran > /dev/null 2>&1; then PKG_TO_REMOVE+=(gfortran); fi;
-    if ! dpkg -s libtool > /dev/null 2>&1; then PKG_TO_REMOVE+=(libtool); fi;
-    if ! dpkg -s automake > /dev/null 2>&1; then PKG_TO_REMOVE+=(automake); fi;
-    if ! dpkg -s zlib1g-dev > /dev/null 2>&1; then PKG_TO_REMOVE+=(zlib1g-dev); fi;
-    if ! dpkg -s libnl-3-dev > /dev/null 2>&1; then PKG_TO_REMOVE+=(libnl-3-dev); fi;
-    if ! dpkg -s libhwloc-dev > /dev/null 2>&1; then PKG_TO_REMOVE+=(libhwloc-dev); fi;
-    if ! dpkg -s libnuma-dev > /dev/null 2>&1; then PKG_TO_REMOVE+=(libnuma-dev); fi;
-    if ! dpkg -s librdmacm-dev > /dev/null 2>&1; then PKG_TO_REMOVE+=(librdmacm-dev); fi;
-    if ! dpkg -s libibverbs-dev > /dev/null 2>&1; then PKG_TO_REMOVE+=(libibverbs-dev); fi;
-    if ! dpkg -s libibverbs-dev > /dev/null 2>&1; then PKG_TO_REMOVE+=(libibverbs-dev); fi;
-    if ! dpkg -s build-essential > /dev/null 2>&1; then PKG_TO_REMOVE+=(build-essential); fi;
+    if ! dpkg -s gfortran > /dev/null 2>&1; then pkg_to_remove+=(gfortran); fi;
+    if ! dpkg -s libtool > /dev/null 2>&1; then pkg_to_remove+=(libtool); fi;
+    if ! dpkg -s automake > /dev/null 2>&1; then pkg_to_remove+=(automake); fi;
+    if ! dpkg -s zlib1g-dev > /dev/null 2>&1; then pkg_to_remove+=(zlib1g-dev); fi;
+    if ! dpkg -s libnl-3-dev > /dev/null 2>&1; then pkg_to_remove+=(libnl-3-dev); fi;
+    if ! dpkg -s libhwloc-dev > /dev/null 2>&1; then pkg_to_remove+=(libhwloc-dev); fi;
+    if ! dpkg -s libnuma-dev > /dev/null 2>&1; then pkg_to_remove+=(libnuma-dev); fi;
+    if ! dpkg -s librdmacm-dev > /dev/null 2>&1; then pkg_to_remove+=(librdmacm-dev); fi;
+    if ! dpkg -s libibverbs-dev > /dev/null 2>&1; then pkg_to_remove+=(libibverbs-dev); fi;
+    if ! dpkg -s libibverbs-dev > /dev/null 2>&1; then pkg_to_remove+=(libibverbs-dev); fi;
+    if ! dpkg -s build-essential > /dev/null 2>&1; then pkg_to_remove+=(build-essential); fi;
 
-    check_packages ${PKG[@]} ${PKG_TO_REMOVE[@]} >&2;
+    apt-get update -y >&2;
+    check_packages "${pkg[@]}" "${pkg_to_remove[@]}" >&2;
 
-    echo "${PKG_TO_REMOVE[@]}";
+    echo "${pkg_to_remove[@]}";
 }
 
 build_and_install_ucx() {
-    local cuda="$(read_cuda_version)";
+    local -r cuda="$(read_cuda_version)";
 
     mkdir /tmp/ucx;
 
@@ -104,11 +104,8 @@ build_and_install_ucx() {
 build_and_install_openmpi_for_ucx() {
     mkdir /tmp/ompi;
 
-    local cuda="$(read_cuda_version)";
-
-    set -x;
-
-    local major_minor="$(grep -o '^[0-9]*.[0-9]*' <<< "${OPENMPI_VERSION}")";
+    local -r cuda="$(read_cuda_version)";
+    local -r major_minor="$(grep -o '^[0-9]*.[0-9]*' <<< "${OPENMPI_VERSION}")";
 
     wget --no-hsts -q -O- "https://download.open-mpi.org/release/open-mpi/v${major_minor}/openmpi-${OPENMPI_VERSION}.tar.gz" \
   | tar -C /tmp/ompi -zf - --strip-components=1 -x;
@@ -167,8 +164,7 @@ BUILD_OPENMPI_FOR_UCX=
 if dpkg -s libopenmpi-dev > /dev/null 2>&1; then
     BUILD_OPENMPI_FOR_UCX=1;
     OPENMPI_VERSION="$(apt-cache policy libopenmpi-dev | grep Installed: | tr -d '[:blank:]' | cut -d: -f2 | cut -d- -f1)";
-    DEBIAN_FRONTEND=noninteractive apt remove -y libopenmpi-dev;
-    DEBIAN_FRONTEND=noninteractive apt-get -y autoremove;
+    DEBIAN_FRONTEND=noninteractive apt-get remove -y libopenmpi-dev;
 fi
 
 declare -a PKG_TO_REMOVE;
@@ -191,8 +187,9 @@ fi
 
 if test ${#PKG_TO_REMOVE[@]} -gt 0; then
     DEBIAN_FRONTEND=noninteractive apt-get -y remove "${PKG_TO_REMOVE[@]}";
-    DEBIAN_FRONTEND=noninteractive apt-get -y autoremove;
 fi
+
+DEBIAN_FRONTEND=noninteractive apt-get -y autoremove;
 
 export UCX_VERSION;
 
