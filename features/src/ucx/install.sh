@@ -174,12 +174,12 @@ declare -a PKG_TO_REMOVE;
 if download_ucx_release; then
     install_ucx_release;
 else
-    mapfile -t PKG_TO_REMOVE < <(install_build_deps);
+    IFS=" " read -r -a PKG_TO_REMOVE <<< "$(install_build_deps)";
     build_and_install_ucx;
 fi
 
 if test -n "${BUILD_OPENMPI_FOR_UCX:-}"; then
-    mapfile -t PKG_TO_REMOVE < <(install_build_deps);
+    IFS=" " read -r -a PKG_TO_REMOVE <<< "$(install_build_deps)";
     build_and_install_openmpi_for_ucx;
     export OMPI_MCA_btl=ucx;
     export OMPI_MCA_pml=ucx;
