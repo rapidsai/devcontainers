@@ -39,11 +39,11 @@ mpirun --version
 check "mpirun --version works" mpirun --version
 check "mpirun version" bash -c "grep '$OPENMPI_VERSION' <(mpirun --version | head -n1 | cut -d' ' -f4)";
 
-check "OMPI_MCA_btl is ucx" test '${OMPI_MCA_btl:-}' = ucx
-check "OMPI_MCA_pml is ucx" test '${OMPI_MCA_pml:-}' = ucx
-check "OMPI_MCA_osc is ucx" test '${OMPI_MCA_osc:-}' = ucx
+check "OMPI_MCA_btl is ucx" test "${OMPI_MCA_btl:-}" = ucx
+check "OMPI_MCA_pml is ucx" test "${OMPI_MCA_pml:-}" = ucx
+check "OMPI_MCA_osc is ucx" test "${OMPI_MCA_osc:-}" = ucx
 
-check "OMPI_MCA_opal_cuda_support is true" test '${OMPI_MCA_opal_cuda_support:-}' = true
+check "OMPI_MCA_opal_cuda_support is true" test "${OMPI_MCA_opal_cuda_support:-}" = true
 
 # Report result
 # If any of the checks above exited with a non-zero exit code, the test will fail.
