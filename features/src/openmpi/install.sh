@@ -22,6 +22,12 @@ read_cuda_version() {
     echo "${cuda}";
 }
 
+ENABLE_UCX=;
+ENABLE_CUDA=;
+
+if test -n "${UCX_VERSION:-}"; then ENABLE_UCX=1; fi
+if test -n "$(read_cuda_version)"; then ENABLE_CUDA=1; fi
+
 install_openmpi_deps() {
     local -r openmpi_lib="$(
         apt-cache depends libopenmpi-dev \
@@ -36,7 +42,7 @@ install_openmpi_deps() {
       | grep -P '^  Depends:'                \
       | sed 's/^  Depends: //'               \
       | (                                    \
-        if test -n "${UCX_VERSION:-}";       \
+        if test "${ENABLE_UCX:-}" = 1;       \
         then grep -v ucx || [ "$?" == "1" ]; \
         else cat -; \
         fi \
@@ -64,21 +70,20 @@ install_openmpi_deps() {
 build_and_install_openmpi() {
     mkdir /tmp/ompi;
 
-    local -r cuda="$(read_cuda_version)";
-    local -r major_minor="$(grep -o '^[0-9]*.[0-9]*' <<< "${OPENMPI_VERSION}")";
-
     local -a ucx_args=();
-    if test -n "${UCX_VERSION:-}"; then
+    if test "${ENABLE_UCX:-}" = 1; then
         ucx_args+=(--with-ucx=/usr);
     fi
 
     local -a cuda_args=();
-    if test -n "${cuda:-}"; then
+    if test "${ENABLE_CUDA}" = 1; then
         cuda_args+=(--with-cuda="${CUDA_HOME:-/usr/local/cuda}");
         cuda_args+=(--with-cuda-libdir="${CUDA_HOME:-/usr/local/cuda}/lib64/stubs}");
     fi
 
     IFS=" " read -r -a openmpi_dev_deps <<< "$(install_openmpi_deps)";
+
+    local -r major_minor="$(grep -o '^[0-9]*.[0-9]*' <<< "${OPENMPI_VERSION}")";
 
     wget --no-hsts -q -O- "https://download.open-mpi.org/release/open-mpi/v${major_minor}/openmpi-${OPENMPI_VERSION}.tar.gz" \
   | tar -C /tmp/ompi -zf - --strip-components=1 -x;
@@ -106,7 +111,7 @@ build_and_install_openmpi() {
         make -j"$(nproc --all)";
         make install;
 
-        if test -n "${UCX_VERSION:-}"; then
+        if test "${ENABLE_UCX:-}" = 1; then
             echo "setting MCA btl to ^ucx..."
             echo "btl = ^ucx" >> /etc/openmpi-mca-params.conf;
             echo "setting MCA pml to ^ucx..."
@@ -115,7 +120,7 @@ build_and_install_openmpi() {
             echo "osc = ^ucx" >> /etc/openmpi-mca-params.conf;
         fi
 
-        if test -n "${cuda-}"; then
+        if test "${ENABLE_CUDA}" = 1; then
             echo "setting MCA mca_base_component_show_load_errors to 0..."
             echo "mca_base_component_show_load_errors = 0" >> /etc/openmpi-mca-params.conf
             echo "setting MCA opal_warn_on_missing_libcuda to 0..."
@@ -147,7 +152,13 @@ build_and_install_openmpi;
 
 DEBIAN_FRONTEND=noninteractive apt-get -y autoremove;
 
-if test -n "${UCX_VERSION:-}"; then
+if test "${ENABLE_CUDA}" = 1; then
+    cat <<EOF >> .bashrc
+OMPI_MCA_opal_cuda_support=true
+EOF
+fi
+
+if test "${ENABLE_UCX:-}" = 1; then
     cat <<EOF >> .bashrc
 export OMPI_MCA_btl=ucx;
 export OMPI_MCA_pml=ucx;
