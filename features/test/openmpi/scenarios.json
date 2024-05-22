@@ -11,6 +11,11 @@
       "openmpi": {
         "version": "system"
       }
-    }
+    },
+    "overrideFeatureInstallOrder": [
+      "./cuda",
+      "./ucx",
+      "./openmpi"
+    ]
   }
 }
