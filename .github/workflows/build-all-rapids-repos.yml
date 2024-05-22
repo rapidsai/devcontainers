@@ -30,7 +30,7 @@ jobs:
     uses: rapidsai/shared-workflows/.github/workflows/build-in-devcontainer.yaml@branch-24.06
     with:
       arch: '["amd64"]'
-      cuda: '["12.0", "12.2"]'
+      cuda: '["11.8", "12.0", "12.2", "12.4"]'
       node_type: cpu32
       extra-repo-deploy-key: CUMLPRIMS_SSH_PRIVATE_DEPLOY_KEY
       extra-repo-deploy-key-2: CUGRAPH_OPS_SSH_PRIVATE_DEPLOY_KEY
