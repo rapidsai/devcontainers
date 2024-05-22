@@ -1,0 +1,20 @@
+{
+  "name": "OpenMPI",
+  "id": "openmpi",
+  "version": "24.6.0",
+  "description": "A feature to install OpenMPI with optional CUDA and UCX support",
+  "options": {
+    "version": {
+      "type": "string",
+      "proposals": [
+        "latest",
+        "system",
+        "5.0.3",
+        "4.1.2",
+        "4.0.3"
+      ],
+      "default": "system",
+      "description": "OpenMPI version to install (defaults to system)."
+    }
+  }
+}

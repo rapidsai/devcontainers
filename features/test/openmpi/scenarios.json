@@ -1,0 +1,16 @@
+{
+  "cuda_ucx_openmpi": {
+    "image": "ubuntu:22.04",
+    "features": {
+      "cuda": {
+        "version": "12.4"
+      },
+      "ucx": {
+        "version": "1.15.0"
+      },
+      "openmpi": {
+        "version": "system"
+      }
+    }
+  }
+}

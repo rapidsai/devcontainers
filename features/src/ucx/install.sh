@@ -1,5 +1,5 @@
 #! /usr/bin/env bash
-set -ex
+set -e
 
 UCX_VERSION="${VERSION:-latest}";
 
@@ -53,33 +53,24 @@ install_ucx_release() {
     apt_get_update;
     DEBIAN_FRONTEND=noninteractive apt-get -y install --no-install-recommends /tmp/ucx/*.deb || true;
     DEBIAN_FRONTEND=noninteractive apt-get -y --fix-broken install;
-}
-
-install_build_deps() {
-    local pkg=(git libevent-2.1-7 libhwloc15 libibverbs1 librdmacm1 libnuma1 numactl);
-    local pkg_to_remove=();
-
-    if ! dpkg -s gfortran > /dev/null 2>&1; then pkg_to_remove+=(gfortran); fi;
-    if ! dpkg -s libtool > /dev/null 2>&1; then pkg_to_remove+=(libtool); fi;
-    if ! dpkg -s automake > /dev/null 2>&1; then pkg_to_remove+=(automake); fi;
-    if ! dpkg -s zlib1g-dev > /dev/null 2>&1; then pkg_to_remove+=(zlib1g-dev); fi;
-    if ! dpkg -s libnl-3-dev > /dev/null 2>&1; then pkg_to_remove+=(libnl-3-dev); fi;
-    if ! dpkg -s libhwloc-dev > /dev/null 2>&1; then pkg_to_remove+=(libhwloc-dev); fi;
-    if ! dpkg -s libnuma-dev > /dev/null 2>&1; then pkg_to_remove+=(libnuma-dev); fi;
-    if ! dpkg -s librdmacm-dev > /dev/null 2>&1; then pkg_to_remove+=(librdmacm-dev); fi;
-    if ! dpkg -s libibverbs-dev > /dev/null 2>&1; then pkg_to_remove+=(libibverbs-dev); fi;
-    if ! dpkg -s build-essential > /dev/null 2>&1; then pkg_to_remove+=(build-essential); fi;
-
-    apt-get update -y >&2;
-    check_packages "${pkg[@]}" "${pkg_to_remove[@]}" >&2;
-
-    echo "${pkg_to_remove[@]}";
+    DEBIAN_FRONTEND=noninteractive apt-get -y autoremove;
 }
 
 build_and_install_ucx() {
-    local -r cuda="$(read_cuda_version)";
-
     mkdir /tmp/ucx;
+
+    local -r cuda="$(read_cuda_version)";
+    local PKG=(git libibverbs1 librdmacm1 libnuma1 numactl);
+    local PKG_TO_REMOVE=();
+
+    if ! dpkg -s libtool > /dev/null 2>&1; then PKG_TO_REMOVE+=(libtool); fi;
+    if ! dpkg -s automake > /dev/null 2>&1; then PKG_TO_REMOVE+=(automake); fi;
+    if ! dpkg -s libnuma-dev > /dev/null 2>&1; then PKG_TO_REMOVE+=(libnuma-dev); fi;
+    if ! dpkg -s librdmacm-dev > /dev/null 2>&1; then PKG_TO_REMOVE+=(librdmacm-dev); fi;
+    if ! dpkg -s libibverbs-dev > /dev/null 2>&1; then PKG_TO_REMOVE+=(libibverbs-dev); fi;
+    if ! dpkg -s build-essential > /dev/null 2>&1; then PKG_TO_REMOVE+=(build-essential); fi;
+
+    check_packages "${PKG[@]}" "${PKG_TO_REMOVE[@]}";
 
     git clone https://github.com/openucx/ucx.git /tmp/ucx --depth 1 --branch "v${UCX_VERSION}";
 
@@ -95,60 +86,14 @@ build_and_install_ucx() {
             --with-rdmacm           \
             ${cuda:+--with-cuda=${CUDA_HOME:-/usr/local/cuda}};
 
-        make -j$(nproc --all);
-        make install;
-    )
-}
-
-build_and_install_openmpi_for_ucx() {
-    mkdir /tmp/ompi;
-
-    local -r cuda="$(read_cuda_version)";
-    local -r major_minor="$(grep -o '^[0-9]*.[0-9]*' <<< "${OPENMPI_VERSION}")";
-
-    wget --no-hsts -q -O- "https://download.open-mpi.org/release/open-mpi/v${major_minor}/openmpi-${OPENMPI_VERSION}.tar.gz" \
-  | tar -C /tmp/ompi -zf - --strip-components=1 -x;
-
-    (
-        cd /tmp/ompi;
-        ./configure \
-            --prefix=/usr \
-            --disable-dependency-tracking \
-            --enable-mpi-fortran \
-            --disable-wrapper-rpath \
-            --disable-wrapper-runpath \
-            --with-wrapper-cflags="-I/usr/include" \
-            --with-wrapper-cxxflags="-I/usr/include" \
-            --with-wrapper-fcflags="-I/usr/include" \
-            --with-wrapper-ldflags="-L/usr/lib -Wl,-rpath,/usr/lib" \
-            --with-sge \
-            --with-hwloc=/usr \
-            --with-libevent=/usr \
-            --with-zlib=/usr \
-            --with-ucx=/usr \
-            --enable-mca-dso \
-            ${cuda:+--with-cuda=${CUDA_HOME:-/usr/local/cuda}} \
-            ${cuda:+--with-cuda-libdir=${CUDA_HOME:-/usr/local/cuda}/lib64/stubs};
-
         make -j"$(nproc --all)";
         make install;
-
-        echo "setting MCA btl to ^ucx..."
-        echo "btl = ^ucx" >> /etc/openmpi-mca-params.conf;
-        echo "setting MCA pml to ^ucx..."
-        echo "pml = ^ucx" >> /etc/openmpi-mca-params.conf;
-        echo "setting MCA osc to ^ucx..."
-        echo "osc = ^ucx" >> /etc/openmpi-mca-params.conf;
-
-        if test -n "${cuda-}"; then
-            echo "setting MCA mca_base_component_show_load_errors to 0..."
-            echo "mca_base_component_show_load_errors = 0" >> /etc/openmpi-mca-params.conf
-            echo "setting MCA opal_warn_on_missing_libcuda to 0..."
-            echo "opal_warn_on_missing_libcuda = 0" >> /etc/openmpi-mca-params.conf
-            echo "setting MCA opal_cuda_support to 0..."
-            echo "opal_cuda_support = 0" >> /etc/openmpi-mca-params.conf
-        fi
     )
+
+    if test ${#PKG_TO_REMOVE[@]} -gt 0; then
+        DEBIAN_FRONTEND=noninteractive apt-get -y remove "${PKG_TO_REMOVE[@]}";
+        DEBIAN_FRONTEND=noninteractive apt-get -y autoremove;
+    fi
 }
 
 check_packages bzip2 wget ca-certificates bash-completion gettext-base pkg-config;
@@ -157,38 +102,11 @@ if test -z "${UCX_VERSION:-}" || [ "${UCX_VERSION:-}" = "latest" ]; then
     find_version_from_git_tags UCX_VERSION https://github.com/openucx/ucx;
 fi
 
-OPENMPI_VERSION=
-BUILD_OPENMPI_FOR_UCX=
-
-if dpkg -s libopenmpi-dev > /dev/null 2>&1; then
-    BUILD_OPENMPI_FOR_UCX=1;
-    OPENMPI_VERSION="$(apt-cache policy libopenmpi-dev | grep Installed: | tr -d '[:blank:]' | cut -d: -f2 | cut -d- -f1)";
-    DEBIAN_FRONTEND=noninteractive apt-get remove -y libopenmpi-dev;
-fi
-
-declare -a PKG_TO_REMOVE;
-
 if download_ucx_release; then
     install_ucx_release;
 else
-    IFS=" " read -r -a PKG_TO_REMOVE <<< "$(install_build_deps)";
     build_and_install_ucx;
 fi
-
-if test -n "${BUILD_OPENMPI_FOR_UCX:-}"; then
-    IFS=" " read -r -a PKG_TO_REMOVE <<< "$(install_build_deps)";
-    build_and_install_openmpi_for_ucx;
-    export OMPI_MCA_btl=ucx;
-    export OMPI_MCA_pml=ucx;
-    export OMPI_MCA_osc=ucx;
-    export OPENMPI_VERSION;
-fi
-
-if test ${#PKG_TO_REMOVE[@]} -gt 0; then
-    DEBIAN_FRONTEND=noninteractive apt-get -y remove "${PKG_TO_REMOVE[@]}";
-fi
-
-DEBIAN_FRONTEND=noninteractive apt-get -y autoremove;
 
 export UCX_VERSION;
 
@@ -201,7 +119,6 @@ add_etc_profile_d_script ucx "$(cat .bashrc | envsubst)";
 # Clean up
 # rm -rf /tmp/*;
 rm -rf /tmp/ucx*;
-rm -rf /tmp/ompi;
 rm -rf /var/tmp/*;
 rm -rf /var/cache/apt/*;
 rm -rf /var/lib/apt/lists/*;

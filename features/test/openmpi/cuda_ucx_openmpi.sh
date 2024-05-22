@@ -25,8 +25,21 @@ ucx_info -v;
 check "ucx version" bash -c "echo '$UCX_VERSION' | grep '$(ucx_info -v | head -n1 | cut -d' ' -f4)'";
 
 echo "OPENMPI_VERSION: $OPENMPI_VERSION";
+
 check "mpicc exists and is on path" which mpicc
+check "mpicc --version works" bash -c "mpicc --version"
+
 check "mpicxx exists and is on path" which mpicxx
+check "mpicxx --version works" bash -c "mpicxx --version"
+
+check "mpirun exists and is on path" which mpirun
+check "mpirun --version works" bash -c "mpirun --version"
+
+check "mpicxx version" bash -c "grep '$OPENMPI_VERSION' <(mpirun --version | head -n1 | cut -d' ' -f4)";
+
+check "OMPI_MCA_btl is ucx" bash -c "test '${OMPI_MCA_btl:-}' = ucx"
+check "OMPI_MCA_pml is ucx" bash -c "test '${OMPI_MCA_pml:-}' = ucx"
+check "OMPI_MCA_osc is ucx" bash -c "test '${OMPI_MCA_osc:-}' = ucx"
 
 # Report result
 # If any of the checks above exited with a non-zero exit code, the test will fail.
