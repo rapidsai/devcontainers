@@ -8,7 +8,11 @@
       "ucx": {
         "version": "1.14.1"
       }
-    }
+    },
+    "overrideFeatureInstallOrder": [
+      "./cuda",
+      "./ucx"
+    ]
   },
   "ucx_v1.15.0-rc3_cuda": {
     "image": "ubuntu:22.04",
@@ -19,6 +23,10 @@
       "ucx": {
         "version": "1.15.0-rc3"
       }
-    }
+    },
+    "overrideFeatureInstallOrder": [
+      "./cuda",
+      "./ucx"
+    ]
   }
 }
