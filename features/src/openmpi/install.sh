@@ -31,13 +31,13 @@ install_openmpi_deps() {
     )";
 
     mapfile -t run_deps < <(
-        apt-cache depends "${openmpi_lib}"     \
-      | grep -v -P '^  (Depends: <)'           \
-      | grep -P '^  Depends:'                  \
-      | sed 's/^  Depends: //'                 \
-      | (                                      \
-        if type ucx_info >/dev/null 2>&1;      \
-        then grep -v "ucx" || [ "$?" == "1" ]; \
+        apt-cache depends "${openmpi_lib}"   \
+      | grep -v -P '^  (Depends: <)'         \
+      | grep -P '^  Depends:'                \
+      | sed 's/^  Depends: //'               \
+      | (                                    \
+        if test -n "${UCX_VERSION:-}";       \
+        then grep -v ucx || [ "$?" == "1" ]; \
         else cat -; \
         fi \
         )  \
@@ -68,7 +68,7 @@ build_and_install_openmpi() {
     local -r major_minor="$(grep -o '^[0-9]*.[0-9]*' <<< "${OPENMPI_VERSION}")";
 
     local -a ucx_args=();
-    if type ucx_info >/dev/null 2>&1; then
+    if test -n "${UCX_VERSION:-}"; then
         ucx_args+=(--with-ucx=/usr);
     fi
 
@@ -106,7 +106,7 @@ build_and_install_openmpi() {
         make -j"$(nproc --all)";
         make install;
 
-        if type ucx_info >/dev/null 2>&1; then
+        if test -n "${UCX_VERSION:-}"; then
             echo "setting MCA btl to ^ucx..."
             echo "btl = ^ucx" >> /etc/openmpi-mca-params.conf;
             echo "setting MCA pml to ^ucx..."
@@ -147,7 +147,7 @@ build_and_install_openmpi;
 
 DEBIAN_FRONTEND=noninteractive apt-get -y autoremove;
 
-if type ucx_info >/dev/null 2>&1; then
+if test -n "${UCX_VERSION:-}"; then
     cat <<EOF >> .bashrc
 export OMPI_MCA_btl=ucx;
 export OMPI_MCA_pml=ucx;
