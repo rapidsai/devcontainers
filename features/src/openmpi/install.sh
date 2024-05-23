@@ -59,12 +59,8 @@ install_openmpi_deps() {
 
     run_deps+=(build-essential gfortran);
 
-    echo "run_deps: ${run_deps[*]}" >&2;
-    echo "dev_deps: ${dev_deps[*]}" >&2;
     echo "Installing packages: ${run_deps[*]} ${dev_deps[*]}" >&2;
     DEBIAN_FRONTEND=noninteractive apt-get -y install --no-install-recommends "${run_deps[@]}" "${dev_deps[@]}" >&2;
-
-    echo "${dev_deps[@]}";
 }
 
 build_and_install_openmpi() {
