@@ -83,7 +83,7 @@ repos:
       sub_dir: cpp
       depends: [rmm]
       env: |
-        MAX_DEVICE_OBJ_MEMORY_USAGE=2
+        MAX_DEVICE_OBJ_MEMORY_USAGE=3
   python:
     - name: pylibraft
       sub_dir: python/pylibraft
