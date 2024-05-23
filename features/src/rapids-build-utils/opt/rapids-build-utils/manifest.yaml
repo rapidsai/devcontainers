@@ -84,6 +84,7 @@ repos:
       depends: [rmm]
       env: |
         MAX_DEVICE_OBJ_MEMORY_USAGE=3
+      args: {cmake: -DRAFT_COMPILE_LIBRARY=ON}
   python:
     - name: pylibraft
       sub_dir: python/pylibraft
@@ -101,6 +102,8 @@ repos:
     - name: cuvs
       sub_dir: cpp
       depends: [raft]
+      env: |
+        MAX_DEVICE_OBJ_MEMORY_USAGE=3
       args: {cmake: -DBUILD_C_LIBRARY=ON}
   python:
     - name: cuvs
