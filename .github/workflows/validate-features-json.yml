@@ -5,7 +5,7 @@ on:
 
 jobs:
   validate:
-    name: Validate features
+    name: features
     runs-on: ubuntu-latest
     steps:
       - name: Checkout ${{ github.repository }}
@@ -19,5 +19,5 @@ jobs:
       - name: Validate devcontainer-feature.json files
         uses: devcontainers/action@v1
         with:
-          validate-only: "true"
+          validate-only: true
           base-path-to-features: "./features/src"

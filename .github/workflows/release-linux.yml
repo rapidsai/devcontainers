@@ -1,7 +1,7 @@
-name: Release Windows
+name: Release Linux
 
 concurrency:
-  group: release-windows-from-${{ github.ref_name }}
+  group: release-linux-from-${{ github.ref_name }}
   cancel-in-progress: true
 
 on:
@@ -20,11 +20,34 @@ on:
 
 jobs:
 
-  image-matrix:
-    name: Determine image matrix
+  features-matrix:
+    name: Determine features matrix
     runs-on: ubuntu-latest
     outputs:
-      windows: ${{ steps.matrix.outputs.windows }}
+      features: "${{ steps.matrix.outputs.features }}"
+      scenarios: "${{ steps.matrix.outputs.scenarios }}"
+    steps:
+      - name: "Checkout ${{ github.repository }}"
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+
+      - name: Copy common scripts into features
+        uses: ./.github/actions/copy-common-scripts
+
+      - id: matrix
+        name: Determine features matrix
+        uses: ./.github/actions/feature-matrix
+        with:
+          full_matrix: "${{ inputs.full_matrix && 'true' || 'false' }}"
+
+  image-matrix:
+    name: Determine image matrix
+    needs: features-matrix
+    runs-on: ubuntu-latest
+    outputs:
+      linux: ${{ steps.matrix.outputs.linux }}
     steps:
       - name: Checkout ${{ github.repository }}
         uses: actions/checkout@v4
@@ -36,16 +59,18 @@ jobs:
         name: Determine image matrix
         uses: ./.github/actions/image-matrix
         with:
+          features: "${{ needs.features-matrix.outputs.features }}"
+          scenarios: "${{ needs.features-matrix.outputs.scenarios }}"
           full_matrix: "${{ inputs.full_matrix && 'true' || 'false' }}"
 
-  release-windows:
+  release-linux:
     name: ${{ matrix.name }}
     needs: image-matrix
     secrets: inherit
-    uses: ./.github/workflows/build-test-and-push-windows-image.yml
+    uses: ./.github/workflows/build-test-and-push-linux-image.yml
     strategy:
       fail-fast: false
-      matrix: ${{ fromJSON(needs.image-matrix.outputs.windows) }}
+      matrix: ${{ fromJSON(needs.image-matrix.outputs.linux) }}
     with:
       push: true
       os: "${{ matrix.os }}"

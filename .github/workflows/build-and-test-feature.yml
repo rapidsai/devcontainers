@@ -5,7 +5,8 @@ on:
     inputs:
       name:
         type: string
-        required: true
+        required: false
+        default: "test"
       args:
         type: string
         required: true
@@ -13,7 +14,7 @@ on:
 jobs:
 
   test:
-    name: ${{ inputs.name }} (${{ matrix.arch }})
+    name: ${{ format(inputs.name, matrix.arch) }}
     runs-on: ${{ fromJSON(github.repository != 'rapidsai/devcontainers' && '"ubuntu-latest"' || format('"linux-{0}-cpu4"', matrix.arch)) }}
     strategy:
       fail-fast: false
@@ -31,7 +32,7 @@ jobs:
           username: ${{ secrets.GPUCIBOT_DOCKERHUB_USER }}
           password: ${{ secrets.GPUCIBOT_DOCKERHUB_TOKEN }}
 
-      - name: ${{ inputs.name }}
+      - name: Build and test feature
         uses: ./.github/actions/build-and-test-feature
         with:
           args: "${{ inputs.args }}"
