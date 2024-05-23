@@ -49,7 +49,5 @@ jobs:
           -DBUILD_PRIMS_BENCH=ON         \
           -DRAFT_COMPILE_LIBRARY=ON      \
           -DBUILD_CUGRAPH_MG_TESTS=ON    \
-          -Drapids-cmake-repo=trxcllnt/rapids-cmake    \
-          -Drapids-cmake-branch=fix/nvtx3-build-export \
           ;
         sccache --show-adv-stats;
