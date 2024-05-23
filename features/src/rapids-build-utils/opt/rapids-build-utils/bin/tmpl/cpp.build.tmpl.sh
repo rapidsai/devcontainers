@@ -17,6 +17,8 @@ build_${CPP_LIB}_cpp() {
     local -;
     set -euo pipefail;
 
+    export ${CPP_ENV} PATH="$PATH";
+
     eval "$(                                          \
     PARALLEL_LEVEL=${PARALLEL_LEVEL:-$(nproc --all)}  \
         rapids-get-num-archs-jobs-and-load "$@"       \

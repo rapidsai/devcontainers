@@ -82,6 +82,8 @@ repos:
     - name: raft
       sub_dir: cpp
       depends: [rmm]
+      env: |
+        MAX_DEVICE_OBJ_MEMORY_USAGE=2
   python:
     - name: pylibraft
       sub_dir: python/pylibraft
@@ -179,6 +181,8 @@ repos:
     - name: cugraph
       sub_dir: cpp
       depends: [cugraph-ops]
+      env: |
+        MAX_DEVICE_OBJ_MEMORY_USAGE=5
     - name: cugraph_etl
       sub_dir: cpp/libcugraph_etl
       depends: [cudf, cugraph]
