@@ -38,8 +38,7 @@ jobs:
         sccache -z;
         sccache --show-adv-stats;
         clone-all -j$(nproc) -v -q --clone-upstream --single-branch --shallow-submodules;
-        INFER_NUM_DEVICE_ARCHITECTURES=1        \
-        MAX_DEVICE_OBJ_TO_COMPILE_IN_PARALLEL=6 \
+        INFER_NUM_DEVICE_ARCHITECTURES=1 \
         build-all                        \
           -v                             \
           -j$(nproc --ignore=1)          \
