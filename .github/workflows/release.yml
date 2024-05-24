@@ -1,11 +1,16 @@
-name: Release Linux
+name: Release
 
 concurrency:
-  group: release-linux-from-${{ github.ref_name }}
+  group: release-from-${{ github.ref_name }}
   cancel-in-progress: true
 
 on:
   workflow_dispatch:
+  push:
+    branches:
+      - "branch-[0-9][0-9].[0-9][0-9]"
+    tags:
+      - "v[0-9][0-9].[0-9][0-9].[0-9][0-9]"
 
 jobs:
 
@@ -29,7 +34,7 @@ jobs:
         name: Determine features matrix
         uses: ./.github/actions/feature-matrix
         with:
-          full_matrix: true
+          full_matrix: "${{ github.event_name == 'workflow_dispatch' }}"
 
   image-matrix:
     name: Determine image matrix
@@ -50,7 +55,7 @@ jobs:
         with:
           features: "${{ needs.features-matrix.outputs.features }}"
           scenarios: "${{ needs.features-matrix.outputs.scenarios }}"
-          full_matrix: true
+          full_matrix: "${{ github.event_name == 'workflow_dispatch' }}"
 
   release-linux:
     if: needs.image-matrix.outputs.linux != '{"include":[]}'
@@ -67,3 +72,25 @@ jobs:
       features: "${{ toJSON(matrix.features) }}"
       container_env: "${{ toJSON(matrix.env) }}"
       repo: "${{ vars.DOCKERHUB_REPOSITORY || github.repository }}"
+
+  release-windows:
+    if: needs.image-matrix.outputs.windows != '{"include":[]}'
+    name: ${{ matrix.name }}
+    needs: image-matrix
+    secrets: inherit
+    uses: ./.github/workflows/build-test-and-push-windows-image.yml
+    strategy:
+      fail-fast: false
+      matrix: ${{ fromJSON(needs.image-matrix.outputs.windows) }}
+    with:
+      push: true
+      os: "${{ matrix.os }}"
+      features: "${{ toJSON(matrix.features) }}"
+      container_env: "${{ toJSON(matrix.env) }}"
+      repo: "${{ vars.DOCKERHUB_REPOSITORY || github.repository }}"
+
+  release-features:
+    if: needs.features-matrix.outputs.features != '[]' || needs.features-matrix.outputs.scenarios != '[]'
+    name: Features
+    secrets: inherit
+    uses: ./.github/workflows/release-features.yml

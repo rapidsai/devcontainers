@@ -6,23 +6,8 @@ on:
 
 jobs:
 
-  features-matrix:
-    name: Determine features matrix
-    runs-on: ubuntu-latest
-    outputs:
-      features: "${{ steps.matrix.outputs.features }}"
-      scenarios: "${{ steps.matrix.outputs.scenarios }}"
-    steps:
-      - name: "Checkout ${{ github.repository }}"
-        uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-          persist-credentials: false
-
   release-features:
-    if: needs.features-matrix.outputs.features != '[]' || needs.features-matrix.outputs.scenarios != '[]'
     name: Release features
-    needs: features-matrix
     runs-on: ubuntu-latest
     permissions:
       packages: write

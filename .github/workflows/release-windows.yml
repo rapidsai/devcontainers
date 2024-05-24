@@ -5,18 +5,7 @@ concurrency:
   cancel-in-progress: true
 
 on:
-  workflow_call:
-    inputs:
-      full_matrix:
-        type: boolean
-        default: false
-        description: Release all images
   workflow_dispatch:
-    inputs:
-      full_matrix:
-        type: boolean
-        default: true
-        description: Release all images
 
 jobs:
 
@@ -36,7 +25,7 @@ jobs:
         name: Determine image matrix
         uses: ./.github/actions/image-matrix
         with:
-          full_matrix: "${{ inputs.full_matrix && 'true' || 'false' }}"
+          full_matrix: true
 
   release-windows:
     if: needs.image-matrix.outputs.windows != '{"include":[]}'
