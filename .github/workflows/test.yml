@@ -109,7 +109,7 @@ jobs:
       matrix:
         feature: ${{ fromJSON(needs.features-matrix.outputs.features) }}
     with:
-      name: "ubuntu:22.04-{0}"
+      name: "{0}"
       args: "-f ${{ matrix.feature }} -i ubuntu:22.04 --skip-scenarios"
 
   image-matrix:
