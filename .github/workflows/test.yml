@@ -35,10 +35,23 @@ jobs:
 
   validate-features-json:
     if: needs.check-event.outputs.ok == 'true'
-    name: Validate
+    name: Validate Features
     needs: check-event
-    secrets: inherit
-    uses: ./.github/workflows/validate-features-json.yml
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout ${{ github.repository }}
+        uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+
+      - name: Install devcontainers CLI
+        uses: ./.github/actions/install-devcontainers-cli
+
+      - name: Validate devcontainer-feature.json files
+        uses: devcontainers/action@v1
+        with:
+          validate-only: true
+          base-path-to-features: "./features/src"
 
   features-matrix:
     name: Determine features matrix
