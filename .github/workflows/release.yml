@@ -42,6 +42,7 @@ jobs:
     runs-on: ubuntu-latest
     outputs:
       linux: ${{ steps.matrix.outputs.linux }}
+      windows: ${{ steps.matrix.outputs.windows }}
     steps:
       - name: Checkout ${{ github.repository }}
         uses: actions/checkout@v4
