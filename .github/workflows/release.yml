@@ -34,7 +34,7 @@ jobs:
         name: Determine features matrix
         uses: ./.github/actions/feature-matrix
         with:
-          full_matrix: "${{ github.event_name == 'workflow_dispatch' }}"
+          full_matrix: "${{ github.event_name == 'workflow_dispatch' && 'true' || 'false' }}"
 
   image-matrix:
     name: Determine image matrix
@@ -55,7 +55,7 @@ jobs:
         with:
           features: "${{ needs.features-matrix.outputs.features }}"
           scenarios: "${{ needs.features-matrix.outputs.scenarios }}"
-          full_matrix: "${{ github.event_name == 'workflow_dispatch' }}"
+          full_matrix: "${{ github.event_name == 'workflow_dispatch' && 'true' || 'false' }}"
 
   release-linux:
     if: needs.image-matrix.outputs.linux != '{"include":[]}'
