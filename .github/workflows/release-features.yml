@@ -24,9 +24,9 @@ jobs:
       - name: Release features
         uses: devcontainers/action@v1
         with:
-          generate-docs: "true"
-          publish-features: "true"
-          disable-repo-tagging: "true"
+          generate-docs: true
+          publish-features: true
+          disable-repo-tagging: true
           base-path-to-features: "./features/src"
           features-namespace: "${{ github.repository }}/features"
         env:

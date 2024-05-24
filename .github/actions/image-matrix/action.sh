@@ -71,7 +71,7 @@ linux_images="$(\
             | (.name | split("/")[-1] | split(":")[0]) + (.version // "" | tostring))
           )
           | (. + [$os])
-          | join(" "),
+          | join("-"),
       }
     )
   )
@@ -101,7 +101,7 @@ if `# Include all images if full_matrix is true`  \
                 | (.name | split("/")[-1] | split(":")[0]) + (.version // "" | tostring))
               )
               | (. + [$os])
-              | join(" "),
+              | join("-"),
           }
         )
       )

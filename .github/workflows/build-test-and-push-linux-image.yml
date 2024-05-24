@@ -14,7 +14,7 @@ on:
       push:
         type: string
         required: false
-        default: 'false'
+        default: false
         description: Whether to push the image
       features:
         type: string
@@ -28,7 +28,7 @@ on:
 jobs:
 
   build-test-and-upload:
-    name: Build (${{ matrix.arch }})
+    name: ${{ matrix.arch }}
     runs-on: ${{ fromJSON(github.repository != 'rapidsai/devcontainers' && '"ubuntu-latest"' || format('"linux-{0}-cpu4"', matrix.arch)) }}
     strategy:
       fail-fast: false
@@ -75,7 +75,7 @@ jobs:
 
   merge-artifacts:
     if: inputs.push == 'true'
-    name: Merge image artifacts
+    name: Download
     needs: build-test-and-upload
     runs-on: ubuntu-latest
     steps:

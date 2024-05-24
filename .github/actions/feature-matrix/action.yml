@@ -3,9 +3,15 @@ name: feature-matrix
 description: Determine the feature matrix
 
 inputs:
+  base_sha:
+    type: string
+    default: ""
   full_matrix:
     type: string
-    default: 'false'
+    default: false
+  file_patterns:
+    type: string
+    default: ""
 
 outputs:
   features:
@@ -16,25 +22,16 @@ outputs:
 runs:
   using: composite
   steps:
-    - id: get-pr-info
+    - id: changes
+      name: Check if files changed
       if: inputs.full_matrix != 'true'
-      name: Get PR target branch info
-      uses: ./.github/actions/get-pr-info
-
-    - name: Check if files changed
-      if: inputs.full_matrix != 'true'
-      id: changes
       uses: tj-actions/changed-files@v44.0.1
       with:
-        base_sha: ${{ fromJSON(steps.get-pr-info.outputs.pr-info).base.sha }}
+        base_sha: "${{ inputs.base_sha }}"
+        since_last_remote_commit: "${{ inputs.base_sha == '' && 'true' || 'false' }}"
         files: |
           features/src/**
-          features/test/**
-          .github/workflows/test.yml
-          .github/actions/feature-matrix/action.sh
-          .github/actions/feature-matrix/action.yml
-          .github/workflows/build-and-test-feature.yml
-          .github/actions/build-and-test-feature/action.yml
+          ${{ inputs.file_patterns }}
 
     - name: Report changes
       if: inputs.full_matrix != 'true'
