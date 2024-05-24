@@ -149,7 +149,7 @@ jobs:
 
   build-and-test-linux-images:
     if: needs.image-matrix.outputs.linux != '{"include":[]}'
-    name: ${{ matrix.name }}
+    name: ${{ matrix.name || 'Linux' }}
     needs: image-matrix
     secrets: inherit
     uses: ./.github/workflows/build-test-and-push-linux-image.yml
@@ -165,7 +165,7 @@ jobs:
 
   build-and-test-windows-images:
     if: needs.image-matrix.outputs.windows != '{"include":[]}'
-    name: ${{ matrix.name }}
+    name: ${{ matrix.name || 'Windows' }}
     needs: image-matrix
     secrets: inherit
     uses: ./.github/workflows/build-test-and-push-windows-image.yml
