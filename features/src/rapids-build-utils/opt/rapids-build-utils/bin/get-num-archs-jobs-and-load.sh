@@ -51,10 +51,14 @@ get_num_archs_jobs_and_load() {
     fi
 
     parallel="${j:-${JOBS:-${PARALLEL_LEVEL:-1}}}";
-    max_archs="${max_archs:-${MAX_DEVICE_OBJ_TO_COMPILE_IN_PARALLEL:-${archs:-3}}}";
+    max_archs="${max_archs:-${MAX_DEVICE_OBJ_TO_COMPILE_IN_PARALLEL:-${arch:-}}}";
     max_device_obj_memory_usage="${max_device_obj_memory_usage:-${MAX_DEVICE_OBJ_MEMORY_USAGE:-1}}";
 
-    local n_arch="${archs:-0}";
+    local n_arch="${archs:-1}";
+
+    # currently: 60-real;70-real;75-real;80-real;86-real;90
+    # see: https://github.com/rapidsai/rapids-cmake/blob/branch-24.04/rapids-cmake/cuda/set_architectures.cmake#L54
+    local n_arch_rapids=6;
 
     if test -z "${archs:-}" \
     && test -n "${INFER_NUM_DEVICE_ARCHITECTURES:-}"; then
@@ -69,12 +73,10 @@ get_num_archs_jobs_and_load() {
                 ;;
             all | all-major)
                 # Max out at ${max_archs} threads per job
-                n_arch=${max_archs};
+                n_arch="${max_archs:-${n_arch_rapids}}";
                 ;;
             ALL | RAPIDS)
-                # currently: 60-real;70-real;75-real;80-real;86-real;90
-                # see: https://github.com/rapidsai/rapids-cmake/blob/branch-24.04/rapids-cmake/cuda/set_architectures.cmake#L54
-                n_arch=6;
+                n_arch=${n_arch_rapids};
                 ;;
             *)
                 # Otherwise if explicitly defined, count the number of archs in the list
@@ -83,15 +85,15 @@ get_num_archs_jobs_and_load() {
         esac
     fi
 
-    local mem_for_device_objs=1;
-
     if test "${n_arch}" -le 0; then
         n_arch=1;
     else
+        max_archs="${max_archs:-${MAX_DEVICE_OBJ_TO_COMPILE_IN_PARALLEL:-${n_arch}}}";
         # Clamp to `min(n_arch, max_archs)` threads per job
         n_arch=$((n_arch > max_archs ? max_archs : n_arch));
-        mem_for_device_objs="$((n_arch * max_device_obj_memory_usage))";
     fi
+
+    local mem_for_device_objs="$((n_arch * max_device_obj_memory_usage))";
 
     local -r free_mem="$(free --gibi | grep -E '^Mem:' | tr -s '[:space:]' | cut -d' ' -f7 || echo '0')";
     local -r freeswap="$(free --gibi | grep -E '^Swap:' | tr -s '[:space:]' | cut -d' ' -f4 || echo '0')";

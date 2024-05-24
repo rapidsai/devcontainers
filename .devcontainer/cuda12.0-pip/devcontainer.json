@@ -5,23 +5,28 @@
     "args": {
       "CUDA": "12.0",
       "PYTHON_PACKAGE_MANAGER": "pip",
-      "BASE": "rapidsai/devcontainers:24.06-cpp-cuda12.0-ubuntu22.04"
+      "BASE": "rapidsai/devcontainers:24.06-cpp-cuda12.0-ucx1.15.0-openmpi-ubuntu22.04"
     }
   },
   "runArgs": [
     "--rm",
     "--name",
-    "${localEnv:USER}-rapids-${localWorkspaceFolderBasename}-24.06-cuda12.0-pip"
+    "${localEnv:USER:anon}-rapids-${localWorkspaceFolderBasename}-24.06-cuda12.0-pip"
   ],
   "hostRequirements": {"gpu": "optional"},
   "features": {
-    "./features/src/ucx": {"version": "1.15.0"},
-    "./features/src/cuda": {"version": "12.0", "installcuBLAS": true, "installcuDNN": true, "installcuSOLVER": true, "installcuRAND": true, "installcuSPARSE": true},
+    "./features/src/cuda": {
+      "version": "12.0",
+      "installcuBLAS": true,
+      "installcuDNN": true,
+      "installcuSOLVER": true,
+      "installcuRAND": true,
+      "installcuSPARSE": true
+    },
     "./features/src/utils": {},
     "./features/src/rapids-build-utils": {}
   },
   "overrideFeatureInstallOrder": [
-    "./features/src/ucx",
     "./features/src/cuda",
     "./features/src/utils",
     "./features/src/rapids-build-utils"
