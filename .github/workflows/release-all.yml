@@ -30,6 +30,5 @@ jobs:
 
   release-features:
     name: Features
-    needs: release-linux
     secrets: inherit
     uses: ./.github/workflows/release-features.yml
