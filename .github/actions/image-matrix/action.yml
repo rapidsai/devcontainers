@@ -3,6 +3,9 @@ name: image-matrix
 description: Determine the image matrix
 
 inputs:
+  base_sha:
+    type: string
+    default: ""
   features:
     type: string
     required: false
@@ -11,7 +14,10 @@ inputs:
     required: false
   full_matrix:
     type: string
-    default: 'true'
+    default: true
+  file_patterns:
+    type: string
+    default: ""
 
 outputs:
   linux:
@@ -22,28 +28,18 @@ outputs:
 runs:
   using: composite
   steps:
-    - id: get-pr-info
+    - id: changes
+      name: Check if files changed
       if: inputs.full_matrix != 'true'
-      name: Get PR target branch info
-      uses: ./.github/actions/get-pr-info
-
-    - name: Check if files changed
-      if: inputs.full_matrix != 'true'
-      id: changes
       uses: tj-actions/changed-files@v44.0.1
       with:
-        base_sha: ${{ fromJSON(steps.get-pr-info.outputs.pr-info).base.sha }}
+        base_sha: "${{ inputs.base_sha }}"
+        since_last_remote_commit: "${{ inputs.base_sha == '' && 'true' || 'false' }}"
         files: |
-          image/*
-          windows/**
           matrix.yml
-          .github/actions/build-linux-image/*
-          .github/actions/build-windows-image/*
-          .github/actions/image-matrix/*
-          .github/actions/test-windows-image/*
-          .github/workflows/test.yml
-          .github/workflows/build-test-and-push-linux-image.yml
-          .github/workflows/build-test-and-push-windows-image.yml
+          windows/**
+          image/.devcontainer/*
+          ${{ inputs.file_patterns }}
 
     - name: Report changes
       if: inputs.full_matrix != 'true'
