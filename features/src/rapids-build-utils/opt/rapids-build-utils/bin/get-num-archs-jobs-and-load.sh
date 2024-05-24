@@ -85,10 +85,13 @@ get_num_archs_jobs_and_load() {
         esac
     fi
 
-    max_archs="${max_archs:-${MAX_DEVICE_OBJ_TO_COMPILE_IN_PARALLEL:-${n_arch}}}";
-
-    # Clamp to `min(n_arch, max_archs)` threads per job
-    n_arch=$((n_arch > max_archs ? max_archs : n_arch));
+    if test "${n_arch}" -le 0; then
+        n_arch=1;
+    else
+        max_archs="${max_archs:-${MAX_DEVICE_OBJ_TO_COMPILE_IN_PARALLEL:-${n_arch}}}";
+        # Clamp to `min(n_arch, max_archs)` threads per job
+        n_arch=$((n_arch > max_archs ? max_archs : n_arch));
+    fi
 
     local mem_for_device_objs="$((n_arch * max_device_obj_memory_usage))";
 
