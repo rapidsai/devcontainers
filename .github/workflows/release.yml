@@ -59,7 +59,7 @@ jobs:
 
   release-linux:
     if: needs.image-matrix.outputs.linux != '{"include":[]}'
-    name: ${{ matrix.name }}
+    name: ${{ matrix.name || 'Linux' }}
     needs: image-matrix
     secrets: inherit
     uses: ./.github/workflows/build-test-and-push-linux-image.yml
@@ -75,7 +75,7 @@ jobs:
 
   release-windows:
     if: needs.image-matrix.outputs.windows != '{"include":[]}'
-    name: ${{ matrix.name }}
+    name: ${{ matrix.name || 'Windows' }}
     needs: image-matrix
     secrets: inherit
     uses: ./.github/workflows/build-test-and-push-windows-image.yml
@@ -92,5 +92,6 @@ jobs:
   release-features:
     if: needs.features-matrix.outputs.features != '[]' || needs.features-matrix.outputs.scenarios != '[]'
     name: Features
+    needs: features-matrix
     secrets: inherit
     uses: ./.github/workflows/release-features.yml
