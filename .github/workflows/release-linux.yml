@@ -64,6 +64,7 @@ jobs:
           full_matrix: "${{ inputs.full_matrix && 'true' || 'false' }}"
 
   release-linux:
+    if: needs.image-matrix.outputs.linux != '{"include":[]}'
     name: ${{ matrix.name }}
     needs: image-matrix
     secrets: inherit

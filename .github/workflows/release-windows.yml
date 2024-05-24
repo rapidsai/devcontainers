@@ -39,6 +39,7 @@ jobs:
           full_matrix: "${{ inputs.full_matrix && 'true' || 'false' }}"
 
   release-windows:
+    if: needs.image-matrix.outputs.windows != '{"include":[]}'
     name: ${{ matrix.name }}
     needs: image-matrix
     secrets: inherit
