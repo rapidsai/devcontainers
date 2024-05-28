@@ -12,8 +12,6 @@
 #  -q,--quiet                   Operate quietly. Progress is not reported to the standard error stream.
 #  --no-fork                    Don't prompt the user to fork the repo if a user fork isn't found.
 #                               (default: false)
-#  --no-update-env              Don't update the Python env with the repo's dependencies after cloning.
-#                               (default: false)
 #  --clone-upstream             Always clone the upstream, not the user's fork.
 #                               (default: false)
 #

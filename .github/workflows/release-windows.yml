@@ -1,7 +1,7 @@
 name: Release Windows
 
 concurrency:
-  group: release-windows-on-${{ github.event_name }}-from-${{ github.ref_name }}
+  group: release-windows-from-${{ github.ref_name }}
   cancel-in-progress: true
 
 on:
@@ -25,9 +25,10 @@ jobs:
         name: Determine image matrix
         uses: ./.github/actions/image-matrix
         with:
-          full_matrix: 'true'
+          full_matrix: true
 
-  build-and-push-windows-images:
+  release-windows:
+    if: needs.image-matrix.outputs.windows != '{"include":[]}'
     name: ${{ matrix.name }}
     needs: image-matrix
     secrets: inherit
@@ -36,7 +37,7 @@ jobs:
       fail-fast: false
       matrix: ${{ fromJSON(needs.image-matrix.outputs.windows) }}
     with:
-      push: 'true'
+      push: true
       os: "${{ matrix.os }}"
       features: "${{ toJSON(matrix.features) }}"
       container_env: "${{ toJSON(matrix.env) }}"

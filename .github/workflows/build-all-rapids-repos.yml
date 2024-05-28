@@ -23,11 +23,17 @@ jobs:
           || echo "ok=false" | tee -a $GITHUB_OUTPUT;
 
   build-all-rapids-repos:
-    name: Build all RAPIDS repos
+    name: RAPIDS
     if: needs.check-event.outputs.ok == 'true'
     needs: check-event
     secrets: inherit
     uses: rapidsai/shared-workflows/.github/workflows/build-in-devcontainer.yaml@branch-24.08
+    permissions:
+      actions: read
+      packages: read
+      id-token: write
+      contents: read
+      pull-requests: read
     with:
       arch: '["amd64"]'
       cuda: '["12.0", "12.2"]'
@@ -38,13 +44,16 @@ jobs:
         sccache -z;
         sccache --show-adv-stats;
         clone-all -j$(nproc) -v -q --clone-upstream --single-branch --shallow-submodules;
-        build-all \
-          -v \
-          -j$(nproc --ignore=1) \
-          -DBUILD_TESTS=ON \
-          -DBUILD_BENCHMARKS=ON \
-          -DBUILD_ANN_BENCH=ON \
-          -DBUILD_PRIMS_BENCH=ON \
-          -DBUILD_SHARED_LIBS=ON \
+        INFER_NUM_DEVICE_ARCHITECTURES=1 \
+        build-all                        \
+          -v                             \
+          -j$(nproc --ignore=1)          \
+          -DBUILD_SHARED_LIBS=ON         \
+          -DBUILD_TESTS=ON               \
+          -DBUILD_BENCHMARKS=ON          \
+          -DBUILD_ANN_BENCH=ON           \
+          -DBUILD_PRIMS_BENCH=ON         \
+          -DRAFT_COMPILE_LIBRARY=ON      \
+          -DBUILD_CUGRAPH_MG_TESTS=ON    \
           ;
         sccache --show-adv-stats;

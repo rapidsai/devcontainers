@@ -46,7 +46,7 @@ generate_script() {
     if test -n "${bin}"; then
         (
             cat - \
-          | envsubst '$HOME $NAME $SRC_PATH $PY_ENV $PY_SRC $PY_LIB $BIN_DIR $CPP_LIB $CPP_SRC $CPP_CMAKE_ARGS $CPP_CPACK_ARGS $CPP_DEPS $GIT_TAG $GIT_SSH_URL $GIT_HTTPS_URL $GIT_REPO $GIT_HOST $GIT_UPSTREAM $PIP_WHEEL_ARGS $PIP_INSTALL_ARGS' \
+          | envsubst '$HOME $NAME $SRC_PATH $PY_ENV $PY_SRC $PY_LIB $BIN_DIR $CPP_ENV $CPP_LIB $CPP_SRC $CPP_CMAKE_ARGS $CPP_CPACK_ARGS $CPP_DEPS $GIT_TAG $GIT_SSH_URL $GIT_HTTPS_URL $GIT_REPO $GIT_HOST $GIT_UPSTREAM $PIP_WHEEL_ARGS $PIP_INSTALL_ARGS' \
           | tee "${TMP_SCRIPT_DIR}/${bin}" >/dev/null;
 
             chmod +x "${TMP_SCRIPT_DIR}/${bin}";
@@ -243,6 +243,7 @@ generate_scripts() {
 
         for ((j=0; j < ${!cpp_length:-0}; j+=1)); do
 
+            cpp_env="${repo}_cpp_${j}_env";
             cpp_name="${repo}_cpp_${j}_name";
             cpp_sub_dir="${repo}_cpp_${j}_sub_dir";
             cpp_cmake_args="${repo}_cpp_${j}_args_cmake";
@@ -280,6 +281,7 @@ generate_scripts() {
                 NAME="${repo_name:-}"                 \
                 SRC_PATH=~/"${!repo_path:-}"          \
                 BIN_DIR="${bin_dir}"                  \
+                CPP_ENV="${!cpp_env:-}"               \
                 CPP_LIB="${cpp_name:-}"               \
                 CPP_SRC="${!cpp_sub_dir:-}"           \
                 CPP_DEPS="${cpp_deps[*]}"             \

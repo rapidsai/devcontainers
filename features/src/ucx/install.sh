@@ -51,15 +51,15 @@ install_ucx_release() {
     mkdir /tmp/ucx;
     tar -C /tmp/ucx -xvjf /tmp/ucx.tar.bz2;
     apt_get_update;
-    DEBIAN_FRONTEND=noninteractive \
-    apt-get -y install --no-install-recommends /tmp/ucx/*.deb || true;
-    apt-get -y --fix-broken install;
+    DEBIAN_FRONTEND=noninteractive apt-get -y install --no-install-recommends /tmp/ucx/*.deb || true;
+    DEBIAN_FRONTEND=noninteractive apt-get -y --fix-broken install;
+    DEBIAN_FRONTEND=noninteractive apt-get -y autoremove;
 }
 
 build_and_install_ucx() {
     mkdir /tmp/ucx;
 
-    local cuda="$(read_cuda_version)";
+    local -r cuda="$(read_cuda_version)";
     local PKG=(git libibverbs1 librdmacm1 libnuma1 numactl);
     local PKG_TO_REMOVE=();
 
@@ -68,10 +68,9 @@ build_and_install_ucx() {
     if ! dpkg -s libnuma-dev > /dev/null 2>&1; then PKG_TO_REMOVE+=(libnuma-dev); fi;
     if ! dpkg -s librdmacm-dev > /dev/null 2>&1; then PKG_TO_REMOVE+=(librdmacm-dev); fi;
     if ! dpkg -s libibverbs-dev > /dev/null 2>&1; then PKG_TO_REMOVE+=(libibverbs-dev); fi;
-    if ! dpkg -s libibverbs-dev > /dev/null 2>&1; then PKG_TO_REMOVE+=(libibverbs-dev); fi;
     if ! dpkg -s build-essential > /dev/null 2>&1; then PKG_TO_REMOVE+=(build-essential); fi;
 
-    check_packages ${PKG[@]} ${PKG_TO_REMOVE[@]};
+    check_packages "${PKG[@]}" "${PKG_TO_REMOVE[@]}";
 
     git clone https://github.com/openucx/ucx.git /tmp/ucx --depth 1 --branch "v${UCX_VERSION}";
 
@@ -87,12 +86,12 @@ build_and_install_ucx() {
             --with-rdmacm           \
             ${cuda:+--with-cuda=${CUDA_HOME:-/usr/local/cuda}};
 
-        make -j$(nproc --all);
+        make -j"$(nproc --all)";
         make install;
     )
 
     if test ${#PKG_TO_REMOVE[@]} -gt 0; then
-        DEBIAN_FRONTEND=noninteractive apt-get -y remove ${PKG_TO_REMOVE[@]};
+        DEBIAN_FRONTEND=noninteractive apt-get -y remove "${PKG_TO_REMOVE[@]}";
         DEBIAN_FRONTEND=noninteractive apt-get -y autoremove;
     fi
 }

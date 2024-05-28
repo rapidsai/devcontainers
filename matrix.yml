@@ -34,9 +34,10 @@ x-nvhpc-curr: &nvhpc_curr { name: "nvhpc", version: "24.3" }
 
 x-nvhpc-env: &nvhpc_env {CC: "nvc", CXX: "nvc++"}
 
-x-rust: &rust { name: "rust" }
 x-mambaforge: &conda { name: "mambaforge" }
 x-python: &python { name: "ghcr.io/devcontainers/features/python:1", version: "os-provided", installTools: "false", hide: true }
+x-ucx-rapids: &ucx_rapids {name: "ucx", version: "1.15.0"}
+x-openmpi: &openmpi {name: "openmpi"}
 
 x-cccl-dev: &cccl_dev { name: "cccl-dev", hide: true }
 x-clangd-dev: &clangd_dev {name: "llvm", version: "dev", packages: "clangd", hide: true}
@@ -147,6 +148,10 @@ include:
   - {features: [*python, *clang_format_rapids, *clangd_dev, *cuda_curr_min], env: *gcc_env}
   - {features: [*python, *clang_format_rapids, *clangd_dev, *cuda_curr_max], env: *gcc_env}
   - {features: [*python, *clang_format_rapids, *clangd_dev, *cuda_curr_max_rapids], env: *gcc_env}
+  - {features: [*python, *clang_format_rapids, *clangd_dev, *cuda_prev_max, *ucx_rapids, *openmpi], env: *gcc_env}
+  - {features: [*python, *clang_format_rapids, *clangd_dev, *cuda_curr_min, *ucx_rapids, *openmpi], env: *gcc_env}
+  - {features: [*python, *clang_format_rapids, *clangd_dev, *cuda_curr_max, *ucx_rapids, *openmpi], env: *gcc_env}
+  - {features: [*python, *clang_format_rapids, *clangd_dev, *cuda_curr_max_rapids, *ucx_rapids, *openmpi], env: *gcc_env}
 
   # mambaforge
   - features: [*conda]

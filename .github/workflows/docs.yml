@@ -1,13 +1,15 @@
 name: Generate feature docs
 
 concurrency:
-  group: generate-feature-docs-on-${{ github.event_name }}-from-${{ github.ref_name }}
+  group: generate-feature-docs-from-${{ github.ref_name }}
   cancel-in-progress: true
 
 on:
   push:
     branches:
-      - branch-*
+      - "branch-[0-9][0-9].[0-9][0-9]"
+    tags:
+      - "v[0-9][0-9].[0-9][0-9].[0-9][0-9]"
 
 jobs:
   docs:
@@ -29,9 +31,9 @@ jobs:
       - name: Generate feature docs
         uses: devcontainers/action@v1
         with:
-          generate-docs: "true"
-          publish-features: "false"
-          disable-repo-tagging: "true"
+          generate-docs: true
+          publish-features: false
+          disable-repo-tagging: true
           base-path-to-features: "./features/src"
           features-namespace: "${{ github.repository }}/features"
 
@@ -54,7 +56,7 @@ jobs:
           git add */**/README.md;
           git commit -m 'Automated documentation update [skip ci]' || export NO_UPDATES=true;
           # Push updates
-          if [ "$NO_UPDATES" != "true" ] ; then
+          if [ "$NO_UPDATES" != 'true' ] ; then
               git push origin "$branch";
               gh pr create --base "$base" --title "$message" --body "$message";
           fi
