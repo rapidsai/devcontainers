@@ -32,7 +32,7 @@ x-llvm-env: &llvm_env {CC: "clang", CXX: "clang++", CUDAHOSTCXX: "clang++"}
 x-nvhpc-prev: &nvhpc_prev { name: "nvhpc", version: "24.1" }
 x-nvhpc-curr: &nvhpc_curr { name: "nvhpc", version: "24.3" }
 
-x-nvhpc-env: &nvhpc_env {CC: "nvc", CXX: "nvc++"}
+x-nvhpc-env: &nvhpc_env {CC: "nvc", CXX: "nvc++", CUDAHOSTCXX: "nvc++"}
 
 x-mambaforge: &conda { name: "mambaforge" }
 x-python: &python { name: "ghcr.io/devcontainers/features/python:1", version: "os-provided", installTools: "false", hide: true }
