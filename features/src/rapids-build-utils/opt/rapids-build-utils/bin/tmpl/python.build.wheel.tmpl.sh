@@ -80,6 +80,12 @@ build_${PY_LIB}_python_wheel() {
         pip_args+=(-C "build-dir=$(rapids-maybe-clean-build-dir "${cmake_args[@]}" -- "${PY_SRC}")");
     fi
 
+    # devcontainers builds always prefer to build projects unsuffixed, e.g. 'cudf' instead of 'cudf-cu12'
+    if rapids-python-uses-rapids-build-backend "${PY_SRC}"; then
+        pip_args+=(-C "rapidsai.disable-cuda=true")
+        # pip_args+=(-C "rapidsai.matrix_entry=cuda=${CUD_VERSION}")
+    fi
+
     pip_args+=("${PY_SRC}");
 
     trap "rm -rf '${PY_SRC}/${py_lib//"-"/"_"}.egg-info'" EXIT;
