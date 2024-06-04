@@ -69,6 +69,8 @@ repos:
       args: {cmake: -DFIND_CUDF_CPP=ON}
     - name: dask_cudf
       sub_dir: python/dask_cudf
+    - name: cudf_polars
+      sub_dir: python/cudf_polars
     - name: cudf_kafka
       sub_dir: python/cudf_kafka
       depends: [cudf_kafka]
