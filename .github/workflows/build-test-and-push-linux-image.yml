@@ -125,7 +125,9 @@ jobs:
             docker image rm -f "${name}" || true;
             docker system prune -f;
           done
+          sleep 5;
           # Create and push the multiarch manifest
           docker buildx imagetools create --tag "${name}" "${hashes[@]}";
+          sleep 5;
           # Create and push the multiarch manifest without the OS in the tag
           docker buildx imagetools create --tag "${name/%-${os//:/}}" "${hashes[@]}";
