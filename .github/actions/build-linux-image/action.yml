@@ -6,6 +6,7 @@ inputs:
   tag: {type: string, required: true, description: Image tag}
   arch: {type: string, required: true, description: Image arch}
   repo: {type: string, required: true, description: Image repo}
+  retries: {type: string, default: '10', description: Number of times to retry the container build}
 
 runs:
   using: composite
@@ -27,10 +28,21 @@ runs:
         NODE_NO_WARNINGS: 1
         repo: ${{ inputs.repo }}
       run: |
-        devcontainer build \
+        i=0
+        until devcontainer build \
           --platform "linux/${{ inputs.arch }}" \
           --cache-from "${repo,,}:${{ inputs.tag }}" \
           --image-name "${repo,,}:${{ inputs.tag }}" \
           --workspace-folder "$(realpath -m ./image)" \
-          --output "type=docker,dest=${{ runner.temp }}/${{ inputs.arch }}.tar" \
-          ;
+          --output "type=docker,dest=${{ runner.temp }}/${{ inputs.arch }}.tar"
+        do
+          if test "${i}" -lt ${{inputs.retries}}; then
+            j=$((i++));
+            t=$((i * i * 5));
+            echo "Attempt $j failed! Trying again in $t seconds...";
+            sleep $t;
+          else
+            echo "Failed to build ${{ inputs.repo }}:${{ inputs.tag }}-${{ inputs.arch }}";
+            exit 1;
+          fi
+        done
