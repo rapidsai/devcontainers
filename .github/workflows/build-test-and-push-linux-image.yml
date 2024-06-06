@@ -128,4 +128,4 @@ jobs:
           # Create and push the multiarch manifest
           docker buildx imagetools create --tag "${name}" "${hashes[@]}";
           # Create and push the multiarch manifest without the OS in the tag
-          docker buildx imagetools create --tag "${name//-${os//:/}/}" "${hashes[@]}";
+          docker buildx imagetools create --tag "${name/%-${os//:/}}" "${hashes[@]}";
