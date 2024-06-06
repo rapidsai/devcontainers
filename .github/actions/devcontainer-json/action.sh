@@ -27,6 +27,7 @@ const {cpSync, readFileSync} = require('fs');
 const json = JSON.parse(readFileSync('image/.devcontainer/devcontainer.json'));
 
 json.build.args.BASE = '${os}';
+json.build.args.RAPIDS_VERSION = '${VERSION}';
 json.containerEnv = ${container_env} || undefined;
 
 const dups = {};
