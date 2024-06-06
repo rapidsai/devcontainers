@@ -64,8 +64,7 @@ jobs:
           repo: "${{ inputs.repo }}"
           tag: "${{ steps.json.outputs.tag }}"
 
-      - if: inputs.push == 'true'
-        name: Upload ${{ steps.json.outputs.tag }}-${{ matrix.arch }}
+      - name: Upload ${{ steps.json.outputs.tag }}-${{ matrix.arch }}
         uses: actions/upload-artifact@v4
         with:
           retention-days: 1
@@ -73,27 +72,10 @@ jobs:
           name: ${{ steps.json.outputs.tag }}-${{ matrix.arch }}
           path: ${{ runner.temp }}/${{ matrix.arch }}.tar
 
-  merge-artifacts:
-    if: inputs.push == 'true'
-    name: Download
-    needs: build-test-and-upload
-    runs-on: ubuntu-latest
-    steps:
-      - name: Merge image artifacts
-        uses: actions/upload-artifact/merge@v4
-        with:
-          retention-days: 1
-          delete-merged: true
-          compression-level: 0
-          name: ${{ needs.build-test-and-upload.outputs.tag }}
-          pattern: ${{ needs.build-test-and-upload.outputs.tag }}-*
-
   push-to-dockerhub:
-    if: inputs.push == 'true'
     name: Push to Docker Hub
     needs:
       - build-test-and-upload
-      - merge-artifacts
     runs-on: ubuntu-latest
     steps:
       - name: Checkout ${{ github.repository }}
@@ -109,33 +91,35 @@ jobs:
       - name: Download ${{ needs.build-test-and-upload.outputs.tag }}
         uses: actions/download-artifact@v4
         with:
-          name: ${{ needs.build-test-and-upload.outputs.tag }}
+          pattern: ${{ needs.build-test-and-upload.outputs.tag }}-*
           path: ${{ runner.temp }}
+          merge-multiple: true
+
+      - name: List downloaded artifacts
+        shell: bash --noprofile --norc -x -eo pipefail {0}
+        run: |
+          find "${{ runner.temp }}/" -type f -name '*.tar';
 
       - name: Login to Docker Hub
+        if: inputs.push == 'true'
         uses: docker/login-action@v3
         with:
           username: ${{ secrets.GPUCIBOT_DOCKERHUB_USER }}
           password: ${{ secrets.GPUCIBOT_DOCKERHUB_TOKEN }}
 
       - name: Push multiarch manifest to Docker Hub
+        if: inputs.push == 'true'
         shell: bash --noprofile --norc -x -eo pipefail {0}
         env:
           name: "${{ inputs.repo }}:${{ needs.build-test-and-upload.outputs.tag }}"
         run: |
-
-          find "${{ runner.temp }}/" -type f -name '*.tar';
-
-          docker manifest rm ${name,,} || true;
-
           hashes=();
-
+          docker manifest rm ${name,,} || true;
           for arch in "amd64" "arm64"; do
             # Load the arch-specific image with the final name
             docker load --input "${{ runner.temp }}/${arch}.tar";
             # Push the local image to the registry and save the remote hash
-            hashes+=("$(docker push ${name,,} | tail -n1 | cut -d' ' -f3)");
+            hashes+=("$(docker push ${name,,} | tee >(cat -) 1>&2 | tail -n1 | cut -d' ' -f3)");
           done
-
           # Create and push the multiarch manifest
           docker buildx imagetools create --tag ${name,,} ${hashes[@]};
