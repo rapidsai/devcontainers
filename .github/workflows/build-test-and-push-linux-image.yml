@@ -114,12 +114,16 @@ jobs:
           # Ensure name is lowercase
           name="${name,,}";
           hashes=();
-          docker manifest rm "${name}" || true;
           for arch in "amd64" "arm64"; do
             # Load the arch-specific image with the final name
             docker load --input "${{ runner.temp }}/${arch}.tar";
             # Push the local image to the registry and save the remote hash
             hashes+=("$(docker push "${name}" | tee >(cat -) 1>&2 | tail -n1 | cut -d' ' -f3)");
+            # Clean up after pushing so we don't run out of disk space
+            rm -f "${{ runner.temp }}/${arch}.tar";
+            docker manifest rm "${name}" || true;
+            docker image rm -f "${name}" || true;
+            docker system prune -f;
           done
           # Create and push the multiarch manifest
           docker buildx imagetools create --tag "${name}" "${hashes[@]}";
