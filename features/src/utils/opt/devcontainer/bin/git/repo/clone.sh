@@ -70,12 +70,12 @@ clone_git_repo() {
         git clone "${qj[@]}" "${OPTS[@]}" -- "${origin}" "${directory}";
     fi
 
-    git -C "${directory}" remote add origin "${origin}" || true;
-    git -C "${directory}" remote add upstream "${upstream}" || true;
-    git -C "${directory}" remote set-url upstream "${upstream}" || true;
-    git -C "${directory}" remote set-url --push upstream read_only || true;
+    git -C "${directory}" remote add origin "${origin}" 2>/dev/null || true;
+    git -C "${directory}" remote add upstream "${upstream}" 2>/dev/null || true;
+    git -C "${directory}" remote set-url upstream "${upstream}" 2>/dev/null || true;
+    git -C "${directory}" remote set-url --push upstream read_only 2>/dev/null || true;
     if test "${upstream}" == "${origin}"; then
-        git -C "${directory}" remote set-url --push origin read_only || true;
+        git -C "${directory}" remote set-url --push origin read_only 2>/dev/null || true;
     fi
 
     git -C "${directory}" fetch "${fqj[@]}" --all;

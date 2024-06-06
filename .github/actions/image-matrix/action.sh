@@ -33,8 +33,9 @@ features="$(echo                        \
 
 if `# Include all images if full_matrix is true`                                    \
    [ "${full_matrix}" == "1" ]                                                      \
-   `# Include all images if matrix or workflows changed`                            \
+   `# Include all images if image, matrix, or workflows changed`                    \
 || grep -q 'matrix\.yml'                                             <<< "${files}" \
+|| grep -q 'image/\.devcontainer/'                                   <<< "${files}" \
 || grep -q '\.github/actions/build-linux-image/'                     <<< "${files}" \
 || grep -q '\.github/actions/image-matrix/'                          <<< "${files}" \
 || grep -q '\.github/workflows/test\.yml'                            <<< "${files}" \
