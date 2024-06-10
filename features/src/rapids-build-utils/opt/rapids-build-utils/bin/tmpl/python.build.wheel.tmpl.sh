@@ -82,8 +82,11 @@ build_${PY_LIB}_python_wheel() {
 
     # devcontainers builds always prefer to build projects unsuffixed, e.g. 'cudf' instead of 'cudf-cu12'
     if rapids-python-uses-rapids-build-backend "${PY_SRC}"; then
-        pip_args+=(-C "rapidsai.disable-cuda=true")
-        # pip_args+=(-C "rapidsai.matrix_entry=cuda=${CUD_VERSION}")
+        pip_args+=(-C "rapidsai.disable-cuda=true");
+        # pip_args+=(-C "rapidsai.matrix_entry=cuda=${CUDA_VERSION}")
+        exit 111;
+    elif
+        exit 112;
     fi
 
     pip_args+=("${PY_SRC}");
