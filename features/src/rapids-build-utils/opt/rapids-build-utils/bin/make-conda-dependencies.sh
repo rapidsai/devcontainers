@@ -85,7 +85,7 @@ make_conda_dependencies() {
                     conda_env_yamls+=("${file}");
                     generate_env_yaml                                                         \
                         "${file}"                                                             \
-                        --file_key "${repo_keys[$keyi]}"                                      \
+                        --file-key "${repo_keys[$keyi]}"                                      \
                         --output conda                                                        \
                         --config ~/"${!repo_path}/dependencies.yaml"                          \
                         --matrix "arch=$(uname -m);cuda=${cuda_version};py=${python_version}" \
@@ -108,7 +108,7 @@ make_conda_dependencies() {
                     conda_env_yamls+=("${file}");
                     generate_env_yaml                                                         \
                         "${file}"                                                             \
-                        --file_key "${repo_keys[$keyi]}"                                      \
+                        --file-key "${repo_keys[$keyi]}"                                      \
                         --output conda                                                        \
                         --config ~/"${!repo_path}/dependencies.yaml"                          \
                         --matrix "arch=$(uname -m);cuda=${cuda_version};py=${python_version}" \
