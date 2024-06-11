@@ -111,8 +111,7 @@ include:
   - {features: [*python, *llvm_18, {<<: *cuda_curr_max, <<: *cccl_cuda_opts}, *clang_format_cccl, *clangd_dev, *cccl_dev], env: *llvm_env}
   - {features: [*python, *oneapi_2022, {<<: *cuda_curr_max, <<: *cccl_cuda_opts}, *clang_format_cccl, *clangd_dev, *cccl_dev], env: *onapi_env}
 
-# Hack for getting gcc-13.2
-- os: "ubuntu:23.04"
+- os: "ubuntu:24.04"
   images:
   - {features: [*python, *gcc_13, {<<: *cuda_curr_max, <<: *cccl_cuda_opts}, *clang_format_cccl, *clangd_dev, *cccl_dev], env: *gcc_env}
 
