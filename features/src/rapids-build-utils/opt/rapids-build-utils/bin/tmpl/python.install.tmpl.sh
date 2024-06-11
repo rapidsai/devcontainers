@@ -21,8 +21,6 @@ install_${PY_LIB}_python() {
     local -;
     set -euo pipefail;
 
-    export ${PY_ENV} PATH="$PATH";
-
     eval "$(                                          \
     PARALLEL_LEVEL=${PARALLEL_LEVEL:-$(nproc --all)}  \
         rapids-get-num-archs-jobs-and-load "$@"       \
@@ -106,7 +104,6 @@ install_${PY_LIB}_python() {
 
     time (
         export ${PY_ENV} PATH="$PATH";
-
         local cudaflags="${CUDAFLAGS:+$CUDAFLAGS }-t=${n_arch}";
         local build_type="$(rapids-select-cmake-build-type "${cmake_args_[@]}")";
         local nvcc_append_flags="${NVCC_APPEND_FLAGS:+$NVCC_APPEND_FLAGS }-t=${n_arch}";

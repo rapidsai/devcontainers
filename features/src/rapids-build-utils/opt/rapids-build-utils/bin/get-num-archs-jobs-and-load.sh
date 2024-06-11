@@ -52,7 +52,16 @@ get_num_archs_jobs_and_load() {
 
     parallel="${j:-${JOBS:-${PARALLEL_LEVEL:-1}}}";
     max_archs="${max_archs:-${MAX_DEVICE_OBJ_TO_COMPILE_IN_PARALLEL:-${arch:-}}}";
-    max_device_obj_memory_usage="${max_device_obj_memory_usage:-${MAX_DEVICE_OBJ_MEMORY_USAGE:-1}}";
+    max_device_obj_memory_usage="${max_device_obj_memory_usage:-${MAX_DEVICE_OBJ_MEMORY_USAGE:-1Gi}}";
+
+    local num_re="^[0-9]+$";
+
+    # Assume un-suffixed inputs means gibibytes
+    if [[ "${max_device_obj_memory_usage}" =~ ${num_re} ]]; then
+        max_device_obj_memory_usage="${max_device_obj_memory_usage}Gi";
+    fi
+
+    max_device_obj_memory_usage="$(numfmt --from=auto "${max_device_obj_memory_usage}")";
 
     local n_arch="${archs:-1}";
 
@@ -94,10 +103,18 @@ get_num_archs_jobs_and_load() {
     fi
 
     local mem_for_device_objs="$((n_arch * max_device_obj_memory_usage))";
+    local mem_total="${max_total_system_memory:-${MAX_TOTAL_SYSTEM_MEMORY:-}}";
 
-    local -r free_mem="$(free --gibi | grep -E '^Mem:' | tr -s '[:space:]' | cut -d' ' -f7 || echo '0')";
-    local -r freeswap="$(free --gibi | grep -E '^Swap:' | tr -s '[:space:]' | cut -d' ' -f4 || echo '0')";
-    local -r mem_total="${max_total_system_memory:-${MAX_TOTAL_SYSTEM_MEMORY:-$((free_mem + freeswap))}}";
+    if test -z "${mem_total}"; then
+        local -r free_mem="$(free --bytes | grep -E '^Mem:' | tr -s '[:space:]' | cut -d' ' -f7 || echo '0')";
+        local -r freeswap="$(free --bytes | grep -E '^Swap:' | tr -s '[:space:]' | cut -d' ' -f4 || echo '0')";
+        mem_total="$((free_mem + freeswap))";
+    # Assume un-suffixed inputs means gibibytes
+    elif [[ "${mem_total}" =~ ${num_re} ]]; then
+        mem_total="${mem_total}Gi";
+    fi
+    mem_total="$(numfmt --from=auto "${mem_total}")";
+
     local n_load=$((parallel > n_cpus ? n_cpus : parallel));
     # shellcheck disable=SC2155
     local n_jobs="$(

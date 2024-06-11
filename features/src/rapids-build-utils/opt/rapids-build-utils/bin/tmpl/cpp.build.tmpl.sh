@@ -17,12 +17,13 @@ build_${CPP_LIB}_cpp() {
     local -;
     set -euo pipefail;
 
-    export ${CPP_ENV} PATH="$PATH";
-
-    eval "$(                                          \
-    PARALLEL_LEVEL=${PARALLEL_LEVEL:-$(nproc --all)}  \
-        rapids-get-num-archs-jobs-and-load "$@"       \
-        2>/dev/null                                   \
+    eval "$(\
+    PARALLEL_LEVEL=${PARALLEL_LEVEL:-$(nproc --all)} \
+    MAX_TOTAL_SYSTEM_MEMORY="${MAX_TOTAL_SYSTEM_MEMORY:-${CPP_MAX_TOTAL_SYSTEM_MEMORY}}" \
+    MAX_DEVICE_OBJ_MEMORY_USAGE="${MAX_DEVICE_OBJ_MEMORY_USAGE:-${CPP_MAX_DEVICE_OBJ_MEMORY_USAGE}}" \
+    MAX_DEVICE_OBJ_TO_COMPILE_IN_PARALLEL="${MAX_DEVICE_OBJ_TO_COMPILE_IN_PARALLEL:-${CPP_MAX_DEVICE_OBJ_TO_COMPILE_IN_PARALLEL}}" \
+        rapids-get-num-archs-jobs-and-load "$@" \
+        2>/dev/null \
     )";
 
     local -a cmake_args_="(${CMAKE_ARGS:-})";
