@@ -44,6 +44,7 @@ build_${CPP_LIB}_cpp() {
 
     # Build C++ lib
     time (
+        export ${CPP_ENV} PATH="$PATH";
         local -a cmake_build_args="($(rapids-select-cmake-build-args ${n_jobs:+-j${n_jobs}} "${OPTS[@]}"))";
         cmake                               \
             --build "${CPP_SRC}/${BIN_DIR}" \
