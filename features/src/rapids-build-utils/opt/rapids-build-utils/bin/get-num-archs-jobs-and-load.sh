@@ -65,9 +65,9 @@ get_num_archs_jobs_and_load() {
 
     local n_arch="${archs:-1}";
 
-    # currently: 60-real;70-real;75-real;80-real;86-real;90
+    # currently: 70-real;75-real;80-real;86-real;90
     # see: https://github.com/rapidsai/rapids-cmake/blob/branch-24.04/rapids-cmake/cuda/set_architectures.cmake#L54
-    local n_arch_rapids=6;
+    local n_arch_rapids=5;
 
     if test -z "${archs:-}" \
     && test -n "${INFER_NUM_DEVICE_ARCHITECTURES:-}"; then
