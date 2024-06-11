@@ -128,6 +128,8 @@ repos:
     - name: cuml
       sub_dir: cpp
       depends: [cumlprims_mg]
+      env: |
+        MAX_DEVICE_OBJ_MEMORY_USAGE=3
   python:
     - name: cuml
       sub_dir: python
@@ -187,7 +189,7 @@ repos:
       sub_dir: cpp
       depends: [cugraph-ops]
       env: |
-        MAX_DEVICE_OBJ_MEMORY_USAGE=5
+        MAX_DEVICE_OBJ_MEMORY_USAGE=6
     - name: cugraph_etl
       sub_dir: cpp/libcugraph_etl
       depends: [cudf, cugraph]
