@@ -129,7 +129,7 @@ repos:
       sub_dir: cpp
       depends: [cumlprims_mg]
       env: |
-        MAX_DEVICE_OBJ_MEMORY_USAGE=3
+        MAX_DEVICE_OBJ_MEMORY_USAGE=5
   python:
     - name: cuml
       sub_dir: python
