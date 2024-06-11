@@ -66,6 +66,7 @@ declare -a commands=(
     python-conda-pkg-names
     python-pkg-names
     python-pkg-roots
+    python-uses-rapids-build-backend
     python-uses-scikit-build
     python-uses-scikit-build-core
     query-manifest
