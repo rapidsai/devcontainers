@@ -89,7 +89,7 @@ make_pip_dependencies() {
                     pip_reqs_txts+=("${file}");
                     generate_requirements                                                     \
                         "${file}"                                                             \
-                        --file_key "${repo_keys[$keyi]}"                                      \
+                        --file-key "${repo_keys[$keyi]}"                                      \
                         --output requirements                                                 \
                         --config ~/"${!repo_path}/dependencies.yaml"                          \
                         --matrix "arch=$(uname -m);cuda=${cuda_version};py=${python_version}" \
@@ -112,7 +112,7 @@ make_pip_dependencies() {
                     pip_reqs_txts+=("${file}");
                     generate_requirements                                                     \
                         "${file}"                                                             \
-                        --file_key "${repo_keys[$keyi]}"                                      \
+                        --file-key "${repo_keys[$keyi]}"                                      \
                         --output requirements                                                 \
                         --config ~/"${!repo_path}/dependencies.yaml"                          \
                         --matrix "arch=$(uname -m);cuda=${cuda_version};py=${python_version}" \
