@@ -55,7 +55,8 @@ jobs:
           cuda=${cuda}
           repo=${repo,,}
           version=${version}
-          tag=${version}-cuda${cuda}-cl${cl}-${{ inputs.os }}${{ matrix.edition }}
+          tag_without_os=${version}-cuda${cuda}-cl${cl}
+          tag=${tag_without_os}-${{ inputs.os }}${{ matrix.edition }}
           EOF
 
       - name: Login to Docker Hub
@@ -88,4 +89,6 @@ jobs:
         name: Push ${{ steps.info.outputs.tag }}
         shell: powershell
         run: |
+          docker image tag ${{ steps.info.outputs.repo }}:${{ steps.info.outputs.tag }} ${{ steps.info.outputs.repo }}:${{ steps.info.outputs.tag_without_os }}
+          docker push ${{ steps.info.outputs.repo }}:${{ steps.info.outputs.tag_without_os }}
           docker push ${{ steps.info.outputs.repo }}:${{ steps.info.outputs.tag }}
