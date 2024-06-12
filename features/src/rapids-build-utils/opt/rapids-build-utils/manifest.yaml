@@ -84,8 +84,8 @@ repos:
     - name: raft
       sub_dir: cpp
       depends: [rmm]
-      env: |
-        MAX_DEVICE_OBJ_MEMORY_USAGE=3
+      parallelism:
+        max_device_obj_memory_usage: 3Gi
       args: {cmake: -DRAFT_COMPILE_LIBRARY=ON}
   python:
     - name: pylibraft
@@ -104,8 +104,8 @@ repos:
     - name: cuvs
       sub_dir: cpp
       depends: [raft]
-      env: |
-        MAX_DEVICE_OBJ_MEMORY_USAGE=3
+      parallelism:
+        max_device_obj_memory_usage: 3Gi
       args: {cmake: -DBUILD_C_LIBRARY=ON}
   python:
     - name: cuvs
@@ -128,6 +128,8 @@ repos:
     - name: cuml
       sub_dir: cpp
       depends: [cumlprims_mg]
+      parallelism:
+        max_device_obj_memory_usage: 3Gi
   python:
     - name: cuml
       sub_dir: python
@@ -186,8 +188,8 @@ repos:
     - name: cugraph
       sub_dir: cpp
       depends: [cugraph-ops]
-      env: |
-        MAX_DEVICE_OBJ_MEMORY_USAGE=5
+      parallelism:
+        max_device_obj_memory_usage: 6Gi
     - name: cugraph_etl
       sub_dir: cpp/libcugraph_etl
       depends: [cudf, cugraph]
