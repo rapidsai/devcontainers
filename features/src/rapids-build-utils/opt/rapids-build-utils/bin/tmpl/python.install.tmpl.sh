@@ -81,13 +81,6 @@ install_${PY_LIB}_python() {
         pip_args+=(-C "build-dir=$(rapids-maybe-clean-build-dir "${cmake_args[@]}" -- "${PY_SRC}")");
     fi
 
-    # devcontainers builds always prefer to build projects unsuffixed, e.g. 'cudf' instead of 'cudf-cu12'
-    if rapids-python-uses-rapids-build-backend "${PY_SRC}"; then
-        pip_args+=(-C "rapidsai.disable-cuda=true")
-        # or maybe $CUDA_VERSION_MAJOR.$CUDA_VERSION_MINOR
-        # pip_args+=(-C "rapidsai.matrix_entry=cuda=${CUDA_VERSION}")
-    fi
-
     # Put --editable at the end of pip_args
     if test ${#editable[@]} -gt 0; then
         cmake_args+=("-DCMAKE_INSTALL_RPATH_USE_LINK_PATH=ON");
