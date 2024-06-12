@@ -46,7 +46,7 @@ generate_script() {
     if test -n "${bin}"; then
         (
             cat - \
-          | envsubst '$HOME $NAME $SRC_PATH $PY_ENV $PY_SRC $PY_LIB $BIN_DIR $CPP_ENV $CPP_LIB $CPP_SRC $CPP_CMAKE_ARGS $CPP_CPACK_ARGS $CPP_DEPS $GIT_TAG $GIT_SSH_URL $GIT_HTTPS_URL $GIT_REPO $GIT_HOST $GIT_UPSTREAM $PIP_WHEEL_ARGS $PIP_INSTALL_ARGS' \
+          | envsubst '$HOME $NAME $SRC_PATH $PY_ENV $PY_SRC $PY_LIB $BIN_DIR $CPP_ENV $CPP_LIB $CPP_SRC $CPP_CMAKE_ARGS $CPP_CPACK_ARGS $CPP_DEPS $CPP_MAX_TOTAL_SYSTEM_MEMORY $CPP_MAX_DEVICE_OBJ_MEMORY_USAGE $CPP_MAX_DEVICE_OBJ_TO_COMPILE_IN_PARALLEL $GIT_TAG $GIT_SSH_URL $GIT_HTTPS_URL $GIT_REPO $GIT_HOST $GIT_UPSTREAM $PIP_WHEEL_ARGS $PIP_INSTALL_ARGS' \
           | tee "${TMP_SCRIPT_DIR}/${bin}" >/dev/null;
 
             chmod +x "${TMP_SCRIPT_DIR}/${bin}";
@@ -185,6 +185,9 @@ generate_scripts() {
     local cpp_cmake_args;
     local cpp_cpack_args;
     local cpp_depends_length;
+    local cpp_max_total_system_memory;
+    local cpp_max_device_obj_memory_usage;
+    local cpp_max_device_obj_to_compile_in_parallel;
 
     local py_env;
     local py_path;
@@ -249,6 +252,9 @@ generate_scripts() {
             cpp_cmake_args="${repo}_cpp_${j}_args_cmake";
             cpp_cpack_args="${repo}_cpp_${j}_args_cpack";
             cpp_depends_length="${repo}_cpp_${j}_depends_length";
+            cpp_max_total_system_memory="${repo}_cpp_${j}_parallelism_max_total_system_memory";
+            cpp_max_device_obj_memory_usage="${repo}_cpp_${j}_parallelism_max_device_obj_memory_usage";
+            cpp_max_device_obj_to_compile_in_parallel="${repo}_cpp_${j}_parallelism_max_device_obj_to_compile_in_parallel";
             cpp_path=~/"${!repo_path:-}${!cpp_sub_dir:+/${!cpp_sub_dir}}";
 
             cpp_dirs+=("${cpp_path}");
@@ -278,16 +284,19 @@ generate_scripts() {
             cpp_name_to_deps["${cpp_name}"]="${cpp_deps[*]}";
 
             if [[ -d ~/"${!repo_path:-}/.git" ]]; then
-                NAME="${repo_name:-}"                 \
-                SRC_PATH=~/"${!repo_path:-}"          \
-                BIN_DIR="${bin_dir}"                  \
-                CPP_ENV="${!cpp_env:-}"               \
-                CPP_LIB="${cpp_name:-}"               \
-                CPP_SRC="${!cpp_sub_dir:-}"           \
-                CPP_DEPS="${cpp_deps[*]}"             \
-                CPP_CMAKE_ARGS="${!cpp_cmake_args:-}" \
-                CPP_CPACK_ARGS="${!cpp_cpack_args:-}" \
-                generate_cpp_scripts                  ;
+                NAME="${repo_name:-}"                                                                       \
+                SRC_PATH=~/"${!repo_path:-}"                                                                \
+                BIN_DIR="${bin_dir}"                                                                        \
+                CPP_ENV="${!cpp_env:-}"                                                                     \
+                CPP_LIB="${cpp_name:-}"                                                                     \
+                CPP_SRC="${!cpp_sub_dir:-}"                                                                 \
+                CPP_DEPS="${cpp_deps[*]}"                                                                   \
+                CPP_CMAKE_ARGS="${!cpp_cmake_args:-}"                                                       \
+                CPP_CPACK_ARGS="${!cpp_cpack_args:-}"                                                       \
+                CPP_MAX_TOTAL_SYSTEM_MEMORY="${!cpp_max_total_system_memory:-}"                             \
+                CPP_MAX_DEVICE_OBJ_MEMORY_USAGE="${!cpp_max_device_obj_memory_usage:-}"                     \
+                CPP_MAX_DEVICE_OBJ_TO_COMPILE_IN_PARALLEL="${!cpp_max_device_obj_to_compile_in_parallel:-}" \
+                generate_cpp_scripts                                                                        ;
             fi
         done
 

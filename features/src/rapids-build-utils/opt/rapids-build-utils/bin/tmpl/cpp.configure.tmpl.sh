@@ -19,12 +19,13 @@ configure_${CPP_LIB}_cpp() {
     local -;
     set -euo pipefail;
 
-    export ${CPP_ENV} PATH="$PATH";
-
-    eval "$(                                          \
-    PARALLEL_LEVEL=${PARALLEL_LEVEL:-$(nproc --all)}  \
-        rapids-get-num-archs-jobs-and-load "$@"       \
-        2>/dev/null                                   \
+    eval "$(\
+    PARALLEL_LEVEL=${PARALLEL_LEVEL:-$(nproc --all)} \
+    MAX_TOTAL_SYSTEM_MEMORY="${MAX_TOTAL_SYSTEM_MEMORY:-${CPP_MAX_TOTAL_SYSTEM_MEMORY}}" \
+    MAX_DEVICE_OBJ_MEMORY_USAGE="${MAX_DEVICE_OBJ_MEMORY_USAGE:-${CPP_MAX_DEVICE_OBJ_MEMORY_USAGE}}" \
+    MAX_DEVICE_OBJ_TO_COMPILE_IN_PARALLEL="${MAX_DEVICE_OBJ_TO_COMPILE_IN_PARALLEL:-${CPP_MAX_DEVICE_OBJ_TO_COMPILE_IN_PARALLEL}}" \
+        rapids-get-num-archs-jobs-and-load "$@" \
+        2>/dev/null \
     )";
 
     local -a cmake_args_="(${CMAKE_ARGS:-})";
@@ -55,6 +56,7 @@ configure_${CPP_LIB}_cpp() {
     cmake_args+=(-B "${bin_dir:-${CPP_SRC}/${BIN_DIR}}");
 
     time (
+        export ${CPP_ENV} PATH="$PATH";
         CUDAFLAGS="${CUDAFLAGS:+$CUDAFLAGS }-t=${n_arch}" \
             cmake "${cmake_args[@]}";
         { set +x; } 2>/dev/null; echo -n "lib${CPP_LIB} configure time:";
