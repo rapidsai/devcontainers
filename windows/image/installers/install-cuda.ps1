@@ -7,7 +7,7 @@ Param(
 )
 
 # Use System.Version to tokenize version
-$version = [Version]cudaVersion
+$version = [Version]$cudaVersion
 
 $major = $version.major
 $minor = $version.minor
