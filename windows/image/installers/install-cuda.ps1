@@ -9,12 +9,12 @@ Param(
 # Use System.Version to tokenize version
 $version = [Version]$cudaVersion
 
-$major = $version.major
-$minor = $version.minor
-$build = $version.build
+$major = $version.Major
+$minor = $version.Minor
+$build = $version.Build
 
 # Minimum build is 0, not -1 as default in case "12.5" is passed
-if ($build < 0) {
+if ($build -lt 0) {
     $build = 0
 }
 
