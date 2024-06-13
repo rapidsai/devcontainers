@@ -67,10 +67,11 @@ get_user_fork_name() {
 ________EOF
         )";
         local nameWithOwner;
-        nameWithOwner="$(gh repo list "${user}" --fork --json nameWithOwner --json parent --jq ". ${query}" 2>/dev/null || echo "err")";
+        nameWithOwner="$(gh repo list --limit 9999 "${user}" --fork --json nameWithOwner --json parent --jq ". ${query}" 2>/dev/null || echo "err")";
         if [ "${nameWithOwner}" = "err" ]; then
             nameWithOwner="";
-            for repo in $(gh repo list "${user}" --fork --json name --jq 'map(.name)[]'); do
+            # Work around https://github.com/cli/cli/issues/7881 by explicitly enumerating each user fork and checking the parent info
+            for repo in $(gh repo list --limit 9999 "${user}" --fork --json name --jq 'map(.name)[]'); do
                 nameWithOwner="$(gh repo view "${repo}" --json nameWithOwner --json parent --jq "[.] ${query}" 2>/dev/null || echo "")";
                 if test -n "${nameWithOwner}"; then
                     break;
