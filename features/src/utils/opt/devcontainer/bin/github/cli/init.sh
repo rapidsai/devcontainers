@@ -84,10 +84,13 @@ init_github_cli() {
         || echo "Continuing without logging into GitHub";
     fi
 
-    gh config set git_protocol ${git_protocol};
-
     if gh auth status >/dev/null 2>&1; then
-        gh auth setup-git --hostname "${GITHUB_HOST:-github.com}";
+        if test "$(gh config get git_protocol --host "${GITHUB_HOST:-github.com}")" != "${git_protocol}"; then
+            gh config set git_protocol --host "${GITHUB_HOST:-github.com}" "${git_protocol}";
+        fi
+        if test "https" = "${git_protocol}" && ! git config credential.helper >/dev/null; then
+            gh auth setup-git --hostname "${GITHUB_HOST:-github.com}";
+        fi
     fi
 
     local github_user="${GITHUB_USER:-}";

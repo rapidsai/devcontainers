@@ -3,6 +3,11 @@ x-git-defaults: &git_defaults
     tag: branch-24.08
     upstream: rapidsai
 
+x-rapids-build-backend-args: &rapids_build_backend_args |
+  --config-settings skbuild.strict-config=false
+  --config-settings rapidsai.disable-cuda=true
+  --config-settings rapidsai.matrix_entry=cuda=$(grep -o '^[0-9]+.[0-9]+' <<< "${CUDA_VERSION}")
+
 repos:
 
 - name: rmm
@@ -15,9 +20,11 @@ repos:
     - name: librmm
       sub_dir: python/librmm
       depends: [rmm]
+      args: {install: *rapids_build_backend_args}
     - name: rmm
       sub_dir: python/rmm
       depends: [rmm]
+      args: {install: *rapids_build_backend_args}
 
 - name: ucxx
   path: ucxx
@@ -34,7 +41,7 @@ repos:
     - name: ucxx
       sub_dir: python
       depends: [ucxx]
-      args: {cmake: -DFIND_UCXX_CPP=ON}
+      args: {cmake: -DFIND_UCXX_CPP=ON, install: *rapids_build_backend_args}
 
 - name: kvikio
   path: kvikio
@@ -47,7 +54,7 @@ repos:
     - name: kvikio
       sub_dir: python/kvikio
       depends: [KvikIO]
-      args: {cmake: -DFIND_KVIKIO_CPP=ON}
+      args: {cmake: -DFIND_KVIKIO_CPP=ON, install: *rapids_build_backend_args}
 
 - name: cudf
   path: cudf
@@ -66,16 +73,20 @@ repos:
     - name: cudf
       sub_dir: python/cudf
       depends: [cudf]
-      args: {cmake: -DFIND_CUDF_CPP=ON}
+      args: {cmake: -DFIND_CUDF_CPP=ON, install: *rapids_build_backend_args}
     - name: dask_cudf
       sub_dir: python/dask_cudf
+      args: {install: *rapids_build_backend_args}
     - name: cudf_polars
       sub_dir: python/cudf_polars
+      args: {install: *rapids_build_backend_args}
     - name: cudf_kafka
       sub_dir: python/cudf_kafka
       depends: [cudf_kafka]
+      args: {install: *rapids_build_backend_args}
     - name: custreamz
       sub_dir: python/custreamz
+      args: {install: *rapids_build_backend_args}
 
 - name: raft
   path: raft
@@ -91,11 +102,11 @@ repos:
     - name: pylibraft
       sub_dir: python/pylibraft
       depends: [raft]
-      args: {cmake: -DFIND_RAFT_CPP=ON}
+      args: {cmake: -DFIND_RAFT_CPP=ON, install: *rapids_build_backend_args}
     - name: raft-dask
       sub_dir: python/raft-dask
       depends: [ucxx, raft]
-      args: {cmake: -DFIND_RAFT_CPP=ON}
+      args: {cmake: -DFIND_RAFT_CPP=ON, install: *rapids_build_backend_args}
 
 - name: cuvs
   path: cuvs
@@ -111,7 +122,7 @@ repos:
     - name: cuvs
       sub_dir: python/cuvs
       depends: [cuvs]
-      args: {cmake: -DFIND_CUVS_CPP=ON}
+      args: {cmake: -DFIND_CUVS_CPP=ON, install: *rapids_build_backend_args}
 
 - name: cumlprims_mg
   path: cumlprims_mg
@@ -134,7 +145,7 @@ repos:
     - name: cuml
       sub_dir: python
       depends: [cuml]
-      args: {cmake: -DFIND_CUML_CPP=ON}
+      args: {cmake: -DFIND_CUML_CPP=ON, install: *rapids_build_backend_args}
 
 - name: cugraph-ops
   path: cugraph-ops
@@ -144,27 +155,25 @@ repos:
       sub_dir: cpp
       depends: [raft]
       args:
-        cmake: |
-          -DCMAKE_CUDA_ARCHITECTURES="${CUDAARCHS}"
+        cmake: -DCMAKE_CUDA_ARCHITECTURES="${CUDAARCHS}"
     - name: cugraph-ops-internal
       sub_dir: cpp_internal
       depends: [cugraph-ops]
       args:
-        cmake: |
-          -DCMAKE_CUDA_ARCHITECTURES="${CUDAARCHS}"
+        cmake: -DCMAKE_CUDA_ARCHITECTURES="${CUDAARCHS}"
   python:
     - name: pylibcugraphops
       sub_dir: pylibcugraphops
       depends: [cugraph-ops]
       args:
-        cmake: |
-          -DCMAKE_CUDA_ARCHITECTURES="${CUDAARCHS}"
+        cmake: -DCMAKE_CUDA_ARCHITECTURES="${CUDAARCHS}"
+        install: *rapids_build_backend_args
     - name: pylibcugraphops_internal
       sub_dir: pylibcugraphops_internal
       depends: [cugraph-ops-internal]
       args:
-        cmake: |
-          -DCMAKE_CUDA_ARCHITECTURES="${CUDAARCHS}"
+        cmake: -DCMAKE_CUDA_ARCHITECTURES="${CUDAARCHS}"
+        install: *rapids_build_backend_args
 
 - name: wholegraph
   path: wholegraph
@@ -174,12 +183,12 @@ repos:
       sub_dir: cpp
       depends: [raft]
       args:
-        cmake: |
-          -DCMAKE_CUDA_ARCHITECTURES="${CUDAARCHS}"
+        cmake: -DCMAKE_CUDA_ARCHITECTURES="${CUDAARCHS}"
   python:
     - name: wholegraph
       sub_dir: python/pylibwholegraph
       depends: [wholegraph]
+      args: {install: *rapids_build_backend_args}
 
 - name: cugraph
   path: cugraph
@@ -194,29 +203,35 @@ repos:
       sub_dir: cpp/libcugraph_etl
       depends: [cudf, cugraph]
       args:
-        cmake: |
-          $([ "pip" = ${PYTHON_PACKAGE_MANAGER} ] && echo -DUSE_LIBARROW_FROM_PYARROW=ON || echo)
+        cmake: $([ "pip" = ${PYTHON_PACKAGE_MANAGER} ] && echo -DUSE_LIBARROW_FROM_PYARROW=ON || echo)
+        install: *rapids_build_backend_args
   python:
     - name: pylibcugraph
       sub_dir: python/pylibcugraph
       depends: [cugraph]
-      args: {cmake: -DFIND_CUGRAPH_CPP=ON}
+      args: {cmake: -DFIND_CUGRAPH_CPP=ON, install: *rapids_build_backend_args}
     - name: cugraph
       sub_dir: python/cugraph
       depends: [cugraph]
-      args: {cmake: -DFIND_CUGRAPH_CPP=ON}
+      args: {cmake: -DFIND_CUGRAPH_CPP=ON, install: *rapids_build_backend_args}
     - name: nx-cugraph
       sub_dir: python/nx-cugraph
+      args: {install: *rapids_build_backend_args}
     - name: cugraph-dgl
       sub_dir: python/cugraph-dgl
+      args: {install: *rapids_build_backend_args}
     - name: cugraph-equivariant
       sub_dir: python/cugraph-equivariant
+      args: {install: *rapids_build_backend_args}
     - name: cugraph_pyg
       sub_dir: python/cugraph-pyg
+      args: {install: *rapids_build_backend_args}
     - name: cugraph-service-client
       sub_dir: python/cugraph-service/client
+      args: {install: *rapids_build_backend_args}
     - name: cugraph-service-server
       sub_dir: python/cugraph-service/server
+      args: {install: *rapids_build_backend_args}
 
 - name: cuspatial
   path: cuspatial
@@ -240,4 +255,4 @@ repos:
     - name: cuspatial
       sub_dir: python/cuspatial
       depends: [cuspatial]
-      args: {cmake: -DFIND_CUSPATIAL_CPP=ON}
+      args: {cmake: -DFIND_CUSPATIAL_CPP=ON, install: *rapids_build_backend_args}
