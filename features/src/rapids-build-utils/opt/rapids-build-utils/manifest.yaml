@@ -51,12 +51,12 @@ repos:
       sub_dir: cpp
       depends: [rmm]
   python:
-    - name: kvikio
-      sub_dir: python/kvikio
-      depends: [KvikIO]
-      args: {cmake: -DFIND_KVIKIO_CPP=ON, install: *rapids_build_backend_args}
     - name: libkvikio
       sub_dir: python/libkvikio
+      depends: [KvikIO]
+      args: {cmake: -DFIND_KVIKIO_CPP=ON, install: *rapids_build_backend_args}
+    - name: kvikio
+      sub_dir: python/kvikio
       depends: [KvikIO]
       args: {cmake: -DFIND_KVIKIO_CPP=ON, install: *rapids_build_backend_args}
 
