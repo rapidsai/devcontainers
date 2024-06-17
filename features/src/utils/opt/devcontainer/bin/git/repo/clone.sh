@@ -72,6 +72,7 @@ clone_git_repo() {
 
     git -C "${directory}" remote add origin "${origin}" 2>/dev/null || true;
     git -C "${directory}" remote add upstream "${upstream}" 2>/dev/null || true;
+    git -C "${directory}" remote set-url origin "${origin}" 2>/dev/null || true;
     git -C "${directory}" remote set-url upstream "${upstream}" 2>/dev/null || true;
     git -C "${directory}" remote set-url --push upstream read_only 2>/dev/null || true;
     if test "${upstream}" == "${origin}"; then
