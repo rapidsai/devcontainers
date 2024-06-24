@@ -45,12 +45,12 @@ get_repo_name() {
     glab api --hostname "${https_url}" graphql -f query="$(cat <<________EOF | tr -s '[:space:]'
         query {
             project(fullPath: "${repo}") {
-                name
+                path
             }
         }
 ________EOF
     )" \
-  | jq -r '.data.project.name';
+  | jq -r '.data.project.path';
 }
 
 get_repo_owner() {
@@ -59,13 +59,13 @@ get_repo_owner() {
         query {
             project(fullPath: "${repo}") {
                 group {
-                    name
+                    path
                 }
             }
         }
 ________EOF
     )" \
-  | jq -r '.data.project.group.name';
+  | jq -r '.data.project.group.path';
 }
 
 get_repo_git_url() {
