@@ -27,27 +27,28 @@
 
 get_default_branch() {
     local repo="${1}";
-    gh repo view "${repo}" --json defaultBranchRef --jq '.defaultBranchRef.name';
+    GH_HOST="${https_url}" gh repo view "${repo}" --json defaultBranchRef --jq '.defaultBranchRef.name';
 }
 
 get_repo_name() {
     local repo="${1}";
-    gh repo view "${repo}" --json 'name' --jq '.name';
+    GH_HOST="${https_url}" gh repo view "${repo}" --json 'name' --jq '.name';
 }
 
 get_repo_owner() {
     local repo="${1}";
-    gh repo view "${repo}" --json 'owner' --jq '.owner.login';
+    GH_HOST="${https_url}" gh repo view "${repo}" --json 'owner' --jq '.owner.login';
 }
 
 get_repo_git_url() {
     local repo="${1}";
-    echo "$(gh repo view "${repo}" --json url --jq ".url").git";
+    echo "$(
+        GH_HOST="${https_url}" gh repo view "${repo}" --json url --jq ".url").git";
 }
 
 get_repo_ssh_url() {
     local repo="${1}";
-    gh repo view "${repo}" --json sshUrl --jq ".sshUrl";
+    GH_HOST="${https_url}" gh repo view "${repo}" --json sshUrl --jq ".sshUrl";
 }
 
 get_user_fork_name() {
@@ -67,12 +68,12 @@ get_user_fork_name() {
 ________EOF
         )";
         local nameWithOwner;
-        nameWithOwner="$(gh repo list --limit 9999 "${user}" --fork --json nameWithOwner --json parent --jq ". ${query}" 2>/dev/null || echo "err")";
+        nameWithOwner="$(GH_HOST="${https_url}" gh repo list --limit 9999 "${user}" --fork --json nameWithOwner --json parent --jq ". ${query}" 2>/dev/null || echo "err")";
         if [ "${nameWithOwner}" = "err" ]; then
             nameWithOwner="";
             # Work around https://github.com/cli/cli/issues/7881 by explicitly enumerating each user fork and checking the parent info
-            for repo in $(gh repo list --limit 9999 "${user}" --fork --json name --jq 'map(.name)[]'); do
-                nameWithOwner="$(gh repo view "${repo}" --json nameWithOwner --json parent --jq "[.] ${query}" 2>/dev/null || echo "")";
+            for repo in $(GH_HOST="${https_url}" gh repo list --limit 9999 "${user}" --fork --json name --jq 'map(.name)[]'); do
+                nameWithOwner="$(GH_HOST="${https_url}" gh repo view "${repo}" --json nameWithOwner --json parent --jq "[.] ${query}" 2>/dev/null || echo "")";
                 if test -n "${nameWithOwner}"; then
                     break;
                 fi
@@ -105,6 +106,9 @@ clone_github_repo() {
     local user=;
     local fork=;
     local owner=;
+
+    ssh_url="${ssh_url:-${GITHUB_HOST:-github.com}}";
+    https_url="${https_url:-${GITHUB_HOST:-github.com}}";
 
     if test -z "${no_fork:-}" && \
        test -z "${clone_upstream:-}" && \
@@ -160,11 +164,11 @@ clone_github_repo() {
 
     if test -z "${origin_:-}" || test -z "${upstream_:-}"; then
         if [ "$(gh config get git_protocol)" = "ssh" ]; then
-            origin_="${origin_:-"ssh://git@${ssh_url:-${GITHUB_HOST:-github.com}}/${origin}.git"}";
-            upstream_="${upstream_:-"ssh://git@${ssh_url:-${GITHUB_HOST:-github.com}}/${upstream}.git"}";
+            origin_="${origin_:-"ssh://git@${ssh_url}/${origin}.git"}";
+            upstream_="${upstream_:-"ssh://git@${ssh_url}/${upstream}.git"}";
         else
-            origin_="${origin_:-"https://${https_url:-${GITHUB_HOST:-github.com}}/${origin}.git"}";
-            upstream_="${upstream_:-"https://${https_url:-${GITHUB_HOST:-github.com}}/${upstream}.git"}";
+            origin_="${origin_:-"https://${https_url}/${origin}.git"}";
+            upstream_="${upstream_:-"https://${https_url}/${upstream}.git"}";
         fi
     fi
 

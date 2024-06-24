@@ -27,7 +27,7 @@
 
 get_default_branch() {
     local repo="${1}";
-    glab api graphql -f query="$(cat <<________EOF | tr -s '[:space:]'
+    glab api --hostname "${https_url}" graphql -f query="$(cat <<________EOF | tr -s '[:space:]'
         query {
             project(fullPath: "${repo}") {
                 repository {
@@ -42,7 +42,7 @@ ________EOF
 
 get_repo_name() {
     local repo="${1}";
-    glab api graphql -f query="$(cat <<________EOF | tr -s '[:space:]'
+    glab api --hostname "${https_url}" graphql -f query="$(cat <<________EOF | tr -s '[:space:]'
         query {
             project(fullPath: "${repo}") {
                 name
@@ -55,7 +55,7 @@ ________EOF
 
 get_repo_owner() {
     local repo="${1}";
-    glab api graphql -f query="$(cat <<________EOF | tr -s '[:space:]'
+    glab api --hostname "${https_url}" graphql -f query="$(cat <<________EOF | tr -s '[:space:]'
         query {
             project(fullPath: "${repo}") {
                 group {
@@ -70,7 +70,7 @@ ________EOF
 
 get_repo_git_url() {
     local repo="${1}";
-    glab api graphql -f query="$(cat <<________EOF | tr -s '[:space:]'
+    glab api --hostname "${https_url}" graphql -f query="$(cat <<________EOF | tr -s '[:space:]'
         query {
             project(fullPath: "${repo}") {
                 httpUrlToRepo
@@ -84,7 +84,7 @@ ________EOF
 
 get_repo_ssh_url() {
     local repo="${1}";
-    glab api graphql -f query="$(cat <<________EOF | tr -s '[:space:]'
+    glab api --hostname "${https_url}" graphql -f query="$(cat <<________EOF | tr -s '[:space:]'
         query {
             project(fullPath: "${repo}") {
                 sshUrlToRepo
@@ -102,7 +102,7 @@ get_user_fork_name() {
     if [ "${user}" = "${owner}" ]; then
         echo "${owner}/${name}";
     else
-        glab api "projects/$(jq -rn --arg x "${owner}/${name}" '$x|@uri')/forks?owned=true" | jq -r '. | map(.path_with_namespace)[]';
+        glab api --hostname "${https_url}" "projects/$(jq -rn --arg x "${owner}/${name}" '$x|@uri')/forks?owned=true" | jq -r '. | map(.path_with_namespace)[]';
     fi
 }
 
@@ -129,6 +129,9 @@ clone_gitlab_repo() {
     local name=;
     local user=;
     local owner=;
+
+    ssh_url="${ssh_url:-${GITLAB_HOST:-gitlab.com}}";
+    https_url="${https_url:-${GITLAB_HOST:-gitlab.com}}";
 
     if test -z "${no_fork:-}" && \
        test -z "${clone_upstream:-}" && \
@@ -184,11 +187,11 @@ clone_gitlab_repo() {
 
     if test -z "${origin_:-}" || test -z "${upstream_:-}"; then
         if [ "$(glab config get git_protocol)" = "ssh" ]; then
-            origin_="${origin_:-"ssh://git@${ssh_url:-${GITLAB_HOST:-gitlab.com}}/${origin}.git"}";
-            upstream_="${upstream_:-"ssh://git@${ssh_url:-${GITLAB_HOST:-gitlab.com}}/${upstream}.git"}";
+            origin_="${origin_:-"ssh://git@${ssh_url}/${origin}.git"}";
+            upstream_="${upstream_:-"ssh://git@${ssh_url}/${upstream}.git"}";
         else
-            origin_="${origin_:-"https://${https_url:-${GITLAB_HOST:-gitlab.com}}/${origin}.git"}";
-            upstream_="${upstream_:-"https://${https_url:-${GITLAB_HOST:-gitlab.com}}/${upstream}.git"}";
+            origin_="${origin_:-"https://${https_url}/${origin}.git"}";
+            upstream_="${upstream_:-"https://${https_url}/${upstream}.git"}";
         fi
     fi
 

@@ -29,6 +29,8 @@ clone_${NAME}() {
         -b,--branch
         -d,--directory
         -u,--upstream
+        --ssh-url
+        --https-url
     ' "$@" <&0)";
 
     eval "$(rapids-get-num-archs-jobs-and-load --archs 0 "$@")";
