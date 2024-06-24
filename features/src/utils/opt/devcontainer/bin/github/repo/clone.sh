@@ -42,8 +42,7 @@ get_repo_owner() {
 
 get_repo_git_url() {
     local repo="${1}";
-    echo "$(
-        GH_HOST="${https_url}" gh repo view "${repo}" --json url --jq ".url").git";
+    echo "$(GH_HOST="${https_url}" gh repo view "${repo}" --json url --jq ".url").git";
 }
 
 get_repo_ssh_url() {
@@ -140,7 +139,7 @@ clone_github_repo() {
             case "${CHOICE:-}" in
                 [Nn]* ) origin="${upstream}"; break;;
                 [Yy]* ) origin="${user}/${name}";
-                        gh repo fork "${upstream}" --clone=false --default-branch-only;
+                        GH_HOST="${https_url}" gh repo fork "${upstream}" --clone=false --default-branch-only;
                         break;;
                 * ) echo "Please answer 'y' or 'n'";;
             esac
@@ -152,8 +151,8 @@ clone_github_repo() {
 
     if test -z "${no_fork:-}" && \
        test -z "${clone_upstream:-}" && \
-       gh auth status >/dev/null 2>&1; then
-        if [ "$(gh config get git_protocol)" = "ssh" ]; then
+       gh auth status --hostname "${https_url}" >/dev/null 2>&1; then
+        if [ "$(gh config get git_protocol --host "${https_url}")" = "ssh" ]; then
             origin_="$(get_repo_ssh_url "${origin}")";
             upstream_="$(get_repo_ssh_url "${upstream}")";
         else
@@ -163,7 +162,7 @@ clone_github_repo() {
     fi
 
     if test -z "${origin_:-}" || test -z "${upstream_:-}"; then
-        if [ "$(gh config get git_protocol)" = "ssh" ]; then
+        if [ "$(gh config get git_protocol --host "${https_url}")" = "ssh" ]; then
             origin_="${origin_:-"ssh://git@${ssh_url}/${origin}.git"}";
             upstream_="${upstream_:-"ssh://git@${ssh_url}/${upstream}.git"}";
         else
