@@ -42,6 +42,10 @@ repos:
       sub_dir: python
       depends: [ucxx]
       args: {cmake: -DFIND_UCXX_CPP=ON, install: *rapids_build_backend_args}
+    - name: distributed-ucxx
+      sub_dir: python/distributed-ucxx
+      depends: [ucxx]
+      args: {cmake: -DFIND_UCXX_CPP=ON, install: *rapids_build_backend_args}
 
 - name: kvikio
   path: kvikio
