@@ -44,14 +44,10 @@
     "./features/src/sccache",
     "./features/src/utils"
   ],
-  "initializeCommand": ["/bin/bash", "-c", "mkdir -m 0755 -p ${localWorkspaceFolder}/.vscode/server"],
   "updateContentCommand": [
     "/bin/bash",
     "-c",
     "mkdir -m 0755 -p ~/.config/clangd && cp -n /etc/skel/.config/clangd/config.yaml ~/.config/clangd/config.yaml"
-  ],
-  "mounts": [
-    "source=${localWorkspaceFolder}/.vscode/server,target=/home/coder/.vscode-server,type=bind,consistency=consistent"
   ],
   "customizations": {
     "vscode": {
