@@ -70,6 +70,23 @@ make_conda_dependencies() {
 
         if [ -f ~/"${!repo_path}/dependencies.yaml" ]; then
 
+            echo "Generating ${!repo_name}'s repo conda env yml" 1>&2;
+
+            local repo_keys=("${key[@]}");
+            local keyi;
+
+            for ((keyi=0; keyi < ${#repo_keys[@]}; keyi+=1)); do
+                local file="/tmp/${!repo_name}.${repo_keys[$keyi]}.env.yaml";
+                conda_env_yamls+=("${file}");
+                generate_env_yaml                                                         \
+                    "${file}"                                                             \
+                    --file-key "${repo_keys[$keyi]}"                                      \
+                    --output conda                                                        \
+                    --config ~/"${!repo_path}/dependencies.yaml"                          \
+                    --matrix "arch=$(uname -m);cuda=${cuda_version};py=${python_version}" \
+                    ;
+            done
+
             local cpp_length="${repo}_cpp_length";
 
             for ((j=0; j < ${!cpp_length:-0}; j+=1)); do
@@ -77,7 +94,7 @@ make_conda_dependencies() {
 
                 echo "Generating lib${!cpp_name}'s conda env yml" 1>&2;
 
-                local repo_keys=("${key[@]}" "${key[@]/%/_lib${!cpp_name//"-"/"_"}}");
+                local repo_keys=("${key[@]/%/_lib${!cpp_name//"-"/"_"}}");
                 local keyi;
 
                 for ((keyi=0; keyi < ${#repo_keys[@]}; keyi+=1)); do
@@ -100,7 +117,7 @@ make_conda_dependencies() {
 
                 echo "Generating ${!py_name}'s conda env yml" 1>&2;
 
-                local repo_keys=("${key[@]}" "${key[@]/%/_${!py_name//"-"/"_"}}");
+                local repo_keys=("${key[@]/%/_${!py_name//"-"/"_"}}");
                 local keyi;
 
                 for ((keyi=0; keyi < ${#repo_keys[@]}; keyi+=1)); do
