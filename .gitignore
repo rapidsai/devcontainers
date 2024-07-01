@@ -2,4 +2,5 @@
 /.cache
 /.config
 /.scratch
+/.vscode/server
 /features/src/*.[0-9]
