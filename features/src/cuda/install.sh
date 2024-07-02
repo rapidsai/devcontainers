@@ -75,7 +75,7 @@ echo "Installing dev CUDA toolkit...";
 export CUDA_HOME="/usr/local/cuda";
 
 cuda_ver="${VERSION}";
-cuda_ver=$(grep -o '^[0-9]*.[0-9]' <<< "${cuda_ver}");
+cuda_ver=$(grep -Po '^[0-9]+\.[0-9]+' <<< "${cuda_ver}");
 
 cudapath="${CUDA_HOME}-${cuda_ver}";
 cuda_tag="cuda${cuda_ver}";
@@ -124,13 +124,13 @@ fi
 
 if [ "${INSTALLNVRTC:-false}" = true ]; then
     PKGS+=("cuda-nvrtc${dev_tag}-${cuda_ver}");
-    if test -n "$(apt-cache search libnvjitlink${dev_tag}-${cuda_ver} 2>/dev/null)"; then
+    if test -n "$(apt-cache search "libnvjitlink${dev_tag}-${cuda_ver}" 2>/dev/null)"; then
         PKGS+=("libnvjitlink${dev_tag}-${cuda_ver}");
     fi
 fi
 
 if [ "${INSTALLOPENCL:-false}" = true ] \
-&& test -n "$(apt-cache search cuda-opencl${dev_tag}-${cuda_ver} 2>/dev/null)"; then
+&& test -n "$(apt-cache search "cuda-opencl${dev_tag}-${cuda_ver}" 2>/dev/null)"; then
     PKGS+=("cuda-opencl${dev_tag}-${cuda_ver}");
 fi
 
@@ -147,7 +147,7 @@ if [ "${INSTALLCUFFT:-false}" = true ]; then
 fi
 
 if [ "${INSTALLCUFILE:-false}" = true ] \
-&& test -n "$(apt-cache search libcufile${dev_tag}-${cuda_ver} 2>/dev/null)"; then
+&& test -n "$(apt-cache search "libcufile${dev_tag}-${cuda_ver}" 2>/dev/null)"; then
     PKGS+=("libcufile${dev_tag}-${cuda_ver}");
 fi
 
@@ -208,7 +208,7 @@ if [ "${INSTALLCUTENSOR:-false}" = true ]; then
     fi
 fi
 
-check_packages ${PKGS[@]};
+check_packages "${PKGS[@]}";
 
 if ! test -L "${CUDA_HOME}"; then
     # Create /usr/local/cuda symlink
