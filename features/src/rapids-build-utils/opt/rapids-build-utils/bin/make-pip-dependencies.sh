@@ -53,8 +53,7 @@ make_pip_dependencies() {
         _include+=(-f "${inc}");
     done
 
-    local cuda_version="${CUDA_VERSION:-${CUDA_VERSION_MAJOR:-12}.${CUDA_VERSION_MINOR:-0}}";
-    cuda_version="$(grep -o '^[0-9]*.[0-9]*' <<< "${cuda_version}")";
+    local cuda_version="${CUDA_VERSION_MAJOR_MINOR:-}";
     local -r cuda_version_major="$(cut -d'.' -f1 <<< "${cuda_version}")";
 
     local python_version="${PYTHON_VERSION:-$(python3 --version 2>&1 | cut -d' ' -f2)}";

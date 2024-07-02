@@ -44,7 +44,7 @@ get_cmake_build_dir() {
         echo "${src:+${src}/}$(python -c 'from skbuild import constants; print(constants.CMAKE_BUILD_DIR())')";
     else
         local -r type="$(rapids-select-cmake-build-type "${OPTS[@]}" "${REST[@]:1}" | tr '[:upper:]' '[:lower:]')";
-        local -r cuda="$(grep -o '^[0-9]*.[0-9]*' <<< "${CUDA_VERSION:-${CUDA_VERSION_MAJOR:-12}.${CUDA_VERSION_MINOR:-0}}")";
+        local -r cuda="${CUDA_VERSION_MAJOR_MINOR:-}";
         local bin="build";
         bin+="${PYTHON_PACKAGE_MANAGER:+/${PYTHON_PACKAGE_MANAGER}}${cuda:+/cuda-${cuda}}";
 

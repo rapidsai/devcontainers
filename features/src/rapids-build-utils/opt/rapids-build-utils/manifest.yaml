@@ -4,9 +4,9 @@ x-git-defaults: &git_defaults
     upstream: rapidsai
 
 x-rapids-build-backend-args: &rapids_build_backend_args |
-  --config-settings skbuild.strict-config=false
-  --config-settings rapidsai.disable-cuda=true
-  --config-settings rapidsai.matrix_entry=cuda=$(grep -o '^[0-9]+.[0-9]+' <<< "${CUDA_VERSION}")
+  --config-settings "skbuild.strict-config=false"
+  --config-settings "rapidsai.disable-cuda=true"
+  --config-settings "rapidsai.matrix-entry=cuda=${CUDA_VERSION_MAJOR_MINOR}"
 
 repos:
 

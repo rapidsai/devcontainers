@@ -41,7 +41,7 @@ clean_${PY_LIB}_python() {
     done
 
     local py_ver="${PYTHON_VERSION:-$(python3 --version 2>&1 | cut -d' ' -f2)}";
-    py_ver="$(grep -o '^[0-9]*.[0-9]*' <<< "${py_ver}")";
+    py_ver="$(grep -Po '^[0-9]+\.[0-9]+' <<< "${py_ver}")";
 
     if test -d "${PY_SRC}/build"; then
         local slug="$(uname -s)-$(uname -m)";
