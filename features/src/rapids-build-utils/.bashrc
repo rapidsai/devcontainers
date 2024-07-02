@@ -17,3 +17,6 @@ if [[ "${PYTHON_PACKAGE_MANAGER:-}" == "pip" ]]; then
         fi
     fi
 fi
+
+# shellcheck disable=SC2155
+export CUDA_VERSION_MAJOR_MINOR="$(grep -Po '^[0-9]+\.[0-9]+' <<< "${CUDA_VERSION:-${CUDA_VERSION_MAJOR:-12}.${CUDA_VERSION_MINOR:-0}}")";
