@@ -168,11 +168,11 @@ if [ "${INSTALLNVJPEG:-false}" = true ]; then
 fi
 
 if [ "${INSTALLCUDNN:-false}" = true ] \
-&& test -n "$(apt-cache search libcudnn8 2>/dev/null)" \
-&& apt-cache policy libcudnn8 2>/dev/null | grep -q "+${cuda_tag}"; then
-    PKGS+=("libcudnn8=*+${cuda_tag}");
+&& test -n "$(apt-cache search libcudnn9 2>/dev/null)" \
+&& apt-cache policy libcudnn9 2>/dev/null | grep -q "+${cuda_tag}"; then
+    PKGS+=("libcudnn9=*+${cuda_tag}");
     if [ "${INSTALLDEVPACKAGES:-false}" = true ]; then
-        PKGS+=("libcudnn8-dev=*+${cuda_tag}");
+        PKGS+=("libcudnn9-dev=*+${cuda_tag}");
     fi
 fi
 
