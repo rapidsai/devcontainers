@@ -25,6 +25,15 @@
       "default": "12.5",
       "description": "Version of the CUDA Toolkit to install."
     },
+    "cudnn_version": {
+      "type": "string",
+      "proposals": [
+        "9",
+        "8"
+      ],
+      "default": "8",
+      "description": "Version of cuDNN to install."
+    },
     "installCompilers": {
       "type": "boolean",
       "default": true,
