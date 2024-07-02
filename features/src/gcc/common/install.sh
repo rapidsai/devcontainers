@@ -58,6 +58,7 @@ EOF
 # shellcheck disable=SC2016
 for_each_user_bashrc '
 if [[ "$(grep -qE "^__bash_prompt\(\) \{$" "$0"; echo $?)" == 0 ]]; then
+    sed -i "s/\${BRANCH}/\${BRANCH:-}/g" "$0";
     sed -i "s/\${GITHUB_USER}/\${GITHUB_USER:-}/g" "$0";
 fi
 ';

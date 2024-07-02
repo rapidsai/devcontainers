@@ -22,11 +22,12 @@
     "./features/src/utils",
     "./features/src/rapids-build-utils"
   ],
-  "initializeCommand": ["/bin/bash", "-c", "mkdir -m 0755 -p ${localWorkspaceFolder}/../.{aws,cache,config,conda/pkgs,conda/${localWorkspaceFolderBasename}-cuda12.2-envs,log/devcontainer-utils} ${localWorkspaceFolder}/../{rmm,kvikio,ucxx,cudf,raft,cuvs,cumlprims_mg,cuml,cugraph-ops,wholegraph,cugraph,cuspatial}"],
+  "initializeCommand": ["/bin/bash", "-c", "mkdir -m 0755 -p ${localWorkspaceFolder}/.vscode/server ${localWorkspaceFolder}/../.{aws,cache,config,conda/pkgs,conda/${localWorkspaceFolderBasename}-cuda12.2-envs,log/devcontainer-utils} ${localWorkspaceFolder}/../{rmm,kvikio,ucxx,cudf,raft,cuvs,cumlprims_mg,cuml,cugraph-ops,wholegraph,cugraph,cuspatial}"],
   "postAttachCommand": ["/bin/bash", "-c", "if [ ${CODESPACES:-false} = 'true' ]; then . devcontainer-utils-post-attach-command; fi"],
   "workspaceFolder": "/home/coder",
   "workspaceMount": "source=${localWorkspaceFolder},target=/home/coder/devcontainers,type=bind,consistency=consistent",
   "mounts": [
+    "source=${localWorkspaceFolder}/.vscode/server,target=/home/coder/.vscode-server,type=bind,consistency=consistent",
     "source=${localWorkspaceFolder}/../rmm,target=/home/coder/rmm,type=bind,consistency=consistent",
     "source=${localWorkspaceFolder}/../kvikio,target=/home/coder/kvikio,type=bind,consistency=consistent",
     "source=${localWorkspaceFolder}/../ucxx,target=/home/coder/ucxx,type=bind,consistency=consistent",
