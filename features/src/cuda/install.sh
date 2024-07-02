@@ -76,6 +76,7 @@ export CUDA_HOME="/usr/local/cuda";
 
 cuda_ver="${VERSION}";
 cuda_ver=$(grep -Po '^[0-9]+\.[0-9]+' <<< "${cuda_ver}");
+cuda_ver_major=$(grep -Po '^[0-9]+' <<< "${cuda_ver}");
 
 cudapath="${CUDA_HOME}-${cuda_ver}";
 cuda_tag="cuda${cuda_ver}";
@@ -168,12 +169,19 @@ if [ "${INSTALLNVJPEG:-false}" = true ]; then
 fi
 
 if [ "${INSTALLCUDNN:-false}" = true ]; then
-    LIBCUDNN_PKG="libcudnn${CUDNN_VERSION}"
-    if test -n "$(apt-cache search ${LIBCUDNN_PKG} 2>/dev/null)" \
-    && apt-cache policy ${LIBCUDNN_PKG} 2>/dev/null | grep -q "+${cuda_tag}"; then
-        PKGS+=("${LIBCUDNN_PKG}=*+${cuda_tag}");
+    CUDNNVERSION="${CUDNNVERSION:-9}";
+    if test "${CUDNNVERSION}" -le 8; then
+        if test -n "$(apt-cache search "libcudnn${CUDNNVERSION:-8}" 2>/dev/null)" \
+        && apt-cache policy "libcudnn${CUDNNVERSION:-8}" 2>/dev/null | grep -q "+${cuda_tag}"; then
+            PKGS+=("libcudnn${CUDNNVERSION:-8}=*+${cuda_tag}");
+            if [ "${INSTALLDEVPACKAGES:-false}" = true ]; then
+                PKGS+=("libcudnn${CUDNNVERSION:-8}-dev=*+${cuda_tag}");
+            fi
+        fi
+    elif test -n "$(apt-cache search "libcudnn${CUDNNVERSION}-cuda-${cuda_ver_major}" 2>/dev/null)"; then
+        PKGS+=("libcudnn${CUDNNVERSION}-cuda-${cuda_ver_major}");
         if [ "${INSTALLDEVPACKAGES:-false}" = true ]; then
-            PKGS+=("${LIBCUDNN_PKG}-dev=*+${cuda_tag}");
+            PKGS+=("libcudnn${CUDNNVERSION}-dev-cuda-${cuda_ver_major}");
         fi
     fi
 fi
@@ -209,6 +217,7 @@ if [ "${INSTALLCUTENSOR:-false}" = true ]; then
 fi
 
 check_packages "${PKGS[@]}";
+apt autoremove -y;
 
 if ! test -L "${CUDA_HOME}"; then
     # Create /usr/local/cuda symlink
