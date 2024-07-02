@@ -8,6 +8,7 @@
   },
   "remoteUser": "coder",
   "containerUser": "root",
+  "containerEnv": { "LANG": "${localEnv:LANG:en_US.UTF-8}" },
   "workspaceFolder": "/home/coder",
   "features": {
     "ghcr.io/devcontainers/features/common-utils:2": {
