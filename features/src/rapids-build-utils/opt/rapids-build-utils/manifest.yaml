@@ -151,7 +151,7 @@ repos:
         max_device_obj_memory_usage: 3Gi
   python:
     - name: cuml
-      sub_dir: python
+      sub_dir: python/cuml
       depends: [cuml]
       args: {cmake: -DFIND_CUML_CPP=ON, install: *rapids_build_backend_args}
 
