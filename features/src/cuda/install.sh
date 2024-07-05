@@ -169,7 +169,7 @@ if [ "${INSTALLNVJPEG:-false}" = true ]; then
 fi
 
 if [ "${INSTALLCUDNN:-false}" = true ]; then
-    CUDNNVERSION="${CUDNNVERSION:-9}";
+    CUDNNVERSION="${CUDNNVERSION:-8}";
     if test "${CUDNNVERSION}" -le 8; then
         if test -n "$(apt-cache search "libcudnn${CUDNNVERSION:-8}" 2>/dev/null)" \
         && apt-cache policy "libcudnn${CUDNNVERSION:-8}" 2>/dev/null | grep -q "+${cuda_tag}"; then
