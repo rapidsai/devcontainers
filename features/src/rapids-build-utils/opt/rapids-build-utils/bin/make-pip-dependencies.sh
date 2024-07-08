@@ -59,6 +59,13 @@ make_pip_dependencies() {
     local python_version="${PYTHON_VERSION:-$(python3 --version 2>&1 | cut -d' ' -f2)}";
     python_version="$(cut -d'.' -f3 --complement <<< "${python_version}")";
 
+    # projects that depend on different pip libraries across different CUDA versions
+    # (e.g. 'cudf' only depending on 'pynvjitlink' from CUDA 12.0 onwards), split up their
+    # dependency lists with 'cuda_suffixed={true,false}'.
+    #
+    # here we want the suffixed versions (like 'pynvjitlink-cu12')
+    local -r matrix_selectors="arch=$(uname -m);cuda=${cuda_version};py=${python_version};cuda_suffixed=true"
+
     local pip_reqs_txts=();
 
     eval "$(rapids-list-repos "${OPTS[@]}")";
@@ -81,12 +88,12 @@ make_pip_dependencies() {
             for ((keyi=0; keyi < ${#repo_keys[@]}; keyi+=1)); do
                 local file="/tmp/${!repo_name}.${repo_keys[$keyi]}.requirements.txt";
                 pip_reqs_txts+=("${file}");
-                generate_requirements                                                     \
-                    "${file}"                                                             \
-                    --file-key "${repo_keys[$keyi]}"                                      \
-                    --output requirements                                                 \
-                    --config ~/"${!repo_path}/dependencies.yaml"                          \
-                    --matrix "arch=$(uname -m);cuda=${cuda_version};py=${python_version}" \
+                generate_requirements                            \
+                    "${file}"                                    \
+                    --file-key "${repo_keys[$keyi]}"             \
+                    --output requirements                        \
+                    --config ~/"${!repo_path}/dependencies.yaml" \
+                    --matrix "${matrix_selectors}"               \
                     ;
             done
 
@@ -103,12 +110,12 @@ make_pip_dependencies() {
                 for ((keyi=0; keyi < ${#repo_keys[@]}; keyi+=1)); do
                     local file="/tmp/${!repo_name}.lib${!cpp_name}.${repo_keys[$keyi]}.requirements.txt";
                     pip_reqs_txts+=("${file}");
-                    generate_requirements                                                     \
-                        "${file}"                                                             \
-                        --file-key "${repo_keys[$keyi]}"                                      \
-                        --output requirements                                                 \
-                        --config ~/"${!repo_path}/dependencies.yaml"                          \
-                        --matrix "arch=$(uname -m);cuda=${cuda_version};py=${python_version}" \
+                    generate_requirements                             \
+                        "${file}"                                     \
+                        --file-key "${repo_keys[$keyi]}"              \
+                        --output requirements                         \
+                        --config ~/"${!repo_path}/dependencies.yaml"  \
+                        --matrix "${matrix_selectors}"                \
                         ;
                 done
             done
