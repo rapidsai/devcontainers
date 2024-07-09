@@ -17,6 +17,12 @@ A feature to install CMake
 |-----|-----|-----|-----|
 | version | CMake version to install. | string | latest |
 
+## Customizations
+
+### VS Code Extensions
+
+- `twxs.cmake`
+
 
 
 ---

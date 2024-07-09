@@ -17,6 +17,13 @@ A feature to install mambaforge
 |-----|-----|-----|-----|
 | version | Mambaforge version to install. | string | latest |
 
+## Customizations
+
+### VS Code Extensions
+
+- `ms-python.python`
+- `ms-python.vscode-pylance`
+
 
 
 ---
