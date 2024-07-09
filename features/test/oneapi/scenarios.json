@@ -1,0 +1,10 @@
+{
+  "oneapi_2023_2_0": {
+    "image": "ubuntu:22.04",
+    "features": {
+      "oneapi": {
+        "version": "2023.2.0"
+      }
+    }
+  }
+}
