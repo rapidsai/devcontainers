@@ -29,7 +29,7 @@ fi
 
 # Install the rapids dependency file generator and conda-merge
 if type python >/dev/null 2>&1; then
-    python -m pip install rapids-dependency-file-generator conda-merge;
+    python -m pip install 'rapids-dependency-file-generator<1.14' conda-merge;
 fi
 
 # Install RAPIDS build utility scripts to /opt/
