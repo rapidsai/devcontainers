@@ -31,7 +31,7 @@ fi
 
 # Install the rapids dependency file generator and conda-merge
 if type python >/dev/null 2>&1; then
-    python -m pip install $BREAK_PACKAGES rapids-dependency-file-generator conda-merge toml;
+    python -m pip install $BREAK_PACKAGES 'rapids-dependency-file-generator<1.14' conda-merge toml;
 fi
 
 # Install RAPIDS build utility scripts to /opt/
