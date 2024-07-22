@@ -13,8 +13,8 @@
 #  -e,--exclude <file>     Path(s) to requirement files of packages to exclude.
 #  -i,--include <file>     Path(s) to requirement files of packages to include.
 #  -k,--key <key>          Only include the key(s)
-#  --matrix-entry <entry>  Matrix entries, in the form 'key=value' to be passed to '--matrix' arg
-#                          of rapids-dependency-file-generator (e.g., 'cuda=12.2').
+#  --matrix-entry <entry>  Matrix entries, in the form 'key=value' to be added to the '--matrix' arg
+#                          of rapids-dependency-file-generator.
 #                          (can be passed multiple times)
 # @_include_value_options rapids-list-repos -h | tail -n+2 | head -n-3;
 #  --repo <repo>           Only include dependencies for repo(s).
@@ -73,8 +73,18 @@ make_pip_dependencies() {
     # It's ok for other RAPIDS libraries to end up in this list (like 'rmm-cu12')... in builds
     # where those are also being built in the devcontainer, they'll be filtered out via
     # inclusion in the 'pip_noinstall' list below.
-    test ${#matrix_entry[@]} -eq 0 && matrix_entry=(arch="$(uname -m)" cuda="${cuda_version}" cuda_suffixed=true py="${python_version}");
-    local -r matrix_selectors=$(IFS=";"; echo "${matrix_entry[*]}")
+    local -a _matrix_selectors=(
+        arch="$(uname -m)"
+        cuda="${cuda_version}"
+        cuda_suffixed=true
+        py="${python_version}"
+    );
+
+    # add extra arguments (if there are conflicts, e.g. 'py=3.10;py=3.11', it's fine... the last one will win)
+    local ent; for ent in "${matrix_entry[@]}"; do
+        _matrix_selectors+=("${ent}")
+    done
+    local -r matrix_selectors=$(IFS=";"; echo "${_matrix_selectors[*]}")
 
     local pip_reqs_txts=();
 
