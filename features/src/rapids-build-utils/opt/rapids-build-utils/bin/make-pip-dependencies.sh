@@ -137,12 +137,12 @@ make_pip_dependencies() {
                 for ((keyi=0; keyi < ${#repo_keys[@]}; keyi+=1)); do
                     local file="/tmp/${!repo_name}.${!py_name}.${repo_keys[$keyi]}.requirements.txt";
                     pip_reqs_txts+=("${file}");
-                    generate_requirements                                                     \
-                        "${file}"                                                             \
-                        --file-key "${repo_keys[$keyi]}"                                      \
-                        --output requirements                                                 \
-                        --config ~/"${!repo_path}/dependencies.yaml"                          \
-                        --matrix "arch=$(uname -m);cuda=${cuda_version};py=${python_version}" \
+                    generate_requirements                            \
+                        "${file}"                                    \
+                        --file-key "${repo_keys[$keyi]}"             \
+                        --output requirements                        \
+                        --config ~/"${!repo_path}/dependencies.yaml" \
+                        --matrix "${matrix_selectors}"               \
                         ;
                 done
             done
