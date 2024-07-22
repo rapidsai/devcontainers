@@ -59,11 +59,15 @@ make_pip_dependencies() {
     local python_version="${PYTHON_VERSION:-$(python3 --version 2>&1 | cut -d' ' -f2)}";
     python_version="$(cut -d'.' -f3 --complement <<< "${python_version}")";
 
-    # projects that depend on different pip libraries across different CUDA versions
+    # Projects that depend on different pip libraries across different CUDA versions
     # (e.g. 'cudf' only depending on 'pynvjitlink' from CUDA 12.0 onwards), split up their
     # dependency lists with 'cuda_suffixed={true,false}'.
     #
-    # here we want the suffixed versions (like 'pynvjitlink-cu12')
+    # Here we want the suffixed versions (like 'pynvjitlink-cu12').
+    #
+    # It's ok for other RAPIDS libraries to end up in this list (like 'rmm-cu12')... in builds
+    # where those are also being built in the devcontainer, they'll be filtered out via
+    # inclusion in the 'pip_noinstall' list below.
     local -r matrix_selectors="arch=$(uname -m);cuda=${cuda_version};py=${python_version};cuda_suffixed=true"
 
     local pip_reqs_txts=();
