@@ -30,7 +30,7 @@ export OSNAME="$(
     echo "$ID$((major - (major % 2)))${minor}";
 )";
 
-VERSION="${CUDA_VERSION:-${VERSION:-12.4.0}}";
+VERSION="${CUDA_VERSION:-${VERSION:-12.5.0}}";
 
 if [[ "$NVARCH" == aarch64 ]]; then
     NVARCH="sbsa";
@@ -75,7 +75,8 @@ echo "Installing dev CUDA toolkit...";
 export CUDA_HOME="/usr/local/cuda";
 
 cuda_ver="${VERSION}";
-cuda_ver=$(grep -o '^[0-9]*.[0-9]' <<< "${cuda_ver}");
+cuda_ver=$(grep -Po '^[0-9]+\.[0-9]+' <<< "${cuda_ver}");
+cuda_ver_major=$(grep -Po '^[0-9]+' <<< "${cuda_ver}");
 
 cudapath="${CUDA_HOME}-${cuda_ver}";
 cuda_tag="cuda${cuda_ver}";
@@ -124,13 +125,13 @@ fi
 
 if [ "${INSTALLNVRTC:-false}" = true ]; then
     PKGS+=("cuda-nvrtc${dev_tag}-${cuda_ver}");
-    if test -n "$(apt-cache search libnvjitlink${dev_tag}-${cuda_ver} 2>/dev/null)"; then
+    if test -n "$(apt-cache search "libnvjitlink${dev_tag}-${cuda_ver}" 2>/dev/null)"; then
         PKGS+=("libnvjitlink${dev_tag}-${cuda_ver}");
     fi
 fi
 
 if [ "${INSTALLOPENCL:-false}" = true ] \
-&& test -n "$(apt-cache search cuda-opencl${dev_tag}-${cuda_ver} 2>/dev/null)"; then
+&& test -n "$(apt-cache search "cuda-opencl${dev_tag}-${cuda_ver}" 2>/dev/null)"; then
     PKGS+=("cuda-opencl${dev_tag}-${cuda_ver}");
 fi
 
@@ -147,7 +148,7 @@ if [ "${INSTALLCUFFT:-false}" = true ]; then
 fi
 
 if [ "${INSTALLCUFILE:-false}" = true ] \
-&& test -n "$(apt-cache search libcufile${dev_tag}-${cuda_ver} 2>/dev/null)"; then
+&& test -n "$(apt-cache search "libcufile${dev_tag}-${cuda_ver}" 2>/dev/null)"; then
     PKGS+=("libcufile${dev_tag}-${cuda_ver}");
 fi
 
@@ -167,12 +168,21 @@ if [ "${INSTALLNVJPEG:-false}" = true ]; then
     PKGS+=("libnvjpeg${dev_tag}-${cuda_ver}");
 fi
 
-if [ "${INSTALLCUDNN:-false}" = true ] \
-&& test -n "$(apt-cache search libcudnn8 2>/dev/null)" \
-&& apt-cache policy libcudnn8 2>/dev/null | grep -q "+${cuda_tag}"; then
-    PKGS+=("libcudnn8=*+${cuda_tag}");
-    if [ "${INSTALLDEVPACKAGES:-false}" = true ]; then
-        PKGS+=("libcudnn8-dev=*+${cuda_tag}");
+if [ "${INSTALLCUDNN:-false}" = true ]; then
+    CUDNNVERSION="${CUDNNVERSION:-8}";
+    if test "${CUDNNVERSION}" -le 8; then
+        if test -n "$(apt-cache search "libcudnn${CUDNNVERSION:-8}" 2>/dev/null)" \
+        && apt-cache policy "libcudnn${CUDNNVERSION:-8}" 2>/dev/null | grep -q "+${cuda_tag}"; then
+            PKGS+=("libcudnn${CUDNNVERSION:-8}=*+${cuda_tag}");
+            if [ "${INSTALLDEVPACKAGES:-false}" = true ]; then
+                PKGS+=("libcudnn${CUDNNVERSION:-8}-dev=*+${cuda_tag}");
+            fi
+        fi
+    elif test -n "$(apt-cache search "libcudnn${CUDNNVERSION}-cuda-${cuda_ver_major}" 2>/dev/null)"; then
+        PKGS+=("libcudnn${CUDNNVERSION}-cuda-${cuda_ver_major}");
+        if [ "${INSTALLDEVPACKAGES:-false}" = true ]; then
+            PKGS+=("libcudnn${CUDNNVERSION}-dev-cuda-${cuda_ver_major}");
+        fi
     fi
 fi
 
@@ -206,7 +216,8 @@ if [ "${INSTALLCUTENSOR:-false}" = true ]; then
     fi
 fi
 
-check_packages ${PKGS[@]};
+check_packages "${PKGS[@]}";
+apt autoremove -y;
 
 if ! test -L "${CUDA_HOME}"; then
     # Create /usr/local/cuda symlink

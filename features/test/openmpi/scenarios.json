@@ -3,7 +3,7 @@
     "image": "ubuntu:22.04",
     "features": {
       "cuda": {
-        "version": "12.4"
+        "version": "12.5"
       },
       "ucx": {
         "version": "1.15.0"

@@ -17,6 +17,7 @@
   "features": {
     "./features/src/cuda": {
       "version": "12.2",
+      "cuDNNVersion": "8",
       "installcuBLAS": true,
       "installcuDNN": true,
       "installcuSOLVER": true,
