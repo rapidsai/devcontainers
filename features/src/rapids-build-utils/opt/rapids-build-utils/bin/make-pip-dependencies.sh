@@ -13,6 +13,9 @@
 #  -e,--exclude <file>     Path(s) to requirement files of packages to exclude.
 #  -i,--include <file>     Path(s) to requirement files of packages to include.
 #  -k,--key <key>          Only include the key(s)
+#  --matrix-entry <entry>  Matrix entries, in the form 'key=value' to be passed to '--matrix' arg
+#                          of rapids-dependency-file-generator (e.g., 'cuda=12.2').
+#                          (can be passed multiple times)
 # @_include_value_options rapids-list-repos -h | tail -n+2 | head -n-3;
 #  --repo <repo>           Only include dependencies for repo(s).
 #                          (default: all repositories)
@@ -59,6 +62,8 @@ make_pip_dependencies() {
     local python_version="${PYTHON_VERSION:-$(python3 --version 2>&1 | cut -d' ' -f2)}";
     python_version="$(cut -d'.' -f3 --complement <<< "${python_version}")";
 
+    # Why default to cuda_suffixed=true?
+    #
     # Projects that depend on different pip libraries across different CUDA versions
     # (e.g. 'cudf' only depending on 'pynvjitlink' from CUDA 12.0 onwards), split up their
     # dependency lists with 'cuda_suffixed={true,false}'.
@@ -68,7 +73,8 @@ make_pip_dependencies() {
     # It's ok for other RAPIDS libraries to end up in this list (like 'rmm-cu12')... in builds
     # where those are also being built in the devcontainer, they'll be filtered out via
     # inclusion in the 'pip_noinstall' list below.
-    local -r matrix_selectors="arch=$(uname -m);cuda=${cuda_version};py=${python_version};cuda_suffixed=true"
+    test ${#matrix_entry[@]} -eq 0 && matrix_entry=(arch="$(uname -m)" cuda="${cuda_version}" cuda_suffixed=true py="${python_version}");
+    local -r matrix_selectors=$(IFS=";"; echo "${matrix_entry[*]}")
 
     local pip_reqs_txts=();
 
