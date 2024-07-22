@@ -133,8 +133,7 @@
   "containerEnv": {
     "BASH_ENV": "/etc/bash.bash_env",
     "NVIDIA_VISIBLE_DEVICES": "all",
-    "NVIDIA_DRIVER_CAPABILITIES": "all",
-    "NVIDIA_DISABLE_REQUIRE": "true"
+    "NVIDIA_DRIVER_CAPABILITIES": "all"
   },
   "capAdd": [
     "SYS_PTRACE"
