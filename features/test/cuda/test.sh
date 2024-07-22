@@ -17,11 +17,11 @@ source dev-container-features-test-lib
 
 # Feature-specific tests
 # The 'check' command comes from the dev-container-features-test-lib.
-check "CUDA version" bash -c "echo '$CUDA_VERSION' | grep '12.4.0'";
+check "CUDA version" bash -c "echo '$CUDA_VERSION' | grep '12.5.0'";
 check "CUDA major version" bash -c "echo '$CUDA_VERSION_MAJOR' | grep '12'";
-check "CUDA minor version" bash -c "echo '$CUDA_VERSION_MINOR' | grep '4'";
+check "CUDA minor version" bash -c "echo '$CUDA_VERSION_MINOR' | grep '5'";
 check "CUDA patch version" bash -c "echo '$CUDA_VERSION_PATCH' | grep '0'";
-check "installed" stat /usr/local/cuda-12.4 /usr/local/cuda
+check "installed" stat /usr/local/cuda-12.5 /usr/local/cuda
 check "nvcc exists and is on path" which nvcc
 
 # Report result
