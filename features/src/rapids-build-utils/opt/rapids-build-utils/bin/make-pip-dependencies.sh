@@ -44,6 +44,7 @@ make_pip_dependencies() {
     test ${#exclude[@]} -eq 0 && exclude=();
     test ${#include[@]} -eq 0 && include=();
     test ${#key[@]} -eq 0 && key=(py_build py_run py_test all);
+    test ${#matrix_entry[@]} -eq 0 && matrix_entry=();
     test ${#requirement[@]} -eq 0 && requirement=();
 
     local -a _exclude=();
