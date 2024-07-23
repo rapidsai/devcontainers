@@ -81,9 +81,7 @@ make_pip_dependencies() {
     );
 
     # add extra arguments (if there are conflicts, e.g. 'py=3.10;py=3.11', it's fine... the last one will win)
-    local ent; for ent in "${matrix_entry[@]}"; do
-        _matrix_selectors+=("${ent}")
-    done
+    test ${#matrix_entry[@]} -gt 0 && _matrix_selectors+=("${matrix_entry[@]}");
     local -r matrix_selectors=$(IFS=";"; echo "${_matrix_selectors[*]}")
 
     local pip_reqs_txts=();
