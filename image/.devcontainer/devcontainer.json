@@ -25,10 +25,10 @@
       "ppa": "true",
       "version": "latest"
     },
-    "ghcr.io/devcontainers/features/git-lfs:1": {
+    "ghcr.io/devcontainers/features/git-lfs:1.2.1": {
       "autoPull": false
     },
-    "ghcr.io/devcontainers/features/github-cli:1": {},
+    "ghcr.io/devcontainers/features/github-cli:1.0.12": {},
     "./features/src/gitlab-cli": {},
     "./features/src/cmake": {},
     "./features/src/ninja": {},
