@@ -25,8 +25,9 @@ x-llvm-13: &llvm_13 { name: "llvm", version: "13" }
 x-llvm-14: &llvm_14 { name: "llvm", version: "14" }
 x-llvm-15: &llvm_15 { name: "llvm", version: "15" }
 x-llvm-16: &llvm_16 { name: "llvm", version: "16" }
-x-llvm-prev: &llvm_17 { name: "llvm", version: "17" }
-x-llvm-curr: &llvm_18 { name: "llvm", version: "18" }
+x-llvm-17: &llvm_17 { name: "llvm", version: "17" }
+x-llvm-prev: &llvm_18 { name: "llvm", version: "18" }
+x-llvm-curr: &llvm_19 { name: "llvm", version: "19" }
 x-llvm-env: &llvm_env {CC: "clang", CXX: "clang++", CUDAHOSTCXX: "clang++"}
 
 x-nvhpc-prev: &nvhpc_prev { name: "nvhpc", version: "24.3" }
@@ -40,7 +41,7 @@ x-ucx-rapids: &ucx_rapids {name: "ucx", version: "1.17.0"}
 x-openmpi: &openmpi {name: "openmpi"}
 
 x-cccl-dev: &cccl_dev { name: "cccl-dev", hide: true }
-x-clangd-dev: &clangd_dev {name: "llvm", version: "dev", packages: "clangd", hide: true}
+x-clangd-dev: &clangd_dev {name: "llvm", version: "19", packages: "clangd", hide: true}
 x-clang-format-cccl: &clang_format_cccl {name: "llvm", version: "18", packages: "clang-format", hide: true}
 x-clang-format-rapids: &clang_format_rapids {name: "llvm", version: "16", packages: "clang-format", hide: true}
 
@@ -109,6 +110,8 @@ include:
   - {features: [*python, *llvm_17, {<<: *cuda_curr_max, <<: *cccl_cuda_opts}, *clang_format_cccl, *clangd_dev, *cccl_dev], env: *llvm_env}
   - {features: [*python, *llvm_18, {<<: *cuda_curr_min, <<: *cccl_cuda_opts}, *clang_format_cccl, *clangd_dev, *cccl_dev], env: *llvm_env}
   - {features: [*python, *llvm_18, {<<: *cuda_curr_max, <<: *cccl_cuda_opts}, *clang_format_cccl, *clangd_dev, *cccl_dev], env: *llvm_env}
+  - {features: [*python, *llvm_19, {<<: *cuda_curr_min, <<: *cccl_cuda_opts}, *clang_format_cccl, *clangd_dev, *cccl_dev], env: *llvm_env}
+  - {features: [*python, *llvm_19, {<<: *cuda_curr_max, <<: *cccl_cuda_opts}, *clang_format_cccl, *clangd_dev, *cccl_dev], env: *llvm_env}
   - {features: [*python, *oneapi_2022, {<<: *cuda_curr_max, <<: *cccl_cuda_opts}, *clang_format_cccl, *clangd_dev, *cccl_dev], env: *onapi_env}
 
 # Hack for getting gcc-13.2
