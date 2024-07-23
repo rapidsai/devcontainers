@@ -128,6 +128,11 @@ LLVM_VERSION_STRING=${LLVM_VERSION_PATTERNS[$LLVM_VERSION]}
 
 # join the repository name
 if [[ -n "${CODENAME}" ]]; then
+
+    if ! curl -fsSL "https://apt.llvm.org/${CODENAME}/dists/llvm-toolchain${LINKNAME}${LLVM_VERSION_STRING}/Release" >/dev/null 2>&1; then
+        LLVM_VERSION_STRING="";
+    fi
+
     REPO_NAME="deb ${BASE_URL}/${CODENAME}/  llvm-toolchain${LINKNAME}${LLVM_VERSION_STRING} main"
 
     # check if the repository exists for the distro and version
