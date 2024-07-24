@@ -28,7 +28,7 @@ const json = JSON.parse(readFileSync('image/.devcontainer/devcontainer.json'));
 
 json.build.args.BASE = '${os}';
 json.build.args.RAPIDS_VERSION = '${VERSION}';
-json.containerEnv = ${container_env} || undefined;
+json.containerEnv = Object.assign(json.containerEnv || {}, ${container_env} || {});
 
 const dups = {};
 
