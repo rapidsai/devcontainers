@@ -1,6 +1,6 @@
 x-git-defaults: &git_defaults
     host: github
-    tag: branch-24.08
+    tag: branch-24.10
     upstream: rapidsai
 
 x-rapids-build-backend-args: &rapids_build_backend_args |
@@ -28,7 +28,7 @@ repos:
 
 - name: ucxx
   path: ucxx
-  git: {<<: *git_defaults, repo: ucxx, tag: branch-0.39}
+  git: {<<: *git_defaults, repo: ucxx, tag: branch-0.40}
   cpp:
     - name: ucxx
       sub_dir: cpp
@@ -155,7 +155,7 @@ repos:
         max_device_obj_memory_usage: 3Gi
   python:
     - name: cuml
-      sub_dir: python
+      sub_dir: python/cuml
       depends: [cuml]
       args: {cmake: -DFIND_CUML_CPP=ON, install: *rapids_build_backend_args}
 

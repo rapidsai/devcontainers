@@ -5,18 +5,19 @@
     "args": {
       "CUDA": "12.0",
       "PYTHON_PACKAGE_MANAGER": "pip",
-      "BASE": "rapidsai/devcontainers:24.08-cpp-cuda12.0-ucx1.15.0-openmpi-ubuntu22.04"
+      "BASE": "rapidsai/devcontainers:24.10-cpp-cuda12.0-ucx1.15.0-openmpi-ubuntu22.04"
     }
   },
   "runArgs": [
     "--rm",
     "--name",
-    "${localEnv:USER:anon}-rapids-${localWorkspaceFolderBasename}-24.08-cuda12.0-pip"
+    "${localEnv:USER:anon}-rapids-${localWorkspaceFolderBasename}-24.10-cuda12.0-pip"
   ],
   "hostRequirements": {"gpu": "optional"},
   "features": {
     "./features/src/cuda": {
       "version": "12.0",
+      "cuDNNVersion": "8",
       "installcuBLAS": true,
       "installcuDNN": true,
       "installcuSOLVER": true,

@@ -39,13 +39,13 @@
         "version": "17"
       }
     }
-  },
-  "llvm_dev": {
-    "image": "ubuntu:22.04",
-    "features": {
-      "llvm": {
-        "version": "dev"
-      }
-    }
+  // },
+  // "llvm_dev": {
+  //   "image": "ubuntu:22.04",
+  //   "features": {
+  //     "llvm": {
+  //       "version": "dev"
+  //     }
+  //   }
   }
 }

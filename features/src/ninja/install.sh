@@ -29,6 +29,10 @@ wget --no-hsts -q -O /tmp/ninja-linux.zip \
 unzip -d /usr/bin /tmp/ninja-linux.zip;
 chmod +x /usr/bin/ninja;
 
+# Install Ninja bash completions
+wget --no-hsts -q -O /usr/share/bash-completion/completions/ninja \
+    "https://github.com/ninja-build/ninja/raw/v${NINJA_VERSION}/misc/bash-completion";
+
 # Clean up
 rm -rf /var/tmp/*;
 rm -rf /var/cache/apt/*;

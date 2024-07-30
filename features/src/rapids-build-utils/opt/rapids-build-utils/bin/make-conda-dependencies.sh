@@ -12,6 +12,9 @@
 #  -e,--exclude <file>     Path(s) to requirement files of packages to exclude.
 #  -i,--include <file>     Path(s) to requirement files of packages to include.
 #  -k,--key <key>        Only include the key(s)
+#  --matrix-entry <entry>  Matrix entries, in the form 'key=value' to be added to the '--matrix' arg
+#                          of rapids-dependency-file-generator.
+#                          (can be passed multiple times)
 # @_include_value_options rapids-list-repos -h | tail -n+2 | head -n-3;
 #  --repo <repo>         Only include dependencies for repo(s).
 #                        (default: all repositories)
@@ -41,6 +44,7 @@ make_conda_dependencies() {
     test ${#exclude[@]} -eq 0 && exclude=();
     test ${#include[@]} -eq 0 && include=();
     test ${#key[@]} -eq 0 && key=(all);
+    test ${#matrix_entry[@]} -eq 0 && matrix_entry=();
 
     local -a _exclude=();
     local exc; for exc in "${exclude[@]}"; do
@@ -57,6 +61,16 @@ make_conda_dependencies() {
 
     local python_version="${PYTHON_VERSION:-$(python3 --version 2>&1 | cut -d' ' -f2)}";
     python_version="$(cut -d'.' -f3 --complement <<< "${python_version}")";
+
+    local -a _matrix_selectors=(
+        arch="$(uname -m)"
+        cuda="${cuda_version}"
+        py="${python_version}"
+    );
+
+    # add extra arguments (if there are conflicts, e.g. 'py=3.10;py=3.11', it's fine... the last one will win)
+    test ${#matrix_entry[@]} -gt 0 && _matrix_selectors+=("${matrix_entry[@]}");
+    local -r matrix_selectors=$(IFS=";"; echo "${_matrix_selectors[*]}")
 
     local conda_env_yamls=();
 
@@ -78,12 +92,12 @@ make_conda_dependencies() {
             for ((keyi=0; keyi < ${#repo_keys[@]}; keyi+=1)); do
                 local file="/tmp/${!repo_name}.${repo_keys[$keyi]}.env.yaml";
                 conda_env_yamls+=("${file}");
-                generate_env_yaml                                                         \
-                    "${file}"                                                             \
-                    --file-key "${repo_keys[$keyi]}"                                      \
-                    --output conda                                                        \
-                    --config ~/"${!repo_path}/dependencies.yaml"                          \
-                    --matrix "arch=$(uname -m);cuda=${cuda_version};py=${python_version}" \
+                generate_env_yaml                                \
+                    "${file}"                                    \
+                    --file-key "${repo_keys[$keyi]}"             \
+                    --output conda                               \
+                    --config ~/"${!repo_path}/dependencies.yaml" \
+                    --matrix "${matrix_selectors}"               \
                     ;
             done
 
@@ -100,12 +114,12 @@ make_conda_dependencies() {
                 for ((keyi=0; keyi < ${#repo_keys[@]}; keyi+=1)); do
                     local file="/tmp/${!repo_name}.lib${!cpp_name}.${repo_keys[$keyi]}.env.yaml";
                     conda_env_yamls+=("${file}");
-                    generate_env_yaml                                                         \
-                        "${file}"                                                             \
-                        --file-key "${repo_keys[$keyi]}"                                      \
-                        --output conda                                                        \
-                        --config ~/"${!repo_path}/dependencies.yaml"                          \
-                        --matrix "arch=$(uname -m);cuda=${cuda_version};py=${python_version}" \
+                    generate_env_yaml                                \
+                        "${file}"                                    \
+                        --file-key "${repo_keys[$keyi]}"             \
+                        --output conda                               \
+                        --config ~/"${!repo_path}/dependencies.yaml" \
+                        --matrix "${matrix_selectors}"               \
                         ;
                 done
             done
@@ -123,12 +137,12 @@ make_conda_dependencies() {
                 for ((keyi=0; keyi < ${#repo_keys[@]}; keyi+=1)); do
                     local file="/tmp/${!repo_name}.${!py_name}.${repo_keys[$keyi]}.env.yaml";
                     conda_env_yamls+=("${file}");
-                    generate_env_yaml                                                         \
-                        "${file}"                                                             \
-                        --file-key "${repo_keys[$keyi]}"                                      \
-                        --output conda                                                        \
-                        --config ~/"${!repo_path}/dependencies.yaml"                          \
-                        --matrix "arch=$(uname -m);cuda=${cuda_version};py=${python_version}" \
+                    generate_env_yaml                                \
+                        "${file}"                                    \
+                        --file-key "${repo_keys[$keyi]}"             \
+                        --output conda                               \
+                        --config ~/"${!repo_path}/dependencies.yaml" \
+                        --matrix "${matrix_selectors}"               \
                         ;
                 done
             done

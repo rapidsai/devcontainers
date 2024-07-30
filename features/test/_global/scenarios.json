@@ -4,7 +4,7 @@
     "features": {
       "rust": {},
       "cuda": {
-        "version": "12.4"
+        "version": "12.5"
       }
     },
     "overrideFeatureInstallOrder": [
@@ -22,12 +22,12 @@
         "installZsh": "true",
         "upgradePackages": "true"
       },
-      "ghcr.io/devcontainers/features/git:1": {
+      "ghcr.io/devcontainers/features/git:1.3.0": {
         "ppa": "true",
         "version": "latest"
       },
-      "ghcr.io/devcontainers/features/git-lfs:1": {},
-      "ghcr.io/devcontainers/features/github-cli:1": {},
+      "ghcr.io/devcontainers/features/git-lfs:1.2.1": {},
+      "ghcr.io/devcontainers/features/github-cli:1.0.12": {},
       "gitlab-cli": {
         "version": "latest"
       },
@@ -44,7 +44,7 @@
         "version": "16"
       },
       "cuda": {
-        "version": "12.4"
+        "version": "12.5"
       },
       "nvhpc": {
         "version": "24.5"
