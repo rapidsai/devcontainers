@@ -84,7 +84,7 @@ repos:
       args: {cmake: -DFIND_CUDF_CPP=ON, install: *rapids_build_backend_args}
     - name: cudf
       sub_dir: python/cudf
-      depends: [cudf, pylibcudf]
+      depends: [cudf]
       args: {cmake: -DFIND_CUDF_CPP=ON, install: *rapids_build_backend_args}
     - name: dask_cudf
       sub_dir: python/dask_cudf
