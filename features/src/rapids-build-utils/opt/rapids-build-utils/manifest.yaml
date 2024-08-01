@@ -39,7 +39,7 @@ repos:
           -DUCXX_ENABLE_RMM=ON
   python:
     - name: ucxx
-      sub_dir: python
+      sub_dir: python/ucxx
       depends: [ucxx]
       args: {cmake: -DFIND_UCXX_CPP=ON, install: *rapids_build_backend_args}
     - name: distributed-ucxx
