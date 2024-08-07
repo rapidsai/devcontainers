@@ -1,7 +1,7 @@
 {
   "name": "GCC",
   "id": "gcc",
-  "version": "24.8.1",
+  "version": "24.10.0",
   "description": "A feature to install gcc",
   "options": {
     "version": {
