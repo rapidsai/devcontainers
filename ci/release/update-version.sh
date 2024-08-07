@@ -22,7 +22,7 @@ NEXT_MINOR=$(echo $NEXT_FULL_TAG | awk '{split($0, a, "."); print a[2]}')
 NEXT_PATCH=$(echo $NEXT_FULL_TAG | awk '{split($0, a, "."); print a[3]}')
 NEXT_SHORT_TAG=${NEXT_MAJOR}.${NEXT_MINOR}
 NEXT_FULL_TAG=${NEXT_MAJOR}.${NEXT_MINOR}.${NEXT_PATCH}
-NEXT_UCX_PY_VERSION="$(curl -sL https://version.gpuci.io/rapids/${NEXT_SHORT_TAG})"
+NEXT_UCXX_SHORT_TAG="$(curl -sL https://version.gpuci.io/rapids/${NEXT_SHORT_TAG})"
 
 # Need to distutils-normalize the versions for some use cases
 CURRENT_SHORT_TAG_PEP440=$(python -c "from setuptools.extern import packaging; print(packaging.version.Version('${CURRENT_SHORT_TAG}'))")
@@ -46,7 +46,7 @@ for file in $(find .devcontainer -name devcontainer.json); do
 done
 
 sed_runner "s/branch-[[:digit:]]\{2\}\.[[:digit:]]\+/branch-${NEXT_SHORT_TAG}/g" ./features/src/rapids-build-utils/opt/rapids-build-utils/manifest.yaml
-sed_runner "s/branch-0.[[:digit:]]\+/branch-${NEXT_UCX_PY_VERSION}/g" ./features/src/rapids-build-utils/opt/rapids-build-utils/manifest.yaml
+sed_runner "s/branch-0.[[:digit:]]\+/branch-${NEXT_UCXX_SHORT_TAG}/g" ./features/src/rapids-build-utils/opt/rapids-build-utils/manifest.yaml
 
 for file in $(find features -name devcontainer-feature.json); do
   tmp=$(mktemp)
