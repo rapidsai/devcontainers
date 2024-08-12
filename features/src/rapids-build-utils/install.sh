@@ -33,13 +33,22 @@ fi
 
 source /etc/lsb-release;
 
-if [[ ! "23.04" > "${DISTRIB_RELEASE}" ]]; then
-  BREAK_PACKAGES="--break-system-packages";
+declare -a _PIP_INSTALL_ARGS=()
+declare -a _PIP_UPGRADE_ARGS=(--upgrade)
+
+if [[ "${DISTRIB_RELEASE}" > "22.04" ]]; then
+    _PIP_INSTALL_ARGS+=(--break-system-packages);
+    if [[ "${DISTRIB_RELEASE}" > "23.04" ]]; then
+        _PIP_UPGRADE_ARGS+=(--ignore-installed);
+    fi
 fi
 
-# Install the rapids dependency file generator and conda-merge
-/usr/bin/python3 -m pip install $BREAK_PACKAGES -U pip;
-/usr/bin/python3 -m pip install $BREAK_PACKAGES 'rapids-dependency-file-generator<1.14' conda-merge toml;
+/usr/bin/python3 -m pip install "${_PIP_INSTALL_ARGS[@]}" "${_PIP_UPGRADE_ARGS[@]}" pip;
+# Install RAPIDS dependency file generator, conda-merge, and toml
+/usr/bin/python3 -m pip install "${_PIP_INSTALL_ARGS[@]}" \
+    'rapids-dependency-file-generator<1.14' \
+    conda-merge \
+    toml;
 
 # Install RAPIDS build utility scripts to /opt/
 

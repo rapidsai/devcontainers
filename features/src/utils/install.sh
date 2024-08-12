@@ -31,12 +31,18 @@ check_packages "${PKGS[@]}";
 
 source /etc/lsb-release;
 
-if [[ ! "23.04" > "${DISTRIB_RELEASE}" ]]; then
-  BREAK_PACKAGES="--break-system-packages";
+# Upgrade system pip
+declare -a _PIP_INSTALL_ARGS=()
+declare -a _PIP_UPGRADE_ARGS=(--upgrade)
+
+if [[ "${DISTRIB_RELEASE}" > "22.04" ]]; then
+    _PIP_INSTALL_ARGS+=(--break-system-packages);
+    if [[ "${DISTRIB_RELEASE}" > "23.04" ]]; then
+        _PIP_UPGRADE_ARGS+=(--ignore-installed);
+    fi
 fi
 
-# upgrade pip
-/usr/bin/python3 -m pip install $BREAK_PACKAGES -U pip;
+/usr/bin/python3 -m pip install "${_PIP_INSTALL_ARGS[@]}" "${_PIP_UPGRADE_ARGS[@]}" pip;
 
 # Install yq if not installed
 if ! type yq >/dev/null 2>&1; then
