@@ -78,6 +78,10 @@ repos:
       sub_dir: cpp/libcudf_kafka
       depends: [cudf]
   python:
+    - name: pylibcudf
+      sub_dir: python/pylibcudf
+      depends: [cudf]
+      args: {cmake: -DFIND_CUDF_CPP=ON, install: *rapids_build_backend_args}
     - name: cudf
       sub_dir: python/cudf
       depends: [cudf]
