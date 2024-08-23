@@ -78,6 +78,9 @@ repos:
       sub_dir: cpp/libcudf_kafka
       depends: [cudf]
   python:
+    - name: libcudf
+      sub_dir: python/libcudf
+      depends: [cudf]
     - name: pylibcudf
       sub_dir: python/pylibcudf
       depends: [cudf]
