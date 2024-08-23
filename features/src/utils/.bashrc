@@ -3,7 +3,7 @@
 export PYTHONSAFEPATH="${PYTHONSAFEPATH:-1}";
 
 # Append history lines as soon as they're entered
-export PROMPT_COMMAND="${PROMPT_COMMAND:-}";
+export PROMPT_COMMAND="${PROMPT_COMMAND:-history -a}";
 
 if test -n "${PROMPT_COMMAND##*"history -a"*}"; then
     export PROMPT_COMMAND="history -a; $PROMPT_COMMAND";
