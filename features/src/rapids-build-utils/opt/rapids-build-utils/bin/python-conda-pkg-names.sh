@@ -37,15 +37,16 @@ python_conda_pkg_names() {
 
         if test -d ~/"${!repo_path:-}/.git"; then
             # the regex will continue until morale improves
-            find ~/"${!repo_path}/"           \
-              -type f -name 'meta.yaml'       \
-              ! -path '*/.conda/*'            \
-              ! -path '*/build/*'             \
-              ! -path '*/_skbuild/*'          \
-                -exec grep -E 'name: ?' {} \; \
-              2>/dev/null                     \
-              | tr -d '[:blank:]'             \
-              | cut -d':' -f2                 \
+            find ~/"${!repo_path}/"            \
+              -type f -name 'meta.yaml'        \
+              ! -path '*/.conda/*'             \
+              ! -path '*/build/*'              \
+              ! -path '*/_skbuild/*'           \
+              ! -path '*/target/cmake-build/*' \
+                -exec grep -E 'name: ?' {} \;  \
+              2>/dev/null                      \
+              | tr -d '[:blank:]'              \
+              | cut -d':' -f2                  \
             ;
         fi
     done
