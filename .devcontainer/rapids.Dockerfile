@@ -26,6 +26,27 @@ RUN apt update -y \
     libcurl4-openssl-dev \
  && rm -rf /tmp/* /var/tmp/* /var/cache/apt/* /var/lib/apt/lists/*;
 
+# https://github.com/conda-forge/aws-sdk-cpp-feedstock/blob/main/recipe/meta.yaml
+# https://github.com/conda-forge/aws-sdk-cpp-feedstock/blob/main/recipe/build.sh
+# maybe we don't need -DCMAKE_INSTALL_PREFIX="${PREFIX}" \
+ENV AWS_SDK_VER=1.11.379
+RUN curl -L -o /tmp/aws-sdk-cpp.tar.gz https://github.com/aws/aws-sdk-cpp/archive/${AWS_SDK_VER}.tar.gz \
+    && tar xvzf aws-sdk-cpp.tar.gz && cd aws-sdk-cpp-${AWS_SDK_VER} \
+    && mkdir -p aws-sdk-cpp-${AWS_SDK_VER}/build \
+    && cd aws-sdk-cpp-${AWS_SDK_VER}/build \
+    && cmake ${CMAKE_ARGS} .. -GNinja \
+       -DCMAKE_INSTALL_LIBDIR=lib \
+       -DCMAKE_MODULE_PATH="/usr/lib/cmake" \
+       -DBUILD_ONLY='s3;core;transfer;config;identity-management;sts;sqs;sns;monitoring;logs' \
+       -DCMAKE_POLICY_DEFAULT_CMP0075=NEW \
+       -DENABLE_UNITY_BUILD=ON \
+       -DENABLE_TESTING=OFF \
+       -DCMAKE_BUILD_TYPE=Release \
+       -DBUILD_DEPS=OFF \
+       -DCURL_HAS_H2=ON \
+       -DCURL_HAS_TLS_PROXY=ON \
+     ninja install 
+
 ENV DEFAULT_VIRTUAL_ENV=rapids
 
 FROM ${BASE} as conda-base
