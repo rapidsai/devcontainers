@@ -256,6 +256,9 @@ repos:
       sub_dir: cpp
       depends: [cudf]
   python:
+    - name: libcuspatial
+      sub_dir: python/libcuspatial
+      depends: [cuspatial]
     - name: cuproj
       sub_dir: python/cuproj
       depends: [rmm]
