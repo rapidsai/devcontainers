@@ -273,4 +273,4 @@ repos:
     - name: cuspatial
       sub_dir: python/cuspatial
       depends: [cuspatial]
-      args: {cmake: -DFIND_CUSPATIAL_CPP=ON, install: *rapids_build_backend_args}
+      args: {install: *rapids_build_backend_args}
