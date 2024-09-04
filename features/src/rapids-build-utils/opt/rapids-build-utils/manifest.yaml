@@ -256,6 +256,9 @@ repos:
       sub_dir: cpp
       depends: [cudf]
   python:
+    - name: libcuspatial
+      sub_dir: python/libcuspatial
+      depends: [cuspatial]
     - name: cuproj
       sub_dir: python/cuproj
       depends: [rmm]
@@ -270,4 +273,4 @@ repos:
     - name: cuspatial
       sub_dir: python/cuspatial
       depends: [cuspatial]
-      args: {cmake: -DFIND_CUSPATIAL_CPP=ON, install: *rapids_build_backend_args}
+      args: {install: *rapids_build_backend_args}
