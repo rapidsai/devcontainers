@@ -75,7 +75,7 @@ Successfully authenticated with vault!
 ____EOF
 
     local -r generated_at="$(date '+%s')";
-    local ttl="${VAULT_S3_TTL:-"28800"}";
+    local ttl="${VAULT_S3_TTL:-"43200"}";
     local uri="${VAULT_S3_URI:-"v1/aws/creds/devs"}";
 
     if grep -qE '^[0-9]$' <<< "${ttl}"; then

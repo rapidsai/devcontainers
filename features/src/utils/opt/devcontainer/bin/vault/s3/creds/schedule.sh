@@ -8,7 +8,7 @@ schedule_s3_creds_refresh() {
     . devcontainer-utils-debug-output 'devcontainer_utils_debug' 'vault-s3 vault-s3-creds-schedule';
 
     local -r now="$(date '+%s')";
-    local ttl="${VAULT_S3_TTL:-"28800"}";
+    local ttl="${VAULT_S3_TTL:-"43200"}";
     ttl="${ttl%s}";
 
     local -r stamp="$(cat ~/.aws/stamp 2>/dev/null || echo "${now}")";
@@ -16,14 +16,14 @@ schedule_s3_creds_refresh() {
     then="$((then < ttl ? then : ttl))";
     then="$((((then + 59) / 60) * 60))";
 
-    # Regenerate if within 5 minutes of keys expiring
-    if test "${then}" -le 300; then
+    # Regenerate if within 2 hours of keys expiring
+    if test "${then}" -le 7200; then
         if devcontainer-utils-vault-s3-creds-generate; then
             devcontainer-utils-vault-s3-creds-schedule;
         fi
     else
-        # Regenerate 5 minutes before keys expire
-        then="$((now + then - 300))";
+        # Regenerate 2 hours before keys expire
+        then="$((now + then - 7200))";
 
         crontab -u "$(whoami)" -r 2>/dev/null || true;
 
