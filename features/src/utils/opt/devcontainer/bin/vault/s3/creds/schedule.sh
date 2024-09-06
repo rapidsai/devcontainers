@@ -12,18 +12,19 @@ schedule_s3_creds_refresh() {
     ttl="${ttl%s}";
 
     local -r stamp="$(cat ~/.aws/stamp 2>/dev/null || echo "${now}")";
-    local then="$((ttl - (now - stamp)))";
-    then="$((then < ttl ? then : ttl))";
-    then="$((((then + 59) / 60) * 60))";
+    local ttime="$((ttl - (now - stamp)))";
+    ttime="$((ttime < ttl ? ttime : ttl))";
+    ttime="$((( (ttime + 59) / 60) * 60))";
 
-    # Regenerate if within 2 hours of keys expiring
-    if test "${then}" -le 7200; then
+    # Regenerate creds if within `min(ttl / 5, 2hrs)` of keys expiring
+    local refresh_window="$(((ttl / 5) < 7200 ? 7200 : ttl / 5))";
+
+    if test "${ttime}" -le "${refresh_window}"; then
         if devcontainer-utils-vault-s3-creds-generate; then
             devcontainer-utils-vault-s3-creds-schedule;
         fi
     else
-        # Regenerate 2 hours before keys expire
-        then="$((now + then - 7200))";
+        ttime="$((now + ttime - refresh_window))";
 
         crontab -u "$(whoami)" -r 2>/dev/null || true;
 
@@ -34,7 +35,7 @@ schedule_s3_creds_refresh() {
 
         cat <<________EOF | tee -a /var/log/devcontainer-utils/vault-s3-creds-refresh.log
 $(date --date="@${now}")
-Scheduling cron to regerate S3 creds $(date -u --date="@$((then - now))" '+%T') from now.
+Scheduling cron to regerate S3 creds $(date -u --date="@$((ttime - now))" '+%T') from now.
 ________EOF
 
         cat <<________EOF | crontab -u "$(whoami)" -
@@ -47,7 +48,7 @@ SCCACHE_BUCKET="${SCCACHE_BUCKET:-}"
 SCCACHE_REGION="${SCCACHE_REGION:-}"
 VAULT_GITHUB_ORGS="${VAULT_GITHUB_ORGS:-}"
 AWS_DEFAULT_REGION="${AWS_DEFAULT_REGION:-}"
-$(date --date="@${then}" '+%M %H %d %m %w') \
+$(date --date="@${ttime}" '+%M %H %d %m %w') \
 devcontainer-utils-vault-s3-creds-schedule
 ________EOF
 
