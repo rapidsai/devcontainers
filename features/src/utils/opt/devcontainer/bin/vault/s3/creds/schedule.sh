@@ -17,7 +17,7 @@ schedule_s3_creds_refresh() {
     ttime="$((( (ttime + 59) / 60) * 60))";
 
     # Regenerate creds if within `min(ttl / 5, 2hrs)` of keys expiring
-    local refresh_window="$(((ttl / 5) < 7200 ? 7200 : ttl / 5))";
+    local refresh_window="$(((ttl / 5) > 7200 ? 7200 : ttl / 5))";
 
     if test "${ttime}" -le "${refresh_window}"; then
         if devcontainer-utils-vault-s3-creds-generate; then
