@@ -157,7 +157,7 @@ include:
   - { features: [*python, *clang_format_rapids, *clangd_dev, *cuda_curr_max_rapids, *ucx_rapids, *openmpi], env: *gcc_env }
 
   # mambaforge
-  - { features: [*conda], env: { "PYTHON_VERSION": "3.11" } }
+  - { features: [*conda], env: { "PYTHON_VERSION": "3.12" } }
 
   ###
   # Legacy CUDA 11.x + mambaforge image. Needed so the cudatoolkit 11.x
@@ -166,4 +166,4 @@ include:
   ###
 
   # cuda-mambaforge
-  - { features: [*cuda_prev_max, *conda], env: { "PYTHON_VERSION": "3.11" } }
+  - { features: [*cuda_prev_max, *conda], env: { "PYTHON_VERSION": "3.12" } }
