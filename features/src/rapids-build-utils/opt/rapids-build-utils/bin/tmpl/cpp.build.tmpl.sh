@@ -17,6 +17,9 @@ build_${CPP_LIB}_cpp() {
     local -;
     set -euo pipefail;
 
+    # Stop the sccache server in case we need to reload credentials before starting the next build
+    sccache --stop-server >/dev/null 2>&1 || true;
+
     eval "$(\
     PARALLEL_LEVEL=${PARALLEL_LEVEL:-$(nproc --all)} \
     MAX_TOTAL_SYSTEM_MEMORY="${MAX_TOTAL_SYSTEM_MEMORY:-${CPP_MAX_TOTAL_SYSTEM_MEMORY}}" \
