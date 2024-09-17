@@ -146,6 +146,7 @@ if test -n "${gh_token:-}" \
     check "no creds with GH_TOKEN, VAULT_HOST, and SCCACHE_BUCKET should generate credentials" no_creds_with_GH_TOKEN_VAULT_HOST_and_SCCACHE_BUCKET_should_generate_credentials;
 
     existing_creds_with_GH_TOKEN_VAULT_HOST_and_SCCACHE_BUCKET_should_reuse_credentials() {
+        rm -rf /tmp/.aws;
         mv ~/.aws /tmp/;
         reset_state;
         cp -ar /tmp/.aws ~/;
@@ -203,6 +204,7 @@ if test -n "${gh_token:-}" \
     check "no creds with GH_TOKEN, AWS_ROLE_ARN, and SCCACHE_BUCKET should generate credentials" no_creds_with_GH_TOKEN_AWS_ROLE_ARN_and_SCCACHE_BUCKET_should_generate_credentials;
 
     existing_creds_with_GH_TOKEN_AWS_ROLE_ARN_and_SCCACHE_BUCKET_should_reuse_credentials() {
+        rm -rf /tmp/.aws;
         mv ~/.aws /tmp/;
         reset_state;
         cp -ar /tmp/.aws ~/;
