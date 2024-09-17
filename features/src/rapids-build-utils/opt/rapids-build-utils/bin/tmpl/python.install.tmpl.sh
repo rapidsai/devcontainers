@@ -21,6 +21,9 @@ install_${PY_LIB}_python() {
     local -;
     set -euo pipefail;
 
+    # Stop the sccache server in case we need to reload credentials before starting the next build
+    sccache --stop-server >/dev/null 2>&1 || true;
+
     eval "$(                                          \
     PARALLEL_LEVEL=${PARALLEL_LEVEL:-$(nproc --all)}  \
         rapids-get-num-archs-jobs-and-load "$@"       \
