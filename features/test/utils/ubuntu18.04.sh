@@ -24,6 +24,7 @@ utils_profile_script="$(find /etc/profile.d/ -type f -name '*-devcontainer-utils
 reset_state() {
     export GH_TOKEN=;
     export VAULT_HOST=;
+    export AWS_ROLE_ARN=;
     export SCCACHE_BUCKET=;
     export SCCACHE_REGION=;
     export AWS_ACCESS_KEY_ID=;
@@ -32,6 +33,7 @@ reset_state() {
 
     export -n GH_TOKEN;
     export -n VAULT_HOST;
+    export -n AWS_ROLE_ARN;
     export -n SCCACHE_BUCKET;
     export -n SCCACHE_REGION;
     export -n AWS_ACCESS_KEY_ID;
@@ -40,6 +42,7 @@ reset_state() {
 
     unset GH_TOKEN;
     unset VAULT_HOST;
+    unset AWS_ROLE_ARN;
     unset SCCACHE_BUCKET;
     unset SCCACHE_REGION;
     unset AWS_ACCESS_KEY_ID;
@@ -181,6 +184,63 @@ if test -n "${gh_token:-}" \
     }
 
     check "bad stored creds with GH_TOKEN, VAULT_HOST, and SCCACHE_BUCKET should regenerate credentials" bad_stored_creds_with_GH_TOKEN_VAULT_HOST_and_SCCACHE_BUCKET_should_regenerate_credentials;
+fi
+
+if test -n "${gh_token:-}" \
+&& test -n "${aws_role_arn:-}" \
+&& test -n "${rw_sccache_bucket:-}"; then
+
+    no_creds_with_GH_TOKEN_AWS_ROLE_ARN_and_SCCACHE_BUCKET_should_generate_credentials() {
+        reset_state;
+        GH_TOKEN="${gh_token}" \
+        AWS_ROLE_ARN="${aws_role_arn}" \
+        SCCACHE_BUCKET="${rw_sccache_bucket}" \
+        SCCACHE_REGION="${rw_sccache_region}" \
+        devcontainer-utils-post-attach-command;
+        expect_s3_cache_is_used;
+    }
+
+    check "no creds with GH_TOKEN, AWS_ROLE_ARN, and SCCACHE_BUCKET should generate credentials" no_creds_with_GH_TOKEN_AWS_ROLE_ARN_and_SCCACHE_BUCKET_should_generate_credentials;
+
+    existing_creds_with_GH_TOKEN_AWS_ROLE_ARN_and_SCCACHE_BUCKET_should_reuse_credentials() {
+        mv ~/.aws /tmp/;
+        reset_state;
+        cp -ar /tmp/.aws ~/;
+        GH_TOKEN="${gh_token}" \
+        AWS_ROLE_ARN="${aws_role_arn}" \
+        SCCACHE_BUCKET="${rw_sccache_bucket}" \
+        SCCACHE_REGION="${rw_sccache_region}" \
+        devcontainer-utils-post-attach-command;
+        expect_s3_cache_is_used;
+    }
+
+    check "existing creds with GH_TOKEN, AWS_ROLE_ARN, and SCCACHE_BUCKET should reuse credentials" existing_creds_with_GH_TOKEN_AWS_ROLE_ARN_and_SCCACHE_BUCKET_should_reuse_credentials;
+
+    should_use_provided_AWS_envvar_credentials() {
+        reset_state;
+        export SCCACHE_BUCKET="${rw_sccache_bucket}";
+        export SCCACHE_REGION="${rw_sccache_region}";
+        export AWS_ACCESS_KEY_ID="$(sed -n 's/aws_access_key_id=//p' /tmp/.aws/credentials 2>/dev/null)";
+        export AWS_SESSION_TOKEN="$(sed -n 's/aws_session_token=//p' /tmp/.aws/credentials 2>/dev/null)";
+        export AWS_SECRET_ACCESS_KEY="$(sed -n 's/aws_secret_access_key=//p' /tmp/.aws/credentials 2>/dev/null)";
+        devcontainer-utils-post-attach-command;
+        expect_s3_cache_is_used;
+    }
+
+    check "should use provided AWS envvar credentials" should_use_provided_AWS_envvar_credentials;
+
+    bad_stored_creds_with_GH_TOKEN_AWS_ROLE_ARN_and_SCCACHE_BUCKET_should_regenerate_credentials() {
+        reset_state;
+        write_bad_creds;
+        GH_TOKEN="${gh_token}" \
+        AWS_ROLE_ARN="${aws_role_arn}" \
+        SCCACHE_BUCKET="${rw_sccache_bucket}" \
+        SCCACHE_REGION="${rw_sccache_region}" \
+        devcontainer-utils-post-attach-command;
+        expect_s3_cache_is_used;
+    }
+
+    check "bad stored creds with GH_TOKEN, AWS_ROLE_ARN, and SCCACHE_BUCKET should regenerate credentials" bad_stored_creds_with_GH_TOKEN_AWS_ROLE_ARN_and_SCCACHE_BUCKET_should_regenerate_credentials;
 fi
 
 # Report result
