@@ -44,7 +44,7 @@ init_vault_s3_creds() {
                 fi
             elif ! devcontainer-utils-vault-s3-creds-propagate; then
                 # bucket is inaccessible
-                devcontainer-utils-vault-s3-creds-persist <<< "--no_bucket --no_region";
+                devcontainer-utils-vault-s3-creds-persist <<< "--no-bucket --no-region";
             fi
         fi
     fi

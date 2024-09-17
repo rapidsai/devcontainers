@@ -46,7 +46,7 @@ _s3_creds_init() {
                 fi
             elif ! devcontainer-utils-creds-s3-propagate; then
                 # bucket is inaccessible
-                devcontainer-utils-creds-s3-persist <<< "--no_bucket --no_region";
+                devcontainer-utils-creds-s3-persist <<< "--no-bucket --no-region";
             fi
         fi
     fi
