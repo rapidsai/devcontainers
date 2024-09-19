@@ -21,6 +21,9 @@ build_${PY_LIB}_python_wheel() {
     local -;
     set -euo pipefail;
 
+    # Stop the sccache server in case we need to reload credentials before starting the next build
+    sccache --stop-server >/dev/null 2>&1 || true;
+
     eval "$(                                          \
     PARALLEL_LEVEL=${PARALLEL_LEVEL:-$(nproc --all)}  \
         rapids-get-num-archs-jobs-and-load "$@"       \
@@ -96,9 +99,9 @@ build_${PY_LIB}_python_wheel() {
         PARALLEL_LEVEL="${n_jobs}"                   \
         CMAKE_ARGS="${cmake_args[*]@Q}"              \
         SKBUILD_BUILD_OPTIONS="${ninja_args[*]}"     \
+        SKBUILD_BUILD_VERBOSE="${v:+True}"           \
         SKBUILD_LOGGING_LEVEL="${v:+INFO}"           \
         SKBUILD_INSTALL_STRIP="${strip:+True}"       \
-        SKBUILD_CMAKE_VERBOSE="${v:+True}"           \
         SKBUILD_CMAKE_BUILD_TYPE="${build_type}"     \
         CMAKE_BUILD_PARALLEL_LEVEL="${n_jobs}"       \
         NVCC_APPEND_FLAGS="${nvcc_append_flags}"     \

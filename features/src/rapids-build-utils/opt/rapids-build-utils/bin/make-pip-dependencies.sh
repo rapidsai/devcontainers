@@ -79,6 +79,7 @@ make_pip_dependencies() {
         cuda="${cuda_version}"
         cuda_suffixed=true
         py="${python_version}"
+        use_cuda_wheels=false
     );
 
     # add extra arguments (if there are conflicts, e.g. 'py=3.10;py=3.11', it's fine... the last one will win)

@@ -1,6 +1,6 @@
 x-git-defaults: &git_defaults
     host: github
-    tag: branch-24.08
+    tag: branch-24.10
     upstream: rapidsai
 
 x-rapids-build-backend-args: &rapids_build_backend_args |
@@ -28,7 +28,7 @@ repos:
 
 - name: ucxx
   path: ucxx
-  git: {<<: *git_defaults, repo: ucxx, tag: branch-0.39}
+  git: {<<: *git_defaults, repo: ucxx, tag: branch-0.40}
   cpp:
     - name: ucxx
       sub_dir: cpp
@@ -39,7 +39,7 @@ repos:
           -DUCXX_ENABLE_RMM=ON
   python:
     - name: ucxx
-      sub_dir: python
+      sub_dir: python/ucxx
       depends: [ucxx]
       args: {cmake: -DFIND_UCXX_CPP=ON, install: *rapids_build_backend_args}
     - name: distributed-ucxx
@@ -78,6 +78,13 @@ repos:
       sub_dir: cpp/libcudf_kafka
       depends: [cudf]
   python:
+    - name: libcudf
+      sub_dir: python/libcudf
+      depends: [cudf]
+    - name: pylibcudf
+      sub_dir: python/pylibcudf
+      depends: [cudf]
+      args: {cmake: -DFIND_CUDF_CPP=ON, install: *rapids_build_backend_args}
     - name: cudf
       sub_dir: python/cudf
       depends: [cudf]
@@ -249,6 +256,9 @@ repos:
       sub_dir: cpp
       depends: [cudf]
   python:
+    - name: libcuspatial
+      sub_dir: python/libcuspatial
+      depends: [cuspatial]
     - name: cuproj
       sub_dir: python/cuproj
       depends: [rmm]
@@ -263,4 +273,4 @@ repos:
     - name: cuspatial
       sub_dir: python/cuspatial
       depends: [cuspatial]
-      args: {cmake: -DFIND_CUSPATIAL_CPP=ON, install: *rapids_build_backend_args}
+      args: {install: *rapids_build_backend_args}

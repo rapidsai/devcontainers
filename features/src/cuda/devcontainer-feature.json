@@ -1,7 +1,7 @@
 {
   "name": "CUDA Toolkit",
   "id": "cuda",
-  "version": "24.8.2",
+  "version": "24.10.0",
   "description": "A feature to install the NVIDIA CUDA Toolkit",
   "options": {
     "version": {
