@@ -6,6 +6,7 @@ inputs:
   args: {type: string, required: true}
   gh_token: {type: string, defaut: '', required: false}
   vault_host: {type: string, defaut: '', required: false}
+  aws_role_arn: {type: string, defaut: '', required: false}
   rw_sccache_bucket: {type: string, defaut: '', required: false}
   rw_sccache_region: {type: string, defaut: '', required: false}
 
@@ -30,5 +31,6 @@ runs:
         VAULT_S3_TTL: "900" # 15 minutes
         gh_token: "${{ inputs.gh_token }}"
         vault_host: "${{ inputs.vault_host }}"
+        aws_role_arn: "${{ inputs.aws_role_arn }}"
         rw_sccache_bucket: "${{ inputs.rw_sccache_bucket }}"
         rw_sccache_region: "${{ inputs.rw_sccache_region }}"
