@@ -51,7 +51,6 @@ clone_${NAME}() {
         --branch "${branch}"                    \
         --ssh-url "${ssh_url}"                  \
         --https-url "${https_url}"              \
-        --recurse-submodules                    \
         -j ${n_jobs:-$(nproc --all --ignore=1)} \
         -c checkout.defaultRemote=upstream      \
         "${OPTS[@]}"                            \
