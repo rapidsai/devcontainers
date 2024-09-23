@@ -58,11 +58,11 @@ repos:
     - name: libkvikio
       sub_dir: python/libkvikio
       depends: [KvikIO]
-      args: {cmake: -DFIND_KVIKIO_CPP=ON, install: *rapids_build_backend_args}
+      args: {install: *rapids_build_backend_args}
     - name: kvikio
       sub_dir: python/kvikio
       depends: [KvikIO]
-      args: {cmake: -DFIND_KVIKIO_CPP=ON, install: *rapids_build_backend_args}
+      args: {install: *rapids_build_backend_args}
 
 - name: cudf
   path: cudf
@@ -71,9 +71,6 @@ repos:
     - name: cudf
       sub_dir: cpp
       depends: [KvikIO]
-      args:
-        cmake: |
-          $([ "pip" = ${PYTHON_PACKAGE_MANAGER} ] && echo -DUSE_LIBARROW_FROM_PYARROW=ON || echo)
     - name: cudf_kafka
       sub_dir: cpp/libcudf_kafka
       depends: [cudf]
@@ -81,14 +78,15 @@ repos:
     - name: libcudf
       sub_dir: python/libcudf
       depends: [cudf]
+      args: {install: *rapids_build_backend_args}
     - name: pylibcudf
       sub_dir: python/pylibcudf
       depends: [cudf]
-      args: {cmake: -DFIND_CUDF_CPP=ON, install: *rapids_build_backend_args}
+      args: {install: *rapids_build_backend_args}
     - name: cudf
       sub_dir: python/cudf
       depends: [cudf]
-      args: {cmake: -DFIND_CUDF_CPP=ON, install: *rapids_build_backend_args}
+      args: {install: *rapids_build_backend_args}
     - name: dask_cudf
       sub_dir: python/dask_cudf
       args: {install: *rapids_build_backend_args}
@@ -217,9 +215,7 @@ repos:
     - name: cugraph_etl
       sub_dir: cpp/libcugraph_etl
       depends: [cudf, cugraph]
-      args:
-        cmake: $([ "pip" = ${PYTHON_PACKAGE_MANAGER} ] && echo -DUSE_LIBARROW_FROM_PYARROW=ON || echo)
-        install: *rapids_build_backend_args
+      args: {install: *rapids_build_backend_args}
   python:
     - name: pylibcugraph
       sub_dir: python/pylibcugraph
@@ -259,6 +255,7 @@ repos:
     - name: libcuspatial
       sub_dir: python/libcuspatial
       depends: [cuspatial]
+      args: {install: *rapids_build_backend_args}
     - name: cuproj
       sub_dir: python/cuproj
       depends: [rmm]
