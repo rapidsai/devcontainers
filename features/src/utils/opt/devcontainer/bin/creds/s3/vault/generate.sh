@@ -2,12 +2,12 @@
 
 # Attempt to retrieve temporary AWS credentials from a vault instance using GitHub OAuth.
 
-generate_s3_creds() {
+_creds_vault_generate() {
     local -;
     set -euo pipefail;
 
     # shellcheck disable=SC1091
-    . devcontainer-utils-debug-output 'devcontainer_utils_debug' 'vault-s3 vault-s3-creds-generate';
+    . devcontainer-utils-debug-output 'devcontainer_utils_debug' 'creds-s3 creds-s3-vault creds-s3-vault-generate';
 
     if test -z "${VAULT_HOST:-}" \
     || test -z "${SCCACHE_BUCKET:-}"; then
@@ -19,9 +19,9 @@ generate_s3_creds() {
     # Remove existing credentials in case vault declines to issue new ones.
     rm -rf ~/.aws/{stamp,config,credentials};
 
-    devcontainer-utils-vault-s3-creds-persist - <<< \
-        --bucket="${SCCACHE_BUCKET:-}"              \
-        --region="${SCCACHE_REGION:-}"              ;
+    devcontainer-utils-creds-s3-persist - <<< \
+        --bucket="${SCCACHE_BUCKET:-}"        \
+        --region="${SCCACHE_REGION:-}"        ;
 
     # Initialize the GitHub CLI with the appropriate user scopes
     # shellcheck disable=SC1091
@@ -61,7 +61,7 @@ ____EOF
     local vault_token="null";
 
     # Attempt to authenticate with GitHub
-    eval "$(devcontainer-utils-vault-auth-github "${VAULT_HOST}" "${user_orgs}")";
+    eval "$(devcontainer-utils-creds-s3-vault-github "${VAULT_HOST}" "${user_orgs}")";
 
     if [ "${vault_token:-null}" = "null" ]; then
         cat <<________EOF | tee -a /var/log/devcontainer-utils/creds-s3.log >&2
@@ -118,9 +118,9 @@ ____EOF
         SCCACHE_REGION="${SCCACHE_REGION:-}" \
         AWS_ACCESS_KEY_ID="${aws_access_key_id:-}"         \
         AWS_SECRET_ACCESS_KEY="${aws_secret_access_key:-}" \
-        devcontainer-utils-vault-s3-creds-propagate | tee -a /var/log/devcontainer-utils/creds-s3.log; then
+        devcontainer-utils-creds-s3-propagate | tee -a /var/log/devcontainer-utils/creds-s3.log; then
         # Store creds in ~/.aws dir
-        devcontainer-utils-vault-s3-creds-persist - <<<         \
+        devcontainer-utils-creds-s3-persist - <<<               \
             --stamp="${generated_at:-}"                         \
             --bucket="${SCCACHE_BUCKET:-}"                      \
             --region="${SCCACHE_REGION:-}"                      \
@@ -129,7 +129,7 @@ ____EOF
     fi
 }
 
-generate_s3_creds "$@";
+_creds_vault_generate "$@";
 
 # shellcheck disable=SC1090
 . /etc/profile.d/*-devcontainer-utils.sh;

@@ -67,9 +67,9 @@ chmod u+s "$(realpath -m "$(which cron)")";
 
 # shellcheck disable=SC2174
 mkdir -m 0775 -p /var/log/devcontainer-utils;
-touch /var/log/devcontainer-utils/vault-s3-creds-refresh.log;
-chmod 0664 /var/log/devcontainer-utils/vault-s3-creds-refresh.log;
-chgrp crontab /var/log/devcontainer-utils/vault-s3-creds-refresh.log;
+touch /var/log/devcontainer-utils/creds-s3.log;
+chmod 0664 /var/log/devcontainer-utils/creds-s3.log;
+chgrp crontab /var/log/devcontainer-utils/creds-s3.log;
 
 # Install Devcontainer utility scripts to /opt/devcontainer
 cp -ar ./opt/devcontainer /opt/;
@@ -79,6 +79,15 @@ declare -a commands_and_sources=(
     "parse-args                         parse-args.sh"
     "parse-args-from-docstring          parse-args-from-docstring.sh"
     "bash-completion.tmpl               bash/completion.tmpl.sh"
+    "creds-s3-init                      creds/s3/init.sh"
+    "creds-s3-generate                  creds/s3/generate.sh"
+    "creds-s3-persist                   creds/s3/persist.sh"
+    "creds-s3-propagate                 creds/s3/propagate.sh"
+    "creds-s3-schedule                  creds/s3/schedule.sh"
+    "creds-s3-test                      creds/s3/test.sh"
+    "creds-s3-gh-generate               creds/s3/gh/generate.sh"
+    "creds-s3-vault-generate            creds/s3/vault/generate.sh"
+    "creds-s3-vault-github              creds/s3/vault/github.sh"
     "generate-bash-completion           bash/generate-bash-completion.sh"
     "shell-is-interactive               shell-is-interactive.sh"
     "post-create-command                post-create-command.sh"
@@ -107,10 +116,10 @@ declare -a commands_and_sources=(
 
 # Install alternatives
 for entry in "${commands_and_sources[@]}"; do
-    declare -a pair=(${entry});
+    declare -a pair="(${entry})";
     declare cmd="devcontainer-utils-${pair[0]}";
     declare src="/opt/devcontainer/bin/${pair[1]}";
-    update-alternatives --install /usr/bin/${cmd} ${cmd} ${src} 0;
+    update-alternatives --install "/usr/bin/${cmd}" "${cmd}" "${src}" 0;
 done
 
 declare -a commands="($(for pair in "${commands_and_sources[@]}"; do cut -d' ' -f1 <<< "${pair}"; done))";
@@ -182,6 +191,30 @@ find_non_root_user;
 
 if test -n "${USERNAME-}"; then
     USERHOME="$(bash -c "echo ~${USERNAME-}")";
+
+    if type gh >/dev/null 2>&1; then
+        mkdir -p -m 0755                                         \
+            "$USERHOME/.local"                                   \
+            "$USERHOME/.local/share"                             \
+            "$USERHOME/.local/share/gh"                          \
+            "$USERHOME/.local/share/gh/extensions"               \
+            "$USERHOME/.local/share/gh/extensions/gh-nv-gha-aws" \
+            ;
+        NV_GHA_AWS_VERSION=latest
+        find_version_from_git_tags NV_GHA_AWS_VERSION https://github.com/nv-gha-runners/gh-nv-gha-aws;
+        wget --no-hsts -q -O "$USERHOME/.local/share/gh/extensions/gh-nv-gha-aws/gh-nv-gha-aws" \
+            "https://github.com/nv-gha-runners/gh-nv-gha-aws/releases/download/v${NV_GHA_AWS_VERSION}/gh-nv-gha-aws_v${NV_GHA_AWS_VERSION}_linux-$(dpkg --print-architecture | awk -F'-' '{print $NF}')";
+        chmod 0755 "$USERHOME/.local/share/gh/extensions/gh-nv-gha-aws/gh-nv-gha-aws";
+        cat <<EOF >"$USERHOME/.local/share/gh/extensions/gh-nv-gha-aws/manifest.yml"
+owner: nv-gha-runners
+name: gh-nv-gha-aws
+host: github.com
+tag: v${NV_GHA_AWS_VERSION}
+ispinned: false
+path: $USERHOME/.local/share/gh/extensions/gh-nv-gha-aws/gh-nv-gha-aws
+EOF
+    fi
+
     # Add user to the crontab group
     usermod -aG crontab "${USERNAME}";
     # Allow user to edit the crontab
