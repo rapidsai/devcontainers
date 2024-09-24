@@ -25,9 +25,9 @@ NEXT_FULL_TAG=${NEXT_MAJOR}.${NEXT_MINOR}.${NEXT_PATCH}
 NEXT_UCXX_SHORT_TAG="$(curl -sL https://version.gpuci.io/rapids/${NEXT_SHORT_TAG})"
 
 # Need to distutils-normalize the versions for some use cases
-CURRENT_SHORT_TAG_PEP440=$(python -c "from setuptools.extern import packaging; print(packaging.version.Version('${CURRENT_SHORT_TAG}'))")
-NEXT_SHORT_TAG_PEP440=$(python -c "from setuptools.extern import packaging; print(packaging.version.Version('${NEXT_SHORT_TAG}'))")
-NEXT_FULL_TAG_PEP440=$(python -c "from setuptools.extern import packaging; print(packaging.version.Version('${NEXT_FULL_TAG}'))")
+CURRENT_SHORT_TAG_PEP440=$(python -c "from packaging.version import Version; print(Version('${CURRENT_SHORT_TAG}'))")
+NEXT_SHORT_TAG_PEP440=$(python -c "from packaging.version import Version; print(Version('${NEXT_SHORT_TAG}'))")
+NEXT_FULL_TAG_PEP440=$(python -c "from packaging.version import Version; print(Version('${NEXT_FULL_TAG}'))")
 echo "current is ${CURRENT_SHORT_TAG_PEP440}, next is ${NEXT_SHORT_TAG_PEP440}"
 
 echo "Preparing release $CURRENT_TAG => $NEXT_FULL_TAG"
