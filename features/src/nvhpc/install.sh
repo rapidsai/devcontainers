@@ -58,7 +58,7 @@ check_packages ${pkgs[@]};
 export NVHPC="/opt/nvidia/hpc_sdk";
 export NVHPC_VERSION="${NVHPC_VERSION}";
 export NVHPC_ROOT="${NVHPC}/Linux_$(uname -p)/${NVHPC_VERSION}";
-export NVHPC_CUDA_HOME="${NVHPC_ROOT}/cuda";
+export NVHPC_CUDA_HOME="$(dirname "$(find "$NVHPC_ROOT/cuda" -type f -name 'version.json' | head -n1)")";
 export NVHPC_MODULEFILE_DIRS="($(find "${NVHPC}/" -type d -name modulefiles -exec echo -n \"{}\"\  \;))";
 
 if ! test -L /usr/local/cuda; then
