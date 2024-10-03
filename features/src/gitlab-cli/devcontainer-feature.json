@@ -1,6 +1,6 @@
 {
   "id": "gitlab-cli",
-  "version": "24.12.0",
+  "version": "24.12.1",
   "name": "GitLab CLI",
   "documentationURL": "https://github.com/rapidsai/devcontainers/features/tree/main/src/gitlab-cli",
   "description": "Installs the GitLab CLI. Auto-detects latest version and installs needed dependencies.",
@@ -8,8 +8,7 @@
     "version": {
       "type": "string",
       "proposals": [
-        "latest",
-        "none"
+        "latest"
       ],
       "default": "latest",
       "description": "Select version of the GitLab CLI, if not latest."
