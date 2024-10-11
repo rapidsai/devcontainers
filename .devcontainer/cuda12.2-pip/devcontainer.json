@@ -22,7 +22,8 @@
       "installcuDNN": true,
       "installcuSOLVER": true,
       "installcuRAND": true,
-      "installcuSPARSE": true
+      "installcuSPARSE": true,
+      "installProfilers": true
     },
     "./features/src/utils": {},
     "./features/src/rapids-build-utils": {}
