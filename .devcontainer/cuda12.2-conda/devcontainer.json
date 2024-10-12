@@ -15,10 +15,33 @@
   ],
   "hostRequirements": {"gpu": "optional"},
   "features": {
+    "./features/src/cuda": {
+      "version": "12.2",
+      "installCompilers": false,
+      "installProfilers": true,
+      "installCTKLibraries": false,
+      "installDevPackages": false,
+      "installcuDNN": false,
+      "installcuTensor": false,
+      "installNCCL": false,
+      "installCUDARuntime": false,
+      "installNVRTC": false,
+      "installOpenCL": false,
+      "installcuBLAS": false,
+      "installcuSPARSE": false,
+      "installcuFFT": false,
+      "installcuFile": false,
+      "installcuRAND": false,
+      "installcuSOLVER": false,
+      "installNPP": false,
+      "installnvJPEG": false,
+      "pruneStaticLibs": true
+    },
     "./features/src/utils": {},
     "./features/src/rapids-build-utils": {}
   },
   "overrideFeatureInstallOrder": [
+    "./features/src/cuda",
     "./features/src/utils",
     "./features/src/rapids-build-utils"
   ],
