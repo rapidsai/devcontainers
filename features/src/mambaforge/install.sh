@@ -23,7 +23,7 @@ wget --no-hsts -q -O /tmp/miniforge.sh \
 
 echo "Installing Mambaforge...";
 
-# Install miniconda
+# Install Mambaforge
 rm -rf /opt/conda;
 /bin/bash /tmp/miniforge.sh -b -p /opt/conda;
 
