@@ -63,6 +63,7 @@ _creds_github_generate() {
         fi
     done
 
+    exit 1;
 }
 
 _creds_github_generate "$@" <&0;

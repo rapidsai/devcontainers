@@ -14,7 +14,7 @@ _creds_s3_generate() {
     if test -n "${AWS_ROLE_ARN:-}" && gh nv-gha-aws --help >/dev/null 2>&1; then
         # shellcheck disable=SC1091
         devcontainer-utils-creds-s3-gh-generate;
-    elif test -n "${VAULT_HOST}"; then
+    elif test -n "${VAULT_HOST:-}"; then
         # shellcheck disable=SC1091
         devcontainer-utils-creds-s3-vault-generate;
     fi
