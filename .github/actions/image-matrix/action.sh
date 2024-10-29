@@ -69,7 +69,7 @@ linux_images="$(\
         name: (.
           | map(.
             | select(.hide != true)
-            | (.name | split("/")[-1] | split(":")[0]) + (.version // "" | tostring))
+            | (.name | split("/")[-1] | split(":")[0]) + (.version // "" | tostring) + (.suffix // "" | tostring))
           )
           | (. + [$os])
           | join("-"),
@@ -99,7 +99,7 @@ if `# Include all images if full_matrix is true`  \
             name: (.
               | map(.
                 | select(.hide != true)
-                | (.name | split("/")[-1] | split(":")[0]) + (.version // "" | tostring))
+                | (.name | split("/")[-1] | split(":")[0]) + (.version // "" | tostring) + (.suffix // "" | tostring))
               )
               | (. + [$os])
               | join("-"),

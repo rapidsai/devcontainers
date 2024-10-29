@@ -9,11 +9,11 @@ container_env="${3:-"null"}";
 
 VERSION="$(git describe --abbrev=0 --tags | sed 's/[a-zA-Z]//g' | cut -d '.' -f -2)";
 tag="$(node -p "$(cat <<EOF
-['cpp', ...${features}.filter((x) => !x.hide).map(({ name = '', version = '' }) => {
+['cpp', ...${features}.filter((x) => !x.hide).map(({ name = '', version = '', suffix = '' }) => {
     if (name.includes(':')) {
         name = name.split('/').pop().split(':')[0];
     }
-    return name + (version || '');
+    return name + (version || '') + (suffix || '');
 })].join('-')
 EOF
 )")";
