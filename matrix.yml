@@ -100,6 +100,7 @@ include:
   - { features: [*python, *llvm_12, { <<: *cuda_curr_max, <<: *cccl_cuda_opts }, *clang_format_cccl, *clangd_dev, *cccl_dev], env: *llvm_env }
   - { features: [*python, *llvm_13, { <<: *cuda_curr_min, <<: *cccl_cuda_opts }, *clang_format_cccl, *clangd_dev, *cccl_dev], env: *llvm_env }
   - { features: [*python, *llvm_13, { <<: *cuda_curr_max, <<: *cccl_cuda_opts }, *clang_format_cccl, *clangd_dev, *cccl_dev], env: *llvm_env }
+  - { features: [*python, *llvm_14, { <<: *cuda_curr_min, <<: *cccl_cuda_ext_opts }, *clang_format_cccl, *clangd_dev, *cccl_dev], env: *llvm_env }
   - { features: [*python, *llvm_14, { <<: *cuda_curr_min, <<: *cccl_cuda_opts }, *clang_format_cccl, *clangd_dev, *cccl_dev], env: *llvm_env }
   - { features: [*python, *llvm_14, { <<: *cuda_curr_max, <<: *cccl_cuda_opts }, *clang_format_cccl, *clangd_dev, *cccl_dev], env: *llvm_env }
   - { features: [*python, *oneapi_2022, { <<: *cuda_curr_max, <<: *cccl_cuda_opts }, *clang_format_cccl, *clangd_dev, *cccl_dev], env: *onapi_env }
@@ -113,9 +114,10 @@ include:
   - { features: [*python, *gcc_11, { <<: *cuda_curr_max, <<: *cccl_cuda_opts }, *clang_format_cccl, *clangd_dev, *cccl_dev], env: *gcc_env }
   - { features: [*python, *gcc_12, { <<: *cuda_curr_min, <<: *cccl_cuda_opts }, *clang_format_cccl, *clangd_dev, *cccl_dev], env: *gcc_env }
   - { features: [*python, *gcc_12, { <<: *cuda_curr_max, <<: *cccl_cuda_opts }, *clang_format_cccl, *clangd_dev, *cccl_dev], env: *gcc_env }
+  - { features: [*python, *gcc_12, { <<: *cuda_curr_min, <<: *cccl_cuda_ext_opts }, *clang_format_cccl, *clangd_dev, *cccl_dev], env: *gcc_env }
+  - { features: [*python, *gcc_12, { <<: *cuda_curr_max, <<: *cccl_cuda_ext_opts }, *clang_format_cccl, *clangd_dev, *cccl_dev], env: *gcc_env }
   - { features: [*python, *gcc_13, { <<: *cuda_curr_min, <<: *cccl_cuda_opts }, *clang_format_cccl, *clangd_dev, *cccl_dev], env: *gcc_env }
   - { features: [*python, *gcc_13, { <<: *cuda_curr_max, <<: *cccl_cuda_opts }, *clang_format_cccl, *clangd_dev, *cccl_dev], env: *gcc_env }
-  - { features: [*python, *gcc_13, { <<: *cuda_curr_min, <<: *cccl_cuda_ext_opts }, *clang_format_cccl, *clangd_dev, *cccl_dev], env: *gcc_env }
   - { features: [*python, *gcc_13, { <<: *cuda_curr_max, <<: *cccl_cuda_ext_opts }, *clang_format_cccl, *clangd_dev, *cccl_dev], env: *gcc_env }
   - { features: [*python, *llvm_15, { <<: *cuda_curr_min, <<: *cccl_cuda_opts }, *clang_format_cccl, *clangd_dev, *cccl_dev], env: *llvm_env }
   - { features: [*python, *llvm_15, { <<: *cuda_curr_max, <<: *cccl_cuda_opts }, *clang_format_cccl, *clangd_dev, *cccl_dev], env: *llvm_env }
@@ -125,9 +127,9 @@ include:
   - { features: [*python, *llvm_17, { <<: *cuda_curr_max, <<: *cccl_cuda_opts }, *clang_format_cccl, *clangd_dev, *cccl_dev], env: *llvm_env }
   - { features: [*python, *llvm_18, { <<: *cuda_curr_min, <<: *cccl_cuda_opts }, *clang_format_cccl, *clangd_dev, *cccl_dev], env: *llvm_env }
   - { features: [*python, *llvm_18, { <<: *cuda_curr_max, <<: *cccl_cuda_opts }, *clang_format_cccl, *clangd_dev, *cccl_dev], env: *llvm_env }
+  - { features: [*python, *llvm_18, { <<: *cuda_curr_max, <<: *cccl_cuda_ext_opts }, *clang_format_cccl, *clangd_dev, *cccl_dev], env: *llvm_env }
   - { features: [*python, *llvm_19, { <<: *cuda_curr_min, <<: *cccl_cuda_opts }, *clang_format_cccl, *clangd_dev, *cccl_dev], env: *llvm_env }
   - { features: [*python, *llvm_19, { <<: *cuda_curr_max, <<: *cccl_cuda_opts }, *clang_format_cccl, *clangd_dev, *cccl_dev], env: *llvm_env }
-  - { features: [*python, *llvm_19, { <<: *cuda_curr_min, <<: *cccl_cuda_ext_opts }, *clang_format_cccl, *clangd_dev, *cccl_dev], env: *llvm_env }
   - { features: [*python, *llvm_19, { <<: *cuda_curr_max, <<: *cccl_cuda_ext_opts }, *clang_format_cccl, *clangd_dev, *cccl_dev], env: *llvm_env }
   - { features: [*python, *oneapi_2022, { <<: *cuda_curr_max, <<: *cccl_cuda_opts }, *clang_format_cccl, *clangd_dev, *cccl_dev], env: *onapi_env }
 
