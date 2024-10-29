@@ -56,6 +56,18 @@ x-cccl-cuda-opts: &cccl_cuda_opts {
   installNVRTC: true,
 }
 
+x-cccl-cuda-ext-opts: &cccl_cuda_ext_opts {
+  suffix: "ext",
+  installCTKLibraries: false,
+  installCUDARuntime: true,
+  installcuRAND: true,
+  installcuTensor: true,
+  installcuBLAS: true,
+  installcuSOLVER: true,
+  installNCCL: false,
+  installNVRTC: true,
+}
+
 include:
 # CCCL devcontainers
 
@@ -103,6 +115,8 @@ include:
   - { features: [*python, *gcc_12, { <<: *cuda_curr_max, <<: *cccl_cuda_opts }, *clang_format_cccl, *clangd_dev, *cccl_dev], env: *gcc_env }
   - { features: [*python, *gcc_13, { <<: *cuda_curr_min, <<: *cccl_cuda_opts }, *clang_format_cccl, *clangd_dev, *cccl_dev], env: *gcc_env }
   - { features: [*python, *gcc_13, { <<: *cuda_curr_max, <<: *cccl_cuda_opts }, *clang_format_cccl, *clangd_dev, *cccl_dev], env: *gcc_env }
+  - { features: [*python, *gcc_13, { <<: *cuda_curr_min, <<: *cccl_cuda_ext_opts }, *clang_format_cccl, *clangd_dev, *cccl_dev], env: *gcc_env }
+  - { features: [*python, *gcc_13, { <<: *cuda_curr_max, <<: *cccl_cuda_ext_opts }, *clang_format_cccl, *clangd_dev, *cccl_dev], env: *gcc_env }
   - { features: [*python, *llvm_15, { <<: *cuda_curr_min, <<: *cccl_cuda_opts }, *clang_format_cccl, *clangd_dev, *cccl_dev], env: *llvm_env }
   - { features: [*python, *llvm_15, { <<: *cuda_curr_max, <<: *cccl_cuda_opts }, *clang_format_cccl, *clangd_dev, *cccl_dev], env: *llvm_env }
   - { features: [*python, *llvm_16, { <<: *cuda_curr_min, <<: *cccl_cuda_opts }, *clang_format_cccl, *clangd_dev, *cccl_dev], env: *llvm_env }
@@ -113,6 +127,8 @@ include:
   - { features: [*python, *llvm_18, { <<: *cuda_curr_max, <<: *cccl_cuda_opts }, *clang_format_cccl, *clangd_dev, *cccl_dev], env: *llvm_env }
   - { features: [*python, *llvm_19, { <<: *cuda_curr_min, <<: *cccl_cuda_opts }, *clang_format_cccl, *clangd_dev, *cccl_dev], env: *llvm_env }
   - { features: [*python, *llvm_19, { <<: *cuda_curr_max, <<: *cccl_cuda_opts }, *clang_format_cccl, *clangd_dev, *cccl_dev], env: *llvm_env }
+  - { features: [*python, *llvm_19, { <<: *cuda_curr_min, <<: *cccl_cuda_ext_opts }, *clang_format_cccl, *clangd_dev, *cccl_dev], env: *llvm_env }
+  - { features: [*python, *llvm_19, { <<: *cuda_curr_max, <<: *cccl_cuda_ext_opts }, *clang_format_cccl, *clangd_dev, *cccl_dev], env: *llvm_env }
   - { features: [*python, *oneapi_2022, { <<: *cuda_curr_max, <<: *cccl_cuda_opts }, *clang_format_cccl, *clangd_dev, *cccl_dev], env: *onapi_env }
 
 - os: "ubuntu:24.04"
