@@ -64,6 +64,7 @@ x-cccl-cuda-ext-opts: &cccl_cuda_ext_opts {
   installcuTensor: true,
   installcuBLAS: true,
   installcuSOLVER: true,
+  installcuSPARSE: true,
   installcuFFT: true,
   installNCCL: false,
   installNVRTC: true,
