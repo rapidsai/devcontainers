@@ -53,7 +53,7 @@ repos:
   cpp:
     - name: kvikio
       sub_dir: cpp
-      depends: [rmm]
+      depends: []
   python:
     - name: libkvikio
       sub_dir: python/libkvikio
