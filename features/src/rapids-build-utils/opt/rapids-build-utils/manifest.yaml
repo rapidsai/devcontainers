@@ -51,17 +51,16 @@ repos:
   path: kvikio
   git: {<<: *git_defaults, repo: kvikio}
   cpp:
-    - name: KvikIO
+    - name: kvikio
       sub_dir: cpp
-      depends: [rmm]
   python:
     - name: libkvikio
       sub_dir: python/libkvikio
-      depends: [KvikIO]
+      depends: [kvikio]
       args: {install: *rapids_build_backend_args}
     - name: kvikio
       sub_dir: python/kvikio
-      depends: [KvikIO]
+      depends: [kvikio]
       args: {install: *rapids_build_backend_args}
 
 - name: cudf
@@ -70,7 +69,7 @@ repos:
   cpp:
     - name: cudf
       sub_dir: cpp
-      depends: [KvikIO]
+      depends: [kvikio]
     - name: cudf_kafka
       sub_dir: cpp/libcudf_kafka
       depends: [cudf]
