@@ -102,7 +102,7 @@ repos:
 
 - name: raft
   path: raft
-  git: {<<: *git_defaults, repo: raft}
+  git: {host: github, upstream: jameslamb, repo: raft, tag: wheel-validation}
   cpp:
     - name: raft
       sub_dir: cpp
