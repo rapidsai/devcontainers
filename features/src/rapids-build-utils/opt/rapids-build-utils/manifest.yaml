@@ -224,9 +224,6 @@ repos:
       sub_dir: python/cugraph
       depends: [cugraph]
       args: {cmake: -DFIND_CUGRAPH_CPP=ON, install: *rapids_build_backend_args}
-    - name: nx-cugraph
-      sub_dir: python/nx-cugraph
-      args: {install: *rapids_build_backend_args}
     - name: cugraph-dgl
       sub_dir: python/cugraph-dgl
       args: {install: *rapids_build_backend_args}
