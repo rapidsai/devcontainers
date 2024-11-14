@@ -240,6 +240,14 @@ repos:
       sub_dir: python/cugraph-service/server
       args: {install: *rapids_build_backend_args}
 
+- name: nx-cugraph
+  path: nx-cugraph
+  git: {<<: *git_defaults, repo: nx-cugraph}
+  python:
+    - name: nx-cugraph
+      sub_dir: .
+      args: {install: *rapids_build_backend_args}
+
 - name: cuspatial
   path: cuspatial
   git: {<<: *git_defaults, repo: cuspatial}
