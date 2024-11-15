@@ -1,6 +1,6 @@
 x-git-defaults: &git_defaults
     host: github
-    tag: branch-24.12
+    tag: branch-25.02
     upstream: rapidsai
 
 x-rapids-build-backend-args: &rapids_build_backend_args |
@@ -28,7 +28,7 @@ repos:
 
 - name: ucxx
   path: ucxx
-  git: {<<: *git_defaults, repo: ucxx, tag: branch-0.41}
+  git: {<<: *git_defaults, repo: ucxx, tag: branch-0.42}
   cpp:
     - name: ucxx
       sub_dir: cpp
