@@ -209,12 +209,6 @@ repos:
       sub_dir: python/cugraph
       depends: [cugraph]
       args: {cmake: -DFIND_CUGRAPH_CPP=ON, install: *rapids_build_backend_args}
-    - name: cugraph-equivariant
-      sub_dir: python/cugraph-equivariant
-      args: {install: *rapids_build_backend_args}
-    - name: cugraph_pyg
-      sub_dir: python/cugraph-pyg
-      args: {install: *rapids_build_backend_args}
     - name: cugraph-service-client
       sub_dir: python/cugraph-service/client
       args: {install: *rapids_build_backend_args}
