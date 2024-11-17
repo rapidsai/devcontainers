@@ -147,7 +147,7 @@ repos:
   cpp:
     - name: cuml
       sub_dir: cpp
-      depends: [cumlprims_mg]
+      depends: [cumlprims_mg, cuvs]
       parallelism:
         max_device_obj_memory_usage: 3Gi
   python:
