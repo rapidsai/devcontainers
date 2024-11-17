@@ -33,10 +33,7 @@ repos:
     - name: ucxx
       sub_dir: cpp
       depends: [rmm]
-      args:
-        cmake: |
-          -DUCXX_ENABLE_PYTHON=ON
-          -DUCXX_ENABLE_RMM=ON
+      args: {cmake: -DUCXX_ENABLE_RMM=ON}
   python:
     - name: ucxx
       sub_dir: python/ucxx
