@@ -218,7 +218,7 @@ repos:
 
 - name: cugraph-gnn
   path: cugraph-gnn
-  git: {host: github, upstream: jameslamb, repo: cugraph-gnn, tag: devcontainers}
+  git: {<<: *git_defaults, repo: cugraph-gnn}
   cpp:
     - name: wholegraph
       sub_dir: cpp
