@@ -28,6 +28,8 @@ RUN apt update -y \
 
 ENV DEFAULT_VIRTUAL_ENV=rapids
 
+ENV RAPIDS_LIBUCX_PREFER_SYSTEM_LIBRARY=true
+
 FROM ${BASE} as conda-base
 
 ENV DEFAULT_CONDA_ENV=rapids

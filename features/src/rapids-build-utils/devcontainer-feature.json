@@ -4,8 +4,7 @@
   "version": "24.12.4",
   "description": "A feature to install the RAPIDS devcontainer build utilities",
   "containerEnv": {
-    "BASH_ENV": "/etc/bash.bash_env",
-    "RAPIDS_LIBUCX_PREFER_SYSTEM_LIBRARY": "true"
+    "BASH_ENV": "/etc/bash.bash_env"
   },
   "postStartCommand": [
     "/bin/bash",
