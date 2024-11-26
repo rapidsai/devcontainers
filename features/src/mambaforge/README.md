@@ -7,7 +7,7 @@ A feature to install mambaforge
 
 ```json
 "features": {
-    "ghcr.io/rapidsai/devcontainers/features/mambaforge:24": {}
+    "ghcr.io/rapidsai/devcontainers/features/mambaforge:25": {}
 }
 ```
 
