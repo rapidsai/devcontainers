@@ -50,7 +50,6 @@ jobs:
           -DBUILD_SHARED_LIBS=ON         \
           -DBUILD_TESTS=ON               \
           -DBUILD_BENCHMARKS=ON          \
-          -DBUILD_ANN_BENCH=ON           \
           -DBUILD_PRIMS_BENCH=ON         \
           -DRAFT_COMPILE_LIBRARY=ON      \
           -DBUILD_CUGRAPH_MG_TESTS=ON    \
