@@ -17,11 +17,14 @@ _creds_vault_generate() {
     SCCACHE_REGION="${SCCACHE_REGION:-${AWS_DEFAULT_REGION:-}}";
 
     # Remove existing credentials in case vault declines to issue new ones.
-    rm -rf ~/.aws/{stamp,config,credentials};
+    if test -w ~/.aws; then
+        rm -rf ~/.aws/{stamp,config,credentials};
+    fi
 
-    devcontainer-utils-creds-s3-persist - <<< \
-        --bucket="${SCCACHE_BUCKET:-}"        \
-        --region="${SCCACHE_REGION:-}"        ;
+    devcontainer-utils-creds-s3-persist - <<< " \
+        --bucket '${SCCACHE_BUCKET:-}'          \
+        --region '${SCCACHE_REGION:-}'          \
+    ";
 
     # Initialize the GitHub CLI with the appropriate user scopes
     # shellcheck disable=SC1091
