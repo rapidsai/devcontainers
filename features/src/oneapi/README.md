@@ -7,7 +7,7 @@ A feature to install the Intel oneapi toolchain
 
 ```json
 "features": {
-    "ghcr.io/rapidsai/devcontainers/features/oneapi:24": {}
+    "ghcr.io/rapidsai/devcontainers/features/oneapi:25": {}
 }
 ```
 
