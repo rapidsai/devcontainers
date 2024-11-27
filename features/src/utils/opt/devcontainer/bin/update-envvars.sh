@@ -3,7 +3,7 @@
 export_envvar() {
     if [ -n "${1:-}" ]; then
         for file in ~/.bashrc /etc/profile.d/*-devcontainer-utils.sh; do
-            echo "export ${1}=\"${2:-}\";" | sudo tee -a "${file}" >/dev/null;
+            cat <<< "export ${1}=\"${2:-}\";" | sudo tee -a "${file}" >/dev/null;
         done;
     fi
 }
@@ -11,7 +11,7 @@ export_envvar() {
 unset_envvar() {
     if [ -n "${1:-}" ]; then
         for file in ~/.bashrc /etc/profile.d/*-devcontainer-utils.sh; do
-            echo "unset ${1};" | sudo tee -a "${file}" >/dev/null;
+            cat <<< "unset ${1};" | sudo tee -a "${file}" >/dev/null;
         done;
     fi
 }

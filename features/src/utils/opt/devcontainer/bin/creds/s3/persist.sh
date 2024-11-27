@@ -41,61 +41,73 @@ _creds_s3_persist() {
     # Reset envvars
     reset_envvar "SCCACHE_BUCKET";
     reset_envvar "SCCACHE_REGION";
-    reset_envvar "AWS_ACCESS_KEY_ID";
-    reset_envvar "AWS_SESSION_TOKEN";
-    reset_envvar "AWS_SECRET_ACCESS_KEY";
 
     mkdir -p ~/.aws;
-    rm -f ~/.aws/{config,credentials};
 
-    if test -n "${stamp:-}"; then
-        echo "${stamp:-}" > ~/.aws/stamp;
+    if test -w ~/.aws; then
+        local name;
+        for name in config credentials; do
+            echo > ~/".aws/${name}"
+        done
+        if test -n "${stamp:-}"; then
+            echo "${stamp:-}" > ~/.aws/stamp;
+        fi
     fi
 
     if ! grep -qE "^$" <<< "${no_bucket-}"; then
         unset_envvar "SCCACHE_BUCKET";
     elif ! grep -qE "^$" <<< "${bucket:-}"; then
         export_envvar "SCCACHE_BUCKET" "${bucket}";
-        cat <<________EOF >> ~/.aws/config
-bucket=${bucket:-}
-________EOF
+        if test -w ~/.aws/config; then
+            cat <<< "bucket=${bucket:-}" >> ~/.aws/config
+        fi
     fi
 
     if ! grep -qE "^$" <<< "${no_region-}"; then
         unset_envvar "SCCACHE_REGION";
     elif ! grep -qE "^$" <<< "${region:-}"; then
         export_envvar "SCCACHE_REGION" "${region}";
-        cat <<________EOF >> ~/.aws/config
-region=${region:-}
-________EOF
+        if test -w ~/.aws/config; then
+            cat <<< "region=${region:-}" >> ~/.aws/config
+        fi
     fi
 
-    if test -f ~/.aws/config; then
+    if test -w ~/.aws && test -w ~/.aws/config; then
         cat <<________EOF > ~/.aws/config2 && mv ~/.aws/config{2,}
 [default]
 $(cat ~/.aws/config)
 ________EOF
+        chmod 0644 ~/.aws/config;
     fi
 
     if ! grep -qE "^$" <<< "${aws_access_key_id:-}"; then
-        cat <<________EOF >> ~/.aws/credentials
-aws_access_key_id=${aws_access_key_id}
-________EOF
+        if test -w ~/.aws/credentials; then
+            reset_envvar "AWS_ACCESS_KEY_ID";
+            cat <<< "aws_access_key_id=${aws_access_key_id}" >> ~/.aws/credentials
+        else
+            export_envvar "AWS_ACCESS_KEY_ID" "${aws_access_key_id}";
+        fi
     fi
 
     if ! grep -qE "^$" <<< "${aws_secret_access_key:-}"; then
-        cat <<________EOF >> ~/.aws/credentials
-aws_secret_access_key=${aws_secret_access_key}
-________EOF
+        if test -w ~/.aws/credentials; then
+            reset_envvar "AWS_SESSION_TOKEN";
+            cat <<< "aws_secret_access_key=${aws_secret_access_key}" >> ~/.aws/credentials
+        else
+            export_envvar "AWS_SESSION_TOKEN" "${aws_secret_access_key}";
+        fi
     fi
 
     if ! grep -qE "^$" <<< "${aws_session_token:-}"; then
-        cat <<________EOF >> ~/.aws/credentials
-aws_session_token=${aws_session_token}
-________EOF
+        if test -w ~/.aws/credentials; then
+            reset_envvar "AWS_SECRET_ACCESS_KEY";
+            cat <<< "aws_session_token=${aws_session_token}" >> ~/.aws/credentials
+        else
+            export_envvar "AWS_SECRET_ACCESS_KEY" "${aws_session_token}";
+        fi
     fi
 
-    if test -f ~/.aws/credentials; then
+    if test -w ~/.aws && test -w ~/.aws/credentials; then
         cat <<________EOF > ~/.aws/credentials2 && mv ~/.aws/credentials{2,}
 [default]
 $(cat ~/.aws/credentials)
