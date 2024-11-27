@@ -66,10 +66,9 @@ chgrp crontab "$(realpath -m "$(which cron)")";
 chmod u+s "$(realpath -m "$(which cron)")";
 
 # shellcheck disable=SC2174
-mkdir -m 0775 -p /var/log/devcontainer-utils;
+mkdir -m 0777 -p /var/log/devcontainer-utils;
 touch /var/log/devcontainer-utils/creds-s3.log;
-chmod 0664 /var/log/devcontainer-utils/creds-s3.log;
-chgrp crontab /var/log/devcontainer-utils/creds-s3.log;
+chmod 0777 /var/log/devcontainer-utils/creds-s3.log;
 
 # Install Devcontainer utility scripts to /opt/devcontainer
 cp -ar ./opt/devcontainer /opt/;
@@ -105,13 +104,6 @@ declare -a commands_and_sources=(
     "init-gitlab-cli                    gitlab/cli/init.sh"
     "clone-gitlab-repo                  gitlab/repo/clone.sh"
     "print-missing-gitlab-token-warning gitlab/print-missing-token-warning.sh"
-    "vault-auth-github                  vault/auth/github.sh"
-    "vault-s3-init                      vault/s3/init.sh"
-    "vault-s3-creds-generate            vault/s3/creds/generate.sh"
-    "vault-s3-creds-persist             vault/s3/creds/persist.sh"
-    "vault-s3-creds-propagate           vault/s3/creds/propagate.sh"
-    "vault-s3-creds-schedule            vault/s3/creds/schedule.sh"
-    "vault-s3-creds-test                vault/s3/creds/test.sh"
 )
 
 # Install alternatives

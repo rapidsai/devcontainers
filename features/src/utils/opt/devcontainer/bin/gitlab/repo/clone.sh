@@ -59,13 +59,13 @@ get_repo_owner() {
         query {
             project(fullPath: "${repo}") {
                 namespace {
-                    path
+                    fullPath
                 }
             }
         }
 ________EOF
     )" \
-  | jq -r '.data.project.namespace.path';
+  | jq -r '.data.project.namespace.fullPath';
 }
 
 get_repo_git_url() {

@@ -226,7 +226,7 @@ repos:
       args:
         cmake: -DCMAKE_CUDA_ARCHITECTURES="${CUDAARCHS}"
   python:
-    - name: wholegraph
+    - name: pylibwholegraph
       sub_dir: python/pylibwholegraph
       depends: [wholegraph]
       args: {install: *rapids_build_backend_args}

@@ -13,8 +13,10 @@ _creds_github_generate() {
         exit 1;
     fi
 
-    # Remove existing credentials in case vault declines to issue new ones.
-    rm -rf ~/.aws/{stamp,config,credentials};
+    # Remove existing credentials in case nv-gha-aws declines to issue new ones.
+    if test -w ~/.aws; then
+        rm -rf ~/.aws/{stamp,config,credentials};
+    fi
 
     SCCACHE_REGION="${SCCACHE_REGION:-${AWS_DEFAULT_REGION:-}}";
 
@@ -57,7 +59,9 @@ _creds_github_generate() {
         generated_at="$(date '+%s')";
         if gh nv-gha-aws org "${org}" "${nv_gha_aws_args[@]}" >"${HOME}/.aws/credentials" 2>>/var/log/devcontainer-utils/creds-s3.log; then
             if devcontainer-utils-creds-s3-propagate 2>&1 | tee -a /var/log/devcontainer-utils/creds-s3.log; then
-                echo "${generated_at}" > ~/.aws/stamp;
+                if test -w ~/.aws; then
+                    echo "${generated_at}" > ~/.aws/stamp;
+                fi
                 return 0;
             fi
         fi
