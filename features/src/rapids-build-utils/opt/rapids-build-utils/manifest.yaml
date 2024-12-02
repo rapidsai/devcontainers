@@ -33,10 +33,7 @@ repos:
     - name: ucxx
       sub_dir: cpp
       depends: [rmm]
-      args:
-        cmake: |
-          -DUCXX_ENABLE_PYTHON=ON
-          -DUCXX_ENABLE_RMM=ON
+      args: {cmake: -DUCXX_ENABLE_RMM=ON}
   python:
     - name: ucxx
       sub_dir: python/ucxx
@@ -69,7 +66,7 @@ repos:
   cpp:
     - name: cudf
       sub_dir: cpp
-      depends: [kvikio]
+      depends: [rmm, kvikio]
     - name: cudf_kafka
       sub_dir: cpp/libcudf_kafka
       depends: [cudf]
@@ -126,7 +123,7 @@ repos:
   cpp:
     - name: cuvs
       sub_dir: cpp
-      depends: [raft]
+      depends: [rmm, raft]
       parallelism:
         max_device_obj_memory_usage: 3Gi
       args: {cmake: -DBUILD_C_LIBRARY=ON}
@@ -142,7 +139,7 @@ repos:
   cpp:
     - name: cumlprims_mg
       sub_dir: cpp
-      depends: [raft]
+      depends: [rmm, raft]
 
 - name: cuml
   path: cuml
@@ -150,7 +147,7 @@ repos:
   cpp:
     - name: cuml
       sub_dir: cpp
-      depends: [cumlprims_mg]
+      depends: [rmm, raft, cumlprims_mg, cuvs]
       parallelism:
         max_device_obj_memory_usage: 3Gi
   python:
@@ -193,7 +190,7 @@ repos:
   cpp:
     - name: cugraph
       sub_dir: cpp
-      depends: [cugraph-ops]
+      depends: [rmm, raft]
       parallelism:
         max_device_obj_memory_usage: 6Gi
     - name: cugraph_etl
