@@ -9,9 +9,11 @@
 #  -h,--help             Print this text.
 #
 # Options that require values:
-#  -e,--exclude <package>  Packages to exclude from the final environment (can be provided multiple times).
-#  -i,--include <package>  Packages to include in the final environment (can be provided multiple times).
-#  -k,--key <key>          Only include the key(s)
+#  -e,--exclude <file>     Path(s) to requirement files of packages to exclude.
+#                          Can also be a file descriptor like '<(echo libucx)'.
+#  -i,--include <file>     Path(s) to requirement files of packages to include.
+#                          Can also be a file descriptor like '<(echo libucx)'.
+#  -k,--key <key>        Only include the key(s)
 #  --matrix-entry <entry>  Matrix entries, in the form 'key=value' to be added to the '--matrix' arg
 #                          of rapids-dependency-file-generator.
 #                          (can be passed multiple times)
@@ -48,12 +50,14 @@ make_conda_dependencies() {
 
     local -a _exclude=();
     local exc; for exc in "${exclude[@]}"; do
-        _exclude+=("${exc}");
+        # append '-f' so each file's contents will be treated as a list of patterns for 'grep'
+        _exclude+=(-f "${exc}");
     done
 
     local -a _include=();
     local inc; for inc in "${include[@]}"; do
-        _include+=("${inc}");
+        # append '-f' so each file's contents will be treated as a list of patterns for 'grep'
+        _include+=(-f "${inc}");
     done
 
     local cuda_version="${CUDA_VERSION:-${CUDA_VERSION_MAJOR:-12}.${CUDA_VERSION_MINOR:-0}}";
