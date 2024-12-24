@@ -14,7 +14,7 @@
 #                          Can also be a file descriptor like '<(echo libucx)'.
 #  -i,--include <file>     Path(s) to requirement files of packages to include.
 #                          Can also be a file descriptor like '<(echo libucx)'.
-#  -k,--key <key>        Only include the key(s)
+#  -k,--key <key>          Only include the key(s)
 #  --matrix-entry <entry>  Matrix entries, in the form 'key=value' to be added to the '--matrix' arg
 #                          of rapids-dependency-file-generator.
 #                          (can be passed multiple times)
