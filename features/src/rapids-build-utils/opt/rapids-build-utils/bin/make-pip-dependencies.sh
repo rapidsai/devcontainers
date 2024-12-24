@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 # Usage:
-#  rapids-make-conda-dependencies [OPTION]...
+#  rapids-make-pip-dependencies [OPTION]...
 #
 # Generate a combined pip requirements file for all repos.
 #
@@ -10,8 +10,8 @@
 #  --no-dedupe             Don't sort and dedupe the combined requirements.txt.
 #
 # Options that require values:
-#  -e,--exclude <file>     Path(s) to requirement files of packages to exclude.
-#  -i,--include <file>     Path(s) to requirement files of packages to include.
+#  -e,--exclude <package>  Packages to exclude from the final environment (can be provided multiple times).
+#  -i,--include <package>  Packages to include in the final environment (can be provided multiple times).
 #  -k,--key <key>          Only include the key(s)
 #  --matrix-entry <entry>  Matrix entries, in the form 'key=value' to be added to the '--matrix' arg
 #                          of rapids-dependency-file-generator.
@@ -49,12 +49,12 @@ make_pip_dependencies() {
 
     local -a _exclude=();
     local exc; for exc in "${exclude[@]}"; do
-        _exclude+=(-f "${exc}");
+        _exclude+=("${exc}");
     done
 
     local -a _include=();
     local inc; for inc in "${include[@]}"; do
-        _include+=(-f "${inc}");
+        _include+=("${inc}");
     done
 
     local cuda_version="${CUDA_VERSION_MAJOR_MINOR:-}";

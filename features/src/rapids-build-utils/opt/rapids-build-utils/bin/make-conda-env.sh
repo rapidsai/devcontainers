@@ -35,7 +35,8 @@ make_conda_env() {
     local -r new_env_path="$(realpath -m "/tmp/${env_file_name}")";
     local -r old_env_path="$(realpath -m "${HOME}/.conda/envs/${env_file_name}")";
 
-    rapids-make-conda-dependencies "${OPTS[@]}" > "${new_env_path}";
+    # the '--exclude <(echo breathe)' can be removed when https://github.com/conda-forge/breathe-feedstock/pull/64 is merged
+    rapids-make-conda-dependencies --exclude <(echo breathe) "${OPTS[@]}" > "${new_env_path}";
 
     if test -f "${new_env_path}" && test "$(wc -l "${new_env_path}" | cut -d' ' -f1)" -gt 0; then
 
