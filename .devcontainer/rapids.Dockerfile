@@ -49,6 +49,7 @@ ENV PYTHONDONTWRITEBYTECODE="1"
 
 ENV SCCACHE_REGION="us-east-2"
 ENV SCCACHE_BUCKET="rapids-sccache-devs"
+ENV SCCACHE_IDLE_TIMEOUT=900
 ENV AWS_ROLE_ARN="arn:aws:iam::279114543810:role/nv-gha-token-sccache-devs"
 
 ENV HISTFILE="/home/coder/.cache/._bash_history"
