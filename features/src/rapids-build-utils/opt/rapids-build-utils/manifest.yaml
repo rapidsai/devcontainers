@@ -99,7 +99,8 @@ repos:
 
 - name: raft
   path: raft
-  git: {<<: *git_defaults, repo: raft}
+  # TODO(jameslamb): revert this before merging
+  git: {<<: *git_defaults, repo: raft, upstream: jameslamb, tag: libraft-wheels}
   cpp:
     - name: raft
       sub_dir: cpp
@@ -108,14 +109,18 @@ repos:
         max_device_obj_memory_usage: 3Gi
       args: {cmake: -DRAFT_COMPILE_LIBRARY=ON}
   python:
+    - name: libraft
+      sub_dir: python/libraft
+      depends: [raft]
+      args: {install: *rapids_build_backend_args}
     - name: pylibraft
       sub_dir: python/pylibraft
       depends: [raft]
-      args: {cmake: -DFIND_RAFT_CPP=ON, install: *rapids_build_backend_args}
+      args: {install: *rapids_build_backend_args}
     - name: raft-dask
       sub_dir: python/raft-dask
       depends: [ucxx, raft]
-      args: {cmake: -DFIND_RAFT_CPP=ON, install: *rapids_build_backend_args}
+      args: {install: *rapids_build_backend_args}
 
 - name: cuvs
   path: cuvs
@@ -143,7 +148,8 @@ repos:
 
 - name: cuml
   path: cuml
-  git: {<<: *git_defaults, repo: cuml}
+  # TODO(jameslamb): revert this before merging
+  git: {<<: *git_defaults, repo: cuml, upstream: jameslamb, tag: libcuml-wheels}
   cpp:
     - name: cuml
       sub_dir: cpp
@@ -151,10 +157,14 @@ repos:
       parallelism:
         max_device_obj_memory_usage: 3Gi
   python:
+    - name: libcuml
+      sub_dir: python/libcuml
+      depends: [cuml]
+      args: {install: *rapids_build_backend_args}
     - name: cuml
       sub_dir: python/cuml
       depends: [cuml]
-      args: {cmake: -DFIND_CUML_CPP=ON, install: *rapids_build_backend_args}
+      args: {install: *rapids_build_backend_args}
 
 - name: cugraph-ops
   path: cugraph-ops
@@ -186,7 +196,8 @@ repos:
 
 - name: cugraph
   path: cugraph
-  git: {<<: *git_defaults, repo: cugraph}
+  # TODO(jameslamb): revert this before merging
+  git: {<<: *git_defaults, repo: cugraph, upstream: jameslamb, tag: libcugraph-wheel}
   cpp:
     - name: cugraph
       sub_dir: cpp
@@ -198,14 +209,18 @@ repos:
       depends: [cudf, cugraph]
       args: {install: *rapids_build_backend_args}
   python:
+    - name: libcugraph
+      sub_dir: python/libcugraph
+      depends: [cugraph]
+      args: {install: *rapids_build_backend_args}  
     - name: pylibcugraph
       sub_dir: python/pylibcugraph
       depends: [cugraph]
-      args: {cmake: -DFIND_CUGRAPH_CPP=ON, install: *rapids_build_backend_args}
+      args: {install: *rapids_build_backend_args}
     - name: cugraph
       sub_dir: python/cugraph
       depends: [cugraph]
-      args: {cmake: -DFIND_CUGRAPH_CPP=ON, install: *rapids_build_backend_args}
+      args: {install: *rapids_build_backend_args}
     - name: cugraph-service-client
       sub_dir: python/cugraph-service/client
       args: {install: *rapids_build_backend_args}
