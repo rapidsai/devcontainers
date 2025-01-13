@@ -1,6 +1,9 @@
-$EnvVarBackup = (Resolve-Path -path "$HOME\build-env\env-var.clixml" | % {$_ -replace '\\','/'})
-# Import the pre-configured environment
-Import-CliXml $EnvVarBackup | % { Set-Item -force -path "env:$($_.Name)" $_.Value }
+param(
+    [string]
+    $vcver="latest"
+)
+
+. "$PSScriptRoot/envvars.ps1"
 
 $MSBuildPath = "C:\msbuild"
 
@@ -35,42 +38,46 @@ $MSBuildPathMap = @{
     "14.37"="$MSBuildPath\17\VC\Auxiliary\Build"
     "14.38"="$MSBuildPath\17\VC\Auxiliary\Build"
     "14.39"="$MSBuildPath\17\VC\Auxiliary\Build"
+    "14.40"="$MSBuildPath\17\VC\Auxiliary\Build"
+    "14.41"="$MSBuildPath\17\VC\Auxiliary\Build"
+    "14.42"="$MSBuildPath\17\VC\Auxiliary\Build"
     "latest"="$MSBuildPath\$ENV:INSTALLED_MSVC_VERSION\VC\Auxiliary\Build"
 }
 
-function Get-VSDevPrompt {
-    param(
-        [string]
-        $vcver="latest"
-    )
+$BuildPath = $MSBuildPathMap[$vcver]
+Write-Output "Loading VC from: $BuildPath"
 
-    if (Test-Path -Path $EnvVarBackup) {
-        Import-CliXml $EnvVarBackup | % { Set-Item -force -path "env:$($_.Name)" $_.Value }
-    }
+# Filter these non-portable exported environment variables
+$envFilter = `
+    "COMPUTERNAME","TEMP","TMP","SystemDrive","SystemRoot","USERNAME","USERPROFILE",`
+    "APPDATA","LOCALAPPDATA","NUMBER_OF_PROCESSORS","PROCESSOR_ARCHITECTURE",`
+    "PROCESSOR_IDENTIFIER","PROCESSOR_LEVEL","PROCESSOR_REVISION","OS","Platform"
 
-    $BuildPath = $MSBuildPathMap[$vcver]
-    Write-Output "Loading VC from: $BuildPath"
-
-    # If a specific version has been requested provide that rather than grab default
-    Push-Location "$BuildPath"
-    $cmd="vcvars64.bat & set"
-    if ($vcver -ne "latest") {
-        $cmd="vcvars64.bat -vcvars_ver=$vcver & set"
-    }
-
-    cmd /c $cmd |
-    foreach {
-        if ($_ -match "=") {
-            $v = $_.split("="); set-item -force -path "ENV:\$($v[0])"  -value "$($v[1])"
-        }
-    }
-    Pop-Location
-
-    # Stupid, but can make CMake happy if it is needed
-    $global:CC_FP = $(get-command cl).Source.Replace("\","/")
-
-    Write-Host "`nVisual Studio Command Prompt variables set." -ForegroundColor Yellow
-    Write-Host "Use 'cl' or `$CC_FP as shortcut for Cmake: $CC_FP" -ForegroundColor Yellow
+# If a specific version has been requested provide that rather than grab default
+Push-Location "$BuildPath"
+$cmd="vcvars64.bat & set"
+if ($vcver -ne "latest") {
+    $cmd="vcvars64.bat -vcvars_ver=$vcver & set"
 }
 
-Export-ModuleMember -Function Get-VSDevPrompt
+Set-MachineEnvironmentVariable -Variable "INSTALLED_MSVC_VERSION" -Value "$msvcVersion"
+
+cmd /c $cmd | foreach {
+    if ($_ -match "=") {
+        $v = $_.split("=");
+        if ($v[0] -notin $envFilter) {
+            Set-MachineEnvironmentVariable -Append -Variable "$($v[0])" -Value "$($v[1])"
+        }
+    }
+}
+
+Pop-Location
+
+# Update PATH from machine env
+Write-MachineEnvironmentVariable -Variable "PATH"
+
+# Stupid, but can make CMake happy if it is needed
+Set-MachineEnvironmentVariable -Variable "CC_FP" -Value "$($(get-command cl).Source.Replace("\","/"))"
+
+Write-Host "`nVisual Studio Command Prompt variables set." -ForegroundColor Yellow
+Write-Host "Use 'cl' or `$CC_FP as shortcut for CMake: $CC_FP" -ForegroundColor Yellow

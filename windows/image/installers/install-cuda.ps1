@@ -27,7 +27,7 @@ $cudaMajorUri = @{
 }["$major"]
 
 $cudaVersionUrl = "https://developer.download.nvidia.com/compute/cuda/$cudaMajorUri"
-$cudaComponents = 
+$cudaComponents =
     "nvcc_$mmVersionTag",
     "curand_$mmVersionTag",
     "curand_dev_$mmVersionTag",
@@ -37,11 +37,13 @@ $cudaComponents =
     "nvrtc_dev_$mmVersionTag",
     "nvml_dev_$mmVersionTag",
     "nvtx_$mmVersionTag"
-    
+
 Invoke-WebRequest -Uri "$cudaVersionUrl" -OutFile "./cuda_network.exe" -UseBasicParsing
 Start-Process -Wait -PassThru -FilePath .\cuda_network.exe -ArgumentList "-s $cudaComponents"
 
-$ENV:PATH="$ENV:PATH;C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v$mmVersionTag\bin"
-$ENV:CUDA_PATH="C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v$mmVersionTag"
+. "$PSScriptRoot/envvars.ps1"
+
+Set-MachineEnvironmentVariable -Append -Variable "PATH" -Value "C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v$mmVersionTag\bin"
+Set-MachineEnvironmentVariable -Variable "CUDA_PATH" -Value "C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v$mmVersionTag"
 
 Remove-Item .\cuda_network.exe

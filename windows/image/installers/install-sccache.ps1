@@ -5,6 +5,8 @@ iex "& {$(irm get.scoop.sh)} -RunAsAdmin"
 
 scoop install sccache
 
-[System.Environment]::SetEnvironmentVariable('CMAKE_CUDA_COMPILER_LAUNCHER','sccache')
-[System.Environment]::SetEnvironmentVariable('CMAKE_CXX_COMPILER_LAUNCHER','sccache')
-[System.Environment]::SetEnvironmentVariable('CMAKE_C_COMPILER_LAUNCHER','sccache')
+. "$PSScriptRoot/envvars.ps1"
+
+Set-MachineEnvironmentVariable -Variable "CMAKE_CUDA_COMPILER_LAUNCHER" -Value "sccache"
+Set-MachineEnvironmentVariable -Variable "CMAKE_CXX_COMPILER_LAUNCHER" -Value "sccache"
+Set-MachineEnvironmentVariable -Variable "CMAKE_C_COMPILER_LAUNCHER" -Value "sccache"
