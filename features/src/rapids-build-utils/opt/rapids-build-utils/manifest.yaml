@@ -99,8 +99,7 @@ repos:
 
 - name: raft
   path: raft
-  # TODO(jameslamb): revert this before merging
-  git: {<<: *git_defaults, repo: raft, upstream: jameslamb, tag: libraft-wheels}
+  git: {<<: *git_defaults, repo: raft}
   cpp:
     - name: raft
       sub_dir: cpp
