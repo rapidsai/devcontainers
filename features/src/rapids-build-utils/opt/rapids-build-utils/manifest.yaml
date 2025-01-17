@@ -108,14 +108,18 @@ repos:
         max_device_obj_memory_usage: 3Gi
       args: {cmake: -DRAFT_COMPILE_LIBRARY=ON}
   python:
+    - name: libraft
+      sub_dir: python/libraft
+      depends: [raft]
+      args: {install: *rapids_build_backend_args}
     - name: pylibraft
       sub_dir: python/pylibraft
       depends: [raft]
-      args: {cmake: -DFIND_RAFT_CPP=ON, install: *rapids_build_backend_args}
+      args: {install: *rapids_build_backend_args}
     - name: raft-dask
       sub_dir: python/raft-dask
       depends: [ucxx, raft]
-      args: {cmake: -DFIND_RAFT_CPP=ON, install: *rapids_build_backend_args}
+      args: {install: *rapids_build_backend_args}
 
 - name: cuvs
   path: cuvs
