@@ -147,8 +147,7 @@ repos:
 
 - name: cuml
   path: cuml
-  # TODO(jameslamb): revert this before merging
-  git: {<<: *git_defaults, repo: cuml, upstream: jameslamb, tag: libcuml-wheels}
+  git: {<<: *git_defaults, repo: cuml}
   cpp:
     - name: cuml
       sub_dir: cpp
@@ -156,14 +155,10 @@ repos:
       parallelism:
         max_device_obj_memory_usage: 3Gi
   python:
-    - name: libcuml
-      sub_dir: python/libcuml
-      depends: [cuml]
-      args: {install: *rapids_build_backend_args}
     - name: cuml
       sub_dir: python/cuml
       depends: [cuml]
-      args: {install: *rapids_build_backend_args}
+      args: {cmake: -DFIND_CUML_CPP=ON, install: *rapids_build_backend_args}
 
 - name: cugraph-ops
   path: cugraph-ops
