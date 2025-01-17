@@ -99,8 +99,7 @@ repos:
 
 - name: raft
   path: raft
-  # TODO(jameslamb): revert this before merging
-  git: {<<: *git_defaults, repo: raft, upstream: jameslamb, tag: libraft-wheels}
+  git: {<<: *git_defaults, repo: raft}
   cpp:
     - name: raft
       sub_dir: cpp
@@ -212,7 +211,7 @@ repos:
     - name: libcugraph
       sub_dir: python/libcugraph
       depends: [cugraph]
-      args: {install: *rapids_build_backend_args}  
+      args: {install: *rapids_build_backend_args}
     - name: pylibcugraph
       sub_dir: python/pylibcugraph
       depends: [cugraph]
