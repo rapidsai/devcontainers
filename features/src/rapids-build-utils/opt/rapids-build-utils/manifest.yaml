@@ -190,8 +190,7 @@ repos:
 
 - name: cugraph
   path: cugraph
-  # TODO(jameslamb): revert this before merging
-  git: {<<: *git_defaults, repo: cugraph, upstream: jameslamb, tag: libcugraph-wheel}
+  git: {<<: *git_defaults, repo: cugraph}
   cpp:
     - name: cugraph
       sub_dir: cpp
