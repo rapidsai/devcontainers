@@ -160,34 +160,6 @@ repos:
       depends: [cuml]
       args: {cmake: -DFIND_CUML_CPP=ON, install: *rapids_build_backend_args}
 
-- name: cugraph-ops
-  path: cugraph-ops
-  git: {<<: *git_defaults, repo: cugraph-ops}
-  cpp:
-    - name: cugraph-ops
-      sub_dir: cpp
-      depends: [raft]
-      args:
-        cmake: -DCMAKE_CUDA_ARCHITECTURES="${CUDAARCHS}"
-    - name: cugraph-ops-internal
-      sub_dir: cpp_internal
-      depends: [cugraph-ops]
-      args:
-        cmake: -DCMAKE_CUDA_ARCHITECTURES="${CUDAARCHS}"
-  python:
-    - name: pylibcugraphops
-      sub_dir: pylibcugraphops
-      depends: [cugraph-ops]
-      args:
-        cmake: -DCMAKE_CUDA_ARCHITECTURES="${CUDAARCHS}"
-        install: *rapids_build_backend_args
-    - name: pylibcugraphops_internal
-      sub_dir: pylibcugraphops_internal
-      depends: [cugraph-ops-internal]
-      args:
-        cmake: -DCMAKE_CUDA_ARCHITECTURES="${CUDAARCHS}"
-        install: *rapids_build_backend_args
-
 - name: cugraph
   path: cugraph
   git: {<<: *git_defaults, repo: cugraph}
