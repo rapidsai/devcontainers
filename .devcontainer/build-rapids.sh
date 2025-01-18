@@ -73,13 +73,6 @@ build_rapids() {
     ) 2>&1 | maybe_write_build_log cuml;
 
     (
-        echo "building cuGraph OPS";
-        clean-cugraph-ops;
-        build-cugraph-ops --verbose;
-        sccache -s;
-    ) 2>&1 | maybe_write_build_log cugraph-ops;
-
-    (
         echo "building wholegraph";
         clean-wholegraph;
         build-wholegraph --verbose;
