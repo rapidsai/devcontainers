@@ -174,14 +174,18 @@ repos:
       depends: [cudf, cugraph]
       args: {install: *rapids_build_backend_args}
   python:
+    - name: libcugraph
+      sub_dir: python/libcugraph
+      depends: [cugraph]
+      args: {install: *rapids_build_backend_args}
     - name: pylibcugraph
       sub_dir: python/pylibcugraph
       depends: [cugraph]
-      args: {cmake: -DFIND_CUGRAPH_CPP=ON, install: *rapids_build_backend_args}
+      args: {install: *rapids_build_backend_args}
     - name: cugraph
       sub_dir: python/cugraph
       depends: [cugraph]
-      args: {cmake: -DFIND_CUGRAPH_CPP=ON, install: *rapids_build_backend_args}
+      args: {install: *rapids_build_backend_args}
     - name: cugraph-service-client
       sub_dir: python/cugraph-service/client
       args: {install: *rapids_build_backend_args}
