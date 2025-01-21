@@ -123,7 +123,8 @@ repos:
 
 - name: cuvs
   path: cuvs
-  git: {<<: *git_defaults, repo: cuvs}
+  # TODO(jameslamb): revert this before merging
+  git: {<<: *git_defaults, repo: cuvs, upstream: jameslamb, tag: libcuvs-wheels}
   cpp:
     - name: cuvs
       sub_dir: cpp
@@ -132,10 +133,14 @@ repos:
         max_device_obj_memory_usage: 3Gi
       args: {cmake: -DBUILD_C_LIBRARY=ON}
   python:
+   - name: libcuvs
+      sub_dir: python/libcuvs
+      depends: [cuvs]
+      args: {install: *rapids_build_backend_args}
     - name: cuvs
       sub_dir: python/cuvs
       depends: [cuvs]
-      args: {cmake: -DFIND_CUVS_CPP=ON, install: *rapids_build_backend_args}
+      args: {install: *rapids_build_backend_args}
 
 - name: cumlprims_mg
   path: cumlprims_mg
