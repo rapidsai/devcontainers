@@ -133,7 +133,7 @@ repos:
         max_device_obj_memory_usage: 3Gi
       args: {cmake: -DBUILD_C_LIBRARY=ON}
   python:
-   - name: libcuvs
+    - name: libcuvs
       sub_dir: python/libcuvs
       depends: [cuvs]
       args: {install: *rapids_build_backend_args}
