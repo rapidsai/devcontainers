@@ -123,8 +123,7 @@ repos:
 
 - name: cuvs
   path: cuvs
-  # TODO(jameslamb): revert this before merging
-  git: {<<: *git_defaults, repo: cuvs, upstream: jameslamb, tag: libcuvs-wheels}
+  git: {<<: *git_defaults, repo: cuvs}
   cpp:
     - name: cuvs
       sub_dir: cpp
