@@ -12,6 +12,7 @@ x-gcc-10: &gcc_10 { name: "gcc", version: "10" }
 x-gcc-11: &gcc_11 { name: "gcc", version: "11" }
 x-gcc-12: &gcc_12 { name: "gcc", version: "12" }
 x-gcc-13: &gcc_13 { name: "gcc", version: "13" }
+x-gcc-14: &gcc_14 { name: "gcc", version: "14" }
 x-gcc-env: &gcc_env { CC: "gcc", CXX: "g++", CUDAHOSTCXX: "g++" }
 
 x-oneapi: &oneapi_2022 { name: "oneapi", version: "2023.2.0" }
@@ -138,7 +139,8 @@ include:
 - os: "ubuntu:24.04"
   images:
   - { features: [*python, *gcc_13, { <<: *cuda_curr_max, <<: *cccl_cuda_opts }, *clang_format_cccl, *clangd_dev, *cccl_dev], env: *gcc_env }
-
+  - { features: [*python, *gcc_14, { <<: *cuda_curr_max, <<: *cccl_cuda_opts }, *clang_format_cccl, *clangd_dev, *cccl_dev], env: *gcc_env }
+  
 - os: "windows"
   images:
   # lowest CUDA version
