@@ -159,10 +159,14 @@ repos:
       parallelism:
         max_device_obj_memory_usage: 3Gi
   python:
+    - name: libcuml
+      sub_dir: python/libcuml
+      depends: [cuml]
+      args: {install: *rapids_build_backend_args}
     - name: cuml
       sub_dir: python/cuml
       depends: [cuml]
-      args: {cmake: -DFIND_CUML_CPP=ON, install: *rapids_build_backend_args}
+      args: {install: *rapids_build_backend_args}
 
 - name: cugraph
   path: cugraph
