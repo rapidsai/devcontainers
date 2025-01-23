@@ -37,7 +37,7 @@ x-nvhpc-env: &nvhpc_env { CC: "nvc", CXX: "nvc++", CUDAHOSTCXX: "nvc++" }
 
 x-mambaforge: &conda { name: "mambaforge" }
 x-python: &python { name: "ghcr.io/devcontainers/features/python:1.6.2", version: "os-provided", installTools: "false", hide: true }
-x-ucx-rapids: &ucx_rapids { name: "ucx", version: "1.17.0" }
+x-ucx-rapids: &ucx_rapids { name: "ucx", version: "1.18.0" }
 x-openmpi: &openmpi { name: "openmpi" }
 
 x-cccl-dev: &cccl_dev { name: "cccl-dev", hide: true }
