@@ -151,8 +151,7 @@ repos:
 
 - name: cuml
   path: cuml
-  # TODO(jameslamb): revert this before merging
-  git: {<<: *git_defaults, repo: cuml, upstream: jameslamb, tag: libcuml-wheels}
+  git: {<<: *git_defaults, repo: cuml}
   cpp:
     - name: cuml
       sub_dir: cpp
