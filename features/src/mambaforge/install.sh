@@ -21,14 +21,14 @@ fi
 last_mambaforge_ver="24.7.1"
 curr_mambaforge_ver="$(grep -oE '[0-9]+.[0-9]+.[0-9]' <<< "${MAMBAFORGE_VERSION}")";
 
-if [[ "$curr_mambaforge_ver" > "$last_mambaforge_ver" ]]; then
-    wget --no-hsts -q -O /tmp/miniforge.sh \
-        "https://github.com/conda-forge/miniforge/releases/download/${MAMBAFORGE_VERSION}/Miniforge3-${MAMBAFORGE_VERSION}-Linux-$(uname -p).sh";
-    echo "Installing Miniforge...";
-else
+if { echo "$curr_mambaforge_ver"; echo "$last_mambaforge_ver"; } | sort --version-sort --check 2>/dev/null; then
     wget --no-hsts -q -O /tmp/miniforge.sh \
         "https://github.com/conda-forge/miniforge/releases/download/${MAMBAFORGE_VERSION}/Mambaforge-${MAMBAFORGE_VERSION}-Linux-$(uname -p).sh";
     echo "Installing Mambaforge...";
+else
+    wget --no-hsts -q -O /tmp/miniforge.sh \
+        "https://github.com/conda-forge/miniforge/releases/download/${MAMBAFORGE_VERSION}/Miniforge3-${MAMBAFORGE_VERSION}-Linux-$(uname -p).sh";
+    echo "Installing Miniforge...";
 fi
 
 # Install Mambaforge
