@@ -19,7 +19,7 @@ if [[ "$MAMBAFORGE_VERSION" == latest ]]; then
 fi
 
 last_mambaforge_ver="24.7.1"
-curr_mambaforge_ver="$(grep -oE '[0-9]+.[0-9]+.[0-9]' <<< <<< "${MAMBAFORGE_VERSION}")";
+curr_mambaforge_ver="$(grep -oE '[0-9]+.[0-9]+.[0-9]' <<< "${MAMBAFORGE_VERSION}")";
 
 if [[ "$curr_mambaforge_ver" > "$last_mambaforge_ver" ]]; then
     wget --no-hsts -q -O /tmp/miniforge.sh \
