@@ -23,7 +23,7 @@ curr_mambaforge_ver="$(grep -oE '[0-9]+.[0-9]+.[0-9]' <<< <<< "${MAMBAFORGE_VERS
 
 if [[ "$curr_mambaforge_ver" > "$last_mambaforge_ver" ]]; then
     wget --no-hsts -q -O /tmp/miniforge.sh \
-        "https://github.com/conda-forge/miniforge/releases/download/${MAMBAFORGE_VERSION}/Miniforge-${MAMBAFORGE_VERSION}-Linux-$(uname -p).sh";
+        "https://github.com/conda-forge/miniforge/releases/download/${MAMBAFORGE_VERSION}/Miniforge3-${MAMBAFORGE_VERSION}-Linux-$(uname -p).sh";
     echo "Installing Miniforge...";
 else
     wget --no-hsts -q -O /tmp/miniforge.sh \
