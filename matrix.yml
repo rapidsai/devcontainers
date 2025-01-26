@@ -36,7 +36,7 @@ x-nvhpc-curr: &nvhpc_curr { name: "nvhpc", version: "24.9" }
 
 x-nvhpc-env: &nvhpc_env { CC: "nvc", CXX: "nvc++", CUDAHOSTCXX: "nvc++" }
 
-x-mambaforge: &conda { name: "mambaforge" }
+x-mambaforge: &conda { name: "mambaforge", version: "24.11.0-1" }
 x-python: &python { name: "ghcr.io/devcontainers/features/python:1.6.2", version: "os-provided", installTools: "false", hide: true }
 x-ucx-rapids: &ucx_rapids { name: "ucx", version: "1.18.0" }
 x-openmpi: &openmpi { name: "openmpi" }
@@ -140,7 +140,7 @@ include:
   images:
   - { features: [*python, *gcc_13, { <<: *cuda_curr_max, <<: *cccl_cuda_opts }, *clang_format_cccl, *clangd_dev, *cccl_dev], env: *gcc_env }
   - { features: [*python, *gcc_14, { <<: *cuda_curr_max, <<: *cccl_cuda_opts }, *clang_format_cccl, *clangd_dev, *cccl_dev], env: *gcc_env }
-  
+
 - os: "windows"
   images:
   # lowest CUDA version
