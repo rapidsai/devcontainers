@@ -1,7 +1,7 @@
 #! /usr/bin/env bash
 set -e
 
-MAMBAFORGE_VERSION="${VERSION:-latest}";
+MINIFORGE_VERSION="${VERSION:-latest}";
 
 # Ensure we're in this feature's directory during build
 cd "$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )";
@@ -12,18 +12,17 @@ cd "$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )";
 
 check_packages jq git wget bzip2 ca-certificates bash-completion;
 
-echo "Downloading Mambaforge...";
+echo "Downloading Miniforge...";
 
-if [[ "$MAMBAFORGE_VERSION" == latest ]]; then
-    find_version_from_git_tags MAMBAFORGE_VERSION https://github.com/conda-forge/miniforge "tags/" "." "-[0-9]+" "true";
+if [[ "$MINIFORGE_VERSION" == latest ]]; then
+    find_version_from_git_tags MINIFORGE_VERSION https://github.com/conda-forge/miniforge "tags/" "." "-[0-9]+" "true";
 fi
 
 wget --no-hsts -q -O /tmp/miniforge.sh \
-    "https://github.com/conda-forge/miniforge/releases/download/${MAMBAFORGE_VERSION}/Mambaforge-${MAMBAFORGE_VERSION}-Linux-$(uname -p).sh";
+    "https://github.com/conda-forge/miniforge/releases/download/${MINIFORGE_VERSION}/Miniforge3-${MINIFORGE_VERSION}-Linux-$(uname -p).sh";
+echo "Installing Miniforge...";
 
-echo "Installing Mambaforge...";
-
-# Install Mambaforge
+# Install Miniforge
 rm -rf /opt/conda;
 /bin/bash /tmp/miniforge.sh -b -p /opt/conda;
 
@@ -53,7 +52,7 @@ EOF
 # export envvars in /etc/profile.d
 ln -s /opt/conda/etc/profile.d/conda.sh /etc/profile.d/$(($(ls -1q /etc/profile.d/*.sh | wc -l) + 20))-conda.sh;
 ln -s /opt/conda/etc/profile.d/mamba.sh /etc/profile.d/$(($(ls -1q /etc/profile.d/*.sh | wc -l) + 20))-mamba.sh;
-add_etc_profile_d_script mambaforge "$(cat .bashrc)";
+add_etc_profile_d_script miniforge "$(cat .bashrc)";
 
 # Update the devcontainers/features/common-utils __bash_prompt fn
 # to insert ${CONDA_PROMPT_MODIFIER} into the dev container's PS1
