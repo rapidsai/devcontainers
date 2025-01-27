@@ -5,8 +5,7 @@ Remove-Item .\tbb.zip
 
 $cwd = Get-Location
 
-# CMake 3.27 or greater can locate packages from this env var:
-$ENV:TBB_ROOT = "$cwd\tbb\oneapi-tbb-$TBB_VERSION"
+. "$PSScriptRoot/envvars.ps1"
 
-# Add dlls to path:
-$ENV:PATH="$ENV:PATH;$ENV:TBB_ROOT\redist\intel64\vc14\"
+Set-MachineEnvironmentVariable -Append -Variable "PATH" -Value "$ENV:TBB_ROOT\redist\intel64\vc14\"
+Set-MachineEnvironmentVariable -Variable "TBB_ROOT" -Value "$cwd\tbb\oneapi-tbb-$TBB_VERSION"

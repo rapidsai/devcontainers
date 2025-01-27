@@ -8,6 +8,7 @@ Param(
     $clVersion
 )
 
+
 $msvcPath = "C:\msbuild\$msvcVersion"
 
 $vsComponentsMap = @{
@@ -26,6 +27,9 @@ $vsComponentsMap = @{
     "14.37"  = "Microsoft.VisualStudio.Component.VC.14.37.17.7.x86.x64"
     "14.38"  = "Microsoft.VisualStudio.Component.VC.14.38.17.8.x86.x64"
     "14.39"  = "Microsoft.VisualStudio.Component.VC.14.39.17.9.x86.x64"
+    "14.40"  = "Microsoft.VisualStudio.Component.VC.14.40.17.10.x86.x64"
+    "14.41"  = "Microsoft.VisualStudio.Component.VC.14.41.17.11.x86.x64"
+    "14.42"  = "Microsoft.VisualStudio.Component.VC.14.42.17.12.x86.x64"
     "latest" = "Microsoft.VisualStudio.Component.VC.Tools.x86.x64"
 }
 
@@ -47,5 +51,8 @@ if ($clVersion -eq "14.16") {
 Invoke-WebRequest -Uri "https://aka.ms/vs/$msvcVersion/release/vs_buildtools.exe" -UseBasicParsing -OutFile .\vs_buildtools.exe
 Write-Output "Installing components: $vsComponentString"
 Start-Process -NoNewWindow -PassThru -Wait -FilePath .\vs_buildtools.exe -ArgumentList "install --installWhileDownloading --installPath $msvcPath --wait --norestart --nocache --quiet $vsComponentString"
+
+# Add VS to the global environment
+. "$PSScriptRoot/build-env.ps1" -vcver "$clVersion"
 
 Remove-Item .\vs_buildtools.exe

@@ -1,2 +1,0 @@
-
-Get-VSDevPrompt $ENV:MSVC_COMPILER_VER
