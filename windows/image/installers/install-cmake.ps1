@@ -3,4 +3,6 @@ Invoke-WebRequest -Uri "https://github.com/Kitware/CMake/releases/download/v3.27
 Start-Process -NoNewWindow -Wait -FilePath msiexec -ArgumentList "/i C:\cmake_installer.msi ADD_CMAKE_TO_PATH=All /qn"
 Remove-Item "C:\cmake_installer.msi"
 
-$ENV:PATH = "C:\Program Files\CMake\bin;$ENV:PATH"
+. "$PSScriptRoot/envvars.ps1"
+
+Set-MachineEnvironmentVariable -Append -Variable "PATH" -Value "C:\Program Files\CMake\bin"

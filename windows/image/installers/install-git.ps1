@@ -3,5 +3,6 @@ Invoke-WebRequest -Uri "https://github.com/git-for-windows/git/releases/download
 Start-Process -NoNewWindow -Wait -FilePath "C:\git_installer.exe" -ArgumentList "/S /VERYSILENT /NORESTART /NOCANCEL /SP- /CLOSEAPPLICATIONS /RESTARTAPPLICATIONS"
 Remove-Item "C:\git_installer.exe"
 
-$ENV:PATH = "C:\Program Files\Git\bin;$ENV:PATH"
+. "$PSScriptRoot/envvars.ps1"
 
+Set-MachineEnvironmentVariable -Append -Variable "PATH" -Value "C:\Program Files\Git\bin"

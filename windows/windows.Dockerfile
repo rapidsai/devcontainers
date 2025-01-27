@@ -1,4 +1,4 @@
-ARG ROOT_IMAGE="mcr.microsoft.com/windows:ltsc2019"
+ARG ROOT_IMAGE
 
 FROM $ROOT_IMAGE as PreCompilerEnv
 
@@ -18,6 +18,3 @@ ARG MSVC_COMPILER_VER
 
 ENV MSVC_COMPILER_VER=${MSVC_COMPILER_VER}
 RUN /tools/install-compiler.ps1 -msvcVersion $ENV:MSVC_VER -clversion $ENV:MSVC_COMPILER_VER
-
-ADD installers/build-env.psm1  /Users/ContainerAdministrator/Documents/WindowsPowerShell/Modules/build-env/build-env.psm1
-ADD installers/profile.ps1  /Users/ContainerAdministrator/Documents/WindowsPowerShell/Microsoft.PowerShell_profile.ps1
