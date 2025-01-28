@@ -128,7 +128,7 @@ include:
   - { features: [{ <<: *cuda_prev_min, <<: *cccl_cuda_opts }, { name: "cl", version: "14.29" }] } # MSVC 2019
   # middlest CUDA version
   - { features: [{ <<: *cuda_curr_min, <<: *cccl_cuda_opts }, { name: "cl", version: "14.29" }] } # MSVC 2019
-  - { features: [{ <<: *cuda_curr_min, <<: *cccl_cuda_opts }, { name: "cl", version: "14.36" }] } # MSVC 2022
+  - { features: [{ <<: *cuda_curr_min, <<: *cccl_cuda_opts }, { name: "cl", version: "14.39" }] } # MSVC 2022
   # highest CUDA version
   - { features: [{ <<: *cuda_curr_max, <<: *cccl_cuda_opts }, { name: "cl", version: "14.14" }] } # MSVC 2017
   - { features: [{ <<: *cuda_curr_max, <<: *cccl_cuda_opts }, { name: "cl", version: "14.15" }] } # MSVC 2017
