@@ -83,4 +83,4 @@ make_conda_env() {
 make_conda_env "${DEFAULT_CONDA_ENV:-rapids}" "$@" <&0;
 
 # shellcheck disable=SC1090
-. /etc/profile.d/*-mambaforge.sh;
+. /etc/profile.d/*-miniforge.sh;
