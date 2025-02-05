@@ -40,11 +40,11 @@ source dev-container-features-test-lib;
 >&2 echo "BASH_ENV=$BASH_ENV";
 
 # Check CUDA
-check "CUDA version" bash -c "echo '$CUDA_VERSION' | grep '12.5.0'";
+check "CUDA version" bash -c "echo '$CUDA_VERSION' | grep '12.8.0'";
 check "CUDA major version" bash -c "echo '$CUDA_VERSION_MAJOR' | grep '12'";
-check "CUDA minor version" bash -c "echo '$CUDA_VERSION_MINOR' | grep '5'";
+check "CUDA minor version" bash -c "echo '$CUDA_VERSION_MINOR' | grep '8'";
 check "CUDA patch version" bash -c "echo '$CUDA_VERSION_PATCH' | grep '0'";
-check "installed" stat /usr/local/cuda-12.5 /usr/local/cuda;
+check "installed" stat /usr/local/cuda-12.8 /usr/local/cuda;
 check "nvcc exists and is on path" which nvcc;
 
 # Check Rust
