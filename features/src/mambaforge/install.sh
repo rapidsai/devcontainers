@@ -49,7 +49,26 @@ done
 $(cat .bashrc)
 EOF
 )";
+
 # export envvars in /etc/profile.d
+
+# Create and/or replace mamba.sh with a version that doesn't print warnings to stdout (https://github.com/mamba-org/mamba/pull/3788)
+# This also protects us when mamba decides to remove this file, which is a decision that is incompatible with this feature.
+cat <<"EOF" > /opt/conda/etc/profile.d/mamba.sh
+if [ -z "${MAMBA_ROOT_PREFIX:-}" ]; then
+    export MAMBA_ROOT_PREFIX="${CONDA_PREFIX:-/opt/conda}"
+fi
+__mamba_setup="$("/opt/conda/mamba" shell hook --shell posix 2> /dev/null)"
+if [ $? -eq 0 ]; then
+    eval "$__mamba_setup"
+else
+    alias mamba="/opt/conda/mamba"  # Fallback on help from mamba activate
+fi
+unset __mamba_setup
+EOF
+
+chmod +x /opt/conda/etc/profile.d/mamba.sh;
+
 ln -s /opt/conda/etc/profile.d/conda.sh /etc/profile.d/$(($(ls -1q /etc/profile.d/*.sh | wc -l) + 20))-conda.sh;
 ln -s /opt/conda/etc/profile.d/mamba.sh /etc/profile.d/$(($(ls -1q /etc/profile.d/*.sh | wc -l) + 20))-mamba.sh;
 add_etc_profile_d_script miniforge "$(cat .bashrc)";
