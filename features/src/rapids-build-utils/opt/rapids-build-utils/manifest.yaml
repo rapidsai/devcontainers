@@ -83,10 +83,10 @@ repos:
       sub_dir: python/cudf
       depends: [cudf]
       args: {install: *rapids_build_backend_args}
-    - name: dask_cudf
+    - name: dask-cudf
       sub_dir: python/dask_cudf
       args: {install: *rapids_build_backend_args}
-    - name: cudf_polars
+    - name: cudf-polars
       sub_dir: python/cudf_polars
       args: {install: *rapids_build_backend_args}
     - name: cudf_kafka
