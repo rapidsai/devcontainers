@@ -22,10 +22,8 @@ x-llvm-prev: &llvm_18 { name: "llvm", version: "18" }
 x-llvm-curr: &llvm_19 { name: "llvm", version: "19" }
 x-llvm-env: &llvm_env { CC: "clang", CXX: "clang++", CUDAHOSTCXX: "clang++" }
 
-x-nvhpc-24-7:  &nvhpc_24-7  { name: "nvhpc", version: "24.7" }
-x-nvhpc-24-9:  &nvhpc_24-9  { name: "nvhpc", version: "24.9" }
-x-nvhpc-24-11: &nvhpc_24-11 { name: "nvhpc", version: "24.11" }
-x-nvhpc-25-1:  &nvhpc_25-1  { name: "nvhpc", version: "25.1" }
+x-nvhpc-prev: &nvhpc_prev { name: "nvhpc", version: "24.11" }
+x-nvhpc-curr: &nvhpc_curr { name: "nvhpc", version: "25.1" }
 
 x-nvhpc-env: &nvhpc_env { CC: "nvc", CXX: "nvc++", CUDAHOSTCXX: "nvc++" }
 
@@ -89,10 +87,8 @@ include:
 
 - os: "ubuntu:22.04"
   images:
-  - { features: [*python, *nvhpc_24-7,  *clang_format_cccl, *clangd_dev, *cccl_dev], env: *nvhpc_env }
-  - { features: [*python, *nvhpc_24-9,  *clang_format_cccl, *clangd_dev, *cccl_dev], env: *nvhpc_env }
-  - { features: [*python, *nvhpc_24-11, *clang_format_cccl, *clangd_dev, *cccl_dev], env: *nvhpc_env }
-  - { features: [*python, *nvhpc_25-1,  *clang_format_cccl, *clangd_dev, *cccl_dev], env: *nvhpc_env }
+  - { features: [*python, *nvhpc_prev, *clang_format_cccl, *clangd_dev, *cccl_dev], env: *nvhpc_env }
+  - { features: [*python, *nvhpc_curr, *clang_format_cccl, *clangd_dev, *cccl_dev], env: *nvhpc_env }
   - { features: [*python, *gcc_11, { <<: *cuda_prev_max, <<: *cccl_cuda_opts }, *clang_format_cccl, *clangd_dev, *cccl_dev], env: *gcc_env }
   - { features: [*python, *gcc_11, { <<: *cuda_curr_min, <<: *cccl_cuda_opts }, *clang_format_cccl, *clangd_dev, *cccl_dev], env: *gcc_env }
   - { features: [*python, *gcc_11, { <<: *cuda_curr_max, <<: *cccl_cuda_opts }, *clang_format_cccl, *clangd_dev, *cccl_dev], env: *gcc_env }
