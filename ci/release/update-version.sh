@@ -54,6 +54,6 @@ for file in $(find features -name devcontainer-feature.json); do
 done
 
 # CI files
-for FILE in .github/workflows/*.yml; do
+for FILE in .github/workflows/*.yaml .github/workflows/*.yml; do
   sed_runner "/shared-workflows/ s/@.*/@branch-${NEXT_SHORT_TAG}/g" "${FILE}"
 done
