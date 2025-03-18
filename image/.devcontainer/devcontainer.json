@@ -21,9 +21,9 @@
       "installZsh": "true",
       "upgradePackages": "true"
     },
-    "ghcr.io/devcontainers/features/git:1.3.0": {
+    "ghcr.io/devcontainers/features/git:1.3.2": {
       "ppa": "true",
-      "version": "latest"
+      "version": "2.47.1"
     },
     "ghcr.io/devcontainers/features/git-lfs:1.2.1": {
       "autoPull": false
