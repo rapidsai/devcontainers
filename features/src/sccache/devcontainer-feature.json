@@ -1,9 +1,17 @@
 {
   "name": "sccache",
   "id": "sccache",
-  "version": "25.4.0",
+  "version": "25.4.1",
   "description": "A feature to install sccache",
   "options": {
+    "repository": {
+      "type": "string",
+      "proposals": [
+        "mozilla/sccache"
+      ],
+      "default": "mozilla/sccache",
+      "description": "The GitHub repository from which to install the sccache binary."
+    },
     "version": {
       "type": "string",
       "proposals": [
