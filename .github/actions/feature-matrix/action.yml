@@ -25,7 +25,7 @@ runs:
     - id: changes
       name: Check if files changed
       if: inputs.full_matrix != 'true'
-      uses: tj-actions/changed-files@v44.0.1
+      uses: step-security/changed-files@3dbe17c78367e7d60f00d78ae6781a35be47b4a1
       with:
         base_sha: "${{ inputs.base_sha }}"
         since_last_remote_commit: "${{ inputs.base_sha == '' && 'true' || 'false' }}"
