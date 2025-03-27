@@ -1,5 +1,5 @@
 #! /usr/bin/env bash
-set -e
+set -eo pipefail
 
 SCCACHE_VERSION="${VERSION:-latest}";
 SCCACHE_REPOSITORY="${REPOSITORY:-"mozilla/sccache"}";
@@ -23,10 +23,6 @@ wget --no-hsts -q -O- \
     "https://github.com/$SCCACHE_REPOSITORY/releases/download/v$SCCACHE_VERSION/sccache-v$SCCACHE_VERSION-$(uname -m)-unknown-linux-musl.tar.gz" \
   | tar -C /usr/bin -zf - --wildcards --strip-components=1 -x '*/sccache' \
  && chmod +x /usr/bin/sccache;
-
-mkdir -m 0777 -p /var/log/devcontainer-utils;
-touch /var/log/devcontainer-utils/sccache.log;
-chmod 0777 /var/log/devcontainer-utils/sccache.log;
 
 # export envvars in /etc/bash.bashrc
 append_to_etc_bashrc "$(cat .bashrc)";
