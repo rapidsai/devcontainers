@@ -35,3 +35,7 @@ fi
 if test -z "${SCCACHE_SERVER_PORT:-}"; then
     export_envvar SCCACHE_SERVER_PORT "$((4220 + $RANDOM % 4999))";
 fi
+
+sudo mkdir -m 0777 -p /var/log/devcontainer-utils;
+sudo touch /var/log/devcontainer-utils/creds-s3.log;
+sudo chmod 0777 /var/log/devcontainer-utils/creds-s3.log;

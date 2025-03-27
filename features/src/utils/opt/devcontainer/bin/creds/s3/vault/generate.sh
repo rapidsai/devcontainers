@@ -50,11 +50,6 @@ _creds_vault_generate() {
         exit 1;
     fi
 
-    sudo mkdir -m 0775 -p /var/log/devcontainer-utils;
-    sudo touch /var/log/devcontainer-utils/creds-s3.log;
-    sudo chmod 0664 /var/log/devcontainer-utils/creds-s3.log;
-    sudo chgrp crontab /var/log/devcontainer-utils/creds-s3.log;
-
     cat <<____EOF | tee -a /var/log/devcontainer-utils/creds-s3.log
 $(date)
 Attempting to use your GitHub account to authenticate with vault at:

@@ -55,11 +55,6 @@ _creds_github_generate() {
         --idp-url "${AWS_IDP_URL:-https://token.gha-runners.nvidia.com}"
     );
 
-    sudo mkdir -m 0775 -p /var/log/devcontainer-utils;
-    sudo touch /var/log/devcontainer-utils/creds-s3.log;
-    sudo chmod 0664 /var/log/devcontainer-utils/creds-s3.log;
-    sudo chgrp crontab /var/log/devcontainer-utils/creds-s3.log;
-
     for org in "${user_orgs[@]}"; do
         generated_at="$(date '+%s')";
         if gh nv-gha-aws org "${org}" "${nv_gha_aws_args[@]}" >"${HOME}/.aws/credentials" 2>>/var/log/devcontainer-utils/creds-s3.log; then
