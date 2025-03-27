@@ -33,6 +33,7 @@ fi
 
 # Randomize the sccache server port in case the container is launched with --network=host
 if test -z "${SCCACHE_SERVER_PORT:-}"; then
+    reset_envvar SCCACHE_SERVER_PORT;
     export_envvar SCCACHE_SERVER_PORT "$((4220 + $RANDOM % 4999))";
 fi
 
