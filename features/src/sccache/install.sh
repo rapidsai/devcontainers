@@ -15,7 +15,7 @@ check_packages jq wget ca-certificates bash-completion;
 echo "Installing sccache...";
 
 if test "$SCCACHE_VERSION" = latest; then
-    find_version_from_git_tags SCCACHE_VERSION "https://github.com/$SCCACHE_REPOSITORY";
+    find_version_from_git_tags SCCACHE_VERSION "https://github.com/$SCCACHE_REPOSITORY" "" "" "-.*" "true";
 fi
 
 # Install sccache
