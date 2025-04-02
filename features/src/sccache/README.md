@@ -15,6 +15,7 @@ A feature to install sccache
 
 | Options Id | Description | Type | Default Value |
 |-----|-----|-----|-----|
+| repository | The GitHub repository from which to install the sccache binary. | string | mozilla/sccache |
 | version | sccache version to install. | string | latest |
 
 
