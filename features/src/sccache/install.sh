@@ -1,7 +1,8 @@
 #! /usr/bin/env bash
-set -e
+set -eo pipefail
 
 SCCACHE_VERSION="${VERSION:-latest}";
+SCCACHE_REPOSITORY="${REPOSITORY:-"mozilla/sccache"}";
 
 # Ensure we're in this feature's directory during build
 cd "$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )";
@@ -13,13 +14,16 @@ check_packages jq wget ca-certificates bash-completion;
 
 echo "Installing sccache...";
 
-if [ $SCCACHE_VERSION == latest ]; then
-    find_version_from_git_tags SCCACHE_VERSION https://github.com/mozilla/sccache;
+if test "$SCCACHE_VERSION" = latest; then
+    find_version_from_git_tags SCCACHE_VERSION "https://github.com/$SCCACHE_REPOSITORY";
+elif test "$SCCACHE_VERSION" = dev; then
+    find_version_from_git_tags SCCACHE_VERSION "https://github.com/$SCCACHE_REPOSITORY" "" "" "-.*" "true";
 fi
 
 # Install sccache
-wget --no-hsts -q -O- "https://github.com/mozilla/sccache/releases/download/v$SCCACHE_VERSION/sccache-v$SCCACHE_VERSION-$(uname -p)-unknown-linux-musl.tar.gz" \
-    | tar -C /usr/bin -zf - --wildcards --strip-components=1 -x */sccache \
+wget --no-hsts -q -O- \
+    "https://github.com/$SCCACHE_REPOSITORY/releases/download/v$SCCACHE_VERSION/sccache-v$SCCACHE_VERSION-$(uname -m)-unknown-linux-musl.tar.gz" \
+  | tar -C /usr/bin -zf - --wildcards --strip-components=1 -x '*/sccache' \
  && chmod +x /usr/bin/sccache;
 
 # export envvars in /etc/bash.bashrc

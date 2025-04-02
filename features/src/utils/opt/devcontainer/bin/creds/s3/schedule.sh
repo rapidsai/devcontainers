@@ -28,11 +28,6 @@ _creds_s3_schedule() {
 
         crontab -u "$(whoami)" -r 2>/dev/null || true;
 
-        sudo mkdir -m 0775 -p /var/log/devcontainer-utils;
-        sudo touch /var/log/devcontainer-utils/creds-s3.log;
-        sudo chmod 0664 /var/log/devcontainer-utils/creds-s3.log;
-        sudo chgrp crontab /var/log/devcontainer-utils/creds-s3.log;
-
         cat <<________EOF | tee -a /var/log/devcontainer-utils/creds-s3.log
 $(date --date="@${now}")
 Scheduling cron to regerate S3 creds $(date -u --date="@$((ttime - now))" '+%T') from now.
