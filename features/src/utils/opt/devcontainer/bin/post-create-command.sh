@@ -26,12 +26,17 @@ if test -n "${SSH_AUTH_SOCK:-}" \
     # test the remapped ssh-agent socket
     SSH_AUTH_SOCK="${ssh_auth_sock}" ssh-add -L 1>&2;
     # set SSH_AUTH_SOCK to the new remapped one
-    export_envvar SSH_AUTH_SOCK "${ssh_auth_sock}";
+    override_envvar SSH_AUTH_SOCK "${ssh_auth_sock}";
     export SSH_AUTH_SOCK="${ssh_auth_sock}";
     unset ssh_auth_sock;
 fi
 
 # Randomize the sccache server port in case the container is launched with --network=host
 if test -z "${SCCACHE_SERVER_PORT:-}"; then
-    export_envvar SCCACHE_SERVER_PORT "$((4220 + $RANDOM % 4999))";
+    reset_envvar SCCACHE_SERVER_PORT;
+    override_envvar SCCACHE_SERVER_PORT "$((4220 + $RANDOM % 4999))";
 fi
+
+sudo mkdir -m 0777 -p /var/log/devcontainer-utils;
+sudo touch /var/log/devcontainer-utils/creds-s3.log;
+sudo chmod 0777 /var/log/devcontainer-utils/creds-s3.log;
