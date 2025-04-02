@@ -15,7 +15,7 @@ repos:
   git: {<<: *git_defaults, repo: rmm}
   cpp:
     - name: rmm
-      sub_dir: ""
+      sub_dir: cpp
   python:
     - name: librmm
       sub_dir: python/librmm
