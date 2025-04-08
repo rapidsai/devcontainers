@@ -27,7 +27,7 @@ make_conda_env() {
     local env_file_name="${env_name}.yml";
 
     # Remove the current conda env if called with `-f,--force`
-    if test -n "${f-}"; then
+    if test -n "${f:+x}"; then
         rm -rf "${HOME}/.conda/envs/${env_name}" \
                "${HOME}/.conda/envs/${env_file_name}";
     fi

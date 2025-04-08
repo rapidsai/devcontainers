@@ -49,7 +49,7 @@ _creds_s3_persist() {
         for name in config credentials; do
             echo > ~/".aws/${name}"
         done
-        if test -n "${stamp:-}"; then
+        if test -n "${stamp:+x}"; then
             echo "${stamp:-}" > ~/.aws/stamp;
         fi
     fi

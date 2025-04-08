@@ -73,7 +73,7 @@ ________EOF
             # Work around https://github.com/cli/cli/issues/7881 by explicitly enumerating each user fork and checking the parent info
             for repo in $(GH_HOST="${https_url}" gh repo list --limit 9999 "${user}" --fork --json name --jq 'map(.name)[]'); do
                 nameWithOwner="$(GH_HOST="${https_url}" gh repo view "${repo}" --json nameWithOwner --json parent --jq "[.] ${query}" 2>/dev/null || echo "")";
-                if test -n "${nameWithOwner}"; then
+                if test -n "${nameWithOwner:+x}"; then
                     break;
                 fi
             done
@@ -109,15 +109,15 @@ clone_github_repo() {
     ssh_url="${ssh_url:-${GITHUB_HOST:-github.com}}";
     https_url="${https_url:-${GITHUB_HOST:-github.com}}";
 
-    if test -z "${no_fork:-}" && \
-       test -z "${clone_upstream:-}" && \
+    if ! test -n "${no_fork:+x}" && \
+       ! test -n "${clone_upstream:+x}" && \
        devcontainer-utils-shell-is-interactive; then
         # shellcheck disable=SC1091
         . devcontainer-utils-init-github-cli;
         user="${GITHUB_USER:-}";
     fi
 
-    if test -n "${clone_upstream:-}"; then
+    if test -n "${clone_upstream:+x}"; then
         fork="${upstream}";
     else
         name="$(get_repo_name "${upstream}")";
@@ -127,10 +127,10 @@ clone_github_repo() {
         fork="$(get_user_fork_name "${owner}" "${name}" "${user}")";
     fi
 
-    if test -n "${fork:-}"; then
+    if test -n "${fork:+x}"; then
         origin="${fork}";
-    elif test -z "${no_fork:-}" && \
-         test -z "${clone_upstream:-}" && \
+    elif ! test -n "${no_fork:+x}" && \
+         ! test -n "${clone_upstream:+x}" && \
          devcontainer-utils-shell-is-interactive; then
         while true; do
             local CHOICE;
@@ -149,8 +149,8 @@ clone_github_repo() {
     local origin_;
     local upstream_;
 
-    if test -z "${no_fork:-}" && \
-       test -z "${clone_upstream:-}" && \
+    if ! test -n "${no_fork:+x}" && \
+       ! test -n "${clone_upstream:+x}" && \
        gh auth status --hostname "${https_url}" >/dev/null 2>&1; then
         if [ "$(gh config get git_protocol --host "${https_url}")" = "ssh" ]; then
             origin_="$(get_repo_ssh_url "${origin}")";
@@ -161,7 +161,7 @@ clone_github_repo() {
         fi
     fi
 
-    if test -z "${origin_:-}" || test -z "${upstream_:-}"; then
+    if ! test -n "${origin_:+x}" || ! test -n "${upstream_:+x}"; then
         if [ "$(gh config get git_protocol --host "${https_url}")" = "ssh" ]; then
             origin_="${origin_:-"ssh://git@${ssh_url}/${origin}.git"}";
             upstream_="${upstream_:-"ssh://git@${ssh_url}/${upstream}.git"}";

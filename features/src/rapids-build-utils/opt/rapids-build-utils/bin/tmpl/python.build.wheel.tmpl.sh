@@ -54,15 +54,15 @@ build_${PY_LIB}_python_wheel() {
 
     local ninja_args=();
 
-    if test -n "${v-}"; then
+    if test -n "${v:+x}"; then
         ninja_args+=("-v");
     fi
 
-    if test -n "${n_jobs-}"; then
+    if test -n "${n_jobs:+x}"; then
         ninja_args+=("-j${n_jobs}");
     fi
 
-    if test -n "${n_load-}"; then
+    if test -n "${n_load:+x}"; then
         ninja_args+=("-l${n_load}");
     fi
 
@@ -90,7 +90,6 @@ build_${PY_LIB}_python_wheel() {
         local build_type="$(rapids-select-cmake-build-type "${cmake_args_[@]}")";
         local nvcc_append_flags="${NVCC_APPEND_FLAGS:+$NVCC_APPEND_FLAGS }-t=${n_arch}";
 
-        # SKBUILD_BUILD_TOOL_ARGS="${ninja_args[*]}"   \
         CUDAFLAGS="${cudaflags}"                     \
         CMAKE_GENERATOR="${G:-Ninja}"                \
         PARALLEL_LEVEL="${n_jobs}"                   \

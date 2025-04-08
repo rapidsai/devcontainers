@@ -29,7 +29,7 @@ make_pip_env() {
 
     test ${#pre[@]} -eq 0 && pre=(--pre);
 
-    if test -n "${no_pre-}"; then
+    if test -n "${no_pre:+x}"; then
         pre=();
     fi
 
@@ -37,7 +37,7 @@ make_pip_env() {
     local env_file_name="${env_name}.requirements.txt";
 
     # Remove the current virtual env if called with `-f,--force`
-    if test -n "${f-}"; then
+    if test -n "${f:+x}"; then
         rm -rf "${HOME}/.local/share/venvs/${env_name}" \
                "${HOME}/.local/share/venvs/${env_file_name}";
     fi

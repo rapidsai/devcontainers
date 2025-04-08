@@ -1,4 +1,4 @@
-if test -z "${DISABLE_SCCACHE:+x}"; then
+if ! test -n "${DISABLE_SCCACHE:+x}"; then
     # Log sccache server messages
     export SCCACHE_SERVER_LOG="${SCCACHE_SERVER_LOG:-sccache=info}";
     export SCCACHE_ERROR_LOG="${SCCACHE_ERROR_LOG:-/tmp/sccache.log}";

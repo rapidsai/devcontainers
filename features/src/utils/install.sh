@@ -181,8 +181,8 @@ rm -rf /root/.config/{clangd,pip};
 # Find the non-root user
 find_non_root_user;
 
-if test -n "${USERNAME-}"; then
-    USERHOME="$(bash -c "echo ~${USERNAME-}")";
+if test -n "${USERNAME:+x}"; then
+    USERHOME="$(bash -c "echo ~${USERNAME}")";
 
     if command -v gh >/dev/null 2>&1; then
         mkdir -p -m 0755                                         \

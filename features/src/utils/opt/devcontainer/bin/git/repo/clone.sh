@@ -40,7 +40,7 @@ clone_git_repo() {
         directory="${REST[1]:?"fatal: missing required positional argument <directory>"}";
     else
         if test "${nargs}" -eq 0; then
-            if test -z "${upstream:-}"; then
+            if ! test -n "${upstream:+x}"; then
                 echo "fatal: missing required positional argument <repository>" 1>&2;
                 exit 1;
             fi
@@ -83,7 +83,7 @@ clone_git_repo() {
 
     git -C "${directory}" fetch "${fqj[@]}" --all;
 
-    if test -n "${branch:-}"; then
+    if test -n "${branch:+x}"; then
         local remote;
         for remote in upstream origin; do
             # if remote has branch

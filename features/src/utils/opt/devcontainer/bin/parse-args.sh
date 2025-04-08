@@ -25,7 +25,7 @@ _parse_args_for_file() {
     for ((idx=0; idx < 2; idx+=1)); do
         if [ "${1:-}" = "--take" ]; then
             shift;
-            if test -n "${1:-}"; then
+            if test -n "${1:+x}"; then
                 local -ar take="($(_parse_args_to_names <<< "${1}" | tr '\n' ' ' | tr -s '[:blank:]'))";
                 for key in "${take[@]}"; do
                     # shellcheck disable=SC2034
@@ -36,7 +36,7 @@ _parse_args_for_file() {
         fi
         if [ "${1:-}" = "--skip" ]; then
             shift;
-            if test -n "${1:-}"; then
+            if test -n "${1:+x}"; then
                 local -ar skip="($(_parse_args_to_names <<< "${1}" | tr '\n' ' ' | tr -s '[:blank:]'))";
                 for key in "${skip[@]}"; do
                     # shellcheck disable=SC2034
@@ -87,10 +87,10 @@ _parse_args_for_file() {
     done
 
 
-    local -r optstring="$(                                                                               \
+    local -r optstring="$(                                                                                 \
         cat <(_parse_bool_names_from_usage  <<< "${usage}" | _parse_short_names | xargs -r -I% echo -n %)  \
             <(_parse_value_names_from_usage <<< "${usage}" | _parse_short_names | xargs -r -I% echo -n %:) \
-      | tr -d '[:space:]'                                                                                \
+      | tr -d '[:space:]'                                                                                  \
     )";
 
     if test ${#long_bools[@]} -gt 0 || test ${#long_value[@]} -gt 0; then
@@ -106,21 +106,41 @@ _parse_args_for_file() {
     local -r short_bools1="@($(echo -n "${short_bools[@]/%/ |}" | rev | cut -d'|' -f1 --complement | rev | tr -d '[:space:]'))";
     local -r short_value1="@($(echo -n "${short_value[@]/%/ |}" | rev | cut -d'|' -f1 --complement | rev | tr -d '[:space:]'))";
 
-    while test -n "${1:-}"; do
+    local __xtrace=;
 
-        # read from stdin on hyphen
-        if test "${1:-}" == -; then
+    _disable_xtrace() {
+        if test -o xtrace; then
+            __xtrace=1;
+            set +x;
+        fi
+    }
+
+    _enable_xtrace() {
+        if test -n "${__xtrace:+x}"; then
+            __xtrace=0;
+            set -x;
+        fi
+    }
+
+    while test -n "${1:+x}"; do
+
+        # If the first arg is `-`, read from stdin on hyphen
+        if test "${1:+${1:0:3}}" == -; then
             shift;
             set -o noglob;
+            { _disable_xtrace; } 2>/dev/null;
             # read and split+glob with glob disabled
             eval set "-- $* $(cat)";
+            { _enable_xtrace; } 2>/dev/null
             set +o noglob;
             continue;
         fi
 
         # If the first arg is `--`, break.
-        if [[ "${1:-}" == -- ]]; then
+        if [[ "${1:+${1:0:3}}" == -- ]]; then
+            { _disable_xtrace; } 2>/dev/null;
             rest=("${@}");
+            { _enable_xtrace; } 2>/dev/null
             set --;
             break;
         fi
@@ -149,12 +169,14 @@ _parse_args_for_file() {
                     # This only works when getopts is in silent mode, i.e. when `:` is at the front of the optstring.
                     # If getopts is not in silent mode, it does not populate `OPTARG`.
                     elif [[ "-${OPTARG}" != "${!idx:-}" ]]; then
+                        { _disable_xtrace; } 2>/dev/null;
                         # Special cases:
                         # -f=foo
                         # -Wno-dev
                         opts+=("${!OPTIND:-}");
                         # Splice the argument at index `OPTIND` out of $@
                         set -- "${@:1:$((OPTIND-1))}" "${@:$((OPTIND+1))}";
+                        { _enable_xtrace; } 2>/dev/null
                         break;
                     else
                         # Normal cases:
@@ -162,16 +184,20 @@ _parse_args_for_file() {
                         # -f foo
                         opts+=("-${OPTARG}");
                         OPTIND=$((OPTIND <= 1 ? 1 : OPTIND-1));
+                        { _disable_xtrace; } 2>/dev/null;
                         # Splice the argument at index `OPTIND` out of $@
                         set -- "${@:1:$((OPTIND-1))}" "${@:$((OPTIND+1))}";
+                        { _enable_xtrace; } 2>/dev/null
 
                         # Peek at the next argument.
                         # If it begins with `-`, leave it for getopts.
                         # Otherwise, push it onto the skipped list and splice it out of $@.
-                        if [[ ${OPTIND} -le ${#@} && "${!OPTIND:-}" != -* ]]; then
+                        if [[ ${OPTIND} -le ${#@} && "${!OPTIND:+${!OPTIND:0:1}}" != - ]]; then
+                            { _disable_xtrace; } 2>/dev/null;
                             opts+=("${!OPTIND}");
                             # Splice the argument at index `OPTIND` out of $@
                             set -- "${@:1:$((OPTIND-1))}" "${@:$((OPTIND+1))}";
+                            { _enable_xtrace; } 2>/dev/null
                         fi
                         break;
                     fi
@@ -195,17 +221,21 @@ _parse_args_for_file() {
                         $long_value1)
                             key="${OPTARG}";
                             arg+=("--${key}");
-                            if [[ ${OPTIND} -le ${#@} && "${!OPTIND:-}" != -* ]]; then
+                            if [[ ${OPTIND} -le ${#@} && "${!OPTIND:+${!OPTIND:0:1}}" != - ]]; then
+                                { _disable_xtrace; } 2>/dev/null;
                                 val="${!OPTIND}";
                                 arg+=("${val}");
+                                { _enable_xtrace; } 2>/dev/null
                                 OPTIND=$((OPTIND + 1));
                             fi
                             ;;
                         # known value opt with value after =
                         $long_value2)
                             key="${OPTARG%=*}";
+                            { _disable_xtrace; } 2>/dev/null;
                             val="${OPTARG#*=}";
                             arg+=("--${key}=${val}");
+                            { _enable_xtrace; } 2>/dev/null
                         ;;
                         # unknown long opt with value after =
                         *=*)
@@ -219,8 +249,10 @@ _parse_args_for_file() {
                                 arg+=("--${key}");
                             else
                                 opts+=("--${OPTARG}");
-                                if [[ ${OPTIND} -le ${#@} && "${!OPTIND:-}" != -* ]]; then
+                                if [[ ${OPTIND} -le ${#@} && "${!OPTIND:+${!OPTIND:0:1}}" != - ]]; then
+                                    { _disable_xtrace; } 2>/dev/null;
                                     opts+=("${!OPTIND}");
+                                    { _enable_xtrace; } 2>/dev/null
                                     OPTIND=$((OPTIND + 1));
                                 fi
                             fi
@@ -246,15 +278,22 @@ _parse_args_for_file() {
                         # If the option and value are separated by `=`
                         =*)
                             # strip the `=` and use the right-hand side as the value
+                            { _disable_xtrace; } 2>/dev/null;
                             val="${OPTARG#*=}";
-                            if [ -z "${val}" ] && [[ "${!OPTIND}" != -* ]]; then
+                            { _enable_xtrace; } 2>/dev/null
+                            if [ -z "${val}" ] && [[ "${!OPTIND:+${!OPTIND:0:1}}" != - ]]; then
                                 # Handle the case where there's an equals sign and a space between the value, e.g. `-v= foo`
+                                { _disable_xtrace; } 2>/dev/null;
                                 val="${!OPTIND}";
+                                { _enable_xtrace; } 2>/dev/null
                                 OPTIND=$((OPTIND + 1));
                             fi
+                            { _disable_xtrace; } 2>/dev/null;
                             arg+=("-${key}=${val}");
+                            { _enable_xtrace; } 2>/dev/null
                             ;;
                         *)
+                            { _disable_xtrace; } 2>/dev/null;
                             val="${OPTARG:-}";
                             idx=$((OPTIND-1));
                             if test "${!idx:-}" != "${val}"; then
@@ -262,12 +301,13 @@ _parse_args_for_file() {
                             else
                                 arg+=("-${key}" "${val}");
                             fi
+                            { _enable_xtrace; } 2>/dev/null
                             ;;
                     esac
                     ;;
             esac
 
-            if test -n "${key}"; then
+            if test -n "${key:+x}"; then
 
                 if test -v skip_map["${key}"] || ! test -v take_map["${key}"]; then
                     opts+=("${arg[@]}");
@@ -276,16 +316,20 @@ _parse_args_for_file() {
                     if test -v reverse_alias_map["${key}"]; then
                         key="${reverse_alias_map["${key}"]}";
                     fi
-                    if test -z "${_map["${key}"]}"; then
+                    if ! test -n "${_map["${key}"]:+x}"; then
+                        { _disable_xtrace; } 2>/dev/null;
                         _map["${key}"]="${val@Q}";
+                        { _enable_xtrace; } 2>/dev/null
                     else
+                        { _disable_xtrace; } 2>/dev/null;
                         _map["${key}"]+=" ${val@Q}";
+                        { _enable_xtrace; } 2>/dev/null
                     fi
                 fi
             fi
 
             # If the next arg is `--`, break so we handle it below instead of getopts eating it.
-            if [[ "${!OPTIND:-}" == -- ]]; then
+            if [[ "${!OPTIND:+${!OPTIND:0:3}}" == -- ]]; then
                 break;
             fi
         done # end getopts loop
@@ -295,12 +339,18 @@ _parse_args_for_file() {
         OPTIND=1;
 
         while test $# -gt 0; do
+            { _disable_xtrace; } 2>/dev/null;
             val="${1}";
-            if [[ "${val}" == -- ]]; then
+            { _enable_xtrace; } 2>/dev/null
+            if [[ "${val:+${val:0:3}}" == -- ]]; then
+                { _disable_xtrace; } 2>/dev/null;
                 rest=("${@}");
+                { _enable_xtrace; } 2>/dev/null
                 set --;
-            elif [[ "${val}" != -* ]]; then
+            elif [[ "${val:+${val:0:1}}" != - ]]; then
+                { _disable_xtrace; } 2>/dev/null;
                 rest=("${@}");
+                { _enable_xtrace; } 2>/dev/null
                 set --;
             else
                 break;
@@ -308,11 +358,12 @@ _parse_args_for_file() {
         done
     done
 
-    if test -n "${_map[h]:-}"; then
+    if test -n "${_map[h]:+x}"; then
         cat <<< "${usage}" >&2;
         echo >&2;
         echo "exit 0";
     else
+        { _disable_xtrace; } 2>/dev/null;
         echo "declare -A ARGS_MAP=(";
         for key in "${!_map[@]}"; do
             echo "[${key@Q}]=${_map["${key}"]@Q}";
@@ -335,6 +386,7 @@ _parse_args_for_file() {
                 echo "declare -n ${a_}=${k_}";
             done
         done
+        { _enable_xtrace; } 2>/dev/null
     fi
 }
 

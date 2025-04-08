@@ -62,13 +62,13 @@ clone_${NAME}() {
     git -C "${SRC_PATH}" config --add remote.upstream.fetch '^refs/heads/pull-request/*';
 
     local upstream_branches="$(git -C "${SRC_PATH}" branch --remotes --list 'upstream/pull-request/*')";
-    if test -n "${upstream_branches:-}"; then
+    if test -n "${upstream_branches:+x}"; then
         git -C "${SRC_PATH}" branch --remotes -d ${upstream_branches};
     fi
 
     git -C "${SRC_PATH}" remote prune upstream;
 
-    if test -z "${no_update_env-}"; then
+    if ! test -n "${no_update_env:+x}"; then
         rapids-post-start-command;
     fi
 }

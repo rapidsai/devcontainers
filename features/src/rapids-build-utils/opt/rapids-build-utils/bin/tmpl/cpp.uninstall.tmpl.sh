@@ -55,7 +55,7 @@ uninstall_${CPP_LIB}_cpp() {
 
             local outd="";
 
-            if test -z "${out_dir-}" || test "${#out_dir[@]}" -eq 0; then
+            if ! test -n "${out_dir:+x}" || test "${#out_dir[@]}" -eq 0; then
                 continue;
             elif test "${i}" -lt "${#out_dir[@]}"; then
                 outd="$(realpath -ms "${out_dir[$i]}")";
@@ -64,7 +64,7 @@ uninstall_${CPP_LIB}_cpp() {
             fi
 
             # shellcheck disable=SC2016
-            if test -n "${outd:-}"; then
+            if test -n "${outd:+x}"; then
                 local patt="cudf-.*${comp:+-$comp}-${kernel}";
                 _list_archive | grep -Ev '^.*/$' | xargs -r -d '\n' rm -f ${v:+-v} -- 2>/dev/null || true;
                 _list_archive | grep -E '^.*/$'  | xargs -r -d '\n' rmdir ${v:+-v} --ignore-fail-on-non-empty 2>/dev/null || true;
