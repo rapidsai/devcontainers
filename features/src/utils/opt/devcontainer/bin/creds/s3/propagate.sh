@@ -7,7 +7,7 @@ _creds_s3_propagate() {
     # shellcheck disable=SC1091
     . devcontainer-utils-debug-output 'devcontainer_utils_debug' 'creds-s3 creds-s3-propagate';
 
-    if ! type sccache >/dev/null 2>&1; then
+    if ! command -v sccache >/dev/null 2>&1; then
         return;
     fi
 

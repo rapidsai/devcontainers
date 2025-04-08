@@ -35,7 +35,7 @@ uninstall_all() {
     echo ${NAMES} \
   | tr '[:space:]' '\0' \
   | xargs ${v:+-t} -r -0 -P${n_jobs} -I% bash -c "
-    if type uninstall-% >/dev/null 2>&1; then
+    if command -v uninstall-% >/dev/null 2>&1; then
         uninstall-% ${OPTS[*]} || exit 255;
     fi
     ";

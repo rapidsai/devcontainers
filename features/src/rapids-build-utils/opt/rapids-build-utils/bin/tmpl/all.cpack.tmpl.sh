@@ -40,7 +40,7 @@ cpack_all() {
     echo ${NAMES} \
   | tr '[:space:]' '\0' \
   | xargs -r -0 -P${n_load} -I% bash -c "
-    if type cpack-% >/dev/null 2>&1; then
+    if command -v cpack-% >/dev/null 2>&1; then
         cpack-% -j ${n_arch} ${OPTS[*]} || exit 255;
     fi
     ";

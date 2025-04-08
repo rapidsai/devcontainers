@@ -36,7 +36,7 @@ clone_all() {
     echo ${NAMES} \
   | tr '[:space:]' '\0' \
   | xargs ${v:+-t} ${_o} -r -0 -P${n_jobs} -I% bash -c "
-    if type clone-% >/dev/null 2>&1; then
+    if command -v clone-% >/dev/null 2>&1; then
         clone-% -j ${n_arch} --no-update-env ${OPTS[*]} || exit 255;
     fi
     ";

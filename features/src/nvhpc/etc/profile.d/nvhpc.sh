@@ -1,4 +1,4 @@
-if ! type module 2>&1 | grep -q function; then
+if ! command -v module 2>&1 | grep -q function; then
     . /etc/profile.d/lmod._sh;
 fi
 
