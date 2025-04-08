@@ -25,10 +25,7 @@ uninstall_${PY_LIB}_python() {
     # shellcheck disable=SC1091
     . devcontainer-utils-debug-output 'rapids_build_utils_debug' 'uninstall-all uninstall-${NAME} uninstall-${PY_LIB}-python';
 
-    time (
-        pip uninstall --no-input -y "${v[@]}" "${q[@]}" "${PY_LIB}" || true;
-        { set +x; } 2>/dev/null; echo -n "${PY_LIB} uninstall time:";
-    ) 2>&1;
+    pip uninstall --no-input -y "${v[@]}" "${q[@]}" "${PY_LIB}" || true;
 
 }
 
