@@ -21,7 +21,7 @@ clone_all() {
     local -;
     set -euo pipefail;
 
-    eval "$(_parse_args --take '-j,--parallel --no-update-env' "$@" <&0)";
+    eval "$(_parse_args --take '-j,--parallel -v,--verbose --no-update-env' "$@" <&0)";
 
     eval "$(rapids-get-num-archs-jobs-and-load --archs 3 --max-device-obj-memory-usage 1 "$@")";
 
@@ -35,11 +35,8 @@ clone_all() {
 
     echo ${NAMES} \
   | tr '[:space:]' '\0' \
-  | xargs ${v:+-t} ${_o} -r -0 -P${n_jobs} -I% bash -c "
-    if command -v clone-% >/dev/null 2>&1; then
-        clone-% -j ${n_arch} --no-update-env ${OPTS[*]} || exit 255;
-    fi
-    ";
+  | xargs ${v:+-t} ${_o} -r -0 -P${n_jobs} -I% bash -c \
+  " if command -v clone-% >/dev/null 2>&1; then if ! clone-% -j ${n_arch} --no-update-env ${OPTS[*]@Q} ${v[*]@Q}; then exit 255; fi; fi";
 
     if test -z "${no_update_env-}"; then
         rapids-post-start-command;

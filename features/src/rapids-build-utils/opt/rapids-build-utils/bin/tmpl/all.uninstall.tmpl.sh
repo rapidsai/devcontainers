@@ -25,7 +25,7 @@ uninstall_all() {
     local -;
     set -euo pipefail;
 
-    eval "$(_parse_args --take '-h,--help -j|--parallel' "$@" <&0)";
+    eval "$(_parse_args --take '-h,--help -j,--parallel -v,--verbose' "$@" <&0)";
 
     eval "$(rapids-get-num-archs-jobs-and-load --archs 0 "$@")";
 
@@ -34,11 +34,8 @@ uninstall_all() {
 
     echo ${NAMES} \
   | tr '[:space:]' '\0' \
-  | xargs ${v:+-t} -r -0 -P${n_jobs} -I% bash -c "
-    if command -v uninstall-% >/dev/null 2>&1; then
-        uninstall-% ${OPTS[*]} || exit 255;
-    fi
-    ";
+  | xargs ${v:+-t} -r -0 -P${n_jobs} -I% bash -c \
+  " if command -v uninstall-% >/dev/null 2>&1; then if ! uninstall-% ${OPTS[*]@Q} ${v[*]@Q}; then exit 255; fi; fi";
 }
 
 uninstall_all "$@" <&0;
