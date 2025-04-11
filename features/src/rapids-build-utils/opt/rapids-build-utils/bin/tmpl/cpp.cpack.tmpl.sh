@@ -107,7 +107,7 @@ cpack_${CPP_LIB}_cpp() {
                 tar -C "${outd}" -c ${v:+-v} -f "${outd}/${slug}.tar.gz" -I "pigz -p ${n_jobs}" "${slug}";
                 cp -a "${outd}/${slug}.tar.gz" "${CPP_SRC}/${BIN_DIR}/";
 
-                if test -z "${out_dir-}" || test "${#out_dir[@]}" -eq 0; then
+                if ! test -n "${out_dir:+x}" || test "${#out_dir[@]}" -eq 0; then
                     continue;
                 elif test "${i}" -lt "${#out_dir[@]}"; then
                     outd="$(realpath -ms "${out_dir[$i]}")";
@@ -115,7 +115,7 @@ cpack_${CPP_LIB}_cpp() {
                     outd="$(realpath -ms "${out_dir[${#out_dir[@]}-1]}")";
                 fi
 
-                if test -n "${outd:-}"; then
+                if test -n "${outd:+x}"; then
                     mkdir -p "${outd}/";
                     cp -a "${CPP_SRC}/${BIN_DIR}/${slug}.tar.gz" "${outd}/";
                 fi

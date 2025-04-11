@@ -224,7 +224,7 @@ if ! test -L "${CUDA_HOME}"; then
     ln -s "${cudapath}" "${CUDA_HOME}";
 fi
 
-if test -z "${CUDA_VERSION:-}"; then
+if ! test -n "${CUDA_VERSION:+x}"; then
     if test -f "${CUDA_HOME}/include/cuda.h"; then
         cuda_ver=$(grep "#define CUDA_VERSION" "${CUDA_HOME}/include/cuda.h" | cut -d' ' -f3);
         CUDA_VERSION_MAJOR=$((cuda_ver / 1000));

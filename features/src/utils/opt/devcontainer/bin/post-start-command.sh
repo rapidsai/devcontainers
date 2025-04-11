@@ -1,6 +1,6 @@
 #! /usr/bin/env bash
 
-if test -z "${SKIP_DEVCONTAINER_UTILS_POST_START_COMMAND:-}"; then
+if ! test -n "${SKIP_DEVCONTAINER_UTILS_POST_START_COMMAND:+x}"; then
     sudo mkdir -m 0777 -p /var/log/devcontainer-utils;
     sudo touch /var/log/devcontainer-utils/creds-s3.log;
     sudo chmod 0777 /var/log/devcontainer-utils/creds-s3.log;

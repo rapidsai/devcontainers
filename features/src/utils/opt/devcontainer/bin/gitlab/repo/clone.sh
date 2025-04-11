@@ -133,15 +133,15 @@ clone_gitlab_repo() {
     ssh_url="${ssh_url:-${GITLAB_HOST:-gitlab.com}}";
     https_url="${https_url:-${GITLAB_HOST:-gitlab.com}}";
 
-    if test -z "${no_fork:-}" && \
-       test -z "${clone_upstream:-}" && \
+    if ! test -n "${no_fork:+x}" && \
+       ! test -n "${clone_upstream:+x}" && \
        devcontainer-utils-shell-is-interactive; then
         # shellcheck disable=SC1091
         . devcontainer-utils-init-gitlab-cli;
         user="${GITLAB_USER:-}";
     fi
 
-    if test -n "${clone_upstream:-}"; then
+    if test -n "${clone_upstream:+x}"; then
         fork="${upstream}";
     else
         name="$(get_repo_name "${upstream}")";
@@ -151,10 +151,10 @@ clone_gitlab_repo() {
         fork="$(get_user_fork_name "${owner}" "${name}" "${user}")";
     fi
 
-    if test -n "${fork:-}"; then
+    if test -n "${fork:+x}"; then
         origin="${fork}";
-    elif test -z "${no_fork:-}" && \
-         test -z "${clone_upstream:-}" && \
+    elif ! test -n "${no_fork:+x}" && \
+         ! test -n "${clone_upstream:+x}" && \
          devcontainer-utils-shell-is-interactive; then
         while true; do
             local CHOICE;
@@ -173,8 +173,8 @@ clone_gitlab_repo() {
     local origin_;
     local upstream_;
 
-    if test -z "${no_fork:-}" && \
-       test -z "${clone_upstream:-}" && \
+    if ! test -n "${no_fork:+x}" && \
+       ! test -n "${clone_upstream:+x}" && \
      ! glab auth status --hostname "${https_url}"  2>&1 | grep -q "No token provided"; then
         if [ "$(glab config get git_protocol --host "${https_url}")" = "ssh" ]; then
             origin_="$(get_repo_ssh_url "${origin}")";
@@ -185,7 +185,7 @@ clone_gitlab_repo() {
         fi
     fi
 
-    if test -z "${origin_:-}" || test -z "${upstream_:-}"; then
+    if ! test -n "${origin_:+x}" || ! test -n "${upstream_:+x}"; then
         if [ "$(glab config get git_protocol --host "${https_url}")" = "ssh" ]; then
             origin_="${origin_:-"ssh://git@${ssh_url}/${origin}.git"}";
             upstream_="${upstream_:-"ssh://git@${ssh_url}/${upstream}.git"}";

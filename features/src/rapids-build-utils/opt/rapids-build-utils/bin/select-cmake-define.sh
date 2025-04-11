@@ -29,7 +29,7 @@ parse_cmake_define() {
             val="${arg#*=}";
         fi
     done
-    test -n "${val:-}" && echo "${val}";
+    test -n "${val:+x}" && echo "${val}";
 }
 
 parse_cmake_define "$@" <&0;

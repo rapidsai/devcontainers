@@ -50,7 +50,7 @@ lldb_pkg="lldb";
 
 if [[ -n "${LLVM_VERSION:-}" ]]; then
     lldb_pkg="lldb-${LLVM_VERSION}";
-elif type llvm-config >/dev/null 2>&1; then
+elif command -v llvm-config >/dev/null 2>&1; then
     lldb_pkg="lldb-$(llvm-config --version | cut -d':' -f3 | cut -d'.' -f1)";
 fi
 
@@ -89,12 +89,12 @@ mkdir -p "${CARGO_HOME}" "${RUSTUP_HOME}";
 chown "${USERNAME}:rustlang" "${RUSTUP_HOME}" "${CARGO_HOME}";
 chmod g+r+w+s "${RUSTUP_HOME}" "${CARGO_HOME}";
 
-if [ "${RUST_VERSION}" = "none" ] || type rustup > /dev/null 2>&1; then
+if [ "${RUST_VERSION}" = "none" ] || command -v rustup > /dev/null 2>&1; then
     echo "Rust already installed. Skipping...";
 else
     if [ "${RUST_VERSION}" != "latest" ] && [ "${RUST_VERSION}" != "lts" ] && [ "${RUST_VERSION}" != "stable" ]; then
         # Find version using soft match
-        if ! type git >/dev/null 2>&1; then
+        if ! command -v git >/dev/null 2>&1; then
             check_packages git;
         fi
 

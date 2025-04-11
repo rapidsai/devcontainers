@@ -7,8 +7,8 @@ _creds_github_generate() {
     # shellcheck disable=SC1091
     . devcontainer-utils-debug-output 'devcontainer_utils_debug' 'creds-s3 creds-s3-vault creds-s3-vault-generate';
 
-    if test -z "${AWS_ROLE_ARN:-}" \
-    || test -z "${SCCACHE_BUCKET:-}" \
+    if ! test -n "${AWS_ROLE_ARN:+x}" \
+    || ! test -n "${SCCACHE_BUCKET:+x}" \
     || ! gh nv-gha-aws --help >/dev/null 2>&1; then
         exit 1;
     fi

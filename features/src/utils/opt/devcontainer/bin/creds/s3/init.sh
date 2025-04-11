@@ -11,7 +11,7 @@ _s3_creds_init() {
     # shellcheck disable=SC1091
     . devcontainer-utils-debug-output 'devcontainer_utils_debug' 'creds-s3 creds-s3-init';
 
-    if type sccache >/dev/null 2>&1; then
+    if command -v sccache >/dev/null 2>&1; then
         if ! grep -qE "^$" <<< "${SCCACHE_BUCKET:-}"; then
             if grep -qE "^$" <<< "${AWS_ACCESS_KEY_ID:-}"     \
             && grep -qE "^$" <<< "${AWS_SECRET_ACCESS_KEY:-}" ; then

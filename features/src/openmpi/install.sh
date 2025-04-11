@@ -10,23 +10,31 @@ cd "$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )";
 . ./common/install.sh;
 
 read_cuda_version() {
+    local -;
+    set -euo pipefail;
+
     local cuda="";
 
     if test -n "${CUDA_VERSION:-${CUDA_VERSION_MAJOR:-}}"; then
-        cuda=$(cut -d'.' -f1 <<< "${CUDA_VERSION:-${CUDA_VERSION_MAJOR:-}}");
+        cuda="$(cut -d'.' -f1 <<< "${CUDA_VERSION:-${CUDA_VERSION_MAJOR:-}}")";
     elif test -f "${CUDA_HOME:-/usr/local/cuda}/include/cuda.h"; then
-        cuda=$(grep "#define CUDA_VERSION" ${CUDA_HOME:-/usr/local/cuda}/include/cuda.h | cut -d' ' -f3);
-        cuda=$((cuda / 1000));
+        cuda="$(grep "#define CUDA_VERSION" ${CUDA_HOME:-/usr/local/cuda}/include/cuda.h | cut -d' ' -f3)";
+        cuda="$((cuda / 1000))";
     fi
 
-    echo "${cuda}";
+    if test -n "${cuda:+x}"; then
+        echo "${cuda}";
+        return 0
+    else
+        return 1
+    fi
 }
 
 ENABLE_UCX=;
 ENABLE_CUDA=;
 
-if test -n "${UCX_VERSION:-}"; then ENABLE_UCX=1; fi
-if test -n "$(read_cuda_version)"; then ENABLE_CUDA=1; fi
+if test -n "${UCX_VERSION:+x}"; then ENABLE_UCX=1; fi
+if read_cuda_version >/dev/null 2>&1; then ENABLE_CUDA=1; fi
 
 install_openmpi_deps() {
     local -r openmpi_lib="$(
@@ -72,7 +80,7 @@ build_and_install_openmpi() {
     fi
 
     local -a cuda_args=();
-    if test "${ENABLE_CUDA}" = 1; then
+    if test "${ENABLE_CUDA:-}" = 1; then
         cuda_args+=(--with-cuda="${CUDA_HOME:-/usr/local/cuda}");
         cuda_args+=(--with-cuda-libdir="${CUDA_HOME:-/usr/local/cuda}/lib64/stubs}");
     fi
@@ -134,7 +142,7 @@ build_and_install_openmpi() {
 apt_get_update;
 check_packages bzip2 wget ca-certificates bash-completion gettext-base pkg-config;
 
-if test -z "${OPENMPI_VERSION:-}" || [ "${OPENMPI_VERSION:-}" = "latest" ]; then
+if ! test -n "${OPENMPI_VERSION:+x}" || test "${OPENMPI_VERSION:-}" = latest; then
     find_version_from_git_tags OPENMPI_VERSION https://github.com/open-mpi/ompi;
 elif [ "${OPENMPI_VERSION:-}" = "system" ]; then
     OPENMPI_VERSION="$(apt-cache policy libopenmpi-dev | grep Candidate: | tr -d '[:blank:]' | cut -d: -f2 | cut -d- -f1)";
@@ -148,7 +156,7 @@ build_and_install_openmpi;
 
 DEBIAN_FRONTEND=noninteractive apt-get -y autoremove;
 
-if test "${ENABLE_CUDA}" = 1; then
+if test "${ENABLE_CUDA:-}" = 1; then
     cat <<EOF >> .bashrc
 OMPI_MCA_opal_cuda_support=true
 EOF

@@ -27,7 +27,7 @@ maybe_clean_build_dir() {
 
     local -r bin_dir="$(rapids-get-cmake-build-dir "${OPTS[@]}" "${REST[@]}")";
 
-    if test -n "${bin_dir-}" && test -d "${bin_dir}"; then
+    if test -n "${bin_dir:+x}" && test -d "${bin_dir}"; then
         case "${G:-Ninja}" in
             "Unix Makefiles")
                 test -f "${bin_dir}/Makefile" || rm -rf "${bin_dir}";;

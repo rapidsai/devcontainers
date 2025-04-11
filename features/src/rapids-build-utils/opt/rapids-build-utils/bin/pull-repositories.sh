@@ -49,11 +49,11 @@ pull_repositories() {
         local branch="$(git -C ~/${!repo_path} rev-parse --abbrev-ref HEAD)";
 
         while true; do
-            if test -n "${branch:-}" \
+            if test -n "${branch:+x}" \
             && git -C ~/${!repo_path} branch -r | grep "${remote}/${branch}"; then
                 break;
             fi
-            if test -n "${default_branch:-}" \
+            if test -n "${default_branch:+x}" \
             && git -C ~/${!repo_path} branch -r | grep "${remote}/${default_branch}"; then
                 branch="${default_branch}";
                 break;
@@ -64,7 +64,7 @@ pull_repositories() {
             read -rp "
 ############################################################
 $(
-    test -z "${default_branch:-}" && \
+  ! test -n "${default_branch:+x}" && \
     echo "Branch \"${branch}\" " || \
     echo "Branches \"${branch}\" and \"${default_branch}\" "
 )\
@@ -74,13 +74,13 @@ ${remote_info}
 
 Please enter a branch name to pull (or leave empty to skip): " branch </dev/tty
 
-            if test -z "${branch:-}"; then
+            if ! test -n "${branch:+x}"; then
                 echo "No alternate branch name supplied, skipping";
                 break;
             fi
         done
 
-        if test -n "${branch:-}"; then
+        if test -n "${branch:+x}"; then
             echo "Pulling ${!repo_name} ${remote}/${branch}...";
             git -C ~/${!repo_path} pull --no-tags "${remote}" "${branch}";
             git -C ~/${!repo_path} submodule update --init --recursive;

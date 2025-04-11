@@ -21,7 +21,7 @@ PKGS=(
     ca-certificates
 );
 
-if ! type /usr/bin/python3 >/dev/null 2>&1; then
+if ! command -v /usr/bin/python3 >/dev/null 2>&1; then
     PKGS+=(python3 python3-pip);
 elif ! /usr/bin/python3 -m pip >/dev/null 2>&1; then
     PKGS+=(python3-pip);
@@ -45,7 +45,7 @@ fi
 /usr/bin/python3 -m pip install "${_PIP_INSTALL_ARGS[@]}" "${_PIP_UPGRADE_ARGS[@]}" pip;
 
 # Install yq if not installed
-if ! type yq >/dev/null 2>&1; then
+if ! command -v yq >/dev/null 2>&1; then
     YQ_BINARY="yq";
     YQ_BINARY+="_$(uname -s | tr '[:upper:]' '[:lower:]')";
     YQ_BINARY+="_${TARGETARCH:-$(dpkg --print-architecture | awk -F'-' '{print $NF}')}";
@@ -181,10 +181,10 @@ rm -rf /root/.config/{clangd,pip};
 # Find the non-root user
 find_non_root_user;
 
-if test -n "${USERNAME-}"; then
-    USERHOME="$(bash -c "echo ~${USERNAME-}")";
+if test -n "${USERNAME:+x}"; then
+    USERHOME="$(bash -c "echo ~${USERNAME}")";
 
-    if type gh >/dev/null 2>&1; then
+    if command -v gh >/dev/null 2>&1; then
         mkdir -p -m 0755                                         \
             "$USERHOME/.local"                                   \
             "$USERHOME/.local/share"                             \
@@ -217,10 +217,10 @@ fi
 
 # Generate bash completions
 if dpkg -s bash-completion >/dev/null 2>&1; then
-    if type gh >/dev/null 2>&1; then
+    if command -v gh >/dev/null 2>&1; then
         gh completion -s bash | tee /etc/bash_completion.d/gh >/dev/null;
     fi
-    if type glab >/dev/null 2>&1; then
+    if command -v glab >/dev/null 2>&1; then
         glab completion -s bash | tee /etc/bash_completion.d/glab >/dev/null;
     fi
 fi

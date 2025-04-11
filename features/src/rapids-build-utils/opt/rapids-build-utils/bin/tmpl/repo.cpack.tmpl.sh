@@ -29,7 +29,7 @@ cpack_${NAME}() {
     . devcontainer-utils-debug-output 'rapids_build_utils_debug' 'cpack-all cpack-${NAME}';
 
     for lib in ${CPP_LIB}; do
-        if type cpack-${lib}-cpp >/dev/null 2>&1; then
+        if command -v cpack-${lib}-cpp >/dev/null 2>&1; then
             cpack-${lib}-cpp "${OPTS[@]}";
         fi
     done

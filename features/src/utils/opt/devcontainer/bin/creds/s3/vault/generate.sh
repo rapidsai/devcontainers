@@ -9,8 +9,8 @@ _creds_vault_generate() {
     # shellcheck disable=SC1091
     . devcontainer-utils-debug-output 'devcontainer_utils_debug' 'creds-s3 creds-s3-vault creds-s3-vault-generate';
 
-    if test -z "${VAULT_HOST:-}" \
-    || test -z "${SCCACHE_BUCKET:-}"; then
+    if ! test -n "${VAULT_HOST:+x}" \
+    || ! test -n "${SCCACHE_BUCKET:+x}"; then
         exit 1;
     fi
 
@@ -30,7 +30,7 @@ _creds_vault_generate() {
     # shellcheck disable=SC1091
     . devcontainer-utils-init-github-cli;
 
-    if test -z "${GITHUB_USER:-}"; then
+    if ! test -n "${GITHUB_USER:+x}"; then
         exit 1;
     fi
 

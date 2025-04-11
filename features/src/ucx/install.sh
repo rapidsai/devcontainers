@@ -32,7 +32,7 @@ download_ucx_release() {
 
     local cuda="$(read_cuda_version)";
 
-    if test -n "${cuda}"; then
+    if test -n "${cuda:+x}"; then
         slug+="-mofed5-cuda${cuda}";
     fi
 
@@ -98,7 +98,7 @@ build_and_install_ucx() {
 
 check_packages bzip2 wget ca-certificates bash-completion gettext-base pkg-config;
 
-if test -z "${UCX_VERSION:-}" || [ "${UCX_VERSION:-}" = "latest" ]; then
+if ! test -n "${UCX_VERSION:+x}" || test "${UCX_VERSION:-}" = latest; then
     find_version_from_git_tags UCX_VERSION https://github.com/openucx/ucx;
 fi
 

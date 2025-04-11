@@ -46,7 +46,7 @@ get_num_archs_jobs_and_load() {
     # Since we want the physical number of processors here, pass --all
     local -r n_cpus="$(nproc --all)";
 
-    if test ${#j[@]} -gt 0 && test -z "${j:-}"; then
+    if test ${#j[@]} -gt 0 && ! test -n "${j:+x}"; then
         j="${n_cpus}";
     fi
 
@@ -69,8 +69,7 @@ get_num_archs_jobs_and_load() {
     # see: https://github.com/rapidsai/rapids-cmake/blob/branch-24.04/rapids-cmake/cuda/set_architectures.cmake#L54
     local n_arch_rapids=5;
 
-    if test -z "${archs:-}" \
-    && test -n "${INFER_NUM_DEVICE_ARCHITECTURES:-}"; then
+    if ! test -n "${archs:+x}" && test -n "${INFER_NUM_DEVICE_ARCHITECTURES:+x}"; then
         archs="$(rapids-select-cmake-define CMAKE_CUDA_ARCHITECTURES "${OPTS[@]}" || echo)";
         archs="${archs:-${CMAKE_CUDA_ARCHITECTURES:-${CUDAARCHS:-}}}";
 
@@ -105,7 +104,7 @@ get_num_archs_jobs_and_load() {
     local mem_for_device_objs="$((n_arch * max_device_obj_memory_usage))";
     local mem_total="${max_total_system_memory:-${MAX_TOTAL_SYSTEM_MEMORY:-}}";
 
-    if test -z "${mem_total}"; then
+    if ! test -n "${mem_total:+x}"; then
         local -r free_mem="$(free --bytes | grep -E '^Mem:' | tr -s '[:space:]' | cut -d' ' -f7 || echo '0')";
         local -r freeswap="$(free --bytes | grep -E '^Swap:' | tr -s '[:space:]' | cut -d' ' -f4 || echo '0')";
         mem_total="$((free_mem + freeswap))";

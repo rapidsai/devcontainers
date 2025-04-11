@@ -1,7 +1,7 @@
 {
   "name": "sccache",
   "id": "sccache",
-  "version": "25.6.1",
+  "version": "25.6.2",
   "description": "A feature to install sccache",
   "options": {
     "repository": {

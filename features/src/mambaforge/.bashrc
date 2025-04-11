@@ -13,7 +13,7 @@ unset nounseton;
 
 if [ -n "${CONDA_EXE:-}" ]; then
     conda_bin_paths="$(dirname "$(dirname "${CONDA_EXE}")")/condabin";
-    if test -n "${CONDA_PREFIX:-}"; then
+    if test -n "${CONDA_PREFIX:+x}"; then
         conda_bin_paths="${conda_bin_paths} ${CONDA_PREFIX}/bin";
     fi
     for conda_bin_path in ${conda_bin_paths}; do

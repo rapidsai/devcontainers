@@ -46,7 +46,7 @@ list_repos() {
         filters+=("| map(select(${omit[@]} true))");
     fi
 
-    if test -n "${filters:-}"; then
+    if test -n "${filters:+x}"; then
         query=".repos ${filters[*]} | {repos: .}";
     fi
 

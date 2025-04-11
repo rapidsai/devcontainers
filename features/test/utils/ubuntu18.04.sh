@@ -83,8 +83,8 @@ expect_local_disk_cache_is_used() {
     grep -qE 'Cache location \s+ Local disk' <<< "${stats}";
 }
 
-if test -n "${vault_host:-}" \
-&& test -n "${rw_sccache_bucket:-}"; then
+if test -n "${vault_host:+x}" \
+&& test -n "${rw_sccache_bucket:+x}"; then
 
     vault_host_with_no_bucket_uses_local_disk_cache() {
         reset_state;
@@ -96,7 +96,7 @@ if test -n "${vault_host:-}" \
     check "VAULT_HOST with no SCCACHE_BUCKET uses local disk cache" vault_host_with_no_bucket_uses_local_disk_cache;
 fi
 
-if test -n "${rw_sccache_bucket:-}"; then
+if test -n "${rw_sccache_bucket:+x}"; then
 
     no_creds_with_bucket_uses_local_disk_cache() {
         reset_state;
@@ -129,9 +129,9 @@ if test -n "${rw_sccache_bucket:-}"; then
     check "bad creds with SCCACHE_BUCKET and no VAULT_HOST uses local disk cache" bad_creds_with_sccache_bucket_and_no_vault_host_uses_local_disk_cache;
 fi
 
-if test -n "${gh_token:-}" \
-&& test -n "${vault_host:-}" \
-&& test -n "${rw_sccache_bucket:-}"; then
+if test -n "${gh_token:+x}" \
+&& test -n "${vault_host:+x}" \
+&& test -n "${rw_sccache_bucket:+x}"; then
 
     no_creds_with_GH_TOKEN_VAULT_HOST_and_SCCACHE_BUCKET_should_generate_credentials() {
         reset_state;
@@ -187,9 +187,9 @@ if test -n "${gh_token:-}" \
     check "bad stored creds with GH_TOKEN, VAULT_HOST, and SCCACHE_BUCKET should regenerate credentials" bad_stored_creds_with_GH_TOKEN_VAULT_HOST_and_SCCACHE_BUCKET_should_regenerate_credentials;
 fi
 
-if test -n "${gh_token:-}" \
-&& test -n "${aws_role_arn:-}" \
-&& test -n "${rw_sccache_bucket:-}"; then
+if test -n "${gh_token:+x}" \
+&& test -n "${aws_role_arn:+x}" \
+&& test -n "${rw_sccache_bucket:+x}"; then
 
     no_creds_with_GH_TOKEN_AWS_ROLE_ARN_and_SCCACHE_BUCKET_should_generate_credentials() {
         reset_state;

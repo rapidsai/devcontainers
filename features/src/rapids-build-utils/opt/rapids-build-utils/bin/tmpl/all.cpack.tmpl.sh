@@ -25,7 +25,7 @@ cpack_all() {
     local -;
     set -euo pipefail;
 
-    eval "$(_parse_args --take '-j,--parallel' "$@" <&0)";
+    eval "$(_parse_args --take '-j,--parallel -v,--verbose' "$@" <&0)";
 
     j=${j:-1};
 
@@ -39,11 +39,8 @@ cpack_all() {
 
     echo ${NAMES} \
   | tr '[:space:]' '\0' \
-  | xargs -r -0 -P${n_load} -I% bash -c "
-    if type cpack-% >/dev/null 2>&1; then
-        cpack-% -j ${n_arch} ${OPTS[*]} || exit 255;
-    fi
-    ";
+  | xargs ${v:+-t} -r -0 -P${n_load} -I% bash -c \
+  " if command -v cpack-% >/dev/null 2>&1; then if ! cpack-% -j ${n_arch} ${OPTS[*]@Q} ${v[*]@Q}; then exit 255; fi; fi";
 }
 
 cpack_all "$@" <&0;

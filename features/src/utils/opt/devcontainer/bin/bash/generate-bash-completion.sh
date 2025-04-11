@@ -33,7 +33,7 @@ generate_bash_completion() {
 
     if test -f "${template}"; then
         mkdir -p "$(dirname "${out_file}")";
-        cp -n "${template}" "${out_file}";
+        cp -u "${template}" "${out_file}";
         local cmd;
         for cmd in "${command[@]}"; do
             local str="complete -F _devcontainer_utils_completions ${cmd};";

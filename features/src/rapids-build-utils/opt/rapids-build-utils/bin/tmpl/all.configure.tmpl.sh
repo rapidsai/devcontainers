@@ -23,7 +23,7 @@ configure_all() {
     . devcontainer-utils-debug-output 'rapids_build_utils_debug' 'configure-all';
 
     for name in ${NAMES}; do
-        if type configure-${name} >/dev/null 2>&1; then
+        if command -v configure-${name} >/dev/null 2>&1; then
             configure-${name} "${OPTS[@]}";
         fi
     done

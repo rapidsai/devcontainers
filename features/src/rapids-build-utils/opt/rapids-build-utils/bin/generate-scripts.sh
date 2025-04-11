@@ -12,7 +12,7 @@ generate_completions() {
     local -;
     set -euo pipefail;
 
-    if type devcontainer-utils-debug-output >/dev/null 2>&1; then
+    if command -v devcontainer-utils-debug-output >/dev/null 2>&1; then
         # shellcheck disable=SC1091
         . devcontainer-utils-debug-output 'rapids_build_utils_debug' 'generate-scripts';
 
@@ -30,7 +30,7 @@ clean_scripts_and_aliases() {
     local -;
     set -euo pipefail;
 
-    if type devcontainer-utils-debug-output >/dev/null 2>&1; then
+    if command -v devcontainer-utils-debug-output >/dev/null 2>&1; then
         # shellcheck disable=SC1091
         . devcontainer-utils-debug-output 'rapids_build_utils_debug' 'generate-scripts';
     fi
@@ -43,7 +43,7 @@ clean_scripts_and_aliases() {
 
 generate_script() {
     local bin="${1:-}";
-    if test -n "${bin}"; then
+    if test -n "${bin:+x}"; then
         (
             cat - \
           | envsubst '$HOME $NAME $SRC_PATH $PY_ENV $PY_SRC $PY_LIB $BIN_DIR $CPP_ENV $CPP_LIB $CPP_SRC $CPP_CMAKE_ARGS $CPP_CPACK_ARGS $CPP_DEPS $CPP_MAX_TOTAL_SYSTEM_MEMORY $CPP_MAX_DEVICE_OBJ_MEMORY_USAGE $CPP_MAX_DEVICE_OBJ_TO_COMPILE_IN_PARALLEL $GIT_TAG $GIT_SSH_URL $GIT_HTTPS_URL $GIT_REPO $GIT_HOST $GIT_UPSTREAM $PIP_WHEEL_ARGS $PIP_INSTALL_ARGS' \
@@ -64,7 +64,7 @@ generate_script() {
 
 generate_all_script_impl() {
     local bin="${SCRIPT}-all";
-    if test -n "${bin}" && ! test -f "${TMP_SCRIPT_DIR}/${bin}"; then
+    if test -n "${bin:+x}" && ! test -f "${TMP_SCRIPT_DIR}/${bin}"; then
         (
             cat - \
           | envsubst '$NAME $NAMES $SCRIPT' \
@@ -158,7 +158,7 @@ generate_scripts() {
 
     eval "$(rapids-list-repos "$@")";
 
-    if type devcontainer-utils-debug-output >/dev/null 2>&1; then
+    if command -v devcontainer-utils-debug-output >/dev/null 2>&1; then
         # shellcheck disable=SC1091
         . devcontainer-utils-debug-output 'rapids_build_utils_debug' 'generate-scripts';
     fi

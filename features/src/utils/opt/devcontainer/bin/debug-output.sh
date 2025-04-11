@@ -4,7 +4,7 @@
 
 for var in ${1}; do
     var="${!var:-}";
-    if test -n "${var:-}"; then
+    if test -n "${var:+x}"; then
         for str in '*' ${2}; do
             if test -z "${var##*"${str}"*}"; then
                 __xtrace=1;
@@ -18,7 +18,7 @@ done
 shift;
 unset var;
 
-if test -n "${__xtrace:-}"; then
+if test -n "${__xtrace:+x}"; then
     unset __xtrace;
     PS4="+ ${BASH_SOURCE[${#BASH_SOURCE[@]}-1]}:\${LINENO} ";
     set -x;

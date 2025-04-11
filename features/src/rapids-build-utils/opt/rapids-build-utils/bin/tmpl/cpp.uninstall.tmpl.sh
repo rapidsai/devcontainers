@@ -38,40 +38,39 @@ uninstall_${CPP_LIB}_cpp() {
 
     prefix="$(realpath -ms "${prefix:-${CONDA_PREFIX:-${CMAKE_INSTALL_PREFIX:-/usr}}}")";
 
-    time (
-        local i;
-        local -r kernel="$(uname -s)";
+    local i;
+    local -r kernel="$(uname -s)";
 
-        for ((i=0; i < ${#component[@]}; i+=1)); do
-            local comp="${component[$i]}";
-            if test "all" = "${comp}";
-                then comp="";
-            fi
+    for ((i=0; i < ${#component[@]}; i+=1)); do
+        local comp="${component[$i]}";
+        if test "all" = "${comp}";
+            then comp="";
+        fi
 
-            if test -f "${CPP_SRC}/${BIN_DIR}/install_manifest${comp:+_$comp}.txt"; then
-                xargs -rd "\n" --arg-file=<(<"${CPP_SRC}/${BIN_DIR}/install_manifest${comp:+_$comp}.txt" tr -d "\r") rm -f ${v:+-v} --;
+        local install_manifest="${CPP_SRC}/${BIN_DIR}/install_manifest${comp:+_$comp}.txt";
+
+        if test -f "$install_manifest"; then
+            xargs -r -d '\n' --arg-file=<(tr -d '\r' <"$install_manifest") rm -f ${v:+-v} -- 2>/dev/null || true;
+        else
+
+            local outd="";
+
+            if ! test -n "${out_dir:+x}" || test "${#out_dir[@]}" -eq 0; then
+                continue;
+            elif test "${i}" -lt "${#out_dir[@]}"; then
+                outd="$(realpath -ms "${out_dir[$i]}")";
             else
-
-                local outd="";
-
-                if test -z "${out_dir-}" || test "${#out_dir[@]}" -eq 0; then
-                    continue;
-                elif test "${i}" -lt "${#out_dir[@]}"; then
-                    outd="$(realpath -ms "${out_dir[$i]}")";
-                else
-                    outd="$(realpath -ms "${out_dir[${#out_dir[@]}-1]}")";
-                fi
-
-                # shellcheck disable=SC2016
-                if test -n "${outd:-}"; then
-                    local patt="cudf-.*${comp:+-$comp}-${kernel}";
-                    _list_archive | grep -Ev '^.*/$' | xargs -rd'\n' rm -f ${v:+-v} -- || true;
-                    _list_archive | grep -E '^.*/$'  | xargs -rd'\n' rmdir ${v:+-v} --ignore-fail-on-non-empty 2>/dev/null || true;
-                fi
+                outd="$(realpath -ms "${out_dir[${#out_dir[@]}-1]}")";
             fi
-        done
-        { set +x; } 2>/dev/null; echo -n "lib${CPP_LIB} uninstall time:";
-    ) 2>&1;
+
+            # shellcheck disable=SC2016
+            if test -n "${outd:+x}"; then
+                local patt="cudf-.*${comp:+-$comp}-${kernel}";
+                _list_archive | grep -Ev '^.*/$' | xargs -r -d '\n' rm -f ${v:+-v} -- 2>/dev/null || true;
+                _list_archive | grep -E '^.*/$'  | xargs -r -d '\n' rmdir ${v:+-v} --ignore-fail-on-non-empty 2>/dev/null || true;
+            fi
+        fi
+    done
 }
 
 uninstall_${CPP_LIB}_cpp "$@" <&0;

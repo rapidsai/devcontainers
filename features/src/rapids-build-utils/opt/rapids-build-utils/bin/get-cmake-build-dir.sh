@@ -40,7 +40,7 @@ get_cmake_build_dir() {
 
     local src="${REST[0]:-}";
 
-    if test -n "${src}" && rapids-python-uses-scikit-build "${src}"; then
+    if test -n "${src:+x}" && rapids-python-uses-scikit-build "${src}"; then
         echo "${src:+${src}/}$(python -c 'from skbuild import constants; print(constants.CMAKE_BUILD_DIR())')";
     else
         local -r type="$(rapids-select-cmake-build-type "${OPTS[@]}" "${REST[@]:1}" | tr '[:upper:]' '[:lower:]')";
@@ -48,10 +48,10 @@ get_cmake_build_dir() {
         local bin="build";
         bin+="${PYTHON_PACKAGE_MANAGER:+/${PYTHON_PACKAGE_MANAGER}}${cuda:+/cuda-${cuda}}";
 
-        if test -n "${src:-}" && test -d "${src:-}"; then
+        if test -n "${src:+x}" && test -d "${src:-}"; then
             mkdir -p "${src}/${bin}";
-            if  test -z "${skip_links-}"; then
-                if test -z "${skip_build_type-}" || ! test -L "${src}/${bin}/latest"; then
+            if  ! test -n "${skip_links:+x}"; then
+                if ! test -n "${skip_build_type:+x}" || ! test -L "${src}/${bin}/latest"; then
                     mkdir -p "${src}/${bin}/${type}";
                     cd "${src}/${bin}/" || exit 1;
                     ln -sfn "${type}" latest;
@@ -59,7 +59,7 @@ get_cmake_build_dir() {
                 cd "${src}/build" || exit 1;
                 local component;
                 for component in "${PYTHON_PACKAGE_MANAGER:-}" "${cuda:+cuda-${cuda}}"; do
-                    if test -n "${component:-}"; then
+                    if test -n "${component:+x}"; then
                         ln -sfn "${component}/latest" latest;
                         cd "${component}" || exit 1;
                     fi
@@ -67,7 +67,7 @@ get_cmake_build_dir() {
             fi
         fi
 
-        if test -n "${skip_build_type-}"; then
+        if test -n "${skip_build_type:+x}"; then
             echo "${src:+${src}/}${bin}/latest";
         else
             echo "${src:+${src}/}${bin}/${type}";

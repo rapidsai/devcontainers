@@ -15,7 +15,7 @@ cd "$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )";
 # install global/common scripts
 . ./common/install.sh;
 
-if ! type python >/dev/null 2>&1; then
+if ! command -v python >/dev/null 2>&1; then
   echo "lit feature expects python to already be installed" >&2;
   exit 1;
 fi
@@ -25,8 +25,8 @@ PKG_TO_REMOVE=();
 
 # Install gcc and g++ because we have to build psutil wheel for non-x86
 if [[ "$(uname -p)" != "x86_64" ]]; then
-    if ! type gcc >/dev/null 2>&1; then PKG_TO_REMOVE+=("gcc"); fi
-    if ! type g++ >/dev/null 2>&1; then PKG_TO_REMOVE+=("g++"); fi
+    if ! command -v gcc >/dev/null 2>&1; then PKG_TO_REMOVE+=("gcc"); fi
+    if ! command -v g++ >/dev/null 2>&1; then PKG_TO_REMOVE+=("g++"); fi
 fi
 
 check_packages "${PKG[@]}" "${PKG_TO_REMOVE[@]}";

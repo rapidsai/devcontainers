@@ -194,7 +194,7 @@ make_pip_dependencies() {
         cat "${requirement[@]}" "${pip_reqs_txts[@]}"                                                           \
       | (grep -v '^#' || [ "$?" == "1" ])                                                                       \
       | (grep -v -E '^$' || [ "$?" == "1" ])                                                                    \
-      | ( if test -n "${no_dedupe-}"; then cat -; else tr -s "[:blank:]" | LC_ALL=C sort -u; fi )               \
+      | ( if test -n "${no_dedupe:+x}"; then cat -; else tr -s "[:blank:]" | LC_ALL=C sort -u; fi )             \
       | (grep -v -P "^($(tr -d '[:blank:]' <<< "${pip_noinstall[@]/%/|}"))(=.*|>.*|<.*)?$" || [ "$?" == "1" ])  \
       | ( if test ${#_exclude[@]} -gt 0; then grep -E -v "${_exclude[@]}" || [ "$?" == "1" ]; else cat -; fi )  \
       | ( if test ${#_include[@]} -gt 0; then grep -E    "${_include[@]}" || [ "$?" == "1" ]; else cat -; fi )  \
