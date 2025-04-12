@@ -14,6 +14,7 @@ PKGS=(
     sudo
     wget
     socat
+    procps
     tzdata
     gettext-base
     openssh-client
@@ -104,6 +105,12 @@ declare -a commands_and_sources=(
     "init-gitlab-cli                    gitlab/cli/init.sh"
     "clone-gitlab-repo                  gitlab/repo/clone.sh"
     "print-missing-gitlab-token-warning gitlab/print-missing-token-warning.sh"
+    "install-sccache                    sccache/install.sh"
+    "start-sccache                      sccache/start.sh"
+    "stop-sccache                       sccache/stop.sh"
+    "init-sccache-dist                  sccache/dist/init.sh"
+    "configure-sccache-dist             sccache/dist/configure.sh"
+    "sccache-dist-status                sccache/dist/status.sh"
 )
 
 # Install alternatives

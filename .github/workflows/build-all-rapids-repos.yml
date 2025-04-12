@@ -35,24 +35,68 @@ jobs:
       contents: read
       pull-requests: read
     with:
-      arch: '["amd64"]'
+      arch: '["amd64", "arm64"]'
       cuda: '["12.8"]'
-      node_type: cpu32
+      node_type: cpu8
       extra-repo-deploy-key: CUMLPRIMS_SSH_PRIVATE_DEPLOY_KEY
+      rapids-aux-secret-1: GIST_REPO_READ_ORG_GITHUB_TOKEN
       build_command: |
+        # Repopulate the cache
+        export SCCACHE_RECACHE=1
+
+        # Prevent the sccache server from shutting down
         export SCCACHE_IDLE_TIMEOUT=0
-        SCCACHE_NO_DAEMON=1 sccache --stop-server
-        sccache -z;
+
+        # Infinitely retry transient errors
+        export SCCACHE_DIST_MAX_RETRIES=inf
+
+        # Never fallback to locally compiling
+        export SCCACHE_DIST_FALLBACK_TO_LOCAL_COMPILE=false
+
+        # Disable CUB/Thrust arch-dependent namespaces.
+        # These prevent reusing ptx and cubins from multi-arch
+        # compilations in single-arch subset compilations.
+        for VAR in CFLAGS CXXFLAGS CUDAFLAGS; do
+          export "$VAR=${!VAR:+${!VAR} }-DCUB_DISABLE_NAMESPACE_MAGIC -DCUB_IGNORE_NAMESPACE_MAGIC_ERROR"
+          export "$VAR=${!VAR:+${!VAR} }-DTHRUST_DISABLE_ABI_NAMESPACE -DTHRUST_IGNORE_ABI_NAMESPACE_ERROR"
+        done
+
+        # Install the latest sccache client
+        devcontainer-utils-install-sccache --repo trxcllnt/sccache;
+
+        # Configure the sccache client to talk to the build cluster
+        devcontainer-utils-init-sccache-dist         \
+          --enable-sccache-dist                      \
+          - <<< "--auth-token '$RAPIDS_AUX_SECRET_1' \
+                 --auth-type 'token'                 \
+        ";
+
+        # Verify sccache cache location
         sccache --show-adv-stats;
-        clone-all -j$(nproc) -v -q --clone-upstream --single-branch --shallow-submodules;
-        build-all                        \
-          -v                             \
-          -j$(nproc --ignore=1)          \
-          -DBUILD_SHARED_LIBS=ON         \
-          -DBUILD_TESTS=ON               \
-          -DBUILD_BENCHMARKS=ON          \
-          -DBUILD_PRIMS_BENCH=ON         \
-          -DRAFT_COMPILE_LIBRARY=ON      \
-          -DBUILD_CUGRAPH_MG_TESTS=ON    \
-          ;
+
+        # Clone all the repos
+        clone-all -j$(nproc) -v -q --clone-upstream --single-branch --shallow-submodules --no-update-env;
+
+        # Create the python env without ninja.
+        # ninja -j10000 fails with `ninja: FATAL: pipe: Too many open files`.
+        # This appears to have been fixed 13 years ago (https://github.com/ninja-build/ninja/issues/233),
+        # so that fix needs to be integrated into the kitware pip ninja builds.
+        rapids-post-start-command --exclude <(echo ninja);
+
+        # Configure all the C++ libs
+        configure-all                 \
+          -j100000                    \
+          -Wno-dev                    \
+          -DBUILD_TESTS=ON            \
+          -DBUILD_BENCHMARKS=ON       \
+          -DBUILD_PRIMS_BENCH=ON      \
+          -DBUILD_SHARED_LIBS=ON      \
+          -DRAFT_COMPILE_LIBRARY=ON   \
+          -DBUILD_CUGRAPH_MG_TESTS=ON \
+          -DCMAKE_POLICY_VERSION_MINIMUM=3.5;
+
+        # Build all the libs
+        build-all -j100000;
+
+        # Print cache and dist stats
         sccache --show-adv-stats;

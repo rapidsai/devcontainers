@@ -8,7 +8,8 @@
       "aws_role_arn": "${localEnv:aws_role_arn}",
       "VAULT_S3_TTL": "${localEnv:VAULT_S3_TTL}",
       "rw_sccache_bucket": "${localEnv:rw_sccache_bucket}",
-      "rw_sccache_region": "${localEnv:rw_sccache_region}"
+      "rw_sccache_region": "${localEnv:rw_sccache_region}",
+      "sccache_dist_scheduler_url": "${localEnv:sccache_dist_scheduler_url}"
     },
     "features": {
       "ghcr.io/devcontainers/features/common-utils:2": {
@@ -53,7 +54,8 @@
       "aws_role_arn": "${localEnv:aws_role_arn}",
       "VAULT_S3_TTL": "${localEnv:VAULT_S3_TTL}",
       "rw_sccache_bucket": "${localEnv:rw_sccache_bucket}",
-      "rw_sccache_region": "${localEnv:rw_sccache_region}"
+      "rw_sccache_region": "${localEnv:rw_sccache_region}",
+      "sccache_dist_scheduler_url": "${localEnv:sccache_dist_scheduler_url}"
     },
     "features": {
       "ghcr.io/devcontainers/features/common-utils:2": {
@@ -98,7 +100,8 @@
       "aws_role_arn": "${localEnv:aws_role_arn}",
       "VAULT_S3_TTL": "${localEnv:VAULT_S3_TTL}",
       "rw_sccache_bucket": "${localEnv:rw_sccache_bucket}",
-      "rw_sccache_region": "${localEnv:rw_sccache_region}"
+      "rw_sccache_region": "${localEnv:rw_sccache_region}",
+      "sccache_dist_scheduler_url": "${localEnv:sccache_dist_scheduler_url}"
     },
     "features": {
       "ghcr.io/devcontainers/features/common-utils:2": {

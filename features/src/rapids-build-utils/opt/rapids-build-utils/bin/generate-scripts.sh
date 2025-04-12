@@ -63,7 +63,7 @@ generate_script() {
 }
 
 generate_all_script_impl() {
-    local bin="${SCRIPT}-all";
+    local bin="${PREFIX:-${SCRIPT}}-${SUFFIX:-all}";
     if test -n "${bin:+x}" && ! test -f "${TMP_SCRIPT_DIR}/${bin}"; then
         (
             cat - \
@@ -378,8 +378,18 @@ generate_scripts() {
             NAME="${cloned_repos[0]:-${repo_names[0]:-}}" \
             NAMES="${repo_names[*]@Q}"  \
             SCRIPT="${script}"          \
+            PREFIX="${script}"          \
             generate_all_script         ;
-        done;
+        done
+        for kind in "cpp" "python"; do
+            # Generate a script to run a type of build for all repos
+            NAME="${cloned_repos[0]:-${repo_names[0]:-}}" \
+            NAMES="${repo_names[*]@Q}"  \
+            SCRIPT="${kind}.build"      \
+            PREFIX="build"              \
+            SUFFIX="all-${kind}"        \
+            generate_all_script         ;
+        done
     fi
 }
 

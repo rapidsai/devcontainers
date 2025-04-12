@@ -31,7 +31,7 @@ init_github_cli() {
       | tr -d ','                             \
     )";
 
-    local needed_scopes="read:org";
+    local needed_scopes="read:org read:enterprise";
 
     needed_scopes="$(                                                     \
       comm -23                                                            \

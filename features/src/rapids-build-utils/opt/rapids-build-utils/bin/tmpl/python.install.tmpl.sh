@@ -100,6 +100,23 @@ install_${PY_LIB}_python() {
         pip_args+=("${PY_SRC}");
     fi
 
+    # Ensure SCCACHE_NO_DIST_COMPILE=1 is set while configuring
+    # so CMake's compiler tests never use the build cluster.
+
+    if ! test -f /tmp/sccache_no_dist_compile.cmake; then
+        cat <<"EOF" > /tmp/sccache_no_dist_compile.cmake
+set(ENV{SCCACHE_NO_DIST_COMPILE} "1")
+EOF
+    fi
+
+    # Merge with outer `-DCMAKE_PROJECT_INCLUDE_BEFORE=` if provided
+    local -a cmake_project_include_before="(
+        $(rapids-select-cmake-define CMAKE_PROJECT_INCLUDE_BEFORE "$@" || echo)
+        /tmp/sccache_no_dist_compile.cmake
+    )";
+    # Join with semicolons
+    cmake_args+=("-DCMAKE_PROJECT_INCLUDE_BEFORE=$(IFS=";"; echo "${cmake_project_include_before[*]}")")
+
     trap "rm -rf '${PY_SRC}/${py_lib//"-"/"_"}.egg-info'" EXIT;
 
     time (

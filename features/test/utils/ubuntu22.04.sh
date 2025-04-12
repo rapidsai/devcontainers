@@ -18,6 +18,7 @@ source dev-container-features-test-lib
 export VAULT_S3_TTL="${VAULT_S3_TTL:-"900"}";
 
 cp ~/.bashrc /tmp/.bashrc-clean;
+sudo cp /usr/bin/sccache{,.orig};
 
 utils_profile_script="$(find /etc/profile.d/ -type f -name '*-devcontainer-utils.sh')";
 
@@ -49,19 +50,24 @@ reset_state() {
     unset AWS_SESSION_TOKEN;
     unset AWS_SECRET_ACCESS_KEY;
 
-    rm -rf ~/.aws/ ~/.config/gh/;
+    while pgrep sccache >/dev/null 2>&1; do
+        devcontainer-utils-stop-sccache --kill-all;
+    done
+
+    sudo rm -rf \
+        ~/.aws/ \
+        ~/.config/gh/ \
+        ~/.config/sccache/config \
+        /var/log/devcontainer-utils/creds-s3.log;
     cp /tmp/.bashrc-clean ~/.bashrc;
+    sudo cp /usr/bin/sccache{.orig,};
     echo "#! /usr/bin/env bash" | sudo tee "${utils_profile_script}" >/dev/null;
     sudo chmod +x "${utils_profile_script}";
     . ~/.bashrc;
-
-    if test -n "$(pgrep sccache || echo)"; then
-        sccache --stop-server >/dev/null 2>&1 || true;
-    fi
 }
 
 write_bad_creds() {
-    devcontainer-utils-vault-s3-creds-persist <<< "
+    devcontainer-utils-creds-s3-persist <<< "
         --stamp='$(date '+%s')'
         --bucket='${rw_sccache_bucket:-}'
         --region='${rw_sccache_region:-}'
@@ -81,6 +87,14 @@ expect_local_disk_cache_is_used() {
     local stats="$(sccache --show-stats 2>&1)";
     grep "Cache location" <<< "${stats}";
     grep -qE 'Cache location \s+ Local disk' <<< "${stats}";
+}
+
+expect_sccache_dist_auth_token_is_gh_token() {
+    set -e;
+    test -f ~/.config/sccache/config;
+    grep -qE "[dist.auth]" ~/.config/sccache/config;
+    grep -qE "type = \"token\"" ~/.config/sccache/config;
+    grep -qE "token = \"${gh_token}\"" ~/.config/sccache/config;
 }
 
 if test -n "${vault_host:+x}" \
@@ -243,6 +257,44 @@ if test -n "${gh_token:+x}" \
     }
 
     check "bad stored creds with GH_TOKEN, AWS_ROLE_ARN, and SCCACHE_BUCKET should regenerate credentials" bad_stored_creds_with_GH_TOKEN_AWS_ROLE_ARN_and_SCCACHE_BUCKET_should_regenerate_credentials;
+fi
+
+if test -n "${gh_token:-}" \
+&& test -n "${sccache_dist_scheduler_url:-}"; then
+
+    does_not_set_sccache_dist_auth_config() {
+        reset_state;
+        DEVCONTAINER_UTILS_ENABLE_SCCACHE_DIST=1 \
+        SCCACHE_DIST_SCHEDULER_URL="${sccache_dist_scheduler_url}" \
+        devcontainer-utils-post-attach-command;
+        if expect_sccache_dist_auth_token_is_gh_token; then
+            return 1;
+        fi
+    }
+
+    check "does not configure sccache-dist auth when no GH_TOKEN or SCCACHE_DIST_TOKEN" does_not_set_sccache_dist_auth_config;
+
+    uses_GH_TOKEN_as_sccache_dist_auth_token() {
+        reset_state;
+        GH_TOKEN="${gh_token}" \
+        DEVCONTAINER_UTILS_ENABLE_SCCACHE_DIST=1 \
+        SCCACHE_DIST_SCHEDULER_URL="${sccache_dist_scheduler_url}" \
+        devcontainer-utils-post-attach-command;
+        expect_sccache_dist_auth_token_is_gh_token;
+    }
+
+    check "configures sccache-dist to use GH_TOKEN as auth token" uses_GH_TOKEN_as_sccache_dist_auth_token;
+
+    uses_SCCACHE_DIST_TOKEN_as_sccache_dist_auth_token() {
+        reset_state;
+        SCCACHE_DIST_TOKEN="${gh_token}" \
+        DEVCONTAINER_UTILS_ENABLE_SCCACHE_DIST=1 \
+        SCCACHE_DIST_SCHEDULER_URL="${sccache_dist_scheduler_url}" \
+        devcontainer-utils-post-attach-command;
+        expect_sccache_dist_auth_token_is_gh_token;
+    }
+
+    check "configures sccache-dist to use SCCACHE_DIST_TOKEN as auth token" uses_SCCACHE_DIST_TOKEN_as_sccache_dist_auth_token;
 fi
 
 # Report result
