@@ -1,5 +1,5 @@
-x-cuda-prev-min: &cuda_prev_min { name: "cuda", version: "11.1" }
-x-cuda-prev-max: &cuda_prev_max { name: "cuda", version: "11.8" }
+x-cuda-prev-min: &cuda_prev_min { name: "cuda", version: "12.0" }
+x-cuda-prev-max: &cuda_prev_max { name: "cuda", version: "12.8" }
 x-cuda-curr-min: &cuda_curr_min { name: "cuda", version: "12.0" }
 x-cuda-curr-max: &cuda_curr_max { name: "cuda", version: "12.8" }
 x-cuda-curr-max-rapids: &cuda_curr_max_rapids { name: "cuda", version: "12.8" }
@@ -64,12 +64,6 @@ x-cccl-cuda-ext-opts: &cccl_cuda_ext_opts {
 
 include:
 # CCCL devcontainers
-
-- os: "ubuntu:18.04"
-  images:
-  - { features: [*python, *gcc_7, { <<: *cuda_prev_min, <<: *cccl_cuda_opts }, *clang_format_cccl, *clangd_dev_bionic, *cccl_dev], env: *gcc_env }
-  - { features: [*python, *gcc_8, { <<: *cuda_prev_min, <<: *cccl_cuda_opts }, *clang_format_cccl, *clangd_dev_bionic, *cccl_dev], env: *gcc_env }
-  - { features: [*python, *gcc_9, { <<: *cuda_prev_min, <<: *cccl_cuda_opts }, *clang_format_cccl, *clangd_dev_bionic, *cccl_dev], env: *gcc_env }
 
 - os: "ubuntu:20.04"
   images:
