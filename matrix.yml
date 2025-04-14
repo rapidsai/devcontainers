@@ -1,5 +1,5 @@
-x-cuda-prev-min: &cuda_prev_min { name: "cuda", version: "11.1" }
-x-cuda-prev-max: &cuda_prev_max { name: "cuda", version: "11.8" }
+x-cuda-prev-min: &cuda_prev_min { name: "cuda", version: "12.0" }
+x-cuda-prev-max: &cuda_prev_max { name: "cuda", version: "12.8" }
 x-cuda-curr-min: &cuda_curr_min { name: "cuda", version: "12.0" }
 x-cuda-curr-max: &cuda_curr_max { name: "cuda", version: "12.8" }
 x-cuda-curr-max-rapids: &cuda_curr_max_rapids { name: "cuda", version: "12.8" }
@@ -35,7 +35,7 @@ x-openmpi: &openmpi { name: "openmpi" }
 x-cccl-dev: &cccl_dev { name: "cccl-dev", hide: true }
 x-clangd-dev: &clangd_dev { name: "llvm", version: "20", packages: "clangd", hide: true }
 x-clangd-dev-bionic: &clangd_dev_bionic { name: "llvm", version: "19", packages: "clangd", hide: true }
-x-clang-format-cccl: &clang_format_cccl { name: "llvm", version: "19", packages: "clang-format llvm-tools", hide: true }
+x-clang-format-cccl: &clang_format_cccl { name: "llvm", version: "20", packages: "clang-format llvm-tools", hide: true }
 x-clang-format-rapids: &clang_format_rapids { name: "llvm", version: "16", packages: "clang-format", hide: true }
 
 # CCCL only needs a subset of the full CTK:
@@ -64,12 +64,6 @@ x-cccl-cuda-ext-opts: &cccl_cuda_ext_opts {
 
 include:
 # CCCL devcontainers
-
-- os: "ubuntu:18.04"
-  images:
-  - { features: [*python, *gcc_7, { <<: *cuda_prev_min, <<: *cccl_cuda_opts }, *clang_format_cccl, *clangd_dev_bionic, *cccl_dev], env: *gcc_env }
-  - { features: [*python, *gcc_8, { <<: *cuda_prev_min, <<: *cccl_cuda_opts }, *clang_format_cccl, *clangd_dev_bionic, *cccl_dev], env: *gcc_env }
-  - { features: [*python, *gcc_9, { <<: *cuda_prev_min, <<: *cccl_cuda_opts }, *clang_format_cccl, *clangd_dev_bionic, *cccl_dev], env: *gcc_env }
 
 - os: "ubuntu:20.04"
   images:
@@ -156,12 +150,3 @@ include:
 
   # mambaforge
   - { features: [*conda], env: { "PYTHON_VERSION": "3.12" } }
-
-  ###
-  # Legacy CUDA 11.x + mambaforge image. Needed so the cudatoolkit 11.x
-  # conda package has access to the CUDA Toolkit headers. Remove once
-  # `cuda_prev_max` is bumped up to CUDA Toolkit 12.
-  ###
-
-  # cuda-mambaforge
-  - { features: [*cuda_prev_max, *conda], env: { "PYTHON_VERSION": "3.12" } }
