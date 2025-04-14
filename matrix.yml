@@ -150,12 +150,3 @@ include:
 
   # mambaforge
   - { features: [*conda], env: { "PYTHON_VERSION": "3.12" } }
-
-  ###
-  # Legacy CUDA 11.x + mambaforge image. Needed so the cudatoolkit 11.x
-  # conda package has access to the CUDA Toolkit headers. Remove once
-  # `cuda_prev_max` is bumped up to CUDA Toolkit 12.
-  ###
-
-  # cuda-mambaforge
-  - { features: [*cuda_prev_max, *conda], env: { "PYTHON_VERSION": "3.12" } }
