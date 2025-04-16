@@ -232,7 +232,7 @@ repos:
 
 - name: cuspatial
   path: cuspatial
-  git: {<<: *git_defaults, repo: cuspatial}
+  git: {<<: *git_defaults, repo: cuspatial, upstream: trxcllnt, tag: fix/vendor-rapids-cmake}
   cpp:
     - name: cuspatial
       sub_dir: cpp
