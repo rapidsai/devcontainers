@@ -92,8 +92,7 @@ jobs:
           -DBUILD_PRIMS_BENCH=ON      \
           -DBUILD_SHARED_LIBS=ON      \
           -DRAFT_COMPILE_LIBRARY=ON   \
-          -DBUILD_CUGRAPH_MG_TESTS=ON \
-          -DCMAKE_POLICY_VERSION_MINIMUM=3.5;
+          -DBUILD_CUGRAPH_MG_TESTS=ON ;
 
         # Build all the libs
         build-all -j100000;
