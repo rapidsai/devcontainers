@@ -53,14 +53,6 @@ jobs:
         # Never fallback to locally compiling
         export SCCACHE_DIST_FALLBACK_TO_LOCAL_COMPILE=false
 
-        # Disable CUB/Thrust arch-dependent namespaces.
-        # These prevent reusing ptx and cubins from multi-arch
-        # compilations in single-arch subset compilations.
-        for VAR in CFLAGS CXXFLAGS CUDAFLAGS; do
-          export "$VAR=${!VAR:+${!VAR} }-DCUB_DISABLE_NAMESPACE_MAGIC -DCUB_IGNORE_NAMESPACE_MAGIC_ERROR"
-          export "$VAR=${!VAR:+${!VAR} }-DTHRUST_DISABLE_ABI_NAMESPACE -DTHRUST_IGNORE_ABI_NAMESPACE_ERROR"
-        done
-
         # Install the latest sccache client
         devcontainer-utils-install-sccache --repo trxcllnt/sccache;
 
