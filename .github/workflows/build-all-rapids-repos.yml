@@ -27,7 +27,7 @@ jobs:
     if: needs.check-event.outputs.ok == 'true'
     needs: check-event
     secrets: inherit
-    uses: rapidsai/shared-workflows/.github/workflows/build-in-devcontainer.yaml@branch-25.06
+    uses: rapidsai/shared-workflows/.github/workflows/build-in-devcontainer.yaml@fea/devcontainers-job-timeout
     permissions:
       actions: read
       packages: read
@@ -40,19 +40,17 @@ jobs:
       node_type: cpu4
       extra-repo-deploy-key: CUMLPRIMS_SSH_PRIVATE_DEPLOY_KEY
       rapids-aux-secret-1: GIST_REPO_READ_ORG_GITHUB_TOKEN
+      timeout-minutes: 720
+      # 1. Repopulate the cache
+      # 2. Prevent the sccache server from shutting down
+      # 3. Infinitely retry transient errors
+      # 4. Never fallback to locally compiling
+      env: |
+        SCCACHE_RECACHE=1
+        SCCACHE_IDLE_TIMEOUT=0
+        SCCACHE_DIST_MAX_RETRIES=inf
+        SCCACHE_DIST_FALLBACK_TO_LOCAL_COMPILE=false
       build_command: |
-        # Repopulate the cache
-        export SCCACHE_RECACHE=1
-
-        # Prevent the sccache server from shutting down
-        export SCCACHE_IDLE_TIMEOUT=0
-
-        # Infinitely retry transient errors
-        export SCCACHE_DIST_MAX_RETRIES=inf
-
-        # Never fallback to locally compiling
-        export SCCACHE_DIST_FALLBACK_TO_LOCAL_COMPILE=false
-
         # Install the latest sccache client
         devcontainer-utils-install-sccache --repo trxcllnt/sccache;
 
