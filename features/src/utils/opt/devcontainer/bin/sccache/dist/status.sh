@@ -52,7 +52,7 @@ _sccache_dist_status() {
     id: .id,
     servers: (if .servers == null then "-" else (.servers | length) end),
     cpus: .info.occupancy,
-    util: ((.info.cpu_usage // 0) * 100 | round | . / 100 | tostring | . + "%"),
+    util: ((.info.cpu_usage // 0) * 1000 | floor | . / 1000 | tostring | . + "%"),
     jobs: (.jobs.loading + .jobs.pending + .jobs.running),
     loading: .jobs.loading,
     pending: .jobs.pending,

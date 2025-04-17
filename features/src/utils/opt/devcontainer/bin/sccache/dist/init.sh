@@ -15,8 +15,9 @@
 #                               (default: false)
 #  --no-local-compile-fallback  Disable building locally after retrying transient sccache-dist errors.
 #                               (default: false)
-#  --use-connection-pool        Enable sccache client HTTP connection pool.
+#  --connection-pool            Enable sccache client HTTP connection pool.
 #                               (default: false)
+#  --keepalive                  Enable sccache client HTTP keepalive.
 #
 # Options that require values:
 #  --auth-type (token|oauth2_code_grant_pkce|oauth2_implicit)   Auth type for build cluster auth.
@@ -26,9 +27,13 @@
 #  --auth-url <url>                                             Auth URL used to authenticate with the build cluster when `--auth-type=(oauth2_code_grant_pkce|oauth2_implicit)`.
 #  --token-url <url>                                            Token URL used to authenticate with the build cluster when `--auth-type=oauth2_code_grant_pkce`.
 #  --connect-timeout <num>                                      The sccache client HTTP connection timeout.
-#                                                               (default: 30)
+#                                                               (default: 5)
 #  --request-timeout <num>                                      The sccache client HTTP request timeout.
-#                                                               (default: 1800)
+#                                                               (default: 600)
+#  --keepalive-interval <num>                                   The sccache HTTP keepalive interval
+#                                                               (default: 20)
+#  --keepalive-timeout <num>                                    The sccache HTTP keepalive timeout
+#                                                               (default: 60)
 #  --scheduler-url <url>                                        URL of the sccache-dist build cluster.
 #  --max-retries <count>                                        Maximum number of times to retry transient sccache-dist errors.
 #                                                               Pass `--max-retries inf` to retry infinitely.
@@ -40,26 +45,19 @@ _init_sccache_dist() {
     local -;
     set -euo pipefail;
 
-    eval "$(devcontainer-utils-parse-args "$0" --take '-e,--enable-sccache-dist --enable-with-github-auth' "$@" <<< "")";
+    eval "$(devcontainer-utils-parse-args "$0" --take '-e,--enable-sccache-dist --enable-with-github-auth' "$@" <&0)";
 
     # shellcheck disable=SC1091
     . devcontainer-utils-debug-output 'devcontainer_utils_debug' 'sccache init-sccache-dist';
 
     if test -n "${enable_sccache_dist:+x}"; then
-        # Add sccache-dist configuration to ~/.config/sccache/config
-        devcontainer-utils-configure-sccache-dist "${OPTS[@]}" - <&0;
+        # Add sccache-dist configuration
+        devcontainer-utils-configure-sccache-dist - <<< "${OPTS[*]@Q}";
     elif test -n "${enable_with_github_auth:+x}"; then
-        devcontainer-utils-configure-sccache-dist - <<< "       \
-            --auth-type 'token' --auth-token '$(gh auth token)'";
+        devcontainer-utils-configure-sccache-dist - <<< "--auth-type token --auth-token '$(gh auth token)' ${OPTS[*]@Q}";
     else
-        # Delete sccache-dist configuration from ~/.config/sccache/config
-        SCCACHE_DIST_MAX_RETRIES=                \
-        SCCACHE_DIST_SCHEDULER_URL=              \
-        SCCACHE_DIST_CONNECT_TIMEOUT=            \
-        SCCACHE_DIST_REQUEST_TIMEOUT=            \
-        SCCACHE_DIST_CONNECTION_POOL=            \
-        SCCACHE_DIST_FALLBACK_TO_LOCAL_COMPILE=  \
-        devcontainer-utils-configure-sccache-dist;
+        # Reset sccache-dist configuration
+        SCCACHE_DIST_URL= devcontainer-utils-configure-sccache-dist;
     fi
 
     # Restart the sccache client with the new configuration

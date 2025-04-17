@@ -53,7 +53,7 @@ ENV SCCACHE_REGION="us-east-2"
 ENV SCCACHE_BUCKET="rapids-sccache-devs"
 ENV SCCACHE_DIST_CONNECT_TIMEOUT=30
 ENV SCCACHE_DIST_REQUEST_TIMEOUT=1800
-ENV SCCACHE_DIST_SCHEDULER_URL="https://${TARGETARCH}.linux.sccache.gha-runners.nvidia.com"
+ENV SCCACHE_DIST_URL="https://${TARGETARCH}.linux.sccache.gha-runners.nvidia.com"
 ENV SCCACHE_IDLE_TIMEOUT=1800
 ENV AWS_ROLE_ARN="arn:aws:iam::279114543810:role/nv-gha-token-sccache-devs"
 
