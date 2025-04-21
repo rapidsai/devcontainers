@@ -35,9 +35,6 @@
 #                                                               ensures the sccache client relies exclusively on the build cluster.
 #                                                               (default: 0)
 
-# shellcheck disable=SC1091
-. "$(dirname "$(realpath -m "${BASH_SOURCE[0]}")")/../../update-envvars.sh";
-
 _configure_sccache_dist() {
     local -;
     set -euo pipefail;
