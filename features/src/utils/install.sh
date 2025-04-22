@@ -22,9 +22,9 @@ PKGS=(
     ca-certificates
 );
 
-if ! command -v /usr/bin/python3 >/dev/null 2>&1; then
+if ! command -v python3 >/dev/null 2>&1; then
     PKGS+=(python3 python3-pip);
-elif ! /usr/bin/python3 -m pip >/dev/null 2>&1; then
+elif ! python3 -m pip >/dev/null 2>&1; then
     PKGS+=(python3-pip);
 fi
 
@@ -43,7 +43,7 @@ if [[ "${DISTRIB_RELEASE}" > "22.04" ]]; then
     fi
 fi
 
-/usr/bin/python3 -m pip install "${_PIP_INSTALL_ARGS[@]}" "${_PIP_UPGRADE_ARGS[@]}" pip;
+python3 -m pip install "${_PIP_INSTALL_ARGS[@]}" "${_PIP_UPGRADE_ARGS[@]}" pip;
 
 # Install yq if not installed
 if ! command -v yq >/dev/null 2>&1; then
@@ -140,11 +140,12 @@ for_each_user_bashrc 'sed -i -re "s/^#(export GCC_COLORS)/\1/g" "$0"';
 for_each_user_bashrc 'sed -i -re "s/^(HIST(FILE)?SIZE=).*$/\1/g" "$0"';
 
 # export envvars in bashrc files
-append_to_etc_bashrc "$(cat .bashrc)";
-append_to_all_bashrcs "$(cat .bashrc)";
+append_to_etc_bashrc "$(cat .bashrc)\n\nexport ORIG_PYTHON=$(which python3)";
+
+append_to_all_bashrcs "$(cat .bashrc)\n\nexport ORIG_PYTHON=$(which python3)";
 
 # export envvars in /etc/profile.d
-add_etc_profile_d_script devcontainer-utils "$(cat .bashrc)";
+add_etc_profile_d_script devcontainer-utils "$(cat .bashrc)\n\nexport ORIG_PYTHON=$(which python3)";
 
 # Add GitHub's key fingerprints to known_hosts (curl -s https://api.github.com/meta | jq -r '.ssh_keys | map("github.com \(.)") | .[]')
 # Add GitLab's key fingerprints to known_hosts (https://docs.gitlab.com/ee/user/gitlab_com/index.html#ssh-known_hosts-entries)
