@@ -112,14 +112,11 @@ mkdir -p /etc/bash_completion.d/;
 yq shell-completion bash | tee /etc/bash_completion.d/yq >/dev/null;
 
 # Activate venv in /etc/bash.bashrc
-append_to_etc_bashrc "$(cat .bashrc)";
-append_to_etc_bashrc "export BASE_PYTHON=$(which python3)";
+append_to_etc_bashrc "$(cat .bashrc)\n\nexport ORIG_PYTHON=$(which python3)";
 # Activate venv in ~/.bashrc
-append_to_all_bashrcs "$(cat .bashrc)";
-append_to_all_bashrcs "export BASE_PYTHON=$(which python3)";
+append_to_all_bashrcs "$(cat .bashrc)\n\nexport ORIG_PYTHON=$(which python3)";
 # export envvars in /etc/profile.d
-add_etc_profile_d_script rapids-build-utils "$(cat .bashrc)";
-echo "export BASE_PYTHON=$(which python3)" >> "/etc/profile.d/$(($(ls -1q /etc/profile.d/*.sh | wc -l) + 19))-rapids-build-utils.sh";
+add_etc_profile_d_script rapids-build-utils "$(cat .bashrc)\n\nexport ORIG_PYTHON=$(which python3)";
 
 # Clean up
 # rm -rf /tmp/*;

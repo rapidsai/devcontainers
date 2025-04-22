@@ -64,7 +64,7 @@ make_pip_dependencies() {
     local cuda_version="${CUDA_VERSION_MAJOR_MINOR:-}";
     local -r cuda_version_major="$(cut -d'.' -f1 <<< "${cuda_version}")";
 
-    local python_version="${PYTHON_VERSION:-$("${BASE_PYTHON:-python3}" --version 2>&1 | cut -d' ' -f2)}";
+    local python_version="${PYTHON_VERSION:-$("${ORIG_PYTHON:-python3}" --version 2>&1 | cut -d' ' -f2)}";
     python_version="$(cut -d'.' -f3 --complement <<< "${python_version}")";
 
     # Why default to cuda_suffixed=true?
