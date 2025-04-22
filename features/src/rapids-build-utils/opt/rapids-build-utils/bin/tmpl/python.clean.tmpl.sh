@@ -40,7 +40,7 @@ clean_${PY_LIB}_python() {
         fi
     done
 
-    local py_ver="${PYTHON_VERSION:-$(python3 --version 2>&1 | cut -d' ' -f2)}";
+    local py_ver="${PYTHON_VERSION:-$("${BASE_PYTHON:-python3}" --version 2>&1 | cut -d' ' -f2)}";
     py_ver="$(grep -Po '^[0-9]+\.[0-9]+' <<< "${py_ver}")";
 
     if test -d "${PY_SRC}/build"; then

@@ -113,10 +113,13 @@ yq shell-completion bash | tee /etc/bash_completion.d/yq >/dev/null;
 
 # Activate venv in /etc/bash.bashrc
 append_to_etc_bashrc "$(cat .bashrc)";
+append_to_etc_bashrc "BASE_PYTHON=$(which python3)";
 # Activate venv in ~/.bashrc
 append_to_all_bashrcs "$(cat .bashrc)";
+append_to_all_bashrcs "BASE_PYTHON=$(which python3)";
 # export envvars in /etc/profile.d
 add_etc_profile_d_script rapids-build-utils "$(cat .bashrc)";
+echo "BASE_PYTHON=$(which python3)" >> "$(which /etc/profile.d/*-rapids-build-utils.sh)";
 
 # Clean up
 # rm -rf /tmp/*;

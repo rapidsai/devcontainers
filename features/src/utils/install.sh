@@ -134,10 +134,14 @@ for_each_user_bashrc 'sed -i -re "s/^(HIST(FILE)?SIZE=).*$/\1/g" "$0"';
 
 # export envvars in bashrc files
 append_to_etc_bashrc "$(cat .bashrc)";
+append_to_etc_bashrc "BASE_PYTHON=$(which python3)";
+
 append_to_all_bashrcs "$(cat .bashrc)";
+append_to_all_bashrcs "BASE_PYTHON=$(which python3)";
 
 # export envvars in /etc/profile.d
 add_etc_profile_d_script devcontainer-utils "$(cat .bashrc)";
+echo "BASE_PYTHON=$(which python3)" >> "$(which /etc/profile.d/*-devcontainer-utils.sh)";
 
 # Add GitHub's key fingerprints to known_hosts (curl -s https://api.github.com/meta | jq -r '.ssh_keys | map("github.com \(.)") | .[]')
 # Add GitLab's key fingerprints to known_hosts (https://docs.gitlab.com/ee/user/gitlab_com/index.html#ssh-known_hosts-entries)
