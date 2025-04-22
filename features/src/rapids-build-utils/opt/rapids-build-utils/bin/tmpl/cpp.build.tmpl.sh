@@ -49,9 +49,7 @@ build_${CPP_LIB}_cpp() {
         local -a cmake_build_args="($(rapids-select-cmake-build-args ${n_jobs:+-j${n_jobs}} "${OPTS[@]}"))";
         cmake                               \
             --build "${CPP_SRC}/${BIN_DIR}" \
-            "${cmake_build_args[@]}"        \
-            --                              \
-            ${n_load:+-l${n_load}}          ;
+            "${cmake_build_args[@]}"        ;
         { set +x; } 2>/dev/null; echo -n "lib${CPP_LIB} build time:";
     ) 2>&1;
 }

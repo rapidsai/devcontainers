@@ -62,10 +62,6 @@ build_${PY_LIB}_python_wheel() {
         ninja_args+=("-j${n_jobs}");
     fi
 
-    if test -n "${n_load:+x}"; then
-        ninja_args+=("-l${n_load}");
-    fi
-
     local -a pip_args="(
         ${pip_args_+"${pip_args_[*]@Q}"}
         $(rapids-select-pip-wheel-args "$@")
