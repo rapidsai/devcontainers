@@ -14,7 +14,6 @@ x-gcc-12: &gcc_12 { name: "gcc", version: "12" }
 x-gcc-13: &gcc_13 { name: "gcc", version: "13" }
 x-gcc-14: &gcc_14 { name: "gcc", version: "14" }
 x-gcc-env: &gcc_env { CC: "gcc", CXX: "g++", CUDAHOSTCXX: "g++" }
-x-gcc-env-rapids: &gcc_env_rapids { CC: "gcc", CXX: "g++", CUDAHOSTCXX: "g++", PYTHON_VERSION: "3.12" }
 
 x-llvm-14: &llvm_14 { name: "llvm", version: "14" }
 x-llvm-15: &llvm_15 { name: "llvm", version: "15" }
@@ -31,7 +30,6 @@ x-nvhpc-env: &nvhpc_env { CC: "nvc", CXX: "nvc++", CUDAHOSTCXX: "nvc++" }
 
 x-mambaforge: &conda { name: "mambaforge" }
 x-python: &python { name: "ghcr.io/devcontainers/features/python:1.6.2", version: "os-provided", installTools: "false", hide: true }
-x-python-rapids: &python_rapids { name: "ghcr.io/devcontainers/features/python:1.6.2", version: "3.12", installTools: "false", hide: true }
 x-ucx-rapids: &ucx_rapids { name: "ucx", version: "1.18.0" }
 x-openmpi: &openmpi { name: "openmpi" }
 
@@ -142,14 +140,14 @@ include:
 - os: "ubuntu:22.04"
   images:
   # cuda
-  - { features: [*python_rapids, *clang_format_rapids, *clangd_dev, *cuda_prev_max], env: *gcc_env_rapids }
-  - { features: [*python_rapids, *clang_format_rapids, *clangd_dev, *cuda_curr_min], env: *gcc_env_rapids }
-  - { features: [*python_rapids, *clang_format_rapids, *clangd_dev, *cuda_curr_max], env: *gcc_env_rapids }
-  - { features: [*python_rapids, *clang_format_rapids, *clangd_dev, *cuda_curr_max_rapids], env: *gcc_env_rapids }
-  - { features: [*python_rapids, *clang_format_rapids, *clangd_dev, *cuda_prev_max, *ucx_rapids, *openmpi], env: *gcc_env_rapids }
-  - { features: [*python_rapids, *clang_format_rapids, *clangd_dev, *cuda_curr_min, *ucx_rapids, *openmpi], env: *gcc_env_rapids }
-  - { features: [*python_rapids, *clang_format_rapids, *clangd_dev, *cuda_curr_max, *ucx_rapids, *openmpi], env: *gcc_env_rapids }
-  - { features: [*python_rapids, *clang_format_rapids, *clangd_dev, *cuda_curr_max_rapids, *ucx_rapids, *openmpi], env: *gcc_env_rapids }
+  - { features: [*python, *clang_format_rapids, *clangd_dev, *cuda_prev_max], env: *gcc_env }
+  - { features: [*python, *clang_format_rapids, *clangd_dev, *cuda_curr_min], env: *gcc_env }
+  - { features: [*python, *clang_format_rapids, *clangd_dev, *cuda_curr_max], env: *gcc_env }
+  - { features: [*python, *clang_format_rapids, *clangd_dev, *cuda_curr_max_rapids], env: *gcc_env }
+  - { features: [*python, *clang_format_rapids, *clangd_dev, *cuda_prev_max, *ucx_rapids, *openmpi], env: *gcc_env }
+  - { features: [*python, *clang_format_rapids, *clangd_dev, *cuda_curr_min, *ucx_rapids, *openmpi], env: *gcc_env }
+  - { features: [*python, *clang_format_rapids, *clangd_dev, *cuda_curr_max, *ucx_rapids, *openmpi], env: *gcc_env }
+  - { features: [*python, *clang_format_rapids, *clangd_dev, *cuda_curr_max_rapids, *ucx_rapids, *openmpi], env: *gcc_env }
 
   # mambaforge
   - { features: [*conda], env: { PYTHON_VERSION: "3.12" } }
