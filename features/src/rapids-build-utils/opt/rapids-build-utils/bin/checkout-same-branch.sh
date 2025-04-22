@@ -17,6 +17,24 @@
 # shellcheck disable=SC1091
 . rapids-generate-docstring;
 
+# Function to convert ucx branch names
+convert-ucx-branch() {
+    repo=$1
+    custom_branch=$2
+    normalized_branch="${custom_branch}"
+
+    if [[ "${repo}" == "ucx"* ]]; then
+        RAPIDS_VERSION=$(echo "${custom_branch}" | awk '{split($0, a, "-"); print a[2]}')
+        if [[ "${RAPIDS_VERSION}" =~ ^[0-9]{2}\.[0-9]{2}$ ]]; then
+            # Get UCX version associated w/ RAPIDS version
+            UCX_VERSION="$(curl -sL https://version.gpuci.io/rapids/${RAPIDS_VERSION})"
+            normalized_branch="branch-${UCX_VERSION}"
+        fi
+    fi
+
+    echo "${normalized_branch}"
+}
+
 checkout_same_branch() {
     local -;
     set -euo pipefail;
@@ -47,6 +65,12 @@ checkout_same_branch() {
         fi
         local name="${!repo_name}";
         local path="${!repo_path}";
+
+        # Skip ucxx repositories when determining common branches
+        if [[ "${name}" == "ucx"* ]]; then
+            continue;
+        fi
+
         repo_names+=("${name}");
         repo_paths+=("${path}");
         repo_pairs+=("${name//"-"/"_"} ${path}");
@@ -118,6 +142,7 @@ checkout_same_branch() {
     for ((i=0; i < ${repos_length:-0}; i+=1)); do
 
         local repo="repos_${i}";
+        local repo_name="${repo}_name";
         local repo_path="${repo}_path";
 
         if [[ ! -d ~/"${!repo_path:-}/.git" ]]; then
@@ -126,6 +151,16 @@ checkout_same_branch() {
 
         local remote="${branch_name/\/*}";
         local branch="${branch_name/#"${remote}/"}";
+
+        # Apply normalization for ucxx repositories
+        local repo_name_val="${!repo_name}";
+        local normalized_branch;
+        normalized_branch=$(convert-ucx-branch "${repo_name_val}" "${branch}");
+
+        if [[ "${repo_name_val}" == "ucx"* ]]; then
+            echo "Using normalized branch '${normalized_branch}' for repository '${repo_name_val}'";
+            branch="${normalized_branch}";
+        fi
 
         git -C ~/${!repo_path} fetch "${remote}" "refs/heads/${branch}";
 
