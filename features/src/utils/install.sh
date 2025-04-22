@@ -21,9 +21,9 @@ PKGS=(
     ca-certificates
 );
 
-if ! command -v /usr/bin/python3 >/dev/null 2>&1; then
+if ! command -v python3 >/dev/null 2>&1; then
     PKGS+=(python3 python3-pip);
-elif ! /usr/bin/python3 -m pip >/dev/null 2>&1; then
+elif ! python3 -m pip >/dev/null 2>&1; then
     PKGS+=(python3-pip);
 fi
 
@@ -42,7 +42,7 @@ if [[ "${DISTRIB_RELEASE}" > "22.04" ]]; then
     fi
 fi
 
-/usr/bin/python3 -m pip install "${_PIP_INSTALL_ARGS[@]}" "${_PIP_UPGRADE_ARGS[@]}" pip;
+python3 -m pip install "${_PIP_INSTALL_ARGS[@]}" "${_PIP_UPGRADE_ARGS[@]}" pip;
 
 # Install yq if not installed
 if ! command -v yq >/dev/null 2>&1; then
