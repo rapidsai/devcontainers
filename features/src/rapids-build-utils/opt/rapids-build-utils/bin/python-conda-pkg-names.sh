@@ -17,7 +17,7 @@
 # shellcheck disable=SC1091
 . rapids-generate-docstring;
 
-python_conda_pkg_names() {
+_python_conda_pkg_names() {
     local -;
     set -euo pipefail;
 
@@ -38,7 +38,12 @@ python_conda_pkg_names() {
         if test -d ~/"${!repo_path:-}/.git"; then
             # the regex will continue until morale improves
             find ~/"${!repo_path}/"            \
-              -type f -name 'meta.yaml'        \
+              -type f                          \
+              \(                               \
+                -name 'meta.yaml'              \
+                -or                            \
+                -name 'recipe.yaml'            \
+              \)                               \
               ! -path '*/.conda/*'             \
               ! -path '*/build/*'              \
               ! -path '*/_skbuild/*'           \
@@ -47,9 +52,12 @@ python_conda_pkg_names() {
               2>/dev/null                      \
               | tr -d '[:blank:]'              \
               | cut -d':' -f2                  \
+              | tr '[:space:]' '\0'            \
+              | tr -s '\0'                     \
+              | tr '\0' '\n'                   \
             ;
         fi
-    done
+    done | sort -u;
 }
 
-python_conda_pkg_names "$@" <&0;
+_python_conda_pkg_names "$@" <&0;
