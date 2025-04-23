@@ -9,9 +9,9 @@ cd "$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )";
 
 PKGS=(bc jq pigz sudo wget gettext-base bash-completion ca-certificates);
 
-if ! command -v /usr/bin/python3 >/dev/null 2>&1; then
+if ! command -v python3 >/dev/null 2>&1; then
     PKGS+=(python3 python3-pip);
-elif ! /usr/bin/python3 -m pip >/dev/null 2>&1; then
+elif ! python3 -m pip >/dev/null 2>&1; then
     PKGS+=(python3-pip);
 fi
 
@@ -43,9 +43,9 @@ if [[ "${DISTRIB_RELEASE}" > "22.04" ]]; then
     fi
 fi
 
-/usr/bin/python3 -m pip install "${_PIP_INSTALL_ARGS[@]}" "${_PIP_UPGRADE_ARGS[@]}" pip;
+python3 -m pip install "${_PIP_INSTALL_ARGS[@]}" "${_PIP_UPGRADE_ARGS[@]}" pip;
 # Install RAPIDS dependency file generator, conda-merge, and toml
-/usr/bin/python3 -m pip install "${_PIP_INSTALL_ARGS[@]}" \
+python3 -m pip install "${_PIP_INSTALL_ARGS[@]}" \
     'rapids-dependency-file-generator<1.14' \
     conda-merge \
     toml;
@@ -112,11 +112,11 @@ mkdir -p /etc/bash_completion.d/;
 yq shell-completion bash | tee /etc/bash_completion.d/yq >/dev/null;
 
 # Activate venv in /etc/bash.bashrc
-append_to_etc_bashrc "$(cat .bashrc)";
+append_to_etc_bashrc "$(cat .bashrc)\n\nexport ORIG_PYTHON=$(which python3)";
 # Activate venv in ~/.bashrc
-append_to_all_bashrcs "$(cat .bashrc)";
+append_to_all_bashrcs "$(cat .bashrc)\n\nexport ORIG_PYTHON=$(which python3)";
 # export envvars in /etc/profile.d
-add_etc_profile_d_script rapids-build-utils "$(cat .bashrc)";
+add_etc_profile_d_script rapids-build-utils "$(cat .bashrc)\n\nexport ORIG_PYTHON=$(which python3)";
 
 # Clean up
 # rm -rf /tmp/*;
