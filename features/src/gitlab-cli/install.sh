@@ -15,10 +15,15 @@ cd "$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )";
 
 gitlab_cli_file_name() {
     local -;
-    set -euxo pipefail;
+    set -euo pipefail;
 
     local os="$(uname -s)";
     local arch="${TARGETARCH:-}";
+
+    echo "gitlab_cli_file_name" > &2;
+    echo "os: $os" > &2;
+    echo "arch: $os" > &2;
+    echo "CLI_VERSION: $CLI_VERSION" > &2;
 
     if [[ "${CLI_VERSION}" < "1.47.0" ]]; then
         arch="${arch:-$(uname -m)}";
