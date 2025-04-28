@@ -33,10 +33,8 @@ gitlab_cli_file_name() {
 download_gitlab_cli_deb() {
     local -;
     set -euo pipefail;
-    local filename="$(gitlab_cli_file_name)";
-    echo "GitLab CLI filename: $filename" >&2;
     wget --no-hsts -q -O /tmp/gitlab-cli.deb \
-        "https://gitlab.com/gitlab-org/cli/-/releases/v${CLI_VERSION}/downloads/$filename";
+        "https://gitlab.com/gitlab-org/cli/-/releases/v${CLI_VERSION}/downloads/$(gitlab_cli_file_name)";
 }
 
 # Fall back on direct download if no apt package exists
