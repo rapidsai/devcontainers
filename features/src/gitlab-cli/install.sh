@@ -20,14 +20,11 @@ gitlab_cli_file_name() {
     local os="$(uname -s)";
     local arch="${TARGETARCH:-}";
 
-    echo "gitlab_cli_file_name" >&2;
-    echo "os: $os" >&2;
-    echo "arch: $os" >&2;
-    echo "CLI_VERSION: $CLI_VERSION" >&2;
-
     if [[ "${CLI_VERSION}" < "1.47.0" ]]; then
+        echo "CLI_VERSION < 1.47.0" >&2;
         arch="${arch:-$(uname -m)}";
     else
+        echo "CLI_VERSION >= 1.47.0" >&2;
         arch="${arch:-$(dpkg --print-architecture | awk -F'-' '{print $NF}')}";
         os="${os,,}";
     fi
