@@ -20,10 +20,10 @@ gitlab_cli_file_name() {
     local os="$(uname -s)";
     local arch="${TARGETARCH:-}";
 
-    echo "gitlab_cli_file_name" > &2;
-    echo "os: $os" > &2;
-    echo "arch: $os" > &2;
-    echo "CLI_VERSION: $CLI_VERSION" > &2;
+    echo "gitlab_cli_file_name" >&2;
+    echo "os: $os" >&2;
+    echo "arch: $os" >&2;
+    echo "CLI_VERSION: $CLI_VERSION" >&2;
 
     if [[ "${CLI_VERSION}" < "1.47.0" ]]; then
         arch="${arch:-$(uname -m)}";
