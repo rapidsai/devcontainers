@@ -3,7 +3,7 @@
 # Copyright (c) Microsoft Corporation. All rights reserved.
 # Licensed under the MIT License. See https://go.microsoft.com/fwlink/?linkid=2090316 for license information.
 #-------------------------------------------------------------------------------------------------------------
-set -ex
+set -e
 
 CLI_VERSION=${VERSION:-"latest"};
 
@@ -15,7 +15,7 @@ cd "$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )";
 
 gitlab_cli_file_name() {
     local -;
-    set -euo pipefail;
+    set -euxo pipefail;
 
     local os="$(uname -s)";
     local arch="${TARGETARCH:-}";
