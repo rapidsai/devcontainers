@@ -34,15 +34,19 @@ repos:
       sub_dir: cpp
       depends: [rmm]
       args: {cmake: -DUCXX_ENABLE_RMM=ON}
+    - name: ucxx-python
+      sub_dir: cpp/python
+      depends: [ucxx]
+      args: {cmake: -DFIND_UCXX_CPP=ON}
   python:
     - name: ucxx
       sub_dir: python/ucxx
-      depends: [ucxx]
-      args: {cmake: -DFIND_UCXX_CPP=ON, install: *rapids_build_backend_args}
+      depends: [ucxx-python]
+      args: {cmake: -DFIND_UCXX_CPP=ON -DFIND_UCXX_PYTHON=ON, install: *rapids_build_backend_args}
     - name: distributed-ucxx
       sub_dir: python/distributed-ucxx
-      depends: [ucxx]
-      args: {cmake: -DFIND_UCXX_CPP=ON, install: *rapids_build_backend_args}
+      depends: [ucxx-python]
+      args: {cmake: -DFIND_UCXX_CPP=ON -DFIND_UCXX_PYTHON=ON, install: *rapids_build_backend_args}
 
 - name: kvikio
   path: kvikio
@@ -95,6 +99,19 @@ repos:
       args: {install: *rapids_build_backend_args}
     - name: custreamz
       sub_dir: python/custreamz
+      args: {install: *rapids_build_backend_args}
+
+- name: rapidsmpf
+  path: rapidsmpf
+  git: {<<: *git_defaults, repo: rapidsmpf}
+  cpp:
+    - name: rapidsmpf
+      sub_dir: cpp
+      depends: [rmm, ucxx, cudf]
+  python:
+    - name: rapidsmpf
+      sub_dir: python/rapidsmpf
+      depends: [rapidsmpf, ucxx-python]
       args: {install: *rapids_build_backend_args}
 
 - name: raft
