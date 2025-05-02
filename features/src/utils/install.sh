@@ -102,6 +102,7 @@ declare -a commands_and_sources=(
     "init-ssh-deploy-keys               ssh/init-deploy-keys.sh"
     "init-github-cli                    github/cli/init.sh"
     "clone-github-repo                  github/repo/clone.sh"
+    "github-user-scopes                 github/user/scopes.sh"
     "init-gitlab-cli                    gitlab/cli/init.sh"
     "clone-gitlab-repo                  gitlab/repo/clone.sh"
     "print-missing-gitlab-token-warning gitlab/print-missing-token-warning.sh"

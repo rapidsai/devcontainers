@@ -50,15 +50,29 @@ _init_sccache_dist() {
     # shellcheck disable=SC1091
     . devcontainer-utils-debug-output 'devcontainer_utils_debug' 'sccache init-sccache-dist';
 
-    if test -n "${enable_sccache_dist:+x}"; then
-        # Add sccache-dist configuration
-        devcontainer-utils-configure-sccache-dist - <<< "${OPTS[*]@Q}";
-    elif test -n "${enable_with_github_auth:+x}"; then
-        devcontainer-utils-configure-sccache-dist - <<< "--auth-type token --auth-token '$(gh auth token)' ${OPTS[*]@Q}";
-    else
+    while true; do
+        if test -n "${enable_sccache_dist:+x}"; then
+            # Passthrough args to configure-sccache-dist
+            devcontainer-utils-configure-sccache-dist - <<< "${OPTS[*]@Q}";
+            break;
+        fi
+        if test -n "${enable_with_github_auth:+x}"; then
+            if devcontainer-utils-shell-is-interactive; then
+                # Initialize the GitHub CLI with the appropriate user scopes
+                # shellcheck disable=SC1091
+                . devcontainer-utils-init-github-cli;
+            fi
+            read -ra sccache_dist_gh_scopes <<< "${SCCACHE_DIST_GH_SCOPES:-"read:enterprise"}";
+            read -ra sccache_dist_gh_scopes <<< "${sccache_dist_gh_scopes[*]/#/--scopes }";
+            if grep -qE "^$" <(devcontainer-utils-github-user-scopes "${sccache_dist_gh_scopes[@]}" --complement); then
+                devcontainer-utils-configure-sccache-dist - <<< "--auth-type token --auth-token '$(gh auth token)' ${OPTS[*]@Q}";
+                break;
+            fi
+        fi
         # Reset sccache-dist configuration
         SCCACHE_DIST_URL= devcontainer-utils-configure-sccache-dist;
-    fi
+        break;
+    done
 
     # Restart the sccache client with the new configuration
     devcontainer-utils-start-sccache;
