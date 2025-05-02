@@ -45,6 +45,7 @@ build_${CPP_LIB}_cpp() {
 
     # Build C++ lib
     time (
+        echo "Building lib${CPP_LIB}";
         export ${CPP_ENV} PATH="$PATH";
         local -a cmake_build_args="($(rapids-select-cmake-build-args ${n_jobs:+-j${n_jobs}} "${OPTS[@]}"))";
         cmake                               \

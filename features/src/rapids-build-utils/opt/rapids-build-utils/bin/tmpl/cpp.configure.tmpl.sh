@@ -56,6 +56,7 @@ configure_${CPP_LIB}_cpp() {
     cmake_args+=(-B "${bin_dir:-${CPP_SRC}/${BIN_DIR}}");
 
     time (
+        echo "Configuring lib${CPP_LIB}";
         export ${CPP_ENV} PATH="$PATH";
         SCCACHE_NO_DIST_COMPILE=1                         \
         CUDAFLAGS="${CUDAFLAGS:+$CUDAFLAGS }-t=${n_arch}" \
