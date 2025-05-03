@@ -17,12 +17,15 @@ generate_completions() {
         . devcontainer-utils-debug-output 'rapids_build_utils_debug' 'generate-scripts';
 
         readarray -t commands < <(find "${TMP_SCRIPT_DIR}"/ -maxdepth 1 -type f -exec basename {} \;);
+        read -ra commands <<< "${commands[*]/#/--command }";
 
-        devcontainer-utils-generate-bash-completion          \
-            --out-file "$(realpath -m "${COMPLETION_FILE}")" \
-            --template "$(realpath -m "${COMPLETION_TMPL}")" \
-            ${commands[@]/#/--command }                      \
-        ;
+        if test "${#commands[@]}" -gt 0; then
+            devcontainer-utils-generate-bash-completion          \
+                --out-file "$(realpath -m "${COMPLETION_FILE}")" \
+                --template "$(realpath -m "${COMPLETION_TMPL}")" \
+                "${commands[@]}"                                 \
+            ;
+        fi
     fi
 }
 

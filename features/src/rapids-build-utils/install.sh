@@ -96,10 +96,13 @@ done
 
 # Install bash_completion script
 if command -v devcontainer-utils-generate-bash-completion >/dev/null 2>&1; then
-    devcontainer-utils-generate-bash-completion                          \
-        --out-file /etc/bash_completion.d/rapids-build-utils-completions \
-        ${commands[@]/#/--command rapids-}                               \
-    ;
+    read -ra commands <<< "${commands[*]/#/--command rapids-}";
+    if test "${#commands[@]}" -gt 0; then
+        devcontainer-utils-generate-bash-completion                          \
+            --out-file /etc/bash_completion.d/rapids-build-utils-completions \
+            "${commands[@]}"                                                 \
+        ;
+    fi
 fi
 
 find /opt/rapids-build-utils \
