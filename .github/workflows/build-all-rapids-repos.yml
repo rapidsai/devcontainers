@@ -49,6 +49,8 @@ jobs:
         SCCACHE_DIST_MAX_RETRIES=inf
         SCCACHE_DIST_FALLBACK_TO_LOCAL_COMPILE=false
       build_command: |
+        set -x;
+
         # Install the latest sccache client
         devcontainer-utils-install-sccache --repo trxcllnt/sccache;
 
@@ -70,8 +72,6 @@ jobs:
         # This appears to have been fixed 13 years ago (https://github.com/ninja-build/ninja/issues/233),
         # so that fix needs to be integrated into the kitware pip ninja builds.
         rapids-post-start-command --exclude <(echo ninja);
-
-        set -x;
 
         # Configure all the C++ libs
         configure-all                 \
