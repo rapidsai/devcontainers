@@ -82,7 +82,7 @@ build_and_install_openmpi() {
     local -a cuda_args=();
     if test "${ENABLE_CUDA:-}" = 1; then
         cuda_args+=(--with-cuda="${CUDA_HOME:-/usr/local/cuda}");
-        cuda_args+=(--with-cuda-libdir="${CUDA_HOME:-/usr/local/cuda}/lib64/stubs}");
+        cuda_args+=(--with-cuda-libdir="${CUDA_HOME:-/usr/local/cuda}/lib64/stubs");
     fi
 
     IFS=" " read -r -a openmpi_dev_deps <<< "$(install_openmpi_deps)";
