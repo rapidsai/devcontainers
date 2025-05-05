@@ -136,6 +136,7 @@ include:
   - { features: [{ <<: *cuda_curr_max, <<: *cccl_cuda_opts }, { name: "cl", version: "14.39" }] } # MSVC 2022
   - { features: [{ <<: *cuda_curr_max, <<: *cccl_cuda_opts }, { name: "cl", version: "14.41" }] } # MSVC 2022
   - { features: [{ <<: *cuda_curr_max, <<: *cccl_cuda_opts }, { name: "cl", version: "14.42" }] } # MSVC 2022
+  - { features: [{ <<: *cuda_curr_max, <<: *cccl_cuda_opts }, { name: "cl", version: "14.43" }] } # MSVC 2022
 
 # RAPIDS devcontainers
 
