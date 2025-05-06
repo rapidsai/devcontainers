@@ -32,39 +32,46 @@ read_cuda_version() {
 
 ENABLE_UCX=;
 ENABLE_CUDA=;
+USE_SYSTEM_VER=;
 
 if test -n "${UCX_VERSION:+x}"; then ENABLE_UCX=1; fi
 if read_cuda_version >/dev/null 2>&1; then ENABLE_CUDA=1; fi
 
 install_openmpi_deps() {
-    local -r openmpi_lib="$(
-        apt-cache depends libopenmpi-dev \
-      | grep -P '^  Depends:'            \
-      | sed 's/^  Depends: //'           \
-      | grep libopenmpi                  \
-    )";
+    local dev_deps=();
+    local run_deps=();
 
-    mapfile -t run_deps < <(
-        apt-cache depends "${openmpi_lib}"   \
-      | grep -v -P '^  (Depends: <)'         \
-      | grep -P '^  Depends:'                \
-      | sed 's/^  Depends: //'               \
-      | (                                    \
-        if test "${ENABLE_UCX:-}" = 1;       \
-        then grep -v ucx || [ "$?" == "1" ]; \
-        else cat -; \
-        fi \
-        )  \
-    );
+    if test -n "${USE_SYSTEM_VER:+x}"; then
+        local -r openmpi_lib="$(
+            apt-cache depends libopenmpi-dev \
+          | grep -P '^  Depends:'            \
+          | sed 's/^  Depends: //'           \
+          | grep libopenmpi                  \
+        )";
 
-    mapfile -t dev_deps < <(
-        apt-cache depends libopenmpi-dev   \
-      | grep -v -P 'openmpi'               \
-      | grep -v -P '^  (Depends: <)'       \
-      | grep -P '^  Depends:'              \
-      | sed 's/^  Depends: //'             \
-    );
+        mapfile -t run_deps < <(
+            apt-cache depends "${openmpi_lib}"   \
+          | grep -v -P '^  (Depends: <)'         \
+          | grep -P '^  Depends:'                \
+          | sed 's/^  Depends: //'               \
+          | (                                    \
+            if test "${ENABLE_UCX:-}" = 1;       \
+            then grep -v ucx || [ "$?" == "1" ]; \
+            else cat -; \
+            fi \
+            )  \
+          );
 
+        mapfile -t dev_deps < <(
+            apt-cache depends libopenmpi-dev \
+          | grep -v -P 'openmpi'             \
+          | grep -v -P '^  (Depends: <)'     \
+          | grep -P '^  Depends:'            \
+          | sed 's/^  Depends: //'           \
+        );
+    fi
+
+    dev_deps+=(libevent-dev);
     run_deps+=(build-essential gfortran);
 
     echo "Installing packages: ${run_deps[*]} ${dev_deps[*]}" >&2;
@@ -82,7 +89,7 @@ build_and_install_openmpi() {
     local -a cuda_args=();
     if test "${ENABLE_CUDA:-}" = 1; then
         cuda_args+=(--with-cuda="${CUDA_HOME:-/usr/local/cuda}");
-        cuda_args+=(--with-cuda-libdir="${CUDA_HOME:-/usr/local/cuda}/lib64/stubs}");
+        cuda_args+=(--with-cuda-libdir="${CUDA_HOME:-/usr/local/cuda}/lib64/stubs");
     fi
 
     IFS=" " read -r -a openmpi_dev_deps <<< "$(install_openmpi_deps)";
@@ -94,6 +101,7 @@ build_and_install_openmpi() {
 
     (
         cd /tmp/ompi;
+        ./configure --help;
         ./configure \
             --prefix=/usr \
             --disable-dependency-tracking \
@@ -105,9 +113,9 @@ build_and_install_openmpi() {
             --with-wrapper-fcflags="-I/usr/include" \
             --with-wrapper-ldflags="-L/usr/lib -Wl,-rpath,/usr/lib" \
             --with-sge \
-            --with-hwloc=/usr \
-            --with-libevent=/usr \
-            --with-zlib=/usr \
+            --with-hwloc \
+            --with-libevent \
+            --with-zlib \
             --enable-mca-dso \
             "${ucx_args[@]}" \
             "${cuda_args[@]}";
@@ -142,10 +150,14 @@ build_and_install_openmpi() {
 apt_get_update;
 check_packages bzip2 wget ca-certificates bash-completion gettext-base pkg-config;
 
-if ! test -n "${OPENMPI_VERSION:+x}" || test "${OPENMPI_VERSION:-}" = latest; then
-    find_version_from_git_tags OPENMPI_VERSION https://github.com/open-mpi/ompi;
-elif [ "${OPENMPI_VERSION:-}" = "system" ]; then
+if [ "${OPENMPI_VERSION:-}" = "system" ]; then
+    USE_SYSTEM_VER=1;
     OPENMPI_VERSION="$(apt-cache policy libopenmpi-dev | grep Candidate: | tr -d '[:blank:]' | cut -d: -f2 | cut -d- -f1)";
+elif ! test -n "${OPENMPI_VERSION:+x}" || test "${OPENMPI_VERSION:-}" = latest; then
+    find_version_from_git_tags OPENMPI_VERSION https://github.com/open-mpi/ompi;
+    if dpkg -s libpmix-dev > /dev/null 2>&1; then
+        DEBIAN_FRONTEND=noninteractive apt-get remove -y libpmix-dev;
+    fi
 fi
 
 if dpkg -s libopenmpi-dev > /dev/null 2>&1; then
