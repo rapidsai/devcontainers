@@ -33,7 +33,7 @@ x-mambaforge: &conda { name: "mambaforge" }
 x-python: &python { name: "ghcr.io/devcontainers/features/python:1.7.1", version: "os-provided", installTools: false, enableShared: true, optimize: true, hide: true }
 x-python-rapids: &python_rapids { name: "ghcr.io/devcontainers/features/python:1.7.1", version: "3.12", installTools: false, enableShared: true, optimize: true, hide: true }
 x-ucx-rapids: &ucx_rapids { name: "ucx", version: "1.18.0" }
-x-openmpi: &openmpi { name: "openmpi" }
+x-openmpi: &openmpi { name: "openmpi", version: "5.0.7" }
 
 x-cccl-dev: &cccl_dev { name: "cccl-dev", hide: true }
 x-clangd-dev: &clangd_dev { name: "llvm", version: "20", packages: "clangd", hide: true }
@@ -117,24 +117,13 @@ include:
 - os: "windows"
   images:
   # lowest CUDA version
-  - { features: [{ <<: *cuda_prev_min, <<: *cccl_cuda_opts }, { name: "cl", version: "14.14" }] } # MSVC 2017
-  - { features: [{ <<: *cuda_prev_min, <<: *cccl_cuda_opts }, { name: "cl", version: "14.15" }] } # MSVC 2017
-  - { features: [{ <<: *cuda_prev_min, <<: *cccl_cuda_opts }, { name: "cl", version: "14.16" }] } # MSVC 2017
-  - { features: [{ <<: *cuda_prev_min, <<: *cccl_cuda_opts }, { name: "cl", version: "14.27" }] } # MSVC 2019
-  - { features: [{ <<: *cuda_prev_min, <<: *cccl_cuda_opts }, { name: "cl", version: "14.28" }] } # MSVC 2019
   - { features: [{ <<: *cuda_prev_min, <<: *cccl_cuda_opts }, { name: "cl", version: "14.29" }] } # MSVC 2019
   # middlest CUDA version
   - { features: [{ <<: *cuda_curr_min, <<: *cccl_cuda_opts }, { name: "cl", version: "14.29" }] } # MSVC 2019
   - { features: [{ <<: *cuda_curr_min, <<: *cccl_cuda_opts }, { name: "cl", version: "14.39" }] } # MSVC 2022
   # highest CUDA version
-  - { features: [{ <<: *cuda_curr_max, <<: *cccl_cuda_opts }, { name: "cl", version: "14.14" }] } # MSVC 2017
-  - { features: [{ <<: *cuda_curr_max, <<: *cccl_cuda_opts }, { name: "cl", version: "14.15" }] } # MSVC 2017
-  - { features: [{ <<: *cuda_curr_max, <<: *cccl_cuda_opts }, { name: "cl", version: "14.16" }] } # MSVC 2017
-  - { features: [{ <<: *cuda_curr_max, <<: *cccl_cuda_opts }, { name: "cl", version: "14.27" }] } # MSVC 2019
-  - { features: [{ <<: *cuda_curr_max, <<: *cccl_cuda_opts }, { name: "cl", version: "14.28" }] } # MSVC 2019
   - { features: [{ <<: *cuda_curr_max, <<: *cccl_cuda_opts }, { name: "cl", version: "14.29" }] } # MSVC 2019
   - { features: [{ <<: *cuda_curr_max, <<: *cccl_cuda_opts }, { name: "cl", version: "14.39" }] } # MSVC 2022
-  - { features: [{ <<: *cuda_curr_max, <<: *cccl_cuda_opts }, { name: "cl", version: "14.41" }] } # MSVC 2022
   - { features: [{ <<: *cuda_curr_max, <<: *cccl_cuda_opts }, { name: "cl", version: "14.42" }] } # MSVC 2022
   - { features: [{ <<: *cuda_curr_max, <<: *cccl_cuda_opts }, { name: "cl", version: "14.43" }] } # MSVC 2022
 
