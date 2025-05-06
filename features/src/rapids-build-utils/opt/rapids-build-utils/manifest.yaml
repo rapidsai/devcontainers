@@ -39,14 +39,17 @@ repos:
       depends: [ucxx]
       args: {cmake: -DFIND_UCXX_CPP=ON}
   python:
+    - name: libucxx
+      sub_dir: python/libucxx
+      args: {install: *rapids_build_backend_args}
     - name: ucxx
       sub_dir: python/ucxx
-      depends: [ucxx-python]
-      args: {cmake: -DFIND_UCXX_CPP=ON -DFIND_UCXX_PYTHON=ON, install: *rapids_build_backend_args}
+      depends: [ucxx, ucxx-python]
+      args: {cmake: -DFIND_UCXX_PYTHON=ON, install: *rapids_build_backend_args}
     - name: distributed-ucxx
       sub_dir: python/distributed-ucxx
-      depends: [ucxx-python]
-      args: {cmake: -DFIND_UCXX_CPP=ON -DFIND_UCXX_PYTHON=ON, install: *rapids_build_backend_args}
+      depends: [ucxx, ucxx-python]
+      args: {install: *rapids_build_backend_args}
 
 - name: kvikio
   path: kvikio
