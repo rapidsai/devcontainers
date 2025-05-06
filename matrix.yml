@@ -117,24 +117,13 @@ include:
 - os: "windows"
   images:
   # lowest CUDA version
-  - { features: [{ <<: *cuda_prev_min, <<: *cccl_cuda_opts }, { name: "cl", version: "14.14" }] } # MSVC 2017
-  - { features: [{ <<: *cuda_prev_min, <<: *cccl_cuda_opts }, { name: "cl", version: "14.15" }] } # MSVC 2017
-  - { features: [{ <<: *cuda_prev_min, <<: *cccl_cuda_opts }, { name: "cl", version: "14.16" }] } # MSVC 2017
-  - { features: [{ <<: *cuda_prev_min, <<: *cccl_cuda_opts }, { name: "cl", version: "14.27" }] } # MSVC 2019
-  - { features: [{ <<: *cuda_prev_min, <<: *cccl_cuda_opts }, { name: "cl", version: "14.28" }] } # MSVC 2019
   - { features: [{ <<: *cuda_prev_min, <<: *cccl_cuda_opts }, { name: "cl", version: "14.29" }] } # MSVC 2019
   # middlest CUDA version
   - { features: [{ <<: *cuda_curr_min, <<: *cccl_cuda_opts }, { name: "cl", version: "14.29" }] } # MSVC 2019
   - { features: [{ <<: *cuda_curr_min, <<: *cccl_cuda_opts }, { name: "cl", version: "14.39" }] } # MSVC 2022
   # highest CUDA version
-  - { features: [{ <<: *cuda_curr_max, <<: *cccl_cuda_opts }, { name: "cl", version: "14.14" }] } # MSVC 2017
-  - { features: [{ <<: *cuda_curr_max, <<: *cccl_cuda_opts }, { name: "cl", version: "14.15" }] } # MSVC 2017
-  - { features: [{ <<: *cuda_curr_max, <<: *cccl_cuda_opts }, { name: "cl", version: "14.16" }] } # MSVC 2017
-  - { features: [{ <<: *cuda_curr_max, <<: *cccl_cuda_opts }, { name: "cl", version: "14.27" }] } # MSVC 2019
-  - { features: [{ <<: *cuda_curr_max, <<: *cccl_cuda_opts }, { name: "cl", version: "14.28" }] } # MSVC 2019
   - { features: [{ <<: *cuda_curr_max, <<: *cccl_cuda_opts }, { name: "cl", version: "14.29" }] } # MSVC 2019
   - { features: [{ <<: *cuda_curr_max, <<: *cccl_cuda_opts }, { name: "cl", version: "14.39" }] } # MSVC 2022
-  - { features: [{ <<: *cuda_curr_max, <<: *cccl_cuda_opts }, { name: "cl", version: "14.41" }] } # MSVC 2022
   - { features: [{ <<: *cuda_curr_max, <<: *cccl_cuda_opts }, { name: "cl", version: "14.42" }] } # MSVC 2022
   - { features: [{ <<: *cuda_curr_max, <<: *cccl_cuda_opts }, { name: "cl", version: "14.43" }] } # MSVC 2022
 
