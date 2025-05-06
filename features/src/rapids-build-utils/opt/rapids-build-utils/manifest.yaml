@@ -106,7 +106,7 @@ repos:
 
 - name: rapidsmpf
   path: rapidsmpf
-  git: {<<: *git_defaults, repo: rapidsmpf}
+  git: {<<: *git_defaults, repo: rapidsmpf, upstream: trxcllnt, tag: fix/pip-requirements}
   cpp:
     - name: rapidsmpf
       sub_dir: cpp
