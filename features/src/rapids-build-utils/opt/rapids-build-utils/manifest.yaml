@@ -34,15 +34,22 @@ repos:
       sub_dir: cpp
       depends: [rmm]
       args: {cmake: -DUCXX_ENABLE_RMM=ON}
+    - name: ucxx-python
+      sub_dir: cpp/python
+      depends: [ucxx]
+      args: {cmake: -DFIND_UCXX_CPP=ON}
   python:
+    - name: libucxx
+      sub_dir: python/libucxx
+      args: {install: *rapids_build_backend_args}
     - name: ucxx
       sub_dir: python/ucxx
-      depends: [ucxx]
-      args: {cmake: -DFIND_UCXX_CPP=ON, install: *rapids_build_backend_args}
+      depends: [ucxx, ucxx-python]
+      args: {cmake: -DFIND_UCXX_PYTHON=ON, install: *rapids_build_backend_args}
     - name: distributed-ucxx
       sub_dir: python/distributed-ucxx
-      depends: [ucxx]
-      args: {cmake: -DFIND_UCXX_CPP=ON, install: *rapids_build_backend_args}
+      depends: [ucxx, ucxx-python]
+      args: {install: *rapids_build_backend_args}
 
 - name: kvikio
   path: kvikio
@@ -95,6 +102,19 @@ repos:
       args: {install: *rapids_build_backend_args}
     - name: custreamz
       sub_dir: python/custreamz
+      args: {install: *rapids_build_backend_args}
+
+- name: rapidsmpf
+  path: rapidsmpf
+  git: {<<: *git_defaults, repo: rapidsmpf}
+  cpp:
+    - name: rapidsmpf
+      sub_dir: cpp
+      depends: [rmm, ucxx, cudf]
+  python:
+    - name: rapidsmpf
+      sub_dir: python/rapidsmpf
+      depends: [rapidsmpf, ucxx-python]
       args: {install: *rapids_build_backend_args}
 
 - name: raft
@@ -232,32 +252,4 @@ repos:
   python:
     - name: nx-cugraph
       sub_dir: .
-      args: {install: *rapids_build_backend_args}
-
-- name: cuspatial
-  path: cuspatial
-  git: {<<: *git_defaults, repo: cuspatial}
-  cpp:
-    - name: cuspatial
-      sub_dir: cpp
-      depends: [cudf]
-  python:
-    - name: libcuspatial
-      sub_dir: python/libcuspatial
-      depends: [cuspatial]
-      args: {install: *rapids_build_backend_args}
-    - name: cuproj
-      sub_dir: python/cuproj
-      depends: [rmm]
-      # cuproj is only built by cuspatial's CMake via add_subdirectory(cuproj),
-      # it doesn't have a build dir of its own. That means we can't list it as
-      # a cpp repo after cuspatial (above), and we have to manually point CMake
-      # to the cuspatial build dir here.
-      args:
-        cmake: |
-          -DFIND_CUPROJ_CPP=ON
-          -Dcuproj_ROOT="${HOME}/cuspatial/cpp/build/${PYTHON_PACKAGE_MANAGER}/cuda-${CUDA_VERSION}/latest"
-    - name: cuspatial
-      sub_dir: python/cuspatial
-      depends: [cuspatial]
       args: {install: *rapids_build_backend_args}
