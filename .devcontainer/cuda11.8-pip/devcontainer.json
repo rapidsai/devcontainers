@@ -5,7 +5,7 @@
     "args": {
       "CUDA": "11.8",
       "PYTHON_PACKAGE_MANAGER": "pip",
-      "BASE": "rapidsai/devcontainers:25.06-cpp-cuda11.8-ucx1.18.0-openmpi-ubuntu22.04"
+      "BASE": "rapidsai/devcontainers:25.06-cpp-cuda11.8-ucx1.18.0-openmpi5.0.7-ubuntu22.04"
     }
   },
   "runArgs": [
@@ -34,7 +34,7 @@
     "./features/src/utils",
     "./features/src/rapids-build-utils"
   ],
-  "initializeCommand": ["/bin/bash", "-c", "mkdir -m 0755 -p ${localWorkspaceFolder}/.vscode/server ${localWorkspaceFolder}/../.{aws,cache,config/pip,local/share/${localWorkspaceFolderBasename}-cuda11.8-venvs,log/devcontainer-utils} ${localWorkspaceFolder}/../{rmm,kvikio,ucxx,cudf,raft,cuvs,cumlprims_mg,cuml,cugraph,cugraph-gnn,nx-cugraph,cuspatial}"],
+  "initializeCommand": ["/bin/bash", "-c", "mkdir -m 0755 -p ${localWorkspaceFolder}/.vscode/server ${localWorkspaceFolder}/../.{aws,cache,config/pip,local/share/${localWorkspaceFolderBasename}-cuda11.8-venvs,log/devcontainer-utils} ${localWorkspaceFolder}/../{rmm,kvikio,ucxx,cudf,raft,cuvs,cumlprims_mg,cuml,cugraph,cugraph-gnn,nx-cugraph}"],
   "postAttachCommand": ["/bin/bash", "-c", "if [ ${CODESPACES:-false} = 'true' ]; then . devcontainer-utils-post-attach-command; fi"],
   "workspaceFolder": "/home/coder",
   "workspaceMount": "source=${localWorkspaceFolder},target=/home/coder/devcontainers,type=bind,consistency=consistent",
@@ -51,7 +51,6 @@
     "source=${localWorkspaceFolder}/../cugraph,target=/home/coder/cugraph,type=bind,consistency=consistent",
     "source=${localWorkspaceFolder}/../cugraph-gnn,target=/home/coder/cugraph-gnn,type=bind,consistency=consistent",
     "source=${localWorkspaceFolder}/../nx-cugraph,target=/home/coder/nx-cugraph,type=bind,consistency=consistent",
-    "source=${localWorkspaceFolder}/../cuspatial,target=/home/coder/cuspatial,type=bind,consistency=consistent",
     "source=${localWorkspaceFolder}/../.aws,target=/home/coder/.aws,type=bind,consistency=consistent",
     "source=${localWorkspaceFolder}/../.cache,target=/home/coder/.cache,type=bind,consistency=consistent",
     "source=${localWorkspaceFolder}/../.config,target=/home/coder/.config,type=bind,consistency=consistent",

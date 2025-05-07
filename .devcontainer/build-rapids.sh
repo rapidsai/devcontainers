@@ -87,13 +87,6 @@ build_rapids() {
         sccache -s;
     ) 2>&1 | maybe_write_build_log cugraph;
 
-    (
-        echo "building cuSpatial";
-        clean-cuspatial;
-        build-cuspatial -DBUILD_TESTS=ON -DBUILD_BENCHMARKS=ON --verbose;
-        sccache -s;
-    ) 2>&1 | maybe_write_build_log cuspatial;
-
 }
 
 (build_rapids "$@");

@@ -18,12 +18,6 @@ RUN apt update -y \
     # cuML/cuGraph dependencies
     libblas-dev \
     liblapack-dev \
-    # needed by libcuspatial
-    libgdal-dev \
-    sqlite3 \
-    libsqlite3-dev \
-    libtiff-dev \
-    libcurl4-openssl-dev \
  && rm -rf /tmp/* /var/tmp/* /var/cache/apt/* /var/lib/apt/lists/*;
 
 ENV DEFAULT_VIRTUAL_ENV=rapids
