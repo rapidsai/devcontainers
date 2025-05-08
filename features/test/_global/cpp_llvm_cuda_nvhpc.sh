@@ -41,7 +41,7 @@ check "gitlab-cli version" glab --version
 # Check CUDA
 check "CUDA version" bash -c "echo '$CUDA_VERSION' | grep '12.9.0'";
 check "CUDA major version" bash -c "echo '$CUDA_VERSION_MAJOR' | grep '12'";
-check "CUDA minor version" bash -c "echo '$CUDA_VERSION_MINOR' | grep '8'";
+check "CUDA minor version" bash -c "echo '$CUDA_VERSION_MINOR' | grep '9'";
 check "CUDA patch version" bash -c "echo '$CUDA_VERSION_PATCH' | grep '0'";
 check "installed" stat /usr/local/cuda-12.9 /usr/local/cuda;
 check "nvcc exists and is on path" which nvcc;
