@@ -71,11 +71,9 @@ jobs:
         # so that fix needs to be integrated into the kitware pip ninja builds.
         rapids-post-start-command --exclude <(echo ninja);
 
-        set -x;
-
         # Configure all the C++ libs
         configure-all                 \
-          -j$(ulimit -Hn)             \
+          -j                          \
           -Wno-dev                    \
           -DBUILD_TESTS=ON            \
           -DBUILD_BENCHMARKS=ON       \
@@ -85,7 +83,7 @@ jobs:
           -DBUILD_CUGRAPH_MG_TESTS=ON ;
 
         # Build all the libs
-        build-all -j$(ulimit -Hn);
+        build-all -j;
 
         # Print cache and dist stats
         sccache --show-adv-stats;

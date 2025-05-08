@@ -34,7 +34,7 @@ install_${PY_LIB}_python() {
 
     local -a pip_args_=(${PIP_INSTALL_ARGS});
 
-    eval "$(_parse_args --take '-G -e,--editable -v,--verbose' "$@" "${cmake_args_[@]}" "${pip_args_[@]}" <&0)";
+    eval "$(_parse_args --take '-G -e,--editable -j,--parallel -v,--verbose' "$@" "${cmake_args_[@]}" "${pip_args_[@]}" <&0)";
 
     if [[ ! -d "${PY_SRC}" ]]; then
         echo "install-${PY_LIB}-python: cannot access '${PY_SRC}': No such directory" >&2;
@@ -43,6 +43,10 @@ install_${PY_LIB}_python() {
 
     # shellcheck disable=SC1091
     . devcontainer-utils-debug-output 'rapids_build_utils_debug' 'build-all build-${NAME} build-${PY_LIB}-python build-${PY_LIB}-python-editable install-all install-${NAME} install-${PY_LIB}-python';
+
+    if test ${#j[@]} -gt 0 && ! test -n "${j:+x}"; then
+        n_jobs="$(ulimit -Hn)";
+    fi
 
     local -a cmake_args="(
         -G\"${G:-Ninja}\"

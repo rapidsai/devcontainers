@@ -39,6 +39,10 @@ build_${CPP_LIB}_cpp() {
     # shellcheck disable=SC1091
     . devcontainer-utils-debug-output 'rapids_build_utils_debug' 'build-all build-${NAME} build-${CPP_LIB}-cpp';
 
+    if test ${#j[@]} -gt 0 && ! test -n "${j:+x}"; then
+        n_jobs="$(ulimit -Hn)";
+    fi
+
     # Reconfigure if not configured or previous configure failed
     local -r bin_dir="$(rapids-maybe-clean-build-dir -G"${G:-Ninja}" "$@" -- "${CPP_SRC}")";
     test -e "${bin_dir:-${CPP_SRC}/${BIN_DIR}}" || configure-${CPP_LIB}-cpp "$@" <&0;
