@@ -239,9 +239,6 @@ repos:
       sub_dir: python/pylibwholegraph
       depends: [wholegraph]
       args: {install: *rapids_build_backend_args}
-    - name: cugraph-dgl
-      sub_dir: python/cugraph-dgl
-      args: {install: *rapids_build_backend_args}
     - name: cugraph_pyg
       sub_dir: python/cugraph-pyg
       args: {install: *rapids_build_backend_args}
