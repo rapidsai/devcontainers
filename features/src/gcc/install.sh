@@ -23,6 +23,11 @@ check_packages                  \
 GCC_VERSION_DEFAULT="$(gcc -dumpversion)";
 GCC_VERSION="${VERSION:-${GCC_VERSION_DEFAULT}}";
 
+if [[ "${GCC_VERSION}" == "15" ]]; then
+    apt-add-repository -y "deb https://ppa.launchpadcontent.net/ubuntu-toolchain-r/ppa/ubuntu plucky main";
+    apt-add-repository -y "deb https://ppa.launchpadcontent.net/ubuntu-toolchain-r/test/ubuntu plucky main";
+fi
+
 if [[ "${GCC_VERSION}" != "${GCC_VERSION_DEFAULT}" ]]; then
     apt-add-repository -y ppa:ubuntu-toolchain-r/test;
     apt-add-repository -y ppa:ubuntu-toolchain-r/ppa;
