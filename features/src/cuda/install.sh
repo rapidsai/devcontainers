@@ -270,11 +270,7 @@ cat <<EOF > /etc/ld.so.conf.d/nvidia.conf
 /usr/local/nvidia/lib64
 EOF
 
-# Clean up
-# rm -rf /tmp/*;
-rm -rf /var/tmp/*;
-rm -rf /var/cache/apt/*;
-rm -rf /var/lib/apt/lists/*;
+
 
 rm -rf /tmp/*.deb;
 

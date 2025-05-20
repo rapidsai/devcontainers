@@ -86,8 +86,4 @@ append_to_all_bashrcs "$(cat <(cat .bashrc | envsubst "${vars_%,}") etc/profile.
 # export envvars in /etc/profile.d
 add_etc_profile_d_script nvhpc "$(cat <(cat .bashrc | envsubst "${vars_%,}") etc/profile.d/nvhpc.sh)";
 
-# Clean up
-# rm -rf /tmp/*;
-rm -rf /var/tmp/*;
-rm -rf /var/cache/apt/*;
-rm -rf /var/lib/apt/lists/*;
+

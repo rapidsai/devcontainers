@@ -49,8 +49,4 @@ append_to_all_bashrcs "$(cat .bashrc | envsubst)";
 # export envvars in /etc/profile.d
 add_etc_profile_d_script gcc "$(cat .bashrc | envsubst)";
 
-# Clean up
-# rm -rf /tmp/*;
-rm -rf /var/tmp/*;
-rm -rf /var/cache/apt/*;
-rm -rf /var/lib/apt/lists/*;
+

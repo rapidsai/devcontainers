@@ -19,5 +19,19 @@
       "default": "",
       "description": "gcc version to install (or empty string to install OS default)."
     }
-  }
+  },
+  "mounts": [
+    {
+      "type": "cache",
+      "target": "/var/tmp"
+    },
+    {
+      "type": "cache",
+      "target": "/var/cache/apt"
+    },
+    {
+      "type": "cache",
+      "target": "/var/lib/apt"
+    }
+  ]
 }

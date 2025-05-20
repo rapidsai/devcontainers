@@ -143,6 +143,20 @@
   "securityOpt": [
     "seccomp=unconfined"
   ],
+  "mounts": [
+    {
+      "type": "cache",
+      "target": "/var/tmp"
+    },
+    {
+      "type": "cache",
+      "target": "/var/cache/apt"
+    },
+    {
+      "type": "cache",
+      "target": "/var/lib/apt"
+    }
+  ],
   "customizations": {
     "vscode": {
       "extensions": [

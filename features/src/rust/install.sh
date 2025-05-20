@@ -153,8 +153,4 @@ rustup completions bash cargo | tee /usr/share/bash-completion/completions/cargo
 # Make files writable for rustlang group
 chmod -R g+r+w "${RUSTUP_HOME}" "${CARGO_HOME}";
 
-# Clean up
-# rm -rf /tmp/*;
-rm -rf /var/tmp/*;
-rm -rf /var/cache/apt/*;
-rm -rf /var/lib/apt/lists/*;
+

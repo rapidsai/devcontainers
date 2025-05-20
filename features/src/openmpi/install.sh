@@ -176,5 +176,4 @@ add_etc_profile_d_script openmpi "$(envsubst < .bashrc)";
 rm -rf /tmp/ucx*;
 rm -rf /tmp/ompi;
 rm -rf /var/tmp/*;
-rm -rf /var/cache/apt/*;
-rm -rf /var/lib/apt/lists/*;
+

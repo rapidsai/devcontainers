@@ -35,6 +35,5 @@ wget --no-hsts -q -O /usr/share/bash-completion/completions/ninja \
 
 # Clean up
 rm -rf /var/tmp/*;
-rm -rf /var/cache/apt/*;
-rm -rf /var/lib/apt/lists/*;
+
 rm -rf /tmp/ninja-linux.zip;

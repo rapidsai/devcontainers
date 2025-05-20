@@ -63,12 +63,6 @@ append_to_all_bashrcs "$(cat .bashrc | envsubst '$LIT_VERSION $USERHOME')";
 # export envvars in /etc/profile.d
 add_etc_profile_d_script cccl-dev "$(cat .bashrc | envsubst '$LIT_VERSION $USERHOME')";
 
-# Clean up
-# rm -rf /tmp/*;
-rm -rf /var/tmp/*;
-rm -rf /var/cache/apt/*;
-rm -rf /var/lib/apt/lists/*;
-
 if [[ ${#PKG_TO_REMOVE[@]} -gt 0 ]]; then
     DEBIAN_FRONTEND=noninteractive apt-get -y remove "${PKG_TO_REMOVE[@]}";
     DEBIAN_FRONTEND=noninteractive apt-get -y autoremove;

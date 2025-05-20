@@ -120,5 +120,4 @@ add_etc_profile_d_script ucx "$(cat .bashrc | envsubst)";
 # rm -rf /tmp/*;
 rm -rf /tmp/ucx*;
 rm -rf /var/tmp/*;
-rm -rf /var/cache/apt/*;
-rm -rf /var/lib/apt/lists/*;
+

@@ -41,5 +41,19 @@
         "python.defaultInterpreterPath": "/tmp/.current-conda-env/bin/python"
       }
     }
-  }
+  },
+  "mounts": [
+    {
+      "type": "cache",
+      "target": "/var/tmp"
+    },
+    {
+      "type": "cache",
+      "target": "/var/cache/apt"
+    },
+    {
+      "type": "cache",
+      "target": "/var/lib/apt"
+    }
+  ]
 }

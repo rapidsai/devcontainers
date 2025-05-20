@@ -14,5 +14,19 @@
       "default": "latest",
       "description": "ninja-build version to install."
     }
-  }
+  },
+  "mounts": [
+    {
+      "type": "cache",
+      "target": "/var/tmp"
+    },
+    {
+      "type": "cache",
+      "target": "/var/cache/apt"
+    },
+    {
+      "type": "cache",
+      "target": "/var/lib/apt"
+    }
+  ]
 }

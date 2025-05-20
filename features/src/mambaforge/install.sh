@@ -101,10 +101,6 @@ for dir in $(for_each_user_bashrc 'echo "$(dirname "$(realpath -m "$0")")"'); do
     mkdir -p "${dir}"/.conda/{envs,pkgs};
 done
 
-# Clean up
-# rm -rf /tmp/*;
-rm -rf /var/tmp/*;
-rm -rf /var/cache/apt/*;
-rm -rf /var/lib/apt/lists/*;
+
 
 rm -rf /tmp/miniforge.sh;
