@@ -24,8 +24,8 @@ x-llvm-prev: &llvm_18 { name: "llvm", version: "18" }
 x-llvm-curr: &llvm_19 { name: "llvm", version: "19" }
 x-llvm-env: &llvm_env { CC: "clang", CXX: "clang++", CUDAHOSTCXX: "clang++" }
 
-x-nvhpc-prev: &nvhpc_prev { name: "nvhpc", version: "25.1" }
-x-nvhpc-curr: &nvhpc_curr { name: "nvhpc", version: "25.3" }
+x-nvhpc-prev: &nvhpc_prev { name: "nvhpc", version: "25.3" }
+x-nvhpc-curr: &nvhpc_curr { name: "nvhpc", version: "25.5" }
 
 x-nvhpc-env: &nvhpc_env { CC: "nvc", CXX: "nvc++", CUDAHOSTCXX: "nvc++" }
 
