@@ -116,6 +116,10 @@ include:
   - { features: [*python, *gcc_14, { <<: *cuda_curr_max, <<: *cccl_cuda_opts }, *clang_format_cccl, *clangd_dev, *cccl_dev], env: *gcc_env }
   - { features: [*python, *gcc_15, { <<: *cuda_curr_max, <<: *cccl_cuda_opts }, *clang_format_cccl, *clangd_dev, *cccl_dev], env: *gcc_env }
 
+- os: "ubuntu:25.04"
+  images:
+  - { features: [*python, *gcc_15, { <<: *cuda_curr_max, <<: *cccl_cuda_opts }, *clang_format_cccl, *clangd_dev, *cccl_dev], env: *gcc_env }
+
 - os: "windows"
   images:
   # lowest CUDA version
