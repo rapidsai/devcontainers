@@ -15,7 +15,7 @@ A feature to install the NVIDIA CUDA Toolkit
 
 | Options Id | Description | Type | Default Value |
 |-----|-----|-----|-----|
-| version | Version of the CUDA Toolkit to install. | string | 12.8 |
+| version | Version of the CUDA Toolkit to install. | string | 12.9 |
 | cuDNNVersion | Version of cuDNN to install. | string | 8 |
 | installCompilers | Install NVIDIA CUDA Compiler (nvcc) | boolean | true |
 | installProfilers | Install NVIDIA NSight Systems Profiler (nsys) | boolean | true |
