@@ -46,7 +46,7 @@ fi
 python3 -m pip install "${_PIP_INSTALL_ARGS[@]}" "${_PIP_UPGRADE_ARGS[@]}" pip;
 # Install RAPIDS dependency file generator, conda-merge, and toml
 python3 -m pip install "${_PIP_INSTALL_ARGS[@]}" \
-    'rapids-dependency-file-generator<1.14' \
+    'rapids-dependency-file-generator' \
     conda-merge \
     toml;
 
