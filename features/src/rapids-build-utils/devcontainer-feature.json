@@ -6,20 +6,6 @@
   "containerEnv": {
     "BASH_ENV": "/etc/bash.bash_env"
   },
-  "mounts": [
-    {
-      "type": "cache",
-      "target": "/var/tmp"
-    },
-    {
-      "type": "cache",
-      "target": "/var/cache/apt"
-    },
-    {
-      "type": "cache",
-      "target": "/var/lib/apt"
-    }
-  ],
   "postStartCommand": [
     "/bin/bash",
     "-l",
