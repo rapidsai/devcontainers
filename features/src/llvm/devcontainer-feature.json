@@ -33,20 +33,6 @@
   "capAdd": [
     "SYS_PTRACE"
   ],
-  "mounts": [
-    {
-      "type": "cache",
-      "target": "/var/tmp"
-    },
-    {
-      "type": "cache",
-      "target": "/var/cache/apt"
-    },
-    {
-      "type": "cache",
-      "target": "/var/lib/apt"
-    }
-  ],
   "securityOpt": [
     "seccomp=unconfined"
   ],
