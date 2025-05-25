@@ -9,17 +9,25 @@ init_github_cli() {
         return;
     fi
 
-    local git_protocol="https";
     local avoid_gh_cli_ssh_keygen_prompt=;
 
-    if [[ "${CODESPACES:-false}" == "true" ]]; then
-        git_protocol="https";
-    else
+    if [[ "${GIT_PROTOCOL:-ssh}" == "ssh" ]]; then
         if grep -q "You've successfully authenticated" <<< "$(ssh -T "git@${GITHUB_HOST:-github.com}" 2>&1)"; then
-            git_protocol="ssh";
             if type ssh-keygen > /dev/null 2>&1; then
                 avoid_gh_cli_ssh_keygen_prompt=1;
             fi
+        fi
+
+        local -r ssh_keygen="$(which ssh-keygen || echo "")";
+
+        if [ -n "${ssh_keygen}" ] \
+        && [ -n "${avoid_gh_cli_ssh_keygen_prompt}" ]; then
+            sudo mv "${ssh_keygen}"{,.bak} || true;
+        fi
+
+        if [ -n "${ssh_keygen}" ] \
+        && [ -n "${avoid_gh_cli_ssh_keygen_prompt}" ]; then
+            sudo mv "${ssh_keygen}"{.bak,} || true;
         fi
     fi
 
@@ -59,23 +67,12 @@ init_github_cli() {
     if ! gh auth status >/dev/null 2>&1; then
         echo "Logging into GitHub..." >&2;
 
-        local -r ssh_keygen="$(which ssh-keygen || echo "")";
-
-        if [ -n "${ssh_keygen}" ] \
-        && [ -n "${avoid_gh_cli_ssh_keygen_prompt}" ]; then
-            sudo mv "${ssh_keygen}"{,.bak} || true;
-        fi
-
         gh auth login \
-            --web --git-protocol ${git_protocol}    \
+            --web --git-protocol ${GIT_PROTOCOL:-ssh}    \
             --hostname "${GITHUB_HOST:-github.com}" \
             ${scopes[@]/#/--scopes }                \
         || echo "Continuing without logging into GitHub";
 
-        if [ -n "${ssh_keygen}" ] \
-        && [ -n "${avoid_gh_cli_ssh_keygen_prompt}" ]; then
-            sudo mv "${ssh_keygen}"{.bak,} || true;
-        fi
     elif [ -n "${needed_scopes}" ]; then
         echo "Logging into GitHub..." >&2;
         gh auth refresh \
@@ -85,10 +82,10 @@ init_github_cli() {
     fi
 
     if gh auth status >/dev/null 2>&1; then
-        if test "$(gh config get git_protocol --host "${GITHUB_HOST:-github.com}")" != "${git_protocol}"; then
-            gh config set git_protocol --host "${GITHUB_HOST:-github.com}" "${git_protocol}";
+        if test "$(gh config get git_protocol --host "${GITHUB_HOST:-github.com}")" != "${GIT_PROTOCOL:-ssh}"; then
+            gh config set git_protocol --host "${GITHUB_HOST:-github.com}" "${GIT_PROTOCOL:-ssh}";
         fi
-        if test "https" = "${git_protocol}" && ! git config credential.helper >/dev/null; then
+        if test "https" = "${GIT_PROTOCOL:-ssh}" && ! git config credential.helper >/dev/null; then
             gh auth setup-git --hostname "${GITHUB_HOST:-github.com}";
         fi
     fi
