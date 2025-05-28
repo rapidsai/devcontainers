@@ -48,9 +48,9 @@ jobs:
         sccache -z;
         sccache --show-adv-stats;
         clone-all -j$(nproc) -v -q --clone-upstream --single-branch --shallow-submodules;
-        # The latest Cython from the main branch supports limited API compilation
+        # The latest Cython from the master branch supports limited API compilation
         export NO_CYTHON_COMPILE=true
-        python -m pip install git+https://github.com/cython/cython.git@main
+        python -m pip install git+https://github.com/cython/cython.git@master
 
         build-all                        \
           -Wno-dev                       \
