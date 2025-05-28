@@ -47,14 +47,8 @@ jobs:
         SCCACHE_NO_DAEMON=1 sccache --stop-server
         sccache -z;
         sccache --show-adv-stats;
-        # Need Python 3.11 for the buffer protocol in the limited API
-        export PYTHON_VERSION="3.11"
-        clone-all -j$(nproc) -v -q --clone-upstream --single-branch --shallow-submodules --no-update-env;
-        rapids-generate-scripts
-        . rapids-make-${PYTHON_PACKAGE_MANAGER}-env
-        # The latest version of this branch includes both my patches (required
-        # for RAPIDS Cython usage to work) and upstream patches required for
-        # Cython itself to work under the limited API.
+        clone-all -j$(nproc) -v -q --clone-upstream --single-branch --shallow-submodules;
+        # The latest Cython from the main branch supports limited API compilation
         export NO_CYTHON_COMPILE=true
         python -m pip install git+https://github.com/cython/cython.git@main
 
