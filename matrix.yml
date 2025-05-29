@@ -2,7 +2,8 @@ x-cuda-prev-min: &cuda_prev_min { name: "cuda", version: "12.0" }
 x-cuda-prev-max: &cuda_prev_max { name: "cuda", version: "12.9" }
 x-cuda-curr-min: &cuda_curr_min { name: "cuda", version: "12.0" }
 x-cuda-curr-max: &cuda_curr_max { name: "cuda", version: "12.9" }
-x-cuda-prev-max-rapids: &cuda_prev_max_rapids { name: "cuda", version: "11.8" }
+# Commented as RAPIDS only supports one major version (CUDA 12) right now
+#x-cuda-prev-max-rapids: &cuda_prev_max_rapids { name: "cuda", version: "12.8" }
 x-cuda-curr-max-rapids: &cuda_curr_max_rapids { name: "cuda", version: "12.8" }
 
 x-gcc-7: &gcc_7 { name: "gcc", version: "7" }
@@ -134,7 +135,8 @@ include:
 - os: "ubuntu:22.04"
   images:
   # cuda
-  - { features: [*python_rapids, *clang_format_rapids, *clangd_dev, *cuda_prev_max_rapids], env: *gcc_env_rapids }
+  # Commented as RAPIDS only supports one major version (CUDA 12) right now
+  #- { features: [*python_rapids, *clang_format_rapids, *clangd_dev, *cuda_prev_max_rapids], env: *gcc_env_rapids }
   - { features: [*python_rapids, *clang_format_rapids, *clangd_dev, *cuda_curr_min], env: *gcc_env_rapids }
   - { features: [*python_rapids, *clang_format_rapids, *clangd_dev, *cuda_curr_max], env: *gcc_env_rapids }
   - { features: [*python_rapids, *clang_format_rapids, *clangd_dev, *cuda_curr_max_rapids], env: *gcc_env_rapids }
@@ -145,12 +147,3 @@ include:
 
   # mambaforge
   - { features: [*conda], env: { PYTHON_VERSION: "3.13" } }
-
-  ###
-  # Legacy CUDA 11.x + mambaforge image. Needed so the cudatoolkit 11.x
-  # conda package has access to the CUDA Toolkit headers. Remove once
-  # `cuda_prev_max_rapids` is bumped up to CUDA Toolkit 12.
-  ###
-
-  # cuda-mambaforge
-  - { features: [*cuda_prev_max_rapids, *conda], env: { PYTHON_VERSION: "3.13" } }
