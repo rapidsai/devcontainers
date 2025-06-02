@@ -38,6 +38,7 @@ run_devcontainer() {
         --workspace-folder "${workspace}" \
         --cache-from "docker.io/rapidsai/devcontainers:${tag}" \
         --image-name "docker.io/rapidsai/devcontainers:${tag}" \
+        --output "type=docker,compression=zstd,force-compression=true" \
         ;
 
     mkdir -p -m 0755 .scratch/.{aws,cache,config};
