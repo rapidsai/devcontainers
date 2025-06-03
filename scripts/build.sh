@@ -36,7 +36,7 @@ build_devcontainer() {
         --workspace-folder "${workspace}" \
         --cache-from "docker.io/rapidsai/devcontainers:${tag}" \
         --image-name "docker.io/rapidsai/devcontainers:${tag}" \
-        --output "type=docker,compression=zstd,force-compression=true" \
+        --output "type=docker,compression=zstd,force-compression=true,oci-mediatypes=true" \
         "${@:3}";
 }
 

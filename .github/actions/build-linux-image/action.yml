@@ -34,7 +34,7 @@ runs:
           --cache-from "${repo,,}:${{ inputs.tag }}" \
           --image-name "${repo,,}:${{ inputs.tag }}" \
           --workspace-folder "$(realpath -m ./image)" \
-          --output "type=docker,compression=zstd,force-compression=true,dest=${{ runner.temp }}/${{ inputs.arch }}.tar.zst"
+          --output "type=docker,compression=zstd,force-compression=true,dest=${{ runner.temp }}/${{ inputs.arch }}.tar.zst,oci-mediatypes=true"
         do
           if test "${i}" -lt ${{inputs.retries}}; then
             j=$((i++));
