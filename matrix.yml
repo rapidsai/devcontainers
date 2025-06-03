@@ -2,7 +2,7 @@ x-cuda-prev-min: &cuda_prev_min { name: "cuda", version: "12.0" }
 x-cuda-prev-max: &cuda_prev_max { name: "cuda", version: "12.9" }
 x-cuda-curr-min: &cuda_curr_min { name: "cuda", version: "12.0" }
 x-cuda-curr-max: &cuda_curr_max { name: "cuda", version: "12.9" }
-x-cuda-curr-min: &cuda_cccl_python { name: "cuda", version: "12.8" }
+x-cuda-cccl-python: &cuda_cccl_python { name: "cuda", version: "12.8" }
 # Commented as RAPIDS only supports one major version (CUDA 12) right now
 #x-cuda-prev-max-rapids: &cuda_prev_max_rapids { name: "cuda", version: "12.8" }
 x-cuda-curr-max-rapids: &cuda_curr_max_rapids { name: "cuda", version: "12.8" }
