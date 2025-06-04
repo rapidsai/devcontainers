@@ -35,8 +35,6 @@ jobs:
       matrix:
         arch: [amd64, arm64]
     outputs:
-      hash_amd64: ${{ steps.build.outputs.hash_amd64 }}
-      hash_arm64: ${{ steps.build.outputs.hash_arm64 }}
       tag: ${{ steps.json.outputs.tag }}
     steps:
       - name: Checkout ${{ github.repository }}
@@ -59,14 +57,21 @@ jobs:
           username: ${{ secrets.GPUCIBOT_DOCKERHUB_USER || vars.DOCKERHUB_USER }}
           password: ${{ secrets.GPUCIBOT_DOCKERHUB_TOKEN || secrets.DOCKERHUB_TOKEN }}
 
-      - id: build
-        name: Build ${{ steps.json.outputs.tag }}-${{ matrix.arch }}
+      - name: Build ${{ steps.json.outputs.tag }}-${{ matrix.arch }}
         uses: ./.github/actions/build-linux-image
         with:
           arch: "${{ matrix.arch }}"
           repo: "${{ inputs.repo }}"
-          push: "${{ inputs.push }}"
           tag: "${{ steps.json.outputs.tag }}"
+
+      - if: inputs.push == 'true'
+        name: Upload ${{ steps.json.outputs.tag }}-${{ matrix.arch }}
+        uses: actions/upload-artifact@v4
+        with:
+          retention-days: 1
+          compression-level: 0
+          name: ${{ steps.json.outputs.tag }}-${{ matrix.arch }}
+          path: ${{ runner.temp }}/${{ matrix.arch }}.tar
 
   push-to-dockerhub:
     if: inputs.push == 'true'
@@ -75,6 +80,23 @@ jobs:
       - build-test-and-upload
     runs-on: ubuntu-latest
     steps:
+      - name: Checkout ${{ github.repository }}
+        uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+
+      - name: Free up disk space
+        uses: ./.github/actions/free-disk-space
+        with:
+          tool_cache: "${{ runner.tool_cache }}"
+
+      - name: Download ${{ needs.build-test-and-upload.outputs.tag }}
+        uses: actions/download-artifact@v4
+        with:
+          pattern: ${{ needs.build-test-and-upload.outputs.tag }}-*
+          path: ${{ runner.temp }}
+          merge-multiple: true
+
       - name: Login to Docker Hub
         uses: docker/login-action@v3
         with:
@@ -84,17 +106,28 @@ jobs:
       - name: Push multiarch manifest to Docker Hub
         shell: bash --noprofile --norc -x -eo pipefail {0}
         env:
-          hash_amd64: "${{ needs.build-test-and-upload.outputs.hash_amd64 }}"
-          hash_arm64: "${{ needs.build-test-and-upload.outputs.hash_arm64 }}"
-          name: "${{ inputs.repo }}:${{ needs.build-test-and-upload.outputs.tag }}"
           os: "${{ inputs.os }}"
+          name: "${{ inputs.repo }}:${{ needs.build-test-and-upload.outputs.tag }}"
         run: |
+          # List downloaded artifacts
+          find "${{ runner.temp }}/" -type f -name '*.tar';
           # Ensure name is lowercase
           name="${name,,}";
-          docker manifest rm "${name}" || true;
+          hashes=();
+          for arch in "amd64" "arm64"; do
+            # Load the arch-specific image with the final name
+            docker load --input "${{ runner.temp }}/${arch}.tar";
+            # Push the local image to the registry and save the remote hash
+            hashes+=("$(docker push "${name}" | tee >(cat -) 1>&2 | tail -n1 | cut -d' ' -f3)");
+            # Clean up after pushing so we don't run out of disk space
+            rm -f "${{ runner.temp }}/${arch}.tar";
+            docker manifest rm "${name}" || true;
+            docker image rm -f "${name}" || true;
+            docker system prune -f;
+          done
           sleep 5;
           # Create and push the multiarch manifest
-          docker buildx imagetools create --tag "${name}" "$hash_amd64" "$hash_arm64";
+          docker buildx imagetools create --tag "${name}" "${hashes[@]}";
           sleep 5;
           # Create and push the multiarch manifest without the OS in the tag
-          docker buildx imagetools create --tag "${name/%-${os//:/}}" "$hash_amd64" "$hash_arm64";
+          docker buildx imagetools create --tag "${name/%-${os//:/}}" "${hashes[@]}";
