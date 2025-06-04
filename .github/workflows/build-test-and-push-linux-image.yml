@@ -45,6 +45,9 @@ jobs:
           fetch-depth: 0
           persist-credentials: false
 
+      - name: Setup runner environment
+        uses: ./.github/actions/setup-runner-env
+
       - id: json
         name: Write .devcontainer.json
         uses: ./.github/actions/devcontainer-json

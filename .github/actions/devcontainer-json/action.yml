@@ -21,12 +21,6 @@ runs:
   using: composite
   steps:
 
-    - if: runner.environment == 'self-hosted'
-      name: Setup Node.js
-      uses: actions/setup-node@v4
-      with:
-        node-version: '20'
-
     - id: json
       name: Make image/.devcontainer/devcontainer.json
       shell: bash

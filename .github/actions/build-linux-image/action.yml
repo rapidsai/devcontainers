@@ -19,9 +19,6 @@ runs:
   using: composite
   steps:
 
-    - name: Setup runner environment
-      uses: ./.github/actions/setup-runner-env
-
     - name: Copy common scripts into features
       uses: ./.github/actions/copy-common-scripts
 
