@@ -12,7 +12,10 @@ if [[ "${PYTHON_PACKAGE_MANAGER:-}" == "pip" ]]; then
      && [ -z "${VIRTUAL_ENV:-}" -o "${VIRTUAL_ENV}" != ~/".local/share/venvs/${DEFAULT_VIRTUAL_ENV}" ]; then
         . ~/".local/share/venvs/${DEFAULT_VIRTUAL_ENV}/bin/activate";
     elif [ -n "${VIRTUAL_ENV_PROMPT:-}" ]; then
-        if ! echo "${PS1:-}" | grep -qF "${VIRTUAL_ENV_PROMPT}"; then
+        if ! grep -qE "(.*) " <<< "${VIRTUAL_ENV_PROMPT}" \
+        && ! grep -qF "(${VIRTUAL_ENV_PROMPT}) " <<< "${PS1:-}"; then
+            export PS1="(${VIRTUAL_ENV_PROMPT}) ${PS1:-}";
+        elif ! grep -qF "${VIRTUAL_ENV_PROMPT}" <<< "${PS1:-}"; then
             export PS1="${VIRTUAL_ENV_PROMPT}${PS1:-}";
         fi
     fi
