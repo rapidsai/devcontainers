@@ -23,8 +23,8 @@ jobs:
         run: |
           [[ '${{ github.event_name }}' == 'push' && '${{ github.repository }}' == 'rapidsai/devcontainers' ]] || \
           [[ '${{ github.event_name }}' == 'pull_request' && '${{ github.repository }}' != 'rapidsai/devcontainers' ]] \
-          && echo "ok=true"  | tee -a $GITHUB_OUTPUT \
-          || echo "ok=false" | tee -a $GITHUB_OUTPUT;
+          && echo "ok=true"  | tee -a "$GITHUB_OUTPUT" \
+          || echo "ok=false" | tee -a "$GITHUB_OUTPUT";
 
   build-all-rapids-repos:
     if: needs.check-event.outputs.ok == 'true' && github.repository_owner == 'rapidsai'
