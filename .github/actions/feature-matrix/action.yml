@@ -46,4 +46,4 @@ runs:
           .github/actions/feature-matrix/action.sh \
           '${{ inputs.full_matrix }}' \
           '${{ steps.changes.outputs.all_changed_and_modified_files }}' \
-        | tee -a "$GITHUB_OUTPUT";
+        | tee -a $GITHUB_OUTPUT;

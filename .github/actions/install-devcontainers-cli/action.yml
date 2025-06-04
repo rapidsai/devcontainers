@@ -14,4 +14,4 @@ runs:
       run: |
         sudo apt update;
         sudo apt install -y --no-install-recommends build-essential;
-        npm install -g @devcontainers/cli@v0.76.0;
+        npm install -g @devcontainers/cli;
