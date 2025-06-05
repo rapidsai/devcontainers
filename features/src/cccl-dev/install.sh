@@ -20,7 +20,7 @@ if ! command -v python >/dev/null 2>&1; then
   exit 1;
 fi
 
-PKG=("gettext-base" "libtbb-dev");
+PKG=("gettext-base" "libtbb-dev" "pbzip2");
 PKG_TO_REMOVE=();
 
 # Install gcc and g++ because we have to build psutil wheel for non-x86
