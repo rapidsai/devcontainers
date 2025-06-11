@@ -40,4 +40,4 @@ jobs:
           aws_role_arn: "${{ secrets.GIST_REPO_READ_ORG_GITHUB_TOKEN && 'arn:aws:iam::279114543810:role/nv-gha-token-sccache-devs' || '' }}"
           rw_sccache_bucket: "${{ secrets.GIST_REPO_READ_ORG_GITHUB_TOKEN && 'rapids-sccache-devs' || '' }}"
           rw_sccache_region: "${{ vars.AWS_REGION }}"
-          sccache_dist_scheduler_url: "sccache.gha-runners.nvidia.com"
+          sccache_dist_scheduler_url: "sccache.rapids.nvidia.com"
