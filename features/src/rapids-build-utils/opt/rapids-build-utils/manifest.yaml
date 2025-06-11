@@ -112,6 +112,10 @@ repos:
       sub_dir: cpp
       depends: [rmm, ucxx, cudf]
   python:
+    - name: librapidsmpf
+      sub_dir: python/librapidsmpf
+      depends: [rmm, ucxx, cudf]
+      args: {install: *rapids_build_backend_args}
     - name: rapidsmpf
       sub_dir: python/rapidsmpf
       depends: [rapidsmpf, ucxx-python]
