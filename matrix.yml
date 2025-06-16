@@ -53,6 +53,7 @@ x-cccl-cuda-opts: &cccl_cuda_opts {
   installcuTensor: false,
   installNCCL: false,
   installNVRTC: true,
+  installCUXXFILT: true,
 }
 
 x-cccl-cuda-ext-opts: &cccl_cuda_ext_opts {
@@ -67,6 +68,7 @@ x-cccl-cuda-ext-opts: &cccl_cuda_ext_opts {
   installcuFFT: true,
   installNCCL: false,
   installNVRTC: true,
+  installCUXXFILT: true,
 }
 
 include:

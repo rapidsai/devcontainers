@@ -115,6 +115,7 @@ if [ "${INSTALLCTKLIBRARIES:-false}" = true ]; then
     INSTALLCUFILE=true;
     INSTALLCURAND=true;
     INSTALLCUSOLVER=true;
+    INSTALLCUXXFILT=true;
     INSTALLNPP=true;
     INSTALLNVJPEG=true;
 fi
@@ -158,6 +159,10 @@ fi
 
 if [ "${INSTALLCUSOLVER:-false}" = true ]; then
     PKGS+=("libcusolver${dev_tag}-${cuda_ver}");
+fi
+
+if [ "${INSTALLCUXXFILT:-false}" = true ]; then
+    PKGS+=("cuda-cuxxfilt-${cuda_ver}");
 fi
 
 if [ "${INSTALLNPP:-false}" = true ]; then
