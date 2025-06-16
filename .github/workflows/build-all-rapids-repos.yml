@@ -49,6 +49,7 @@ jobs:
         sccache --show-adv-stats;
         clone-all -j$(nproc) -v -q --clone-upstream --single-branch --shallow-submodules;
         build-all                        \
+          -v                             \
           -Wno-dev                       \
           -j$(nproc --ignore=1)          \
           -DBUILD_SHARED_LIBS=ON         \
