@@ -117,11 +117,6 @@
       "default": false,
       "description": "Install CUDA Direct Linear Solvers Library (cuSOLVER)"
     },
-    "installCUXXFILT": {
-      "type": "boolean",
-      "default": false,
-      "description": "Install CUDA C++ demangler (cu++filt)"
-    },
     "installNPP": {
       "type": "boolean",
       "default": false,
