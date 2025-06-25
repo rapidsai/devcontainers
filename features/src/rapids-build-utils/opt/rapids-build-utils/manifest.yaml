@@ -42,6 +42,7 @@ repos:
     - name: libucxx
       sub_dir: python/libucxx
       args: {install: *rapids_build_backend_args}
+      depends: [ucxx]
     - name: ucxx
       sub_dir: python/ucxx
       depends: [ucxx, ucxx-python]
@@ -114,7 +115,7 @@ repos:
   python:
     - name: librapidsmpf
       sub_dir: python/librapidsmpf
-      depends: [rmm, ucxx, cudf]
+      depends: [rapidsmpf]
       args: {install: *rapids_build_backend_args}
     - name: rapidsmpf
       sub_dir: python/rapidsmpf
