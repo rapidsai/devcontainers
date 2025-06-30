@@ -267,7 +267,7 @@ if test -n "${gh_token:-}" \
         DEVCONTAINER_UTILS_ENABLE_SCCACHE_DIST=1 \
         SCCACHE_DIST_URL="${sccache_dist_scheduler_url}" \
         devcontainer-utils-post-attach-command;
-        !expect_sccache_dist_auth_token_is_gh_token;
+        test !expect_sccache_dist_auth_token_is_gh_token;
     }
 
     check "does not configure sccache-dist auth when no GH_TOKEN or SCCACHE_DIST_AUTH_TOKEN" does_not_set_sccache_dist_auth_config;

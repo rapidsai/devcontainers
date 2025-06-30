@@ -55,13 +55,7 @@ jobs:
         sccache --show-adv-stats;
 
         # Clone all the repos
-        clone-all -j$(nproc) -v -q --clone-upstream --depth 1 --single-branch --shallow-submodules --no-update-env;
-
-        # Create the python env without ninja.
-        # ninja -j10000 fails with `ninja: FATAL: pipe: Too many open files`.
-        # This appears to have been fixed 13 years ago (https://github.com/ninja-build/ninja/issues/233),
-        # so that fix needs to be integrated into the kitware pip ninja builds.
-        rapids-post-start-command --exclude <(echo ninja);
+        clone-all -j$(nproc) -v -q --clone-upstream --depth 1 --single-branch --shallow-submodules;
 
         # Configure all the C++ libs
         time configure-all            \
