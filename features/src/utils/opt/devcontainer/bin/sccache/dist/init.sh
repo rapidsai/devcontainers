@@ -7,17 +7,17 @@
 # then restart sccache to ensure the configuration is applied.
 #
 # Boolean options:
-#  -h,--help                    Print this text.
-#  -e,--enable-sccache-dist     Enable sccache-dist. If omitted, disable sccache-dist.
-#                               (default: false)
-#  --enable-with-github-auth    Enable sccache-dist and configure it to use GitHub token auth.
-#                               Shorthand for `-e --auth-type token --auth-token $(gh auth token)`
-#                               (default: false)
-#  --no-local-compile-fallback  Disable building locally after retrying transient sccache-dist errors.
-#                               (default: false)
-#  --connection-pool            Enable sccache client HTTP connection pool.
-#                               (default: false)
-#  --keepalive                  Enable sccache client HTTP keepalive.
+#  -h,--help                                Print this text.
+#  -e,--enable-sccache-dist                 Enable sccache-dist. If omitted, disable sccache-dist.
+#                                           (default: false)
+#  --enable-sccache-dist-with-github-auth   Enable sccache-dist and configure it to use GitHub token auth.
+#                                           Shorthand for `-e --auth-type token --auth-token $(gh auth token)`
+#                                           (default: false)
+#  --no-local-compile-fallback              Disable building locally after retrying transient sccache-dist errors.
+#                                           (default: false)
+#  --connection-pool                        Enable sccache client HTTP connection pool.
+#                                           (default: false)
+#  --keepalive                              Enable sccache client HTTP keepalive.
 #
 # Options that require values:
 #  --auth-type (token|oauth2_code_grant_pkce|oauth2_implicit)   Auth type for build cluster auth.
@@ -45,7 +45,7 @@ _init_sccache_dist() {
     local -;
     set -euo pipefail;
 
-    eval "$(devcontainer-utils-parse-args "$0" --take '-e,--enable-sccache-dist --enable-with-github-auth' "$@" <&0)";
+    eval "$(devcontainer-utils-parse-args "$0" --take '-e,--enable-sccache-dist --enable-sccache-dist-with-github-auth' "$@" <&0)";
 
     # shellcheck disable=SC1091
     . devcontainer-utils-debug-output 'devcontainer_utils_debug' 'sccache init-sccache-dist';
@@ -56,7 +56,7 @@ _init_sccache_dist() {
             devcontainer-utils-configure-sccache-dist - <<< "${OPTS[*]@Q}";
             break;
         fi
-        if test -n "${enable_with_github_auth:+x}"; then
+        if test -n "${enable_sccache_dist_with_github_auth:+x}"; then
             if devcontainer-utils-shell-is-interactive; then
                 # Initialize the GitHub CLI with the appropriate user scopes
                 # shellcheck disable=SC1091

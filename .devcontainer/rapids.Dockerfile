@@ -43,25 +43,35 @@ ENV PYTHONSAFEPATH="1"
 ENV PYTHONUNBUFFERED="1"
 ENV PYTHONDONTWRITEBYTECODE="1"
 
+ENV HISTFILE="/home/coder/.cache/._bash_history"
+ENV LIBCUDF_KERNEL_CACHE_PATH="/home/coder/cudf/cpp/build/${PYTHON_PACKAGE_MANAGER}/cuda-${CUDA_VERSION}/latest/jitify_cache"
+
+###
+# sccache configuration
+###
+ENV AWS_ROLE_ARN="arn:aws:iam::279114543810:role/nv-gha-token-sccache-devs"
 ENV SCCACHE_REGION="us-east-2"
 ENV SCCACHE_BUCKET="rapids-sccache-devs"
+# 2hr (1 minute longer than sccache-dist request timeout)
+ENV SCCACHE_IDLE_TIMEOUT=7200
+ENV SCCACHE_S3_KEY_PREFIX=rapids-test-sccache-dist
+
+###
+# sccache-dist configuration
+###
+# Enable sccache-dist by default
+ENV DEVCONTAINER_UTILS_ENABLE_SCCACHE_DIST=1
+# Compile locally if max retries exceeded
+ENV SCCACHE_DIST_FALLBACK_TO_LOCAL_COMPILE=true
+# Retry transient errors 4 times (for a total of 5 attempts)
+ENV SCCACHE_DIST_MAX_RETRIES=4
 ENV SCCACHE_DIST_CONNECT_TIMEOUT=30
-ENV SCCACHE_DIST_REQUEST_TIMEOUT=7200
+# 1hr 59min (to accommodate debug builds)
+ENV SCCACHE_DIST_REQUEST_TIMEOUT=7140
 ENV SCCACHE_DIST_KEEPALIVE_ENABLED=true
 ENV SCCACHE_DIST_KEEPALIVE_INTERVAL=20
 ENV SCCACHE_DIST_KEEPALIVE_TIMEOUT=600
 ENV SCCACHE_DIST_URL="https://${TARGETARCH}.linux.sccache.rapids.nvidia.com"
-ENV SCCACHE_IDLE_TIMEOUT=1800
-ENV AWS_ROLE_ARN="arn:aws:iam::279114543810:role/nv-gha-token-sccache-devs"
-
-ENV HISTFILE="/home/coder/.cache/._bash_history"
-
-ENV LIBCUDF_KERNEL_CACHE_PATH="/home/coder/cudf/cpp/build/${PYTHON_PACKAGE_MANAGER}/cuda-${CUDA_VERSION}/latest/jitify_cache"
-
-# Prevent the sccache server from shutting down
-ENV SCCACHE_IDLE_TIMEOUT=0
-ENV SCCACHE_SERVER_LOG="sccache=info"
-ENV SCCACHE_S3_KEY_PREFIX=rapids-test-sccache-dist
 
 # Build as much in parallel as possible
 ENV INFER_NUM_DEVICE_ARCHITECTURES=1

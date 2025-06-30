@@ -267,9 +267,7 @@ if test -n "${gh_token:-}" \
         DEVCONTAINER_UTILS_ENABLE_SCCACHE_DIST=1 \
         SCCACHE_DIST_URL="${sccache_dist_scheduler_url}" \
         devcontainer-utils-post-attach-command;
-        if expect_sccache_dist_auth_token_is_gh_token; then
-            return 1;
-        fi
+        !expect_sccache_dist_auth_token_is_gh_token;
     }
 
     check "does not configure sccache-dist auth when no GH_TOKEN or SCCACHE_DIST_AUTH_TOKEN" does_not_set_sccache_dist_auth_config;
@@ -285,17 +283,16 @@ if test -n "${gh_token:-}" \
 
     check "configures sccache-dist to use GH_TOKEN as auth token" uses_GH_TOKEN_as_sccache_dist_auth_token;
 
-    # uses_SCCACHE_DIST_AUTH_TOKEN_as_sccache_dist_auth_token() {
-    #     reset_state;
-    #     SCCACHE_DIST_AUTH_TYPE=token \
-    #     SCCACHE_DIST_AUTH_TOKEN="${gh_token}" \
-    #     DEVCONTAINER_UTILS_ENABLE_SCCACHE_DIST=1 \
-    #     SCCACHE_DIST_URL="${sccache_dist_scheduler_url}" \
-    #     devcontainer-utils-post-attach-command;
-    #     expect_sccache_dist_auth_token_is_gh_token;
-    # }
+    uses_SCCACHE_DIST_AUTH_TOKEN_as_sccache_dist_auth_token() {
+        reset_state;
+        SCCACHE_DIST_AUTH_TOKEN="${gh_token}" \
+        DEVCONTAINER_UTILS_ENABLE_SCCACHE_DIST=1 \
+        SCCACHE_DIST_URL="${sccache_dist_scheduler_url}" \
+        devcontainer-utils-post-attach-command;
+        expect_sccache_dist_auth_token_is_gh_token;
+    }
 
-    # check "configures sccache-dist to use SCCACHE_DIST_AUTH_TOKEN as auth token" uses_SCCACHE_DIST_AUTH_TOKEN_as_sccache_dist_auth_token;
+    check "configures sccache-dist to use SCCACHE_DIST_AUTH_TOKEN as auth token" uses_SCCACHE_DIST_AUTH_TOKEN_as_sccache_dist_auth_token;
 fi
 
 # Report result
