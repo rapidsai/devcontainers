@@ -54,7 +54,6 @@ ENV SCCACHE_REGION="us-east-2"
 ENV SCCACHE_BUCKET="rapids-sccache-devs"
 # 2hr (1 minute longer than sccache-dist request timeout)
 ENV SCCACHE_IDLE_TIMEOUT=7200
-ENV SCCACHE_S3_KEY_PREFIX=rapids-test-sccache-dist
 
 ###
 # sccache-dist configuration
