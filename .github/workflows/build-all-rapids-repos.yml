@@ -43,13 +43,16 @@ jobs:
       # Prevent the sccache server from shutting down
       env: |
         SCCACHE_IDLE_TIMEOUT=0
+        SCCACHE_LOG=DEBUG
+        SCCACHE_ERROR_LOG=/home/coder/${{ env.REPOSITORY }}/sccache-log-${{ matrix.ARCH }}-${{ matrix.CUDA_VER }}-${{ matrix.PACKAGER }}.txt
       build_command: |
+        mkdir -p ~/.config/sccache;
+        touch ~/.config/sccache/config;
         SCCACHE_NO_DAEMON=1 sccache --stop-server
         sccache -z;
         sccache --show-adv-stats;
         clone-all -j$(nproc) -v -q --clone-upstream --single-branch --shallow-submodules;
         build-all                        \
-          -v                             \
           -Wno-dev                       \
           -j$(nproc --ignore=1)          \
           -DBUILD_SHARED_LIBS=ON         \
@@ -60,3 +63,13 @@ jobs:
           -DBUILD_CUGRAPH_MG_TESTS=ON    \
           ;
         sccache --show-adv-stats;
+  upload-sccache-log:
+    name: Upload sccache logs
+    runs-on: ubuntu-latest
+    needs: build-all-rapids-repos
+    if: ${{ always() }}
+    steps:
+      - uses: actions/upload-artifact@v4
+        with:
+          path: devcontainers/sccache-log-*.txt
+          if-no-files-found: warn
