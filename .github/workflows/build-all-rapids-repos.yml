@@ -44,7 +44,7 @@ jobs:
       env: |
         SCCACHE_IDLE_TIMEOUT=0
         SCCACHE_LOG=DEBUG
-        SCCACHE_ERROR_LOG=/home/coder/${{ env.REPOSITORY }}/sccache-log-${{ matrix.ARCH }}-${{ matrix.CUDA_VER }}-${{ matrix.PACKAGER }}.txt
+        SCCACHE_ERROR_LOG=/home/coder/devcontainers/sccache-log-${{ matrix.ARCH }}-${{ matrix.CUDA_VER }}-${{ matrix.PACKAGER }}.txt
       build_command: |
         mkdir -p ~/.config/sccache;
         touch ~/.config/sccache/config;
