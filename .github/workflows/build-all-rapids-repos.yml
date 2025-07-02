@@ -27,7 +27,7 @@ jobs:
     if: needs.check-event.outputs.ok == 'true'
     needs: check-event
     secrets: inherit
-    uses: rapidsai/shared-workflows/.github/workflows/build-in-devcontainer.yaml@upload-sccache-client-logs
+    uses: rapidsai/shared-workflows/.github/workflows/build-in-devcontainer.yaml@branch-25.08
     permissions:
       actions: read
       packages: read
