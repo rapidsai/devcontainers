@@ -18,7 +18,7 @@ if ! test -n "${SKIP_DEVCONTAINER_UTILS_POST_ATTACH_COMMAND:+x}"; then
     # Update sccache client configuration to enable/disable sccache-dist
     if test -n "${DEVCONTAINER_UTILS_ENABLE_SCCACHE_DIST:+x}"; then
         devcontainer-utils-install-sccache                   \
-            --repo "${SCCACHE_REPOSITORY:-trxcllnt/sccache}" \
+            --repo "${SCCACHE_REPOSITORY:-rapidsai/sccache}" \
             --version "${SCCACHE_VERSION:-latest}"           \
         ;
         if test -n "${SCCACHE_DIST_AUTH_TOKEN:+x}"; then
