@@ -59,7 +59,8 @@ jobs:
 
         # Configure all the C++ libs
         time configure-all            \
-          -j                          \
+          -j0                         \
+          -GNinja                     \
           -Wno-dev                    \
           -DBUILD_TESTS=ON            \
           -DBUILD_BENCHMARKS=ON       \
@@ -68,8 +69,11 @@ jobs:
           -DRAFT_COMPILE_LIBRARY=ON   \
           -DBUILD_CUGRAPH_MG_TESTS=ON ;
 
-        # Build all the libs
-        time build-all -j;
+        # Build all the C++ libs
+        time build-all-cpp -j0;
+
+        # Build all the Python libs
+        time build-all-python -j0;
 
         # Print cache and dist stats
         sccache --show-adv-stats;

@@ -77,7 +77,7 @@ get_num_archs_jobs_and_load() {
     fi
 
     local n_load="$((parallel > n_cpus ? n_cpus : parallel))";
-    local n_jobs="$((parallel < 1 ? 1 : parallel))";
+    local n_jobs="$((parallel < 0 ? 1 : parallel))";
 
     echo "declare n_arch=${n_arch}";
     echo "declare n_jobs=${n_jobs}";

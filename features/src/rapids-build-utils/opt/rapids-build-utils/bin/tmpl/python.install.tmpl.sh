@@ -44,10 +44,6 @@ install_${PY_LIB}_python() {
     # shellcheck disable=SC1091
     . devcontainer-utils-debug-output 'rapids_build_utils_debug' 'build-all build-${NAME} build-${PY_LIB}-python build-${PY_LIB}-python-editable install-all install-${NAME} install-${PY_LIB}-python';
 
-    if test ${#j[@]} -gt 0 && ! test -n "${j:+x}"; then
-        n_jobs="$(ulimit -Hn)";
-    fi
-
     local -a cmake_args="(
         -G\"${G:-Ninja}\"
         ${cmake_args_[*]@Q}

@@ -41,10 +41,6 @@ configure_${CPP_LIB}_cpp() {
     # shellcheck disable=SC1091
     . devcontainer-utils-debug-output 'rapids_build_utils_debug' 'configure-all configure-${NAME} configure-${CPP_LIB}-cpp';
 
-    if test ${#j[@]} -gt 0 && ! test -n "${j:+x}"; then
-        n_jobs="$(ulimit -Hn)";
-    fi
-
     local -a cmake_args="(
         -G\"${G:-Ninja}\"
         ${cmake_args_[*]@Q}
