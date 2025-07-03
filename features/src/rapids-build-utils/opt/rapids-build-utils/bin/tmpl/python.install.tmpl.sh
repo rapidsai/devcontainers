@@ -123,7 +123,7 @@ EOF
         echo "Installing ${PY_LIB}";
         export ${PY_ENV} PATH="$PATH";
         local cudaflags="${CUDAFLAGS:+$CUDAFLAGS }-t=${n_arch}";
-        local build_type="$(rapids-select-cmake-build-type "${cmake_args_[@]}")";
+        local build_type="$(rapids-select-cmake-build-type "${cmake_args_[@]}" || echo "Release")";
         local nvcc_append_flags="${NVCC_APPEND_FLAGS:+$NVCC_APPEND_FLAGS }-t=${n_arch}";
 
         CUDAFLAGS="${cudaflags}"                     \
