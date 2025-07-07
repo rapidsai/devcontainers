@@ -37,7 +37,7 @@ jobs:
     with:
       arch: '["amd64", "arm64"]'
       cuda: '["12.9"]'
-      node_type: cpu8
+      node_type: cpu32
       extra-repo-deploy-key: CUMLPRIMS_SSH_PRIVATE_DEPLOY_KEY
       rapids-aux-secret-1: GIST_REPO_READ_ORG_GITHUB_TOKEN
       timeout-minutes: 720
@@ -46,11 +46,26 @@ jobs:
       # 3. Never fallback to locally compiling
       # 4. Use RAPIDS_AUX_SECRET_1 as the sccache-dist auth token
       env: |
+        SCCACHE_BUCKET=
+        DISABLE_SCCACHE=1
+        INFER_NUM_DEVICE_ARCHITECTURES=
+        DEVCONTAINER_UTILS_ENABLE_SCCACHE_DIST=
+        MAX_DEVICE_OBJ_TO_COMPILE_IN_PARALLEL=1
         SCCACHE_DIST_MAX_RETRIES=inf
         SCCACHE_SERVER_LOG=sccache=debug
         SCCACHE_DIST_FALLBACK_TO_LOCAL_COMPILE=false
         SCCACHE_DIST_AUTH_TOKEN_VAR=RAPIDS_AUX_SECRET_1
       build_command: |
+        unset SCCACHE_BUCKET;
+
+        source ~/.profile;
+
+        echo "SCCACHE_BUCKET=${SCCACHE_BUCKET:-}";
+        echo "DISABLE_SCCACHE=${DISABLE_SCCACHE:-}";
+        echo "CMAKE_C_COMPILER_LAUNCHER=${CMAKE_C_COMPILER_LAUNCHER:-}";
+        echo "CMAKE_CXX_COMPILER_LAUNCHER=${CMAKE_CXX_COMPILER_LAUNCHER:-}";
+        echo "CMAKE_CUDA_COMPILER_LAUNCHER=${CMAKE_CUDA_COMPILER_LAUNCHER:-}";
+
         # Verify sccache cache location
         sccache --show-adv-stats;
 
@@ -59,7 +74,7 @@ jobs:
 
         # Configure all the C++ libs
         time configure-all            \
-          -j0                         \
+          -j                          \
           -GNinja                     \
           -Wno-dev                    \
           -DBUILD_TESTS=ON            \
@@ -70,10 +85,10 @@ jobs:
           -DBUILD_CUGRAPH_MG_TESTS=ON ;
 
         # Build all the C++ libs
-        time build-all-cpp -j0;
+        time build-all-cpp -j;
 
         # Build all the Python libs
-        time build-all-python -j0;
+        time build-all-python -j;
 
         # Print cache and dist stats
         sccache --show-adv-stats;
