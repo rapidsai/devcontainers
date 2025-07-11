@@ -12,7 +12,7 @@ repos:
 
 - name: rmm
   path: rmm
-  git: {<<: *git_defaults, repo: rmm, tag: main}
+  git: {<<: *git_defaults, repo: rmm}
   cpp:
     - name: rmm
       sub_dir: cpp
