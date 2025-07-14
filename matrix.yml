@@ -140,7 +140,7 @@ include:
 
 # RAPIDS devcontainers
 
-- os: "ubuntu:22.04"
+- os: "ubuntu:24.04"
   images:
   # cuda
   # Commented as RAPIDS only supports one major version (CUDA 12) right now
