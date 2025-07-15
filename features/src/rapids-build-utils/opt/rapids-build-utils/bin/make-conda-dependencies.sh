@@ -161,8 +161,10 @@ make_conda_dependencies() {
             done
         done
 
+        local xgboost_packages=(xgboost py-xgboost libxgboost);
+
         # shellcheck disable=SC2207
-        local conda_noinstall=($(rapids-python-pkg-names) $(rapids-python-conda-pkg-names));
+        local conda_noinstall=($(rapids-python-pkg-names) $(rapids-python-conda-pkg-names) ${xgboost_packages[@]});
 
         # Generate a combined conda env yaml file.
         conda-merge "${conda_env_yamls[@]}"                                                                                   \
