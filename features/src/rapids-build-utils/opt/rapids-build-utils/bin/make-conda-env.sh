@@ -8,6 +8,8 @@
 # Boolean options:
 #  -h,--help             Print this text.
 #  -f,--force            Delete the existing conda env and recreate it from scratch.
+#  -q,--quiet            Don't show `conda env create` progress bars.
+#                        (default: $CONDA_ENV_CREATE_QUIET)
 #
 # @_include_value_options rapids-make-conda-dependencies -h
 
@@ -18,10 +20,12 @@ make_conda_env() {
     local -;
     set -euo pipefail;
 
-    eval "$(_parse_args --take '-f,--force' "${@:2}" <&0)";
+    eval "$(_parse_args --take '-f,--force -q,--quiet' "${@:2}" <&0)";
 
     # shellcheck disable=SC1091
     . devcontainer-utils-debug-output 'rapids_build_utils_debug' 'make-conda-env';
+
+    test ${#quiet[@]} -eq 0 && quiet=(${CONDA_ENV_CREATE_QUIET:+"-q"});
 
     local env_name="${1}"; shift;
     local env_file_name="${env_name}.yml";
@@ -46,7 +50,7 @@ make_conda_env() {
             cat "${new_env_path}";
             echo "";
 
-            conda env create -q -n "${env_name}" -f "${new_env_path}" --solver=libmamba;
+            conda env create "${q[@]}" -n "${env_name}" -f "${new_env_path}" --solver=libmamba;
         # If the conda env does exist but it's different from the generated one,
         # print the diff between the envs and update it
         elif ! diff -BNqw "${old_env_path}" "${new_env_path}" >/dev/null 2>&1; then
@@ -65,7 +69,7 @@ make_conda_env() {
             # We mount in the package cache, so this should still be fast in most cases.
             rm -rf "${HOME}/.conda/envs/${env_name}";
 
-            conda env create -q -n "${env_name}" -f "${new_env_path}" --solver=libmamba;
+            conda env create "${q[@]}" -n "${env_name}" -f "${new_env_path}" --solver=libmamba;
         fi
 
         cp -a "${new_env_path}" "${old_env_path}";
