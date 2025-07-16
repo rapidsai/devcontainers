@@ -31,7 +31,7 @@ configure_${CPP_LIB}_cpp() {
     local -a cmake_args_="(${CMAKE_ARGS:-})";
     cmake_args_+=(${CPP_CMAKE_ARGS});
 
-    eval "$(_parse_args --take '-G -j,--parallel -v,--verbose' "$@" "${cmake_args_[@]}" <&0)";
+    eval "$(_parse_args --take '-G -v,--verbose' "$@" "${cmake_args_[@]}" <&0)";
 
     if [[ ! -d "${CPP_SRC}" ]]; then
         echo "configure-${CPP_LIB}-cpp: cannot access '${CPP_SRC}': No such directory" >&2;
