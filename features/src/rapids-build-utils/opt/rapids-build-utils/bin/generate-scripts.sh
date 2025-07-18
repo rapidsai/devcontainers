@@ -392,21 +392,23 @@ generate_scripts() {
             generate_all_script         ;
         done
 
-        # Generate a script to run C++ builds for all repos
-        NAME="${cpp_names[0]:-${repo_names[0]:-}}" \
-        NAMES="${cpp_names[*]@Q}"   \
-        SCRIPT="cpp.build"          \
-        PREFIX="build"              \
-        SUFFIX="all-cpp"            \
-        generate_all_script         ;
+        for script in "clean" "build"; do
+            # Generate a script to run C++ builds for all repos
+            NAME="${cpp_names[0]:-${repo_names[0]:-}}" \
+            NAMES="${cpp_names[*]@Q}"   \
+            SCRIPT="cpp.$script"        \
+            PREFIX="$script"            \
+            SUFFIX="all-cpp"            \
+            generate_all_script         ;
 
-        # Generate a script to run Python builds for all repos
-        NAME="${py_names[0]:-${repo_names[0]:-}}" \
-        NAMES="${py_names[*]@Q}"    \
-        SCRIPT="python.build"       \
-        PREFIX="build"              \
-        SUFFIX="all-python"         \
-        generate_all_script         ;
+            # Generate a script to run Python builds for all repos
+            NAME="${py_names[0]:-${repo_names[0]:-}}" \
+            NAMES="${py_names[*]@Q}"    \
+            SCRIPT="python.$script"     \
+            PREFIX="$script"            \
+            SUFFIX="all-python"         \
+            generate_all_script         ;
+        done
     fi
 }
 
