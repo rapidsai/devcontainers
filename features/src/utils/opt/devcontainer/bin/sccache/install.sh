@@ -10,9 +10,9 @@
 #
 # Options that require values:
 # --repo <repo>   The GitHub repository to use.
-#                 (default: mozilla/sccache)
+#                 (default: ${SCCACHE_REPOSITORY:-mozilla/sccache})
 # --version <ver> The sccache version to install (e.g. `0.10.0`).
-#                 (default: latest)
+#                 (default: ${SCCACHE_VERSION:-latest})
 #
 
 
@@ -90,8 +90,8 @@ _install_sccache() {
     # shellcheck disable=SC1091
     . devcontainer-utils-debug-output 'devcontainer_utils_debug' 'sccache install-sccache';
 
-    local sccache_version="${version:-"latest"}";
-    local github_repo="${repo:-"mozilla/sccache"}";
+    local sccache_version="${version:-"${SCCACHE_VERSION:-"latest"}"}";
+    local github_repo="${repo:-"${SCCACHE_REPOSITORY:-"mozilla/sccache"}"}";
 
     _find_version_from_git_tags sccache_version "https://github.com/$github_repo" "" "" "-.*" "true";
 
