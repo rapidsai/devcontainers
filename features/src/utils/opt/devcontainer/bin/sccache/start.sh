@@ -39,8 +39,6 @@ _start_sccache() {
     if test -n "${f:-${foreground:+x}}"; then
         # Unset this so sccache outputs to stderr
         unset SCCACHE_ERROR_LOG;
-        # Increase the open file limit so users can do `make -j1024`
-        ulimit -n "$(ulimit -Hn)";
         # Start the sccache server in the foreground
         RUST_LOG_STYLE="always"                                 \
         SCCACHE_NO_DAEMON=1                                     \
@@ -63,8 +61,6 @@ _start_sccache() {
       | tee "$logfile";
         # Write the pid to the pidfile
         pgrep sccache | sort -n | head -n1 | tee "${pidfile}" >/dev/null;
-        # Increase the open file limit so users can do `make -j1024`
-        prlimit --nofile=$(ulimit -Hn):$(ulimit -Hn) --pid "$(cat "${pidfile}")";
         echo "=== sccache logfile: $logfile ===" >&2;
         echo "=== sccache pidfile: $pidfile ===" >&2;
     fi

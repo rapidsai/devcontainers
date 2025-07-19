@@ -77,7 +77,7 @@ get_num_archs_jobs_and_load() {
     fi
 
     if test "$parallel" -eq 0; then
-        parallel="$(ulimit -Hn)"
+        parallel="$(ulimit -n)"
     fi
 
     local n_load="$((parallel > n_cpus ? n_cpus : parallel))";

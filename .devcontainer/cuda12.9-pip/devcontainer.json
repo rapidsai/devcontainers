@@ -13,7 +13,7 @@
     "--name",
     "${localEnv:USER:anon}-rapids-${localWorkspaceFolderBasename}-25.08-cuda12.9-pip",
     "--ulimit",
-    "nofile=1048576:1048576"
+    "nofile=65536:65536"
   ],
   "hostRequirements": {"gpu": "optional"},
   "features": {
