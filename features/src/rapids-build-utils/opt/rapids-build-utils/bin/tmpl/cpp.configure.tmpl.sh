@@ -73,7 +73,7 @@ configure_${CPP_LIB}_cpp() {
             ;
     fi
 
-    rapids-merge-compile-commands-json > ~/compile_commands.json;
+    rapids-merge-compile-commands-json > ~/compile_commands.json &
 }
 
 configure_${CPP_LIB}_cpp "$@" <&0;
