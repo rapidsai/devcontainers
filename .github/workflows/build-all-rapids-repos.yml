@@ -27,7 +27,7 @@ jobs:
     if: needs.check-event.outputs.ok == 'true'
     needs: check-event
     secrets: inherit
-    uses: rapidsai/shared-workflows/.github/workflows/build-in-devcontainer.yaml@branch-25.08
+    uses: rapidsai/shared-workflows/.github/workflows/build-in-devcontainer.yaml@fea/always-upload-sccache-logs
     permissions:
       actions: read
       packages: read
@@ -48,7 +48,7 @@ jobs:
       env: |
         CONDA_ENV_CREATE_QUIET=1
         SCCACHE_DIST_MAX_RETRIES=inf
-        SCCACHE_SERVER_LOG=sccache=info
+        SCCACHE_SERVER_LOG=sccache=debug
         SCCACHE_DIST_FALLBACK_TO_LOCAL_COMPILE=false
         SCCACHE_DIST_AUTH_TOKEN_VAR=RAPIDS_AUX_SECRET_1
       build_command: |
