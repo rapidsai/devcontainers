@@ -25,7 +25,7 @@ make_conda_env() {
     # shellcheck disable=SC1091
     . devcontainer-utils-debug-output 'rapids_build_utils_debug' 'make-conda-env';
 
-    test ${#quiet[@]} -eq 0 && quiet=(${CONDA_ENV_CREATE_QUIET:+"-q"});
+    test ${#q[@]} -eq 0 && q=(${CONDA_ENV_CREATE_QUIET:+"-q"});
 
     local env_name="${1}"; shift;
     local env_file_name="${env_name}.yml";
