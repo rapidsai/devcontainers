@@ -40,7 +40,7 @@ make_conda_env() {
     local -r old_env_path="$(realpath -m "${HOME}/.conda/envs/${env_file_name}")";
 
     # Create the python env without ninja.
-    # ninja -j10000000 fails with `ninja: FATAL: pipe: Too many open files`.
+    # ninja -j$(ulimit -n) fails with `ninja: FATAL: pipe: Too many open files`.
     # This appears to have been fixed 13 years ago (https://github.com/ninja-build/ninja/issues/233),
     # so that fix needs to be integrated into the kitware pip ninja builds.
     rapids-make-conda-dependencies --exclude <(echo ninja) "${OPTS[@]}" > "${new_env_path}";
