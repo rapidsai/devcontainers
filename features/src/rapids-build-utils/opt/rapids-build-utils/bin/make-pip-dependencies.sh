@@ -26,15 +26,13 @@
 # shellcheck disable=SC1091
 . rapids-generate-docstring;
 
-generate_requirements() {
-    (
-        (rapids-dependency-file-generator "${@:2}" 2>/dev/null || echo "") \
-      | (grep -v '^#' || [ "$?" == "1" ]) \
-      | tee "${1}" 1>/dev/null;
-    ) & true
+_generate_requirements() {
+    (rapids-dependency-file-generator "$@" 2>/dev/null || echo -n) \
+  | (grep -v '^#' || [ "$?" == "1" ]) \
+  | tee -a "${reqs}" 1>/dev/null;
 }
 
-make_pip_dependencies() {
+_make_pip_dependencies() {
     local -;
     set -euo pipefail;
 
@@ -96,6 +94,16 @@ make_pip_dependencies() {
     local i;
     local j;
 
+    local -r tmpdir="$(mktemp -d)";
+    # shellcheck disable=SC2064
+    trap "rm -rf '${tmpdir}'" EXIT;
+    local reqs="${tmpdir}/requirements.txt";
+    mkfifo "${reqs}";
+
+    if test ${#requirement[@]} -gt 0; then
+        cat "${requirement[@]}" | tee -a "$reqs";
+    fi
+
     for ((i=0; i < ${repos_length:-0}; i+=1)); do
 
         local repo="repos_${i}";
@@ -131,13 +139,12 @@ make_pip_dependencies() {
             for ((keyi=0; keyi < ${#keys[@]}; keyi+=1)); do
                 local file="/tmp/${name}.${keys[$keyi]}.requirements.txt";
                 pip_reqs_txts+=("${file}");
-                generate_requirements                      \
-                    "${file}"                              \
+                _generate_requirements                     \
                     --file-key "${keys[$keyi]}"            \
                     --output requirements                  \
                     --config ~/"${path}/dependencies.yaml" \
                     --matrix "${matrix_selectors}"         \
-                    ;
+                    &
             done
 
             local cpp_length="${repo}_cpp_length";
@@ -154,13 +161,12 @@ make_pip_dependencies() {
                 for ((keyi=0; keyi < ${#keys[@]}; keyi+=1)); do
                     local file="/tmp/${name}.${cpp_name}.${keys[$keyi]}.requirements.txt";
                     pip_reqs_txts+=("${file}");
-                    generate_requirements                      \
-                        "${file}"                              \
+                    _generate_requirements                     \
                         --file-key "${keys[$keyi]}"            \
                         --output requirements                  \
                         --config ~/"${path}/dependencies.yaml" \
                         --matrix "${matrix_selectors}"         \
-                        ;
+                        &
                 done
             done
 
@@ -178,13 +184,12 @@ make_pip_dependencies() {
                 for ((keyi=0; keyi < ${#keys[@]}; keyi+=1)); do
                     local file="/tmp/${name}.${py_name}.${keys[$keyi]}.requirements.txt";
                     pip_reqs_txts+=("${file}");
-                    generate_requirements                      \
-                        "${file}"                              \
+                    _generate_requirements                     \
                         --file-key "${keys[$keyi]}"            \
                         --output requirements                  \
                         --config ~/"${path}/dependencies.yaml" \
                         --matrix "${matrix_selectors}"         \
-                        ;
+                        &
                 done
             done
         fi
@@ -192,27 +197,18 @@ make_pip_dependencies() {
 
     if test ${#requirement[@]} -gt 0 || test ${#pip_reqs_txts[@]} -gt 0; then
 
-        for ((i=0; i < ${#pip_reqs_txts[@]}; i+=1)); do
-            while ! test -f "${pip_reqs_txts[$i]}"; do
-                sleep 0.1;
-            done
-        done
-
-        local pip_noinstall=();
+        readarray -t rapids_python_pkg_names < <(rapids-python-pkg-names);
 
         # add all python packages to the noinstall list.
-        for pkg in $(rapids-python-pkg-names); do
-            pip_noinstall+=("${pkg}" "${pkg}-cu.*");
-            if test -z "${pkg##*"-"*}"; then
-                pip_noinstall+=("${pkg//"-"/"_"}" "${pkg//"-"/"_"}-cu.*")
-            fi
-            if test -z "${pkg##*"_"*}"; then
-                pip_noinstall+=("${pkg//"_"/"-"}" "${pkg//"_"/"-"}-cu.*")
-            fi
-        done
+        local -a pip_noinstall=();
+        pip_noinstall+=("${rapids_python_pkg_names[@]}");
+        pip_noinstall+=("${rapids_python_pkg_names[@]//"-"/"_"}");
+        pip_noinstall+=("${rapids_python_pkg_names[@]//"_"/"-"}");
+        pip_noinstall+=("${pip_noinstall[@]/%/"-cu.*"}");
 
         # Generate a combined requirements.txt file
-        cat "${requirement[@]}" "${pip_reqs_txts[@]}"                                                           \
+        # shellcheck disable=SC2002
+        cat "${reqs}"                                                                                           \
       | (grep -v '^#' || [ "$?" == "1" ])                                                                       \
       | (grep -v -E '^$' || [ "$?" == "1" ])                                                                    \
       | ( if test -n "${no_dedupe:+x}"; then cat -; else tr -s "[:blank:]" | LC_ALL=C sort -u; fi )             \
@@ -223,9 +219,7 @@ make_pip_dependencies() {
       | sed -E "s/^cupy-cuda[0-9]+x/cupy-cuda${cuda_version_major}x/g"                                          \
       | sed -E "s/^cuda-python.*/cuda-python>=${cuda_version}.0,<$((cuda_version_major+1)).0a0/g"               \
         ;
-
-        rm -f "${pip_reqs_txts[@]}";
     fi
 }
 
-make_pip_dependencies "$@" <&0;
+_make_pip_dependencies "$@" <&0;
