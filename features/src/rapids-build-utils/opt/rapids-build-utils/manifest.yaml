@@ -178,11 +178,7 @@ repos:
   path: cuml
   git: {<<: *git_defaults, repo: cuml}
   dependency_keys:
-    - cpp_all
-    - docs
-    - py_build
-    - py_rapids_build
-    - py_run
+    - devcontainers
   cpp:
     - name: cuml
       sub_dir: cpp
