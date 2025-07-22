@@ -70,10 +70,6 @@ jobs:
           -DRAFT_COMPILE_LIBRARY=ON   \
           -DBUILD_CUGRAPH_MG_TESTS=ON ;
 
-        # Print memory usage every 1s
-        sh -c 'free -g -h -s 1 | grep -v Swap:' &
-        pid=$?
-
         # Build all the C++ libs
         time build-all-cpp -j0;
 
@@ -82,5 +78,3 @@ jobs:
 
         # Print cache and dist stats
         sccache --show-adv-stats;
-
-        kill -9 $pid
