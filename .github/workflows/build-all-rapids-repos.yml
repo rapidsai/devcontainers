@@ -42,6 +42,7 @@ jobs:
       timeout-minutes: 720
       # Prevent the sccache server from shutting down
       env: |
+        CONDA_ENV_CREATE_QUIET=1
         SCCACHE_IDLE_TIMEOUT=0
       build_command: |
         SCCACHE_NO_DAEMON=1 sccache --stop-server
