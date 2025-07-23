@@ -140,6 +140,23 @@ include:
 
 # RAPIDS devcontainers
 
+- os: "ubuntu:22.04"
+  images:
+  # cuda
+  # Commented as RAPIDS only supports one major version (CUDA 12) right now
+  #- { features: [*python_rapids, *clang_format_rapids, *clangd_dev, *cuda_prev_max_rapids], env: *gcc_env_rapids }
+  #- { features: [*python_rapids, *clang_format_rapids, *clangd_dev, *cuda_curr_min], env: *gcc_env_rapids }
+  - { features: [*python_rapids, *clang_format_rapids, *clangd_dev, *cuda_curr_max], env: *gcc_env_rapids }
+  - { features: [*python_rapids, *clang_format_rapids, *clangd_dev, *cuda_curr_max_rapids], env: *gcc_env_rapids }
+  # Commented as RAPIDS only supports one major version (CUDA 12) right now
+  #- { features: [*python_rapids, *clang_format_rapids, *clangd_dev, *cuda_prev_max_rapids, *ucx_rapids, *openmpi], env: *gcc_env_rapids }
+  #- { features: [*python_rapids, *clang_format_rapids, *clangd_dev, *cuda_curr_min, *ucx_rapids, *openmpi], env: *gcc_env_rapids }
+  - { features: [*python_rapids, *clang_format_rapids, *clangd_dev, *cuda_curr_max, *ucx_rapids, *openmpi], env: *gcc_env_rapids }
+  - { features: [*python_rapids, *clang_format_rapids, *clangd_dev, *cuda_curr_max_rapids, *ucx_rapids, *openmpi], env: *gcc_env_rapids }
+
+  # mambaforge
+  - { features: [*conda], env: { PYTHON_VERSION: "3.13" } }
+
 - os: "ubuntu:24.04"
   images:
   # cuda
