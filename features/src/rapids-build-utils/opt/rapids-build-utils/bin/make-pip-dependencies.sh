@@ -101,7 +101,10 @@ _make_pip_dependencies() {
     mkfifo "${reqs}";
 
     if test ${#requirement[@]} -gt 0; then
-        cat "${requirement[@]}" | tee -a "$reqs";
+        cat "${requirement[@]}" 2>/dev/null \
+      | (grep -v '^#' || [ "$?" == "1" ])   \
+      | tee -a "${reqs}" 1>/dev/null        \
+        &
     fi
 
     for ((i=0; i < ${repos_length:-0}; i+=1)); do
