@@ -33,6 +33,9 @@ _generate_env_yaml() {
 }
 
 _generate_env_yamls() {
+    local i;
+    local j;
+
     for ((i=0; i < ${repos_length:-0}; i+=1)); do
 
         local repo="repos_${i}";
@@ -161,11 +164,6 @@ _make_conda_dependencies() {
     # add extra arguments (if there are conflicts, e.g. 'py=3.10;py=3.11', it's fine... the last one will win)
     test ${#matrix_entry[@]} -gt 0 && _matrix_selectors+=("${matrix_entry[@]}");
     local -r matrix_selectors=$(IFS=";"; echo "${_matrix_selectors[*]}")
-
-    local conda_env_yamls=();
-
-    local i;
-    local j;
 
     local -r tmpdir="$(mktemp -d)";
     # shellcheck disable=SC2064
