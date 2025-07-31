@@ -114,13 +114,16 @@ include:
 
 - os: "ubuntu:24.04"
   images:
+  # CTK versions < cuda_curr_max used for python wheel testing.
+  # FIXME 12.3, 12.4, 12.7 don't seem to have apt packages available in the repos. Investigate if we end up really needing those.
+  - { features: [*python, *dood, *gcc_14, { name: "cuda", version: "12.5", <<: *cccl_cuda_opts }, *clang_format_cccl, *clangd_dev, *cccl_dev], env: *gcc_env }
+  - { features: [*python, *dood, *gcc_14, { name: "cuda", version: "12.6", <<: *cccl_cuda_opts }, *clang_format_cccl, *clangd_dev, *cccl_dev], env: *gcc_env }
+  - { features: [*python, *dood, *gcc_14, { name: "cuda", version: "12.8", <<: *cccl_cuda_opts }, *clang_format_cccl, *clangd_dev, *cccl_dev], env: *gcc_env }
+
   - { features: [*python, *dood, *gcc_13, { <<: *cuda_curr_max, <<: *cccl_cuda_opts }, *clang_format_cccl, *clangd_dev, *cccl_dev], env: *gcc_env }
   - { features: [*python, *dood, *gcc_14, { <<: *cuda_curr_max, <<: *cccl_cuda_opts }, *clang_format_cccl, *clangd_dev, *cccl_dev], env: *gcc_env }
+  - { features: [*python, *dood, *gcc_14, { <<: *cuda_curr_max, <<: *cccl_cuda_ext_opts }, *clang_format_cccl, *clangd_dev, *cccl_dev], env: *gcc_env }
 
-  # CTK versions < cuda_curr_max used for python wheel testing.
-  # FIXME 12.3, 12.4, 12.7 don't seem to have apt packages avaiable in the repos. Investigate if we end up really needing those.
-  - { features: [*python, *dood, *gcc_13, { name: "cuda", version: "12.5", <<: *cccl_cuda_opts }, *clang_format_cccl, *clangd_dev, *cccl_dev], env: *gcc_env }
-  - { features: [*python, *dood, *gcc_13, { name: "cuda", version: "12.6", <<: *cccl_cuda_opts }, *clang_format_cccl, *clangd_dev, *cccl_dev], env: *gcc_env }
 
 - os: "windows"
   images:
