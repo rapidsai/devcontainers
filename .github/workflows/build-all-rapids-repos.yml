@@ -46,7 +46,6 @@ jobs:
       # 3. Never fallback to locally compiling
       # 4. Use RAPIDS_AUX_SECRET_1 as the sccache-dist auth token
       env: |
-        SCCACHE_RECACHE=1
         CONDA_ENV_CREATE_QUIET=1
         SCCACHE_DIST_MAX_RETRIES=inf
         SCCACHE_SERVER_LOG=sccache=debug
