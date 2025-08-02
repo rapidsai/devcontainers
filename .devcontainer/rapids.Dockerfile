@@ -55,13 +55,13 @@ ENV SCCACHE_BUCKET="rapids-sccache-devs"
 # 2hr (1 minute longer than sccache-dist request timeout)
 ENV SCCACHE_IDLE_TIMEOUT=7200
 # ENV SCCACHE_S3_KEY_PREFIX=rapids-test-sccache-dist
-ENV SCCACHE_S3_KEY_PREFIX=rapids-test-sccache-v0-7-7
+ENV SCCACHE_S3_KEY_PREFIX=rapids-test-sccache-v-rapids
 
-# ###
-# # sccache-dist configuration
-# ###
-# # Enable sccache-dist by default
-# ENV DEVCONTAINER_UTILS_ENABLE_SCCACHE_DIST=1
+###
+# sccache-dist configuration
+###
+# Enable sccache-dist by default
+ENV DEVCONTAINER_UTILS_ENABLE_SCCACHE_DIST=1
 # # Compile locally if max retries exceeded
 # ENV SCCACHE_DIST_FALLBACK_TO_LOCAL_COMPILE=true
 # # Retry transient errors 4 times (for a total of 5 attempts)
@@ -75,6 +75,5 @@ ENV SCCACHE_S3_KEY_PREFIX=rapids-test-sccache-v0-7-7
 # ENV SCCACHE_DIST_KEEPALIVE_TIMEOUT=600
 # ENV SCCACHE_DIST_URL="https://${TARGETARCH}.linux.sccache.rapids.nvidia.com"
 
-# # Build as much in parallel as possible
-# ENV INFER_NUM_DEVICE_ARCHITECTURES=1
-# ENV MAX_DEVICE_OBJ_TO_COMPILE_IN_PARALLEL=20
+# Build as much in parallel as possible
+ENV INFER_NUM_DEVICE_ARCHITECTURES=1

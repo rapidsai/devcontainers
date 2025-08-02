@@ -204,6 +204,7 @@ repos:
       depends: [rmm, raft]
       parallelism:
         max_device_obj_memory_usage: 6Gi
+        max_device_obj_to_compile_in_parallel: 1
     - name: cugraph_etl
       sub_dir: cpp/libcugraph_etl
       depends: [cudf, cugraph]
