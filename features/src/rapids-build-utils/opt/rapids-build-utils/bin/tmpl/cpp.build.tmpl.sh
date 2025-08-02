@@ -50,9 +50,9 @@ build_${CPP_LIB}_cpp() {
         local -a cmake_build_args="($(rapids-select-cmake-build-args ${n_jobs:+-j${n_jobs}} "${OPTS[@]}"))";
         cmake                               \
             --build "${CPP_SRC}/${BIN_DIR}" \
-            "${cmake_build_args[@]}"        ;
+            "${cmake_build_args[@]}" 2>&1   ;
         { set +x; } 2>/dev/null; echo -n "lib${CPP_LIB} build time:";
-    ) 2>&1;
+    ) 2> >(tee -a /var/log/devcontainer-utils/build-${CPP_LIB}-cpp-time.log >&2);
 }
 
 build_${CPP_LIB}_cpp "$@" <&0;

@@ -122,21 +122,20 @@ EOF
         local build_type="$(rapids-select-cmake-build-type "${cmake_args_[@]}" || echo "Release")";
         local nvcc_append_flags="${NVCC_APPEND_FLAGS:+$NVCC_APPEND_FLAGS }-t=${n_arch}";
 
-        CUDAFLAGS="${cudaflags}"                     \
-        CMAKE_GENERATOR="${G:-Ninja}"                \
-        PARALLEL_LEVEL="${n_jobs}"                   \
-        CMAKE_ARGS="${cmake_args[*]@Q}"              \
-        SKBUILD_BUILD_OPTIONS="${ninja_args[*]}"     \
-        SKBUILD_BUILD_VERBOSE="${v:+True}"           \
-        SKBUILD_LOGGING_LEVEL="${v:+INFO}"           \
-        SKBUILD_INSTALL_STRIP="${strip:+True}"       \
-        SKBUILD_CMAKE_BUILD_TYPE="${build_type}"     \
-        CMAKE_BUILD_PARALLEL_LEVEL="${n_jobs}"       \
-        NVCC_APPEND_FLAGS="${nvcc_append_flags}"     \
-            python -m pip install "${pip_args[@]}"   \
-        ;
+        CUDAFLAGS="${cudaflags}"                       \
+        CMAKE_GENERATOR="${G:-Ninja}"                  \
+        PARALLEL_LEVEL="${n_jobs}"                     \
+        CMAKE_ARGS="${cmake_args[*]@Q}"                \
+        SKBUILD_BUILD_OPTIONS="${ninja_args[*]}"       \
+        SKBUILD_BUILD_VERBOSE="${v:+True}"             \
+        SKBUILD_LOGGING_LEVEL="${v:+INFO}"             \
+        SKBUILD_INSTALL_STRIP="${strip:+True}"         \
+        SKBUILD_CMAKE_BUILD_TYPE="${build_type}"       \
+        CMAKE_BUILD_PARALLEL_LEVEL="${n_jobs}"         \
+        NVCC_APPEND_FLAGS="${nvcc_append_flags}"       \
+            python -m pip install "${pip_args[@]}" 2>&1;
         { set +x; } 2>/dev/null; echo -n "${PY_LIB} install time:";
-    ) 2>&1;
+    ) 2> >(tee -a /var/log/devcontainer-utils/install-${PY_LIB}-python-time.log >&2);
 }
 
 install_${PY_LIB}_python "$@" <&0;
