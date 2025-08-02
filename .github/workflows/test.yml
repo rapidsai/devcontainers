@@ -28,8 +28,14 @@ jobs:
 
   build-all-rapids-repos:
     if: needs.check-event.outputs.ok == 'true' && github.repository_owner == 'rapidsai'
-    name: Build
+    name: Build RAPIDS
     needs: check-event
+    secrets: inherit
+    uses: ./.github/workflows/build-all-rapids-repos.yml
+
+  build-all-rapids-repos-again:
+    needs: build-all-rapids-repos
+    name: Build RAPIDS again
     secrets: inherit
     uses: ./.github/workflows/build-all-rapids-repos.yml
 
