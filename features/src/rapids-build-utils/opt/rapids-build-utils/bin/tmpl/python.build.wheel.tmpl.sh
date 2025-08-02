@@ -115,10 +115,9 @@ EOF
         SKBUILD_CMAKE_BUILD_TYPE="${build_type}"     \
         CMAKE_BUILD_PARALLEL_LEVEL="${n_jobs}"       \
         NVCC_APPEND_FLAGS="${nvcc_append_flags}"     \
-            python -m pip wheel "${pip_args[@]}"     \
-        ;
+            python -m pip wheel "${pip_args[@]}" 2>&1;
         { set +x; } 2>/dev/null; echo -n "${PY_LIB} wheel build time:";
-    ) 2>&1;
+    ) 2> >(tee -a /var/log/devcontainer-utils/install-${PY_LIB}-python-time.log >&2);
 }
 
 build_${PY_LIB}_python_wheel "$@" <&0;
