@@ -37,7 +37,7 @@ jobs:
     with:
       arch: '["amd64", "arm64"]'
       cuda: '["12.9"]'
-      node_type: cpu8
+      node_type: cpu32
       extra-repo-deploy-key: CUMLPRIMS_SSH_PRIVATE_DEPLOY_KEY
       rapids-aux-secret-1: GIST_REPO_READ_ORG_GITHUB_TOKEN
       timeout-minutes: 720
@@ -60,7 +60,7 @@ jobs:
 
         # Configure all the C++ libs
         time configure-all            \
-          -j0                         \
+          -j                          \
           -GNinja                     \
           -Wno-dev                    \
           -DBUILD_TESTS=ON            \
@@ -71,10 +71,13 @@ jobs:
           -DBUILD_CUGRAPH_MG_TESTS=ON ;
 
         # Build all the C++ libs
-        time build-all-cpp -j0;
+        time build-all-cpp -j;
 
-        # Build all the Python libs
-        time build-all-python -j0;
+        # # Build all the Python libs
+        # time build-all-python -j;
 
         # Print cache and dist stats
         sccache --show-adv-stats;
+
+        # Print build times
+        find /var/log/devcontainer-utils/ -type f -name 'build-*-time.log' -print0 | xargs -0 -n1 grep -H real | sed 's/real\t/ /g'
