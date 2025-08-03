@@ -32,6 +32,9 @@ jobs:
     needs: check-event
     secrets: inherit
     uses: ./.github/workflows/build-all-rapids-repos.yml
+    with:
+      env: |
+        SCCACHE_RECACHE=1
 
   build-all-rapids-repos-again:
     needs: build-all-rapids-repos

@@ -4,6 +4,12 @@ on:
   schedule:
     - cron: '0 0 * * *'
   workflow_call:
+    inputs:
+      env:
+        description: |
+          Additional environment variables to be set inside the devcontainer.
+          Should be a space-delimited string in the form "KEY=value".
+        type: string
 
 jobs:
   check-event:
@@ -51,6 +57,7 @@ jobs:
         SCCACHE_SERVER_LOG=sccache=debug
         SCCACHE_DIST_FALLBACK_TO_LOCAL_COMPILE=false
         SCCACHE_DIST_AUTH_TOKEN_VAR=RAPIDS_AUX_SECRET_1
+        ${{ inputs.env }}
       build_command: |
         # Verify sccache cache location
         sccache --show-adv-stats;
