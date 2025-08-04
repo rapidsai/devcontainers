@@ -1,0 +1,92 @@
+name: build-in-devcontainer
+
+description: Build in devcontainer
+
+inputs:
+  env:
+    description: |
+      Additional environment variables to be set inside the devcontainer.
+      Should be a space-delimited string in the form "KEY=value".
+    type: string
+  arch:
+    description: "One of [amd64, arm64]. CPU architecture to run on."
+    type: string
+    default: "amd64"
+  cuda:
+    description: |
+      CUDA version to run this workflow for.
+    type: string
+    default: "12.0"
+  python_package_manager:
+    description: |
+      Python package manager to run devcontainer builds for.
+      One of: '["conda"]', '["pip"]', '["conda", "pip"]'.
+    type: string
+    default: "conda"
+  timeout-minutes:
+    description: "Maximum time (in minutes) allowed for a run of this workflow."
+    type: number
+    default: 360
+  build_command:
+    description: |
+      Shell commands to run inside the devcontainer after it's built and started.
+      This is almost always some form of 'build-all --verbose;'.
+      See https://github.com/rapidsai/devcontainers for details.
+    type: string
+    required: true
+
+runs:
+  using: composite
+  steps:
+
+    - name: Set up env
+      shell: bash
+      run: |
+        echo "REPOSITORY=$(basename "$(pwd)")" | tee -a "${GITHUB_ENV}"
+        echo "ARTIFACT_SLUG=${{ github.run_id }}-${{ github.run_attempt }}-$RANDOM" >> "${GITHUB_ENV}"
+
+    - name: Run build in devcontainer
+      uses: devcontainers/ci@8bf61b26e9c3a98f69cb6ce2f88d24ff59b785c6 # v0.3.1900000417
+      with:
+        push: never
+        checkoutPath: repo
+        imageName: "docker.io/rapidsai/${{ env.REPOSITORY }}-devcontainer"
+        imageTag: "cuda${{ inputs.cuda }}-${{ inputs.python_package_manager }}"
+        configFile: .devcontainer/cuda${{ inputs.cuda }}-${{ inputs.python_package_manager }}/devcontainer.json
+        # Env vars are NOT automatically passed from our current env into the devcontainer.
+        # We have to pass them in explicitly.
+        env: |
+          AWS_ACCESS_KEY_ID=${{ env.AWS_ACCESS_KEY_ID }}
+          AWS_SESSION_TOKEN=${{ env.AWS_SESSION_TOKEN }}
+          AWS_SECRET_ACCESS_KEY=${{ env.AWS_SECRET_ACCESS_KEY }}
+          REPOSITORY=${{ env.REPOSITORY }}
+          SCCACHE_REGION=${{ env.AWS_REGION }}
+          SCCACHE_ERROR_LOG=/home/coder/${{ env.REPOSITORY }}/sccache.log
+          SKIP_RAPIDS_BUILD_UTILS_POST_START_COMMAND=1
+          ${{ inputs.env }}
+        runCmd: |
+          set -euo pipefail;
+
+          # Generate scripts
+          rapids-generate-scripts;
+
+          cd ~/"${REPOSITORY}"
+
+          # Verify sccache cache location
+          sccache --show-adv-stats
+
+          ${{ inputs.build_command }}
+
+          # Print cache and dist stats
+          sccache --show-adv-stats
+
+          # Print build times
+          find /var/log/devcontainer-utils/ -type f -name 'build-*-time.log' -print0 | xargs -0 -n1 grep -H real | sed 's/real\t/ /g' || true
+
+    - if: ${{ !cancelled() }}
+      name: Upload sccache logs
+      uses: actions/upload-artifact@v4
+      with:
+        name: sccache-client-logs-cuda${{ inputs.cuda }}-${{ inputs.python_package_manager }}-${{ inputs.arch }}-${{ env.ARTIFACT_SLUG }}
+        path: repo/sccache*.log
+        compression-level: 9
