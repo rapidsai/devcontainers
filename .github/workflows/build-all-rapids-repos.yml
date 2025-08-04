@@ -30,61 +30,198 @@ jobs:
 
   build-all-rapids-repos:
     name: RAPIDS
+    timeout-minutes: 720
     if: needs.check-event.outputs.ok == 'true'
     needs: check-event
-    secrets: inherit
-    uses: rapidsai/shared-workflows/.github/workflows/build-in-devcontainer.yaml@fea/preprocessor-caching
     permissions:
       actions: read
       packages: read
       id-token: write
       contents: read
       pull-requests: read
-    with:
-      arch: '["amd64", "arm64"]'
-      cuda: '["12.9"]'
-      node_type: cpu8
-      extra-repo-deploy-key: CUMLPRIMS_SSH_PRIVATE_DEPLOY_KEY
-      rapids-aux-secret-1: GIST_REPO_READ_ORG_GITHUB_TOKEN
-      timeout-minutes: 720
-      # 1. Infinitely retry transient errors
-      # 2. Enable debug logging to track cache misses
-      # 3. Never fallback to locally compiling
-      # 4. Use RAPIDS_AUX_SECRET_1 as the sccache-dist auth token
-      env: |
-        CONDA_ENV_CREATE_QUIET=1
-        SCCACHE_DIST_MAX_RETRIES=inf
-        SCCACHE_SERVER_LOG=sccache=debug
-        SCCACHE_DIST_FALLBACK_TO_LOCAL_COMPILE=false
-        SCCACHE_DIST_AUTH_TOKEN_VAR=RAPIDS_AUX_SECRET_1
-        ${{ inputs.env }}
-      build_command: |
-        # Verify sccache cache location
-        sccache --show-adv-stats;
 
-        # Clone all the repos
-        clone-all -j$(nproc) -v -q --clone-upstream --depth 1 --single-branch --shallow-submodules;
+    runs-on: "linux-${{ matrix.CPU_ARCH }}-cpu8"
+    strategy:
+      fail-fast: false
+      matrix:
+        CPU_ARCH: ["amd64", "arm64"]
+        CUDA_VER: ["12.9"]
+        PACKAGER: ["conda", "pip"]
+        # 1. No conda progress bar
+        # 2. Infinitely retry transient errors
+        # 3. Enable debug logging to track cache misses
+        # 4. Never fallback to locally compiling
+        # 5. Use RAPIDS_AUX_SECRET_1 as the sccache-dist auth token
+        ENVIRONMENT:
+          - |
+            CONDA_ENV_CREATE_QUIET=1
+            SCCACHE_DIST_MAX_RETRIES=inf
+            SCCACHE_SERVER_LOG=sccache=debug
+            SCCACHE_DIST_FALLBACK_TO_LOCAL_COMPILE=false
+            ${{ inputs.env }}
 
-        # Configure all the C++ libs
-        time configure-all            \
-          -j0                         \
-          -GNinja                     \
-          -Wno-dev                    \
-          -DBUILD_TESTS=ON            \
-          -DBUILD_BENCHMARKS=ON       \
-          -DBUILD_PRIMS_BENCH=ON      \
-          -DBUILD_SHARED_LIBS=ON      \
-          -DRAFT_COMPILE_LIBRARY=ON   \
-          -DBUILD_CUGRAPH_MG_TESTS=ON ;
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          path: repo
+          fetch-depth: 0
+          persist-credentials: true
 
-        # Build all the C++ libs
-        time build-all-cpp -j0;
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
 
-        # # Build all the Python libs
-        # time build-all-python -j0;
+      - uses: aws-actions/configure-aws-credentials@b47578312673ae6fa5b5096b330d9fbac3d116df # v4.2.1
+        with:
+          role-to-assume: ${{ vars.AWS_ROLE_ARN }}
+          aws-region: ${{ vars.AWS_REGION }}
+          role-duration-seconds: 43200 # 12h
 
-        # Print cache and dist stats
-        sccache --show-adv-stats;
+      - name: Set up env
+        shell: bash
+        run: |
+          echo "ARTIFACT_SLUG=${{ github.run_id }}-${{ github.run_attempt }}-$RANDOM" >> "${GITHUB_ENV}"
 
-        # Print build times
-        find /var/log/devcontainer-utils/ -type f -name 'build-*-time.log' -print0 | xargs -0 -n1 grep -H real | sed 's/real\t/ /g'
+      - name: Set up proxy cache
+        uses: nv-gha-runners/setup-proxy-cache@main
+        continue-on-error: true
+
+      - name: Set up sccache preprocessor cache
+        id: sccache-preprocessor-cache
+        uses: actions/cache@v4
+        with:
+          path: .cache/sccache
+          restore-keys: sccache-preprocessor-cache-${{ runner.os }}-cuda${{ matrix.CUDA_VER }}-${{ matrix.PACKAGER }}-${{ matrix.CPU_ARCH }}
+          key: sccache-preprocessor-cache-${{ runner.os }}-cuda${{ matrix.CUDA_VER }}-${{ matrix.PACKAGER }}-${{ matrix.CPU_ARCH }}-${{ env.ARTIFACT_SLUG }}
+
+      - name: Set up sccache-dist client toolchains cache
+        id: sccache-dist-toolchains-cache
+        uses: actions/cache@v4
+        with:
+          path: .cache/sccache-dist-client
+          restore-keys: sccache-toolchains-cache-${{ runner.os }}-cuda${{ matrix.CUDA_VER }}-${{ matrix.PACKAGER }}-${{ matrix.CPU_ARCH }}
+          key: sccache-toolchains-cache-${{ runner.os }}-cuda${{ matrix.CUDA_VER }}-${{ matrix.PACKAGER }}-${{ matrix.CPU_ARCH }}-${{ env.ARTIFACT_SLUG }}
+
+      - name: Configure all
+        uses: ./repo/.github/actions/build-in-devcontainer
+        with:
+          arch: ${{ matrix.CPU_ARCH }}
+          cuda: ${{ matrix.CUDA_VER }}
+          python_package_manager: ${{ matrix.PACKAGER }}
+          env: |
+            ${{ matrix.ENVIRONMENT }}
+            SCCACHE_DIST_AUTH_TOKEN=${{ secrets.GIST_REPO_READ_ORG_GITHUB_TOKEN }}
+          build_command: |
+
+            if ! pgrep ssh-agent >/dev/null 2>&1; then eval "$(ssh-agent -s)"; fi;
+            ssh-add - <<< '${{ secrets.CUMLPRIMS_SSH_PRIVATE_DEPLOY_KEY }}';
+            devcontainer-utils-init-ssh-deploy-keys || true;
+
+            mkdir -p ~/.config/pip/;
+            cat <<EOF >> ~/.config/pip/pip.conf
+            [global]
+            extra-index-url = https://pypi.anaconda.org/rapidsai-wheels-nightly/simple
+            EOF
+
+            # Clone all the repos
+            clone-all -j$(nproc) -v -q --clone-upstream --depth 1 --single-branch --shallow-submodules;
+
+            # Generate scripts
+            rapids-generate-scripts;
+
+            # Create python environment
+            rapids-make-${PYTHON_PACKAGE_MANAGER}-env;
+
+            # Configure all the C++ libs
+            time configure-all            \
+              -j                          \
+              -GNinja                     \
+              -Wno-dev                    \
+              -DBUILD_TESTS=ON            \
+              -DBUILD_BENCHMARKS=ON       \
+              -DBUILD_PRIMS_BENCH=ON      \
+              -DBUILD_SHARED_LIBS=ON      \
+              -DRAFT_COMPILE_LIBRARY=ON   \
+              -DBUILD_CUGRAPH_MG_TESTS=ON ;
+
+      - name: Build rmm, ucxx, kvikio
+        uses: ./repo/.github/actions/build-in-devcontainer
+        with:
+          arch: ${{ matrix.CPU_ARCH }}
+          cuda: ${{ matrix.CUDA_VER }}
+          python_package_manager: ${{ matrix.PACKAGER }}
+          env: |
+            ${{ matrix.ENVIRONMENT }}
+            SCCACHE_DIST_AUTH_TOKEN=${{ secrets.GIST_REPO_READ_ORG_GITHUB_TOKEN }}
+          build_command: |
+            time build-rmm-cpp -j0
+            time build-ucxx-cpp -j0
+            time build-ucxx-python-cpp -j0
+            time build-kvikio-cpp -j0
+
+      - name: Build cudf
+        uses: ./repo/.github/actions/build-in-devcontainer
+        with:
+          arch: ${{ matrix.CPU_ARCH }}
+          cuda: ${{ matrix.CUDA_VER }}
+          python_package_manager: ${{ matrix.PACKAGER }}
+          env: |
+            ${{ matrix.ENVIRONMENT }}
+            SCCACHE_DIST_AUTH_TOKEN=${{ secrets.GIST_REPO_READ_ORG_GITHUB_TOKEN }}
+          build_command: |
+            time build-cudf-cpp -j0
+            time build-cudf_kafka-cpp -j0
+
+      - name: Build raft
+        uses: ./repo/.github/actions/build-in-devcontainer
+        with:
+          arch: ${{ matrix.CPU_ARCH }}
+          cuda: ${{ matrix.CUDA_VER }}
+          python_package_manager: ${{ matrix.PACKAGER }}
+          env: |
+            ${{ matrix.ENVIRONMENT }}
+            SCCACHE_DIST_AUTH_TOKEN=${{ secrets.GIST_REPO_READ_ORG_GITHUB_TOKEN }}
+          build_command: |
+            time build-rapidsmpf-cpp -j0
+            time build-raft-cpp -j0
+
+      - name: Build cuvs
+        uses: ./repo/.github/actions/build-in-devcontainer
+        with:
+          arch: ${{ matrix.CPU_ARCH }}
+          cuda: ${{ matrix.CUDA_VER }}
+          python_package_manager: ${{ matrix.PACKAGER }}
+          env: |
+            ${{ matrix.ENVIRONMENT }}
+            SCCACHE_DIST_AUTH_TOKEN=${{ secrets.GIST_REPO_READ_ORG_GITHUB_TOKEN }}
+          build_command: |
+            time build-cuvs-cpp -j0
+
+      - name: Build cuml
+        uses: ./repo/.github/actions/build-in-devcontainer
+        with:
+          arch: ${{ matrix.CPU_ARCH }}
+          cuda: ${{ matrix.CUDA_VER }}
+          python_package_manager: ${{ matrix.PACKAGER }}
+          env: |
+            ${{ matrix.ENVIRONMENT }}
+            SCCACHE_DIST_AUTH_TOKEN=${{ secrets.GIST_REPO_READ_ORG_GITHUB_TOKEN }}
+          build_command: |
+            time build-cumlprims_mg-cpp -j0
+            time build-cuml-cpp -j0
+
+      - name: Build cugraph
+        uses: ./repo/.github/actions/build-in-devcontainer
+        with:
+          arch: ${{ matrix.CPU_ARCH }}
+          cuda: ${{ matrix.CUDA_VER }}
+          python_package_manager: ${{ matrix.PACKAGER }}
+          env: |
+            ${{ matrix.ENVIRONMENT }}
+            SCCACHE_DIST_AUTH_TOKEN=${{ secrets.GIST_REPO_READ_ORG_GITHUB_TOKEN }}
+          build_command: |
+            time build-cugraph-cpp -j0
+            time build-cugraph_etl-cpp -j0
+            time build-wholegraph-cpp -j0
