@@ -1,7 +1,7 @@
 Param(
     [Parameter(Mandatory=$false)]
     [string]
-    $cudaVersion="12.9.0"
+    $cudaVersion="13.0.0"
 )
 
 # Use System.Version to tokenize version
@@ -11,7 +11,7 @@ $major = $version.Major
 $minor = $version.Minor
 $build = $version.Build
 
-# Minimum build is 0, not -1 as default in case "12.9" is passed
+# Minimum build is 0, not -1 as default in case "13.0" is passed
 if ($build -lt 0) {
     $build = 0
 }

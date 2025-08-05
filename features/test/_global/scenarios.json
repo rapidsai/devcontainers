@@ -4,7 +4,7 @@
     "features": {
       "rust": {},
       "cuda": {
-        "version": "12.9"
+        "version": "13.0"
       }
     },
     "overrideFeatureInstallOrder": [
@@ -44,7 +44,7 @@
         "version": "16"
       },
       "cuda": {
-        "version": "12.9"
+        "version": "13.0"
       },
       "nvhpc": {
         "version": "24.5"

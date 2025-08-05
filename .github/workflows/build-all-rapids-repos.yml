@@ -36,7 +36,7 @@ jobs:
       pull-requests: read
     with:
       arch: '["amd64", "arm64"]'
-      cuda: '["12.9"]'
+      cuda: '["13.0"]'
       node_type: cpu32
       extra-repo-deploy-key: CUMLPRIMS_SSH_PRIVATE_DEPLOY_KEY
       timeout-minutes: 720
