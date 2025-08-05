@@ -21,11 +21,7 @@ $mmbVersionTag = "${major}.${minor}.${build}"
 # mm = major minor
 $mmVersionTag = "${major}.${minor}"
 
-$cudaMajorUri = @{
-    "11" = "${mmbVersionTag}/network_installers/cuda_${mmbVersionTag}_win10_network.exe"
-    "12" = "${mmbVersionTag}/network_installers/cuda_${mmbVersionTag}_windows_network.exe"
-}["$major"]
-
+$cudaMajorUri = "${mmbVersionTag}/network_installers/cuda_${mmbVersionTag}_windows_network.exe"
 $cudaVersionUrl = "https://developer.download.nvidia.com/compute/cuda/$cudaMajorUri"
 $cudaComponents =
     "nvcc_$mmVersionTag",
