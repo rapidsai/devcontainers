@@ -54,6 +54,7 @@ jobs:
         # 5. Use RAPIDS_AUX_SECRET_1 as the sccache-dist auth token
         ENVIRONMENT:
           - |
+            SCCACHE_DIRECT=false
             CONDA_ENV_CREATE_QUIET=1
             SCCACHE_DIST_MAX_RETRIES=inf
             SCCACHE_SERVER_LOG=sccache=debug
