@@ -43,9 +43,10 @@ check "CUDA version" bash -c "echo '$CUDA_VERSION' | grep '13.0.0'";
 check "CUDA major version" bash -c "echo '$CUDA_VERSION_MAJOR' | grep '13'";
 check "CUDA minor version" bash -c "echo '$CUDA_VERSION_MINOR' | grep '0'";
 check "CUDA patch version" bash -c "echo '$CUDA_VERSION_PATCH' | grep '0'";
-check "nvcc version" bash -c "nvcc --version | grep 'release 13.0'";
+check "nvcc exists and is on path" realpath $(which nvcc);
+check "nvcc version" nvcc --version;
+check "nvcc version matches expected value" bash -c "nvcc --version | grep 'release 13.0'";
 check "installed" stat /usr/local/cuda-13.0 /usr/local/cuda;
-check "nvcc exists and is on path" which nvcc;
 
 # Check NVHPC
 >&2 echo "NVHPC=$NVHPC";
