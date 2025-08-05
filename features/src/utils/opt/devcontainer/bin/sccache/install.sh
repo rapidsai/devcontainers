@@ -42,14 +42,20 @@ _install_sccache() {
 
     _find_version_from_git_tags sccache_version "${find_version_args[@]}";
 
-    while ! wget --no-hsts -q -O- "https://github.com/$github_repo/releases/download/v$sccache_version/sccache-v$sccache_version-$(uname -m)-unknown-linux-musl.tar.gz" \
-          | sudo tar -C /usr/bin -zf - --wildcards --strip-components=1 -x '*/sccache' \
-         && sudo chmod +x /usr/bin/sccache; do
+    while test -n "${sccache_version:+x}" && \
+        ! wget --no-hsts -q -O- "https://github.com/$github_repo/releases/download/v$sccache_version/sccache-v$sccache_version-$(uname -m)-unknown-linux-musl.tar.gz" \
+        | sudo tar -C /usr/bin -zf - --wildcards --strip-components=1 -x '*/sccache' 2>/dev/null \
+       && sudo chmod +x /usr/bin/sccache; do
         echo "(!) failed to download sccache v${sccache_version}. Attempting to fall back one version to retry...";
-        _find_prev_version_from_git_tags sccache_version "${find_version_args[@]}";
+        _find_version_from_git_tags sccache_version "${find_version_args[@]}" "${sccache_version}";
     done
 
-    echo "Installed sccache v$(sccache --version | cut -d' ' -f2) to $(which sccache)"
+    if test -n "${sccache_version:+x}"; then
+        echo "Installed sccache v$(sccache --version | cut -d' ' -f2) to $(which sccache)";
+    else
+        echo "(!) failed to download sccache" >&2;
+        return 1
+    fi
 }
 
 _install_sccache "$@" <&0;

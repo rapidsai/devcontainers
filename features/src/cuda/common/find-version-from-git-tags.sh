@@ -16,6 +16,8 @@ _upvar() {
     fi
 }
 
+declare -Ag _find_version_from_git_tags_cache=();
+
 # Figure out correct version of a three part version number is not passed
 _find_version_from_git_tags() {
     local variable_name="$1"
@@ -26,6 +28,7 @@ _find_version_from_git_tags() {
     local separator="${4:-"."}"
     local suffix="${5:-}"
     local last_part_optional="${6:-"false"}"
+    local after_version="${7:-""}"
     if [ "$(echo "${requested_version}" | grep -o "." | wc -l)" != "2" ]; then
         local escaped_separator="${separator//./\\.}"
         local last_part=""
@@ -43,16 +46,33 @@ _find_version_from_git_tags() {
             fi
         fi
         local regex="${prefix}\\K[0-9]+${last_part}$"
-        local remote_upstream_fetch="$(git --no-pager config get remote.upstream.fetch)";
-        if test -n "${remote_upstream_fetch:+x}"; then
-            git config unset --global remote.upstream.fetch
+
+        if ! test -v _find_version_from_git_tags_cache["$variable_name"]; then
+            local remote_upstream_fetch="$(git --no-pager config get remote.upstream.fetch)"
+            if test -n "${remote_upstream_fetch:+x}"; then
+                git config unset --global remote.upstream.fetch || true
+            fi
+            readarray -t version_list < <(
+                git ls-remote --tags "${repository}" \
+              | grep -oP "${regex}"                  \
+              | tr -d ' '                            \
+              | tr "${separator}" "."                \
+              | sort -rV
+            )
+            if test -n "${remote_upstream_fetch:+x}"; then
+                git config set --global remote.upstream.fetch "${remote_upstream_fetch}"
+            fi
+            _upvar _find_version_from_git_tags_cache["$variable_name"] "${version_list[*]}"
+        else
+            readarray -d' ' -t version_list <<< "${_find_version_from_git_tags_cache["$variable_name"]}"
         fi
-        local -r version_list="$(git ls-remote --tags "${repository}" | grep -oP "${regex}" | tr -d ' ' | tr "${separator}" "." | sort -rV)"
-        if test -n "${remote_upstream_fetch:+x}"; then
-            git config set --global remote.upstream.fetch "${remote_upstream_fetch}";
-        fi
+        local version_list="$(IFS=$'\n'; echo "${version_list[*]}")"
         if [ "${requested_version}" = "latest" ] || [ "${requested_version}" = "current" ] || [ "${requested_version}" = "lts" ]; then
             requested_version="$(head -n 1 <<< "${version_list}")"
+        elif test -n "${after_version:+x}"; then
+            set +e
+            requested_version="$(grep -A 1 -m 1 "${after_version}" <<< "${version_list}" | tail -n 1)"
+            set -e
         else
             set +e
             requested_version="$(grep -E -m 1 "^${requested_version//./\\.}([\\.\\s]|$)" <<< "${version_list}")"
