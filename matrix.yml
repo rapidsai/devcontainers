@@ -1,7 +1,7 @@
 x-cuda-prev-min: &cuda_prev_min { name: "cuda", version: "12.0" }
 x-cuda-prev-max: &cuda_prev_max { name: "cuda", version: "12.9" }
-x-cuda-curr-min: &cuda_curr_min { name: "cuda", version: "12.0" }
-x-cuda-curr-max: &cuda_curr_max { name: "cuda", version: "12.9" }
+x-cuda-curr-min: &cuda_curr_min { name: "cuda", version: "13.0" }
+x-cuda-curr-max: &cuda_curr_max { name: "cuda", version: "13.0" }
 # Commented as RAPIDS only supports one major version (CUDA 12) right now
 #x-cuda-prev-max-rapids: &cuda_prev_max_rapids { name: "cuda", version: "12.9" }
 x-cuda-curr-max-rapids: &cuda_curr_max_rapids { name: "cuda", version: "12.9" }
@@ -73,44 +73,52 @@ include:
 
 - os: "ubuntu:20.04"
   images:
-  - { features: [*python, *dood, *gcc_7, { <<: *cuda_curr_min, <<: *cccl_cuda_opts }, *clang_format_cccl, *clangd_dev, *cccl_dev], env: *gcc_env }
-  - { features: [*python, *dood, *gcc_7, { <<: *cuda_curr_max, <<: *cccl_cuda_opts }, *clang_format_cccl, *clangd_dev, *cccl_dev], env: *gcc_env }
-  - { features: [*python, *dood, *gcc_8, { <<: *cuda_curr_min, <<: *cccl_cuda_opts }, *clang_format_cccl, *clangd_dev, *cccl_dev], env: *gcc_env }
-  - { features: [*python, *dood, *gcc_8, { <<: *cuda_curr_max, <<: *cccl_cuda_opts }, *clang_format_cccl, *clangd_dev, *cccl_dev], env: *gcc_env }
-  - { features: [*python, *dood, *gcc_9, { <<: *cuda_curr_min, <<: *cccl_cuda_opts }, *clang_format_cccl, *clangd_dev, *cccl_dev], env: *gcc_env }
-  - { features: [*python, *dood, *gcc_9, { <<: *cuda_curr_max, <<: *cccl_cuda_opts }, *clang_format_cccl, *clangd_dev, *cccl_dev], env: *gcc_env }
-  - { features: [*python, *dood, *gcc_10, { <<: *cuda_curr_min, <<: *cccl_cuda_opts }, *clang_format_cccl, *clangd_dev, *cccl_dev], env: *gcc_env }
-  - { features: [*python, *dood, *gcc_10, { <<: *cuda_curr_max, <<: *cccl_cuda_opts }, *clang_format_cccl, *clangd_dev, *cccl_dev], env: *gcc_env }
-  - { features: [*python, *dood, *llvm_14, { <<: *cuda_curr_min, <<: *cccl_cuda_ext_opts }, *clang_format_cccl, *clangd_dev, *cccl_dev], env: *llvm_env }
-  - { features: [*python, *dood, *llvm_14, { <<: *cuda_curr_min, <<: *cccl_cuda_opts }, *clang_format_cccl, *clangd_dev, *cccl_dev], env: *llvm_env }
-  - { features: [*python, *dood, *llvm_14, { <<: *cuda_curr_max, <<: *cccl_cuda_opts }, *clang_format_cccl, *clangd_dev, *cccl_dev], env: *llvm_env }
+  - { features: [*python, *dood, *gcc_7, { <<: *cuda_prev_min, <<: *cccl_cuda_opts }, *clang_format_cccl, *clangd_dev, *cccl_dev], env: *gcc_env }
+  - { features: [*python, *dood, *gcc_7, { <<: *cuda_prev_max, <<: *cccl_cuda_opts }, *clang_format_cccl, *clangd_dev, *cccl_dev], env: *gcc_env }
+  - { features: [*python, *dood, *gcc_8, { <<: *cuda_prev_min, <<: *cccl_cuda_opts }, *clang_format_cccl, *clangd_dev, *cccl_dev], env: *gcc_env }
+  - { features: [*python, *dood, *gcc_8, { <<: *cuda_prev_max, <<: *cccl_cuda_opts }, *clang_format_cccl, *clangd_dev, *cccl_dev], env: *gcc_env }
+  - { features: [*python, *dood, *gcc_9, { <<: *cuda_prev_min, <<: *cccl_cuda_opts }, *clang_format_cccl, *clangd_dev, *cccl_dev], env: *gcc_env }
+  - { features: [*python, *dood, *gcc_9, { <<: *cuda_prev_max, <<: *cccl_cuda_opts }, *clang_format_cccl, *clangd_dev, *cccl_dev], env: *gcc_env }
+  - { features: [*python, *dood, *gcc_10, { <<: *cuda_prev_min, <<: *cccl_cuda_opts }, *clang_format_cccl, *clangd_dev, *cccl_dev], env: *gcc_env }
+  - { features: [*python, *dood, *gcc_10, { <<: *cuda_prev_max, <<: *cccl_cuda_opts }, *clang_format_cccl, *clangd_dev, *cccl_dev], env: *gcc_env }
+
+  - { features: [*python, *dood, *llvm_14, { <<: *cuda_prev_min, <<: *cccl_cuda_opts }, *clang_format_cccl, *clangd_dev, *cccl_dev], env: *llvm_env }
+  - { features: [*python, *dood, *llvm_14, { <<: *cuda_prev_max, <<: *cccl_cuda_opts }, *clang_format_cccl, *clangd_dev, *cccl_dev], env: *llvm_env }
 
 - os: "ubuntu:22.04"
   images:
   - { features: [*python, *dood, *nvhpc_prev, *clang_format_cccl, *clangd_dev, *cccl_dev], env: *nvhpc_env }
   - { features: [*python, *dood, *nvhpc_curr, *clang_format_cccl, *clangd_dev, *cccl_dev], env: *nvhpc_env }
+
+  - { features: [*python, *dood, *gcc_11, { <<: *cuda_prev_min, <<: *cccl_cuda_opts }, *clang_format_cccl, *clangd_dev, *cccl_dev], env: *gcc_env }
   - { features: [*python, *dood, *gcc_11, { <<: *cuda_prev_max, <<: *cccl_cuda_opts }, *clang_format_cccl, *clangd_dev, *cccl_dev], env: *gcc_env }
   - { features: [*python, *dood, *gcc_11, { <<: *cuda_curr_min, <<: *cccl_cuda_opts }, *clang_format_cccl, *clangd_dev, *cccl_dev], env: *gcc_env }
   - { features: [*python, *dood, *gcc_11, { <<: *cuda_curr_max, <<: *cccl_cuda_opts }, *clang_format_cccl, *clangd_dev, *cccl_dev], env: *gcc_env }
+  - { features: [*python, *dood, *gcc_12, { <<: *cuda_prev_min, <<: *cccl_cuda_opts }, *clang_format_cccl, *clangd_dev, *cccl_dev], env: *gcc_env }
+  - { features: [*python, *dood, *gcc_12, { <<: *cuda_prev_max, <<: *cccl_cuda_opts }, *clang_format_cccl, *clangd_dev, *cccl_dev], env: *gcc_env }
   - { features: [*python, *dood, *gcc_12, { <<: *cuda_curr_min, <<: *cccl_cuda_opts }, *clang_format_cccl, *clangd_dev, *cccl_dev], env: *gcc_env }
   - { features: [*python, *dood, *gcc_12, { <<: *cuda_curr_max, <<: *cccl_cuda_opts }, *clang_format_cccl, *clangd_dev, *cccl_dev], env: *gcc_env }
-  - { features: [*python, *dood, *gcc_12, { <<: *cuda_curr_min, <<: *cccl_cuda_ext_opts }, *clang_format_cccl, *clangd_dev, *cccl_dev], env: *gcc_env }
-  - { features: [*python, *dood, *gcc_12, { <<: *cuda_curr_max, <<: *cccl_cuda_ext_opts }, *clang_format_cccl, *clangd_dev, *cccl_dev], env: *gcc_env }
+  - { features: [*python, *dood, *gcc_13, { <<: *cuda_prev_min, <<: *cccl_cuda_opts }, *clang_format_cccl, *clangd_dev, *cccl_dev], env: *gcc_env }
+  - { features: [*python, *dood, *gcc_13, { <<: *cuda_prev_max, <<: *cccl_cuda_opts }, *clang_format_cccl, *clangd_dev, *cccl_dev], env: *gcc_env }
   - { features: [*python, *dood, *gcc_13, { <<: *cuda_curr_min, <<: *cccl_cuda_opts }, *clang_format_cccl, *clangd_dev, *cccl_dev], env: *gcc_env }
   - { features: [*python, *dood, *gcc_13, { <<: *cuda_curr_max, <<: *cccl_cuda_opts }, *clang_format_cccl, *clangd_dev, *cccl_dev], env: *gcc_env }
-  - { features: [*python, *dood, *gcc_13, { <<: *cuda_curr_max, <<: *cccl_cuda_ext_opts }, *clang_format_cccl, *clangd_dev, *cccl_dev], env: *gcc_env }
+
+  - { features: [*python, *dood, *llvm_15, { <<: *cuda_prev_min, <<: *cccl_cuda_opts }, *clang_format_cccl, *clangd_dev, *cccl_dev], env: *llvm_env }
+  - { features: [*python, *dood, *llvm_15, { <<: *cuda_prev_max, <<: *cccl_cuda_opts }, *clang_format_cccl, *clangd_dev, *cccl_dev], env: *llvm_env }
   - { features: [*python, *dood, *llvm_15, { <<: *cuda_curr_min, <<: *cccl_cuda_opts }, *clang_format_cccl, *clangd_dev, *cccl_dev], env: *llvm_env }
   - { features: [*python, *dood, *llvm_15, { <<: *cuda_curr_max, <<: *cccl_cuda_opts }, *clang_format_cccl, *clangd_dev, *cccl_dev], env: *llvm_env }
+  - { features: [*python, *dood, *llvm_16, { <<: *cuda_prev_min, <<: *cccl_cuda_opts }, *clang_format_cccl, *clangd_dev, *cccl_dev], env: *llvm_env }
+  - { features: [*python, *dood, *llvm_16, { <<: *cuda_prev_max, <<: *cccl_cuda_opts }, *clang_format_cccl, *clangd_dev, *cccl_dev], env: *llvm_env }
   - { features: [*python, *dood, *llvm_16, { <<: *cuda_curr_min, <<: *cccl_cuda_opts }, *clang_format_cccl, *clangd_dev, *cccl_dev], env: *llvm_env }
   - { features: [*python, *dood, *llvm_16, { <<: *cuda_curr_max, <<: *cccl_cuda_opts }, *clang_format_cccl, *clangd_dev, *cccl_dev], env: *llvm_env }
+  - { features: [*python, *dood, *llvm_17, { <<: *cuda_prev_min, <<: *cccl_cuda_opts }, *clang_format_cccl, *clangd_dev, *cccl_dev], env: *llvm_env }
+  - { features: [*python, *dood, *llvm_17, { <<: *cuda_prev_max, <<: *cccl_cuda_opts }, *clang_format_cccl, *clangd_dev, *cccl_dev], env: *llvm_env }
   - { features: [*python, *dood, *llvm_17, { <<: *cuda_curr_min, <<: *cccl_cuda_opts }, *clang_format_cccl, *clangd_dev, *cccl_dev], env: *llvm_env }
   - { features: [*python, *dood, *llvm_17, { <<: *cuda_curr_max, <<: *cccl_cuda_opts }, *clang_format_cccl, *clangd_dev, *cccl_dev], env: *llvm_env }
+  - { features: [*python, *dood, *llvm_18, { <<: *cuda_prev_min, <<: *cccl_cuda_opts }, *clang_format_cccl, *clangd_dev, *cccl_dev], env: *llvm_env }
+  - { features: [*python, *dood, *llvm_18, { <<: *cuda_prev_max, <<: *cccl_cuda_opts }, *clang_format_cccl, *clangd_dev, *cccl_dev], env: *llvm_env }
   - { features: [*python, *dood, *llvm_18, { <<: *cuda_curr_min, <<: *cccl_cuda_opts }, *clang_format_cccl, *clangd_dev, *cccl_dev], env: *llvm_env }
   - { features: [*python, *dood, *llvm_18, { <<: *cuda_curr_max, <<: *cccl_cuda_opts }, *clang_format_cccl, *clangd_dev, *cccl_dev], env: *llvm_env }
-  - { features: [*python, *dood, *llvm_18, { <<: *cuda_curr_max, <<: *cccl_cuda_ext_opts }, *clang_format_cccl, *clangd_dev, *cccl_dev], env: *llvm_env }
-  - { features: [*python, *dood, *llvm_19, { <<: *cuda_curr_min, <<: *cccl_cuda_opts }, *clang_format_cccl, *clangd_dev, *cccl_dev], env: *llvm_env }
-  - { features: [*python, *dood, *llvm_19, { <<: *cuda_curr_max, <<: *cccl_cuda_opts }, *clang_format_cccl, *clangd_dev, *cccl_dev], env: *llvm_env }
-  - { features: [*python, *dood, *llvm_19, { <<: *cuda_curr_max, <<: *cccl_cuda_ext_opts }, *clang_format_cccl, *clangd_dev, *cccl_dev], env: *llvm_env }
 
 - os: "ubuntu:24.04"
   images:
@@ -119,23 +127,38 @@ include:
   - { features: [*python, *dood, *gcc_14, { name: "cuda", version: "12.5", <<: *cccl_cuda_opts }, *clang_format_cccl, *clangd_dev, *cccl_dev], env: *gcc_env }
   - { features: [*python, *dood, *gcc_14, { name: "cuda", version: "12.6", <<: *cccl_cuda_opts }, *clang_format_cccl, *clangd_dev, *cccl_dev], env: *gcc_env }
   - { features: [*python, *dood, *gcc_14, { name: "cuda", version: "12.8", <<: *cccl_cuda_opts }, *clang_format_cccl, *clangd_dev, *cccl_dev], env: *gcc_env }
+  - { features: [*python, *dood, *gcc_14, { name: "cuda", version: "12.9", <<: *cccl_cuda_opts }, *clang_format_cccl, *clangd_dev, *cccl_dev], env: *gcc_env }
 
-  - { features: [*python, *dood, *gcc_13, { <<: *cuda_curr_max, <<: *cccl_cuda_opts }, *clang_format_cccl, *clangd_dev, *cccl_dev], env: *gcc_env }
+  - { features: [*python, *dood, *gcc_14, { <<: *cuda_prev_min, <<: *cccl_cuda_opts }, *clang_format_cccl, *clangd_dev, *cccl_dev], env: *gcc_env }
+  - { features: [*python, *dood, *gcc_14, { <<: *cuda_prev_max, <<: *cccl_cuda_opts }, *clang_format_cccl, *clangd_dev, *cccl_dev], env: *gcc_env }
+  - { features: [*python, *dood, *gcc_14, { <<: *cuda_curr_min, <<: *cccl_cuda_opts }, *clang_format_cccl, *clangd_dev, *cccl_dev], env: *gcc_env }
   - { features: [*python, *dood, *gcc_14, { <<: *cuda_curr_max, <<: *cccl_cuda_opts }, *clang_format_cccl, *clangd_dev, *cccl_dev], env: *gcc_env }
+  - { features: [*python, *dood, *gcc_14, { <<: *cuda_prev_min, <<: *cccl_cuda_ext_opts }, *clang_format_cccl, *clangd_dev, *cccl_dev], env: *gcc_env }
+  - { features: [*python, *dood, *gcc_14, { <<: *cuda_prev_max, <<: *cccl_cuda_ext_opts }, *clang_format_cccl, *clangd_dev, *cccl_dev], env: *gcc_env }
+  - { features: [*python, *dood, *gcc_14, { <<: *cuda_curr_min, <<: *cccl_cuda_ext_opts }, *clang_format_cccl, *clangd_dev, *cccl_dev], env: *gcc_env }
   - { features: [*python, *dood, *gcc_14, { <<: *cuda_curr_max, <<: *cccl_cuda_ext_opts }, *clang_format_cccl, *clangd_dev, *cccl_dev], env: *gcc_env }
+
+  - { features: [*python, *dood, *llvm_19, { <<: *cuda_prev_min, <<: *cccl_cuda_opts }, *clang_format_cccl, *clangd_dev, *cccl_dev], env: *llvm_env }
+  - { features: [*python, *dood, *llvm_19, { <<: *cuda_prev_max, <<: *cccl_cuda_opts }, *clang_format_cccl, *clangd_dev, *cccl_dev], env: *llvm_env }
+  - { features: [*python, *dood, *llvm_19, { <<: *cuda_curr_min, <<: *cccl_cuda_opts }, *clang_format_cccl, *clangd_dev, *cccl_dev], env: *llvm_env }
+  - { features: [*python, *dood, *llvm_19, { <<: *cuda_curr_max, <<: *cccl_cuda_opts }, *clang_format_cccl, *clangd_dev, *cccl_dev], env: *llvm_env }
+  - { features: [*python, *dood, *llvm_19, { <<: *cuda_prev_min, <<: *cccl_cuda_ext_opts }, *clang_format_cccl, *clangd_dev, *cccl_dev], env: *llvm_env }
+  - { features: [*python, *dood, *llvm_19, { <<: *cuda_prev_max, <<: *cccl_cuda_ext_opts }, *clang_format_cccl, *clangd_dev, *cccl_dev], env: *llvm_env }
+  - { features: [*python, *dood, *llvm_19, { <<: *cuda_curr_min, <<: *cccl_cuda_ext_opts }, *clang_format_cccl, *clangd_dev, *cccl_dev], env: *llvm_env }
+  - { features: [*python, *dood, *llvm_19, { <<: *cuda_curr_max, <<: *cccl_cuda_ext_opts }, *clang_format_cccl, *clangd_dev, *cccl_dev], env: *llvm_env }
 
 
 - os: "windows"
   images:
-  # lowest CUDA version
   - { features: [{ <<: *cuda_prev_min, <<: *cccl_cuda_opts }, { name: "cl", version: "14.29" }] } # MSVC 2019
-  # middlest CUDA version
+  - { features: [{ <<: *cuda_prev_max, <<: *cccl_cuda_opts }, { name: "cl", version: "14.29" }] } # MSVC 2019
   - { features: [{ <<: *cuda_curr_min, <<: *cccl_cuda_opts }, { name: "cl", version: "14.29" }] } # MSVC 2019
-  - { features: [{ <<: *cuda_curr_min, <<: *cccl_cuda_opts }, { name: "cl", version: "14.39" }] } # MSVC 2022
-  # highest CUDA version
   - { features: [{ <<: *cuda_curr_max, <<: *cccl_cuda_opts }, { name: "cl", version: "14.29" }] } # MSVC 2019
-  - { features: [{ <<: *cuda_curr_max, <<: *cccl_cuda_opts }, { name: "cl", version: "14.39" }] } # MSVC 2022
-  - { features: [{ <<: *cuda_curr_max, <<: *cccl_cuda_opts }, { name: "cl", version: "14.42" }] } # MSVC 2022
+
+  # CTK 12.0 doesn't know that it supports 14.40+, use 14.39:
+  - { features: [{ <<: *cuda_prev_min, <<: *cccl_cuda_opts }, { name: "cl", version: "14.39" }] } # MSVC 2022
+  - { features: [{ <<: *cuda_prev_max, <<: *cccl_cuda_opts }, { name: "cl", version: "14.43" }] } # MSVC 2022
+  - { features: [{ <<: *cuda_curr_min, <<: *cccl_cuda_opts }, { name: "cl", version: "14.43" }] } # MSVC 2022
   - { features: [{ <<: *cuda_curr_max, <<: *cccl_cuda_opts }, { name: "cl", version: "14.43" }] } # MSVC 2022
 
 # RAPIDS devcontainers

@@ -8,6 +8,9 @@ $ErrorActionPreference = "Stop"
 
 Push-location "$ENV:TEMP"
 try {
+    Write-Output "Environment Variables"
+    Get-ChildItem Env: | ForEach-Object { "$($_.Name)=$($_.Value)" }
+
     Write-Output "Test Ninja"
     ninja --version
     TestReturnCode
