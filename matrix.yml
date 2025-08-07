@@ -2,9 +2,8 @@ x-cuda-prev-min: &cuda_prev_min { name: "cuda", version: "12.0" }
 x-cuda-prev-max: &cuda_prev_max { name: "cuda", version: "12.9" }
 x-cuda-curr-min: &cuda_curr_min { name: "cuda", version: "13.0" }
 x-cuda-curr-max: &cuda_curr_max { name: "cuda", version: "13.0" }
-# Commented as RAPIDS only supports one major version (CUDA 12) right now
-#x-cuda-prev-max-rapids: &cuda_prev_max_rapids { name: "cuda", version: "12.9" }
-x-cuda-curr-max-rapids: &cuda_curr_max_rapids { name: "cuda", version: "12.9" }
+x-cuda-prev-max-rapids: &cuda_prev_max_rapids { name: "cuda", version: "12.9" }
+x-cuda-curr-max-rapids: &cuda_curr_max_rapids { name: "cuda", version: "13.0" }
 
 x-gcc-7: &gcc_7 { name: "gcc", version: "7" }
 x-gcc-8: &gcc_8 { name: "gcc", version: "8" }
@@ -33,7 +32,7 @@ x-nvhpc-env: &nvhpc_env { CC: "nvc", CXX: "nvc++", CUDAHOSTCXX: "nvc++" }
 x-mambaforge: &conda { name: "mambaforge" }
 x-python: &python { name: "ghcr.io/devcontainers/features/python:1.7.1", version: "os-provided", installTools: false, enableShared: true, optimize: true, hide: true }
 x-python-rapids: &python_rapids { name: "ghcr.io/devcontainers/features/python:1.7.1", version: "3.13", installTools: false, enableShared: true, optimize: true, hide: true }
-x-ucx-rapids: &ucx_rapids { name: "ucx", version: "1.18.0" }
+x-ucx-rapids: &ucx_rapids { name: "ucx", version: "1.19.0" }
 x-openmpi: &openmpi { name: "openmpi", version: "5.0.7" }
 
 x-cccl-dev: &cccl_dev { name: "cccl-dev", hide: true }
@@ -162,14 +161,12 @@ include:
 - os: "ubuntu:24.04"
   images:
   # cuda
-  # Commented as RAPIDS only supports one major version (CUDA 12) right now
-  #- { features: [*python_rapids, *clang_format_rapids, *clangd_dev, *cuda_prev_max_rapids], env: *gcc_env_rapids }
-  #- { features: [*python_rapids, *clang_format_rapids, *clangd_dev, *cuda_curr_min], env: *gcc_env_rapids }
+  - { features: [*python_rapids, *clang_format_rapids, *clangd_dev, *cuda_prev_max_rapids], env: *gcc_env_rapids }
+  - { features: [*python_rapids, *clang_format_rapids, *clangd_dev, *cuda_curr_min], env: *gcc_env_rapids }
   - { features: [*python_rapids, *clang_format_rapids, *clangd_dev, *cuda_curr_max], env: *gcc_env_rapids }
   - { features: [*python_rapids, *clang_format_rapids, *clangd_dev, *cuda_curr_max_rapids], env: *gcc_env_rapids }
-  # Commented as RAPIDS only supports one major version (CUDA 12) right now
-  #- { features: [*python_rapids, *clang_format_rapids, *clangd_dev, *cuda_prev_max_rapids, *ucx_rapids, *openmpi], env: *gcc_env_rapids }
-  #- { features: [*python_rapids, *clang_format_rapids, *clangd_dev, *cuda_curr_min, *ucx_rapids, *openmpi], env: *gcc_env_rapids }
+  - { features: [*python_rapids, *clang_format_rapids, *clangd_dev, *cuda_prev_max_rapids, *ucx_rapids, *openmpi], env: *gcc_env_rapids }
+  - { features: [*python_rapids, *clang_format_rapids, *clangd_dev, *cuda_curr_min, *ucx_rapids, *openmpi], env: *gcc_env_rapids }
   - { features: [*python_rapids, *clang_format_rapids, *clangd_dev, *cuda_curr_max, *ucx_rapids, *openmpi], env: *gcc_env_rapids }
   - { features: [*python_rapids, *clang_format_rapids, *clangd_dev, *cuda_curr_max_rapids, *ucx_rapids, *openmpi], env: *gcc_env_rapids }
 

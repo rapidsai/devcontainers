@@ -30,7 +30,7 @@ export OSNAME="$(
     echo "$ID$((major - (major % 2)))${minor}";
 )";
 
-VERSION="${CUDA_VERSION:-${VERSION:-12.9.0}}";
+VERSION="${CUDA_VERSION:-${VERSION:-13.0.0}}";
 
 if [[ "$NVARCH" == aarch64 ]]; then
     NVARCH="sbsa";
