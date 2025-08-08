@@ -80,17 +80,11 @@ vars_+=('$NVHPC_CUDA_HOME');
 vars_+=('$NVHPC_MODULEFILE_DIRS');
 printf -v vars_ '%s,' "${vars_[@]}";
 
-if [[ 25.7 > "$NVHPC_VERSION" ]]; then
-    nvhpcrc="etc/profile.d/nvhpc25.5.sh"
-else
-    nvhpcrc="etc/profile.d/nvhpc25.7.sh"
-fi
-
 # export envvars in bashrc files
-append_to_etc_bashrc "$(cat <(cat .bashrc | envsubst "${vars_%,}") "$nvhpcrc")";
-append_to_all_bashrcs "$(cat <(cat .bashrc | envsubst "${vars_%,}") "$nvhpcrc")";
+append_to_etc_bashrc "$(cat <(cat .bashrc | envsubst "${vars_%,}") etc/profile.d/nvhpc.sh)";
+append_to_all_bashrcs "$(cat <(cat .bashrc | envsubst "${vars_%,}") etc/profile.d/nvhpc.sh)";
 # export envvars in /etc/profile.d
-add_etc_profile_d_script nvhpc "$(cat <(cat .bashrc | envsubst "${vars_%,}") "$nvhpcrc")";
+add_etc_profile_d_script nvhpc "$(cat <(cat .bashrc | envsubst "${vars_%,}") etc/profile.d/nvhpc.sh)";
 
 # Clean up
 # rm -rf /tmp/*;
