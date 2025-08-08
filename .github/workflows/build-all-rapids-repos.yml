@@ -40,7 +40,7 @@ jobs:
       contents: read
       pull-requests: read
 
-    runs-on: "linux-${{ matrix.CPU_ARCH }}-cpu8"
+    runs-on: "linux-${{ matrix.CPU_ARCH }}-cpu32"
     strategy:
       fail-fast: false
       matrix:
