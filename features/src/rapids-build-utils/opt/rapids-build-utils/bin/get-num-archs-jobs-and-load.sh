@@ -4,10 +4,6 @@
 #  rapids-get-num-archs-jobs-and-load [OPTION]...
 #
 # Compute an appropriate total number of jobs, load, and CUDA archs to build in parallel.
-# This routine scales the input `-j` with respect to the `-a` and `-m` values, taking into account the
-# amount of available system memory (free mem + swap), in order to balance the job and arch parallelism.
-#
-# note: This wouldn't be necessary if `nvcc` interacted with the POSIX jobserver.
 #
 # Boolean options:
 #  -h,--help                              Print this text.
@@ -18,16 +14,6 @@
 #  -j,--parallel <num>                    Run <num> parallel compilation jobs.
 #  --max-archs <num>                      Build at most <num> CUDA archs in parallel.
 #                                         (default: 3)
-#  --max-total-system-memory <num>        An upper-bound on the amount of total system memory (in GiB) to use during
-#                                         C++ and CUDA device compilations.
-#                                         Smaller values yield fewer parallel C++ and CUDA device compilations.
-#                                         (default: all available memory)
-#  --max-device-obj-memory-usage <num>    An upper-bound on the amount of memory each CUDA device object compilation
-#                                         is expected to take. This is used to estimate the number of parallel device
-#                                         object compilations that can be launched without hitting the system memory
-#                                         limit.
-#                                         Higher values yield fewer parallel CUDA device object compilations.
-#                                         (default: 1)
 
 # shellcheck disable=SC1091
 . rapids-generate-docstring;
@@ -41,10 +27,9 @@ get_num_archs_jobs_and_load() {
     # shellcheck disable=SC1091
     . devcontainer-utils-debug-output 'rapids_build_utils_debug' 'get-num-archs-jobs-and-load';
 
-    # The return value of nproc is (who knew!) constrained by the
-    # values of OMP_NUM_THREADS and/or OMP_THREAD_LIMIT
-    # Since we want the physical number of processors here, pass --all
-    local -r n_cpus="$(nproc --all)";
+    # nproc --all returns 2x the number of threads in Ubuntu24.04+,
+    # so instead we cound the number of processors in /proc/cpuinfo
+    local -r n_cpus="$(grep -cP 'processor\s+:' /proc/cpuinfo)";
 
     if test ${#j[@]} -gt 0 && ! test -n "${j:+x}"; then
         j="${n_cpus}";
@@ -52,22 +37,12 @@ get_num_archs_jobs_and_load() {
 
     parallel="${j:-${JOBS:-${PARALLEL_LEVEL:-1}}}";
     max_archs="${max_archs:-${MAX_DEVICE_OBJ_TO_COMPILE_IN_PARALLEL:-${arch:-}}}";
-    max_device_obj_memory_usage="${max_device_obj_memory_usage:-${MAX_DEVICE_OBJ_MEMORY_USAGE:-1Gi}}";
-
-    local num_re="^[0-9]+$";
-
-    # Assume un-suffixed inputs means gibibytes
-    if [[ "${max_device_obj_memory_usage}" =~ ${num_re} ]]; then
-        max_device_obj_memory_usage="${max_device_obj_memory_usage}Gi";
-    fi
-
-    max_device_obj_memory_usage="$(numfmt --from=auto "${max_device_obj_memory_usage}")";
 
     local n_arch="${archs:-1}";
 
-    # currently: 70-real;75-real;80-real;86-real;90
-    # see: https://github.com/rapidsai/rapids-cmake/blob/branch-24.04/rapids-cmake/cuda/set_architectures.cmake#L54
-    local n_arch_rapids=5;
+    # currently: 70-real;75-real;80-real;86-real;90-real;100-real;120
+    # see: https://github.com/rapidsai/rapids-cmake/blob/branch-25.04/rapids-cmake/cuda/set_architectures.cmake#L59
+    local n_arch_rapids=7;
 
     if ! test -n "${archs:+x}" && test -n "${INFER_NUM_DEVICE_ARCHITECTURES:+x}"; then
         archs="$(rapids-select-cmake-define CMAKE_CUDA_ARCHITECTURES "${OPTS[@]}" || echo)";
@@ -101,31 +76,12 @@ get_num_archs_jobs_and_load() {
         n_arch=$((n_arch > max_archs ? max_archs : n_arch));
     fi
 
-    local mem_for_device_objs="$((n_arch * max_device_obj_memory_usage))";
-    local mem_total="${max_total_system_memory:-${MAX_TOTAL_SYSTEM_MEMORY:-}}";
-
-    if ! test -n "${mem_total:+x}"; then
-        local -r free_mem="$(free --bytes | grep -E '^Mem:' | tr -s '[:space:]' | cut -d' ' -f7 || echo '0')";
-        local -r freeswap="$(free --bytes | grep -E '^Swap:' | tr -s '[:space:]' | cut -d' ' -f4 || echo '0')";
-        mem_total="$((free_mem + freeswap))";
-    # Assume un-suffixed inputs means gibibytes
-    elif [[ "${mem_total}" =~ ${num_re} ]]; then
-        mem_total="${mem_total}Gi";
+    if test "$parallel" -eq 0; then
+        parallel="$(ulimit -n)"
     fi
-    mem_total="$(numfmt --from=auto "${mem_total}")";
 
-    local n_load=$((parallel > n_cpus ? n_cpus : parallel));
-    # shellcheck disable=SC2155
-    local n_jobs="$(
-        echo "
-scale=0
-max_cpu=(${n_load} / ${n_arch} / 2 * 3)
-max_mem=(${mem_total} / ${mem_for_device_objs})
-if(max_cpu < max_mem) max_cpu else max_mem
-" | bc
-    )"
-    n_jobs=$((n_jobs < 1 ? 1 : n_jobs));
-    n_jobs=$((n_arch > 1 ? n_jobs : n_load));
+    local n_load="$((parallel > n_cpus ? n_cpus : parallel))";
+    local n_jobs="$((parallel < 1 ? 1 : parallel))";
 
     echo "declare n_arch=${n_arch}";
     echo "declare n_jobs=${n_jobs}";

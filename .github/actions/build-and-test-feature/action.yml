@@ -8,6 +8,7 @@ inputs:
   aws_role_arn: {type: string, defaut: '', required: false}
   rw_sccache_bucket: {type: string, defaut: '', required: false}
   rw_sccache_region: {type: string, defaut: '', required: false}
+  sccache_dist_scheduler_url: {type: string, defaut: '', required: false}
 
 runs:
   using: composite
@@ -32,3 +33,4 @@ runs:
         aws_role_arn: "${{ inputs.aws_role_arn }}"
         rw_sccache_bucket: "${{ inputs.rw_sccache_bucket }}"
         rw_sccache_region: "${{ inputs.rw_sccache_region }}"
+        sccache_dist_scheduler_url: "${{ inputs.sccache_dist_scheduler_url }}"

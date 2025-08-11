@@ -17,12 +17,15 @@ generate_completions() {
         . devcontainer-utils-debug-output 'rapids_build_utils_debug' 'generate-scripts';
 
         readarray -t commands < <(find "${TMP_SCRIPT_DIR}"/ -maxdepth 1 -type f -exec basename {} \;);
+        read -ra commands <<< "${commands[*]/#/--command }";
 
-        devcontainer-utils-generate-bash-completion          \
-            --out-file "$(realpath -m "${COMPLETION_FILE}")" \
-            --template "$(realpath -m "${COMPLETION_TMPL}")" \
-            ${commands[@]/#/--command }                      \
-        ;
+        if test "${#commands[@]}" -gt 0; then
+            devcontainer-utils-generate-bash-completion          \
+                --out-file "$(realpath -m "${COMPLETION_FILE}")" \
+                --template "$(realpath -m "${COMPLETION_TMPL}")" \
+                "${commands[@]}"                                 \
+            ;
+        fi
     fi
 }
 
@@ -63,7 +66,7 @@ generate_script() {
 }
 
 generate_all_script_impl() {
-    local bin="${SCRIPT}-all";
+    local bin="${PREFIX:-${SCRIPT}}-${SUFFIX:-all}";
     if test -n "${bin:+x}" && ! test -f "${TMP_SCRIPT_DIR}/${bin}"; then
         (
             cat - \
@@ -211,6 +214,8 @@ generate_scripts() {
     local -a cpp_dirs=();
     local -a cpp_deps=();
 
+    local -a py_names=();
+    local -a cpp_names=();
     local -a repo_names=();
     local -a cloned_repos=();
     local -a immediate_cpp_deps=();
@@ -258,8 +263,8 @@ generate_scripts() {
             cpp_path=~/"${!repo_path:-}${!cpp_sub_dir:+/${!cpp_sub_dir}}";
 
             cpp_dirs+=("${cpp_path}");
-            cpp_libs+=("${!cpp_name:-}");
             cpp_name="${!cpp_name:-}";
+            cpp_libs+=("${cpp_name}");
 
             cpp_name_to_path["${cpp_name}"]="${cpp_path}";
 
@@ -300,6 +305,8 @@ generate_scripts() {
             fi
         done
 
+        cpp_names+=("${cpp_libs[@]}");
+
         for ((j=0; j < ${!py_length:-0}; j+=1)); do
             py_env="${repo}_python_${j}_env";
             py_name="${repo}_python_${j}_name";
@@ -330,14 +337,15 @@ generate_scripts() {
             cpp_deps=(${inherited_cpp_deps[@]@Q} ${immediate_cpp_deps[@]@Q});
 
             py_dirs+=("${py_path}");
-            py_libs+=("${!py_name}");
+            py_name="${!py_name:-}";
+            py_libs+=("${py_name}");
 
             if [[ -d ~/"${!repo_path:-}/.git" ]]; then
                 NAME="${repo_name:-}"                     \
                 BIN_DIR="${bin_dir}"                      \
                 SRC_PATH=~/"${!repo_path:-}"              \
                 PY_SRC="${py_path}"                       \
-                PY_LIB="${!py_name}"                      \
+                PY_LIB="${py_name}"                       \
                 PY_ENV="${!py_env:-}"                     \
                 CPP_DEPS="${cpp_deps[*]}"                 \
                 CPP_CMAKE_ARGS="${!py_cmake_args:-}"      \
@@ -345,7 +353,9 @@ generate_scripts() {
                 PIP_INSTALL_ARGS="${!pip_install_args:-}" \
                 generate_python_scripts                   ;
             fi
-        done;
+        done
+
+        py_names+=("${py_libs[@]}");
 
         if [[ -d ~/"${!repo_path:-}/.git" ]]; then
             NAME="${repo_name:-}"      \
@@ -378,8 +388,27 @@ generate_scripts() {
             NAME="${cloned_repos[0]:-${repo_names[0]:-}}" \
             NAMES="${repo_names[*]@Q}"  \
             SCRIPT="${script}"          \
+            PREFIX="${script}"          \
             generate_all_script         ;
-        done;
+        done
+
+        for script in "clean" "build"; do
+            # Generate a script to run C++ builds for all repos
+            NAME="${cpp_names[0]:-${repo_names[0]:-}}" \
+            NAMES="${cpp_names[*]@Q}"   \
+            SCRIPT="cpp.$script"        \
+            PREFIX="$script"            \
+            SUFFIX="all-cpp"            \
+            generate_all_script         ;
+
+            # Generate a script to run Python builds for all repos
+            NAME="${py_names[0]:-${repo_names[0]:-}}" \
+            NAMES="${py_names[*]@Q}"    \
+            SCRIPT="python.$script"     \
+            PREFIX="$script"            \
+            SUFFIX="all-python"         \
+            generate_all_script         ;
+        done
     fi
 }
 

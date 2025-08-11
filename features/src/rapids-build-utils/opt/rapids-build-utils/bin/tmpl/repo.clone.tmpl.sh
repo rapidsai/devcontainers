@@ -28,6 +28,7 @@ clone_${NAME}() {
         --no-update-env
         -b,--branch
         -d,--directory
+        -q,--quiet
         -u,--upstream
         --ssh-url
         --https-url
@@ -53,6 +54,7 @@ clone_${NAME}() {
         --https-url "${https_url}"              \
         -j ${n_jobs:-$(nproc --all --ignore=1)} \
         -c checkout.defaultRemote=upstream      \
+        "${q[@]}"                               \
         "${OPTS[@]}"                            \
         --                                      \
         "${upstream}"                           \
@@ -63,7 +65,7 @@ clone_${NAME}() {
 
     local upstream_branches="$(git -C "${SRC_PATH}" branch --remotes --list 'upstream/pull-request/*')";
     if test -n "${upstream_branches:+x}"; then
-        git -C "${SRC_PATH}" branch --remotes -d ${upstream_branches};
+        git -C "${SRC_PATH}" branch --remotes -d "${q[@]}" ${upstream_branches};
     fi
 
     git -C "${SRC_PATH}" remote prune upstream;

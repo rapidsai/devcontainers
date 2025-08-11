@@ -62,10 +62,6 @@ build_${PY_LIB}_python_wheel() {
         ninja_args+=("-j${n_jobs}");
     fi
 
-    if test -n "${n_load:+x}"; then
-        ninja_args+=("-l${n_load}");
-    fi
-
     local -a pip_args="(
         ${pip_args_+"${pip_args_[*]@Q}"}
         $(rapids-select-pip-wheel-args "$@")
@@ -82,12 +78,30 @@ build_${PY_LIB}_python_wheel() {
 
     pip_args+=("${PY_SRC}");
 
+    # Ensure SCCACHE_NO_DIST_COMPILE=1 is set while configuring
+    # so CMake's compiler tests never use the build cluster.
+
+    if ! test -f /tmp/sccache_no_dist_compile.cmake; then
+        cat <<"EOF" > /tmp/sccache_no_dist_compile.cmake
+set(ENV{SCCACHE_NO_DIST_COMPILE} "1")
+EOF
+    fi
+
+    # Merge with outer `-DCMAKE_PROJECT_INCLUDE_BEFORE=` if provided
+    local -a cmake_project_include_before="(
+        $(rapids-select-cmake-define CMAKE_PROJECT_INCLUDE_BEFORE "$@" || echo)
+        /tmp/sccache_no_dist_compile.cmake
+    )";
+    # Join with semicolons
+    cmake_args+=("-DCMAKE_PROJECT_INCLUDE_BEFORE=$(IFS=";"; echo "${cmake_project_include_before[*]}")")
+
     trap "rm -rf '${PY_SRC}/${py_lib//"-"/"_"}.egg-info'" EXIT;
 
     time (
+        echo "Building ${PY_LIB} wheel";
         export ${PY_ENV} PATH="$PATH";
         local cudaflags="${CUDAFLAGS:+$CUDAFLAGS }-t=${n_arch}";
-        local build_type="$(rapids-select-cmake-build-type "${cmake_args_[@]}")";
+        local build_type="$(rapids-select-cmake-build-type "${cmake_args_[@]}" || echo "Release")";
         local nvcc_append_flags="${NVCC_APPEND_FLAGS:+$NVCC_APPEND_FLAGS }-t=${n_arch}";
 
         CUDAFLAGS="${cudaflags}"                     \
@@ -101,10 +115,9 @@ build_${PY_LIB}_python_wheel() {
         SKBUILD_CMAKE_BUILD_TYPE="${build_type}"     \
         CMAKE_BUILD_PARALLEL_LEVEL="${n_jobs}"       \
         NVCC_APPEND_FLAGS="${nvcc_append_flags}"     \
-            python -m pip wheel "${pip_args[@]}"     \
-        ;
+            python -m pip wheel "${pip_args[@]}" 2>&1;
         { set +x; } 2>/dev/null; echo -n "${PY_LIB} wheel build time:";
-    ) 2>&1;
+    ) 2> >(tee -a /var/log/devcontainer-utils/install-${PY_LIB}-python-time.log >&2);
 }
 
 build_${PY_LIB}_python_wheel "$@" <&0;
