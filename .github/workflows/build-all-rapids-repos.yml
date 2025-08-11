@@ -78,3 +78,7 @@ jobs:
 
         # Print cache and dist stats
         sccache --show-adv-stats;
+
+        # Print build times
+        find /var/log/devcontainer-utils/ -type f -name 'build-*-time.log' -print0 \
+          | xargs -0 -n1 grep -H real | sed 's/real\t/ /g' || : # Nonfatal if not found
