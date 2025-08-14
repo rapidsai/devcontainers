@@ -39,6 +39,8 @@ init_gitlab_cli() {
         || echo "Continuing without logging into GitLab";
     fi
 
+    glab config set git_protocol --host "${GITLAB_HOST:-gitlab.com}" ${GIT_PROTOCOL:-ssh};
+
     local gitlab_user="${GITLAB_USER:-}";
 
     if [ -z "${gitlab_user:-}" ]; then
