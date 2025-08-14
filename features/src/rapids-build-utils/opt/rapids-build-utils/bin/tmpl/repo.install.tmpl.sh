@@ -20,7 +20,7 @@ install_${NAME}() {
     . devcontainer-utils-debug-output 'rapids_build_utils_debug' 'install-all install-${NAME}';
 
     for lib in ${CPP_LIB}; do
-        if command -v install-${lib}-cpp >/dev/null 2>&1; then
+        if command -V install-${lib}-cpp >/dev/null 2>&1; then
             install-${lib}-cpp "${OPTS[@]}";
         fi
     done

@@ -36,7 +36,7 @@ clone_all() {
     echo ${NAMES} \
   | tr '[:space:]' '\0' \
   | xargs ${v:+-t} ${_o} -r -0 -P${n_jobs} -I% bash -c \
-  " if command -v clone-% >/dev/null 2>&1; then if ! clone-% -j ${n_arch} --no-update-env ${OPTS[*]@Q} ${v[*]@Q}; then exit 255; fi; fi";
+  " if command -V clone-% >/dev/null 2>&1; then if ! clone-% -j ${n_arch} --no-update-env ${OPTS[*]@Q} ${v[*]@Q}; then exit 255; fi; fi";
 
     if ! test -n "${no_update_env:+x}"; then
         rapids-post-start-command;

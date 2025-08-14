@@ -22,7 +22,7 @@ install_all() {
     . devcontainer-utils-debug-output 'rapids_build_utils_debug' 'install-all';
 
     for name in ${NAMES}; do
-        if command -v install-${name} >/dev/null 2>&1; then
+        if command -V install-${name} >/dev/null 2>&1; then
             install-${name} "${OPTS[@]}";
         fi
     done

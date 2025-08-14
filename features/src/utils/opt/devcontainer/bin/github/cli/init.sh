@@ -7,7 +7,7 @@ init_github_cli() {
     local -;
     set -euo pipefail;
 
-    if ! command -v gh > /dev/null 2>&1; then
+    if ! command -V gh > /dev/null 2>&1; then
         export GITHUB_USER="";
         return;
     fi
@@ -20,7 +20,7 @@ init_github_cli() {
     else
         if grep -q "You've successfully authenticated" <<< "$(ssh -T "git@${GITHUB_HOST:-github.com}" 2>&1)"; then
             git_protocol="ssh";
-            if command -v ssh-keygen > /dev/null 2>&1; then
+            if command -V ssh-keygen > /dev/null 2>&1; then
                 avoid_gh_cli_ssh_keygen_prompt=1;
             fi
         fi

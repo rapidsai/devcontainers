@@ -43,7 +43,7 @@ _stop_sccache() {
         sccache --stop-server >/dev/null 2>&1 || true;
         if test -f "${pidfile}"; then
             # Wait for the server to shutdown
-            if command -v pidwait >/dev/null 2>&1; then
+            if command -V pidwait >/dev/null 2>&1; then
                 pidwait --pidfile "${pidfile}" >/dev/null 2>&1 || true;
             else
                 while IFS= read -r pid; do

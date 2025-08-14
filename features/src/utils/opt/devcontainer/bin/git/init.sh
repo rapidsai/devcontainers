@@ -10,7 +10,7 @@ init_git_cli_config() {
         fi
     fi
 
-    if test -n "${SSH_AUTH_SOCK:+x}" && command -v ssh-add >/dev/null 2>&1; then
+    if test -n "${SSH_AUTH_SOCK:+x}" && command -V ssh-add >/dev/null 2>&1; then
         mkdir -p ~/.config/git;
         git config --global gpg.ssh.allowedSignersFile ~/.config/git/allowed_signers;
         awk 'BEGIN {FS=" "; OFS=" "} {print $3, $1, $2}' <(ssh-add -L) > ~/.config/git/allowed_signers;
