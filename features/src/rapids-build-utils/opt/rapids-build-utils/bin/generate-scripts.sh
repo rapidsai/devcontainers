@@ -12,7 +12,7 @@ generate_completions() {
     local -;
     set -euo pipefail;
 
-    if command -v devcontainer-utils-debug-output >/dev/null 2>&1; then
+    if command -V devcontainer-utils-debug-output >/dev/null 2>&1; then
         # shellcheck disable=SC1091
         . devcontainer-utils-debug-output 'rapids_build_utils_debug' 'generate-scripts';
 
@@ -33,7 +33,7 @@ clean_scripts_and_aliases() {
     local -;
     set -euo pipefail;
 
-    if command -v devcontainer-utils-debug-output >/dev/null 2>&1; then
+    if command -V devcontainer-utils-debug-output >/dev/null 2>&1; then
         # shellcheck disable=SC1091
         . devcontainer-utils-debug-output 'rapids_build_utils_debug' 'generate-scripts';
     fi
@@ -161,7 +161,7 @@ generate_scripts() {
 
     eval "$(rapids-list-repos "$@")";
 
-    if command -v devcontainer-utils-debug-output >/dev/null 2>&1; then
+    if command -V devcontainer-utils-debug-output >/dev/null 2>&1; then
         # shellcheck disable=SC1091
         . devcontainer-utils-debug-output 'rapids_build_utils_debug' 'generate-scripts';
     fi

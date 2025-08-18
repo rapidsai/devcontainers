@@ -20,8 +20,8 @@ check "version" bash -c "echo '$LLVM_VERSION' | grep '17'";
 check "clang-format version" bash -c "clang-format --version | grep 'clang-format version $LLVM_VERSION'";
 check "apt repo" grep "llvm-toolchain-$(lsb_release -cs)-17 main" $(find /etc/apt -type f -name '*.list');
 
-check "clang is not installed" bash -c '! command -v clang';
-check "clang++ is not installed" bash -c '! command -v clang++';
+check "clang is not installed" bash -c '! command -V clang';
+check "clang++ is not installed" bash -c '! command -V clang++';
 check "clang-format is installed" bash -c 'which clang-format';
 
 # Report result

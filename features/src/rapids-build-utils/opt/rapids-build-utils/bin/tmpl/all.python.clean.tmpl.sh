@@ -31,7 +31,7 @@ _clean_all_python() {
     echo ${NAMES} \
   | tr '[:space:]' '\0' \
   | xargs ${v:+-t} -r -0 -P${n_jobs} -I% bash -c \
-  " if command -v clean-%-python >/dev/null 2>&1; then if ! clean-%-python ${OPTS[*]@Q} ${v[*]@Q}; then exit 255; fi; fi";
+  " if command -V clean-%-python >/dev/null 2>&1; then if ! clean-%-python ${OPTS[*]@Q} ${v[*]@Q}; then exit 255; fi; fi";
 }
 
 _clean_all_python "$@" <&0;

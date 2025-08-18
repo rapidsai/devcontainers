@@ -23,7 +23,7 @@ configure_${NAME}() {
     . devcontainer-utils-debug-output 'rapids_build_utils_debug' 'configure-all configure-${NAME}';
 
     for lib in ${CPP_LIB}; do
-        if command -v configure-${lib}-cpp >/dev/null 2>&1; then
+        if command -V configure-${lib}-cpp >/dev/null 2>&1; then
             configure-${lib}-cpp "${OPTS[@]}";
         fi
     done

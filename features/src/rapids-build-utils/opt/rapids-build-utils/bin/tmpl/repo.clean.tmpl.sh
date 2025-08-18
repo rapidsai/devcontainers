@@ -21,12 +21,12 @@ clean_${NAME}() {
     . devcontainer-utils-debug-output 'rapids_build_utils_debug' 'clean-all clean-${NAME}';
 
     for lib in ${CPP_LIB}; do
-        if command -v clean-${lib}-cpp >/dev/null 2>&1; then
+        if command -V clean-${lib}-cpp >/dev/null 2>&1; then
             clean-${lib}-cpp "${OPTS[@]}";
         fi
     done
     for lib in ${PY_LIB}; do
-        if command -v clean-${lib}-python >/dev/null 2>&1; then
+        if command -V clean-${lib}-python >/dev/null 2>&1; then
             clean-${lib}-python "${OPTS[@]}";
         fi
     done

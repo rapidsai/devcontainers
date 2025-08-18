@@ -65,7 +65,7 @@ export DEBIAN_FRONTEND=noninteractive;
 
 # Install curl, ca-certificates, apt-transport-https, and git (if missing)
 check_packages curl ca-certificates apt-transport-https;
-if ! command -v git >/dev/null 2>&1; then
+if ! command -V git >/dev/null 2>&1; then
     check_packages git;
 fi
 
@@ -77,7 +77,7 @@ install_deb_using_gitlab;
 glab config set -g check_update false;
 
 if dpkg -s bash-completion >/dev/null 2>&1; then
-    if command -v glab >/dev/null 2>&1; then
+    if command -V glab >/dev/null 2>&1; then
         glab completion -s bash | tee /etc/bash_completion.d/glab >/dev/null;
     fi
 fi
