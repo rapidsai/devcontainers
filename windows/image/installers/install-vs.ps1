@@ -13,7 +13,7 @@ $msvcPath = "C:\msbuild\$msvcVersion"
 
 $vsComponentsMap = @{
     "15"     = "Microsoft.VisualStudio.Component.Windows10SDK.17763"
-    "16"     = "Microsoft.VisualStudio.Component.Windows10SDK.20348"
+    "16"     = "Microsoft.VisualStudio.Component.Windows10SDK.19041"
     "17"     = "Microsoft.VisualStudio.Component.Windows11SDK.22621"
     "14.14"  = "Microsoft.VisualStudio.Component.VC.Tools.14.14"
     "14.15"  = "Microsoft.VisualStudio.Component.VC.Tools.14.15"
