@@ -37,6 +37,11 @@ $cudaComponents =
 
 if ("${major}" -ge "13") {
     $cudaComponents += "crt_$mmVersionTag"
+    $cudaComponents += "cuobjdump_$mmVersionTag"
+    $cudaComponents += "nvfatbin_$mmVersionTag"
+    $cudaComponents += "nvjitlink_$mmVersionTag"
+    $cudaComponents += "nvvm_$mmVersionTag"
+    $cudaComponents += "nvptxcompiler_$mmVersionTag"
 }
 
 Write-Output "Installing CUDA Components: ${cudaComponents}"

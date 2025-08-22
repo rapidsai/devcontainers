@@ -1,6 +1,6 @@
 ARG ROOT_IMAGE
 
-FROM $ROOT_IMAGE as PreCompilerEnv
+FROM $ROOT_IMAGE
 
 SHELL ["powershell.exe"]
 
@@ -10,8 +10,6 @@ RUN Set-ExecutionPolicy Unrestricted -Scope CurrentUser
 ADD ./ /tools
 
 RUN /tools/install-tools.ps1 -cudaVersion $ENV:CUDA_VER
-
-FROM PreCompilerEnv as BuildEnv
 
 ARG MSVC_VER
 ARG MSVC_COMPILER_VER
