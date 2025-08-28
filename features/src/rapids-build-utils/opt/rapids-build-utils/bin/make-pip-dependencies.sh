@@ -200,6 +200,7 @@ _make_pip_dependencies() {
         pip_noinstall+=("${rapids_python_pkg_names[@]//"-"/"_"}");
         pip_noinstall+=("${rapids_python_pkg_names[@]//"_"/"-"}");
         pip_noinstall+=("${pip_noinstall[@]/%/"-cu.*"}");
+        pip_noinstall+=("${pip_noinstall[@]/%/"\[.*\]"}");
 
         # Generate a combined requirements.txt file
         # shellcheck disable=SC2002
