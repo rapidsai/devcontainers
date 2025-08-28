@@ -33,7 +33,7 @@ try {
     TestReturnCode
 
     Write-Output "int main() {return 0;}" > .\test.cu
-    nvcc .\test.cu
+    nvcc -v .\test.cu
     TestReturnCode
 }
 catch {
