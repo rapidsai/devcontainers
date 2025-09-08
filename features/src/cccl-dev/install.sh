@@ -76,7 +76,7 @@ DOXYGEN_URL="https://github.com/doxygen/doxygen/releases/download/Release_${DOXY
 chown -R "${USERNAME}:${USERNAME}" "${USERHOME}";
 
 export USERHOME;
-export DOXYGEN_VERSION="$(doxygen --version | grep -o -e '[0-9].*')";
+export DOXYGEN_VERSION="$(doxygen --version | grep -o -e '[0-9]*\.[0-9]\.[0-9]')";
 export LIT_VERSION="$(lit --version | grep -o -e '[0-9].*')";
 
 # export envvars in bashrc files
