@@ -28,7 +28,7 @@ if ! command -V python >/dev/null 2>&1; then
   exit 1;
 fi
 
-PKG=("gettext-base" "libtbb-dev" "pbzip2");
+PKG=("gettext-base" "libtbb-dev" "pbzip2", "wget");
 PKG_TO_REMOVE=();
 
 # Install gcc and g++ because we have to build psutil wheel for non-x86
@@ -60,16 +60,17 @@ CC=gcc CXX=g++ python -m pip install -U wheel setuptools;
 CC=gcc CXX=g++ python -m pip install -U psutil "${LIT_VERSION_TO_INSTALL}" pre-commit;
 
 # Install doxygen from GitHub
-DOXY_VER_US=$(echo $DOXYGEN_VERSION_TO_INSTALL | sed "s/\./_/g")
+DOXY_VER_US="$(echo "$DOXYGEN_VERSION_TO_INSTALL" | sed "s/\./_/g")"
 DOXYGEN_URL="https://github.com/doxygen/doxygen/releases/download/Release_${DOXY_VER_US}/doxygen-${DOXYGEN_VERSION_TO_INSTALL}.linux.bin.tar.gz"
 
 (
   TEMPDEST=$(mktemp -d)
-  wget -q $DOXYGEN_URL -O "$TEMPDEST/doxygen.tar.gz"
-  cd $TEMPDEST
+  wget --no-hsts -q "$DOXYGEN_URL" -O "$TEMPDEST/doxygen.tar.gz"
+  cd "$TEMPDEST"
   tar --strip-components=1 -xf doxygen.tar.gz
-  make install
-  rm -rf ./*
+  make install -j
+  cd -
+  rm -rf "$TEMPDEST"
 )
 
 # Ensure the user owns their homedir
