@@ -38,7 +38,6 @@ jobs:
       arch: '["amd64", "arm64"]'
       cuda: '["12.9"]'
       node_type: cpu8
-      extra-repo-deploy-key: CUMLPRIMS_SSH_PRIVATE_DEPLOY_KEY
       rapids-aux-secret-1: GIST_REPO_READ_ORG_GITHUB_TOKEN
       timeout-minutes: 720
       # 1. Infinitely retry transient errors
