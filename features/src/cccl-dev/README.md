@@ -16,6 +16,7 @@ A feature to install NVIDIA CCCL development utilities
 | Options Id | Description | Type | Default Value |
 |-----|-----|-----|-----|
 | litVersion | lit version to install. | string | latest |
+| doxygenVersion | doxygen version to install. | string | latest |
 
 
 
