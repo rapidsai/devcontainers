@@ -12,6 +12,15 @@
       ],
       "default": "latest",
       "description": "lit version to install."
+    },
+    "doxygenVersion": {
+      "type": "string",
+      "proposals": [
+        "latest",
+        "1.9.6"
+      ],
+      "default": "latest",
+      "description": "doxygen version to install."
     }
   }
 }

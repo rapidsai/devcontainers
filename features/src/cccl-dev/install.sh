@@ -9,6 +9,14 @@ else
   LIT_VERSION_TO_INSTALL="lit==$LIT_VERSION"
 fi;
 
+DOXYGEN_VERSION="${DOXYGENVERSION:-latest}";
+
+if [ "$DOXYGEN_VERSION" = "latest" ]; then
+  DOXYGEN_VERSION_TO_INSTALL="1.14.0"
+else
+  DOXYGEN_VERSION_TO_INSTALL="$DOXYGEN_VERSION"
+fi;
+
 # Ensure we're in this feature's directory during build
 cd "$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )";
 
@@ -20,7 +28,7 @@ if ! command -V python >/dev/null 2>&1; then
   exit 1;
 fi
 
-PKG=("gettext-base" "libtbb-dev" "pbzip2");
+PKG=("gettext-base" "libtbb-dev" "pbzip2" "wget");
 PKG_TO_REMOVE=();
 
 # Install gcc and g++ because we have to build psutil wheel for non-x86
@@ -51,17 +59,32 @@ CC=gcc CXX=g++ python -m pip install -U pip;
 CC=gcc CXX=g++ python -m pip install -U wheel setuptools;
 CC=gcc CXX=g++ python -m pip install -U psutil "${LIT_VERSION_TO_INSTALL}" pre-commit;
 
+# Install doxygen from GitHub
+DOXY_VER_US="$(echo "$DOXYGEN_VERSION_TO_INSTALL" | sed "s/\./_/g")"
+DOXYGEN_URL="https://github.com/doxygen/doxygen/releases/download/Release_${DOXY_VER_US}/doxygen-${DOXYGEN_VERSION_TO_INSTALL}.linux.bin.tar.gz"
+
+(
+  TEMPDEST=$(mktemp -d)
+  wget --no-hsts -q "$DOXYGEN_URL" -O "$TEMPDEST/doxygen.tar.gz"
+  cd "$TEMPDEST"
+  tar --strip-components=1 -xf doxygen.tar.gz
+  make install -j
+  cd -
+  rm -rf "$TEMPDEST"
+)
+
 # Ensure the user owns their homedir
 chown -R "${USERNAME}:${USERNAME}" "${USERHOME}";
 
 export USERHOME;
+export DOXYGEN_VERSION="$(doxygen --version | grep -o -e '[0-9]*\.[0-9]\.[0-9]')";
 export LIT_VERSION="$(lit --version | grep -o -e '[0-9].*')";
 
 # export envvars in bashrc files
-append_to_etc_bashrc "$(cat .bashrc | envsubst '$LIT_VERSION $USERHOME')";
-append_to_all_bashrcs "$(cat .bashrc | envsubst '$LIT_VERSION $USERHOME')";
+append_to_etc_bashrc "$(cat .bashrc | envsubst '$LIT_VERSION $DOXYGEN_VERSION $USERHOME')";
+append_to_all_bashrcs "$(cat .bashrc | envsubst '$LIT_VERSION $DOXYGEN_VERSION $USERHOME')";
 # export envvars in /etc/profile.d
-add_etc_profile_d_script cccl-dev "$(cat .bashrc | envsubst '$LIT_VERSION $USERHOME')";
+add_etc_profile_d_script cccl-dev "$(cat .bashrc | envsubst '$LIT_VERSION $DOXYGEN_VERSION $USERHOME')";
 
 # Clean up
 # rm -rf /tmp/*;
