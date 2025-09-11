@@ -60,16 +60,17 @@ jobs:
         clone-all -j$(nproc) -v -q --clone-upstream --depth 1 --single-branch --shallow-submodules;
 
         # Configure all the C++ libs
-        time configure-all            \
-          -j0                         \
-          -GNinja                     \
-          -Wno-dev                    \
-          -DBUILD_TESTS=ON            \
-          -DBUILD_BENCHMARKS=ON       \
-          -DBUILD_PRIMS_BENCH=ON      \
-          -DBUILD_SHARED_LIBS=ON      \
-          -DRAFT_COMPILE_LIBRARY=ON   \
-          -DBUILD_CUGRAPH_MG_TESTS=ON ;
+        time configure-all                  \
+          -j0                               \
+          -GNinja                           \
+          -Wno-dev                          \
+          -DBUILD_TESTS=ON                  \
+          -DBUILD_BENCHMARKS=ON             \
+          -DBUILD_PRIMS_BENCH=ON            \
+          -DBUILD_SHARED_LIBS=ON            \
+          -DRAFT_COMPILE_LIBRARY=ON         \
+          -DBUILD_CUGRAPH_MG_TESTS=ON       \
+          -DDISABLE_DEPRECATION_WARNINGS=ON ;
 
         # Build all the C++ libs
         time build-all-cpp -j0;
