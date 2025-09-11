@@ -17,6 +17,9 @@ source dev-container-features-test-lib
 check "lit exists and is on path" which lit
 echo "lit version: $(lit --version)"
 
+check "doxygen exists and is on path" which doxygen
+echo "lit version: $(doxygen --version)"
+
 # Report result
 # If any of the checks above exited with a non-zero exit code, the test will fail.
 reportResults

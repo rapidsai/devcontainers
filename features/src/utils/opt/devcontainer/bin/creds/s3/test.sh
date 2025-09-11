@@ -9,7 +9,7 @@ _creds_s3_test() {
     # shellcheck disable=SC1091
     . devcontainer-utils-debug-output 'devcontainer_utils_debug' 'creds-s3 creds-s3-test';
 
-    if ! command -v sccache >/dev/null 2>&1; then exit 1; fi
+    if ! command -V sccache >/dev/null 2>&1; then exit 1; fi
 
     if test -f ~/.aws/stamp; then
         local -r now="$(date '+%s')";

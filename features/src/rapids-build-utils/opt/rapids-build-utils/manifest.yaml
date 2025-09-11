@@ -52,6 +52,12 @@ repos:
       depends: [ucxx, ucxx-python]
       args: {install: *rapids_build_backend_args}
 
+- name: dask-cuda
+  path: dask-cuda
+  git: {<<: *git_defaults, repo: dask-cuda}
+  python:
+    - name: dask-cuda
+
 - name: kvikio
   path: kvikio
   git: {<<: *git_defaults, repo: kvikio}

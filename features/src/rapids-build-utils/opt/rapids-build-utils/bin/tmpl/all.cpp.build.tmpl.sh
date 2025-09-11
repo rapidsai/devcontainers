@@ -22,7 +22,7 @@ _build_all_cpp() {
     . devcontainer-utils-debug-output 'rapids_build_utils_debug' 'build-all build-all-cpp';
 
     for name in ${NAMES}; do
-        if command -v build-${name}-cpp >/dev/null 2>&1; then
+        if command -V build-${name}-cpp >/dev/null 2>&1; then
             build-${name}-cpp "${OPTS[@]}";
         fi
     done

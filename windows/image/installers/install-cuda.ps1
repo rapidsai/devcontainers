@@ -35,6 +35,17 @@ $cudaComponents =
     "nvtx_$mmVersionTag",
     "cuxxfilt_$mmVersionTag"
 
+if ("${major}" -ge "13") {
+    $cudaComponents += "crt_$mmVersionTag"
+    $cudaComponents += "cuobjdump_$mmVersionTag"
+    $cudaComponents += "nvfatbin_$mmVersionTag"
+    $cudaComponents += "nvjitlink_$mmVersionTag"
+    $cudaComponents += "nvvm_$mmVersionTag"
+    $cudaComponents += "nvptxcompiler_$mmVersionTag"
+}
+
+Write-Output "Installing CUDA Components: ${cudaComponents}"
+
 Invoke-WebRequest -Uri "$cudaVersionUrl" -OutFile "./cuda_network.exe" -UseBasicParsing
 Start-Process -Wait -PassThru -FilePath .\cuda_network.exe -ArgumentList "-s $cudaComponents"
 

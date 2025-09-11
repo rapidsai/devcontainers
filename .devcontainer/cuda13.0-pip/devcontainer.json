@@ -11,7 +11,9 @@
   "runArgs": [
     "--rm",
     "--name",
-    "${localEnv:USER:anon}-rapids-${localWorkspaceFolderBasename}-25.10-cuda13.0-pip"
+    "${localEnv:USER:anon}-rapids-${localWorkspaceFolderBasename}-25.10-cuda13.0-pip",
+    "--ulimit",
+    "nofile=500000"
   ],
   "hostRequirements": {"gpu": "optional"},
   "features": {
@@ -33,12 +35,13 @@
     "./features/src/utils",
     "./features/src/rapids-build-utils"
   ],
-  "initializeCommand": ["/bin/bash", "-c", "mkdir -m 0755 -p ${localWorkspaceFolder}/../.{aws,cache,config/pip,local/share/${localWorkspaceFolderBasename}-cuda13.0-venvs,log/devcontainer-utils} ${localWorkspaceFolder}/../{rmm,kvikio,ucxx,cudf,rapidsmpf,raft,cuvs,cumlprims_mg,cuml,cugraph,cugraph-gnn,nx-cugraph}"],
+  "initializeCommand": ["/bin/bash", "-c", "mkdir -m 0755 -p ${localWorkspaceFolder}/../.{aws,cache,config/pip,local/share/${localWorkspaceFolderBasename}-cuda13.0-venvs,log/devcontainer-utils} ${localWorkspaceFolder}/../{rmm,dask-cuda,kvikio,ucxx,cudf,rapidsmpf,raft,cuvs,cumlprims_mg,cuml,cugraph,cugraph-gnn,nx-cugraph}"],
   "postAttachCommand": ["/bin/bash", "-c", "if [ ${CODESPACES:-false} = 'true' ]; then . devcontainer-utils-post-attach-command; fi"],
   "workspaceFolder": "/home/coder",
   "workspaceMount": "source=${localWorkspaceFolder},target=/home/coder/devcontainers,type=bind,consistency=consistent",
   "mounts": [
     "source=${localWorkspaceFolder}/../rmm,target=/home/coder/rmm,type=bind,consistency=consistent",
+    "source=${localWorkspaceFolder}/../dask-cuda,target=/home/coder/dask-cuda,type=bind,consistency=consistent",
     "source=${localWorkspaceFolder}/../kvikio,target=/home/coder/kvikio,type=bind,consistency=consistent",
     "source=${localWorkspaceFolder}/../ucxx,target=/home/coder/ucxx,type=bind,consistency=consistent",
     "source=${localWorkspaceFolder}/../cudf,target=/home/coder/cudf,type=bind,consistency=consistent",

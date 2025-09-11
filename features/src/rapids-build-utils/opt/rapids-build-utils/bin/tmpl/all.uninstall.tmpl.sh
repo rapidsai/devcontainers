@@ -35,7 +35,7 @@ uninstall_all() {
     echo ${NAMES} \
   | tr '[:space:]' '\0' \
   | xargs ${v:+-t} -r -0 -P${n_jobs} -I% bash -c \
-  " if command -v uninstall-% >/dev/null 2>&1; then if ! uninstall-% ${OPTS[*]@Q} ${v[*]@Q}; then exit 255; fi; fi";
+  " if command -V uninstall-% >/dev/null 2>&1; then if ! uninstall-% ${OPTS[*]@Q} ${v[*]@Q}; then exit 255; fi; fi";
 }
 
 uninstall_all "$@" <&0;

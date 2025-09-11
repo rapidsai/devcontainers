@@ -33,17 +33,17 @@ _stop_sccache() {
 
     if test -n "${a:-${kill_all:+x}}"; then
         # Shutdown all sccache processes forcefully
-        pkill -9 sccache >/dev/null 2>&1 || true;
+        sudo pkill -9 sccache >/dev/null 2>&1 || true;
     elif test -n "${k:-${kill:+x}}" && test -f "${pidfile}"; then
         # Shutdown the sccache process on `$sccache_port` forcefully
-        pkill -9 --pidfile "${pidfile}" >/dev/null 2>&1 || true;
+        sudo pkill -9 --pidfile "${pidfile}" >/dev/null 2>&1 || true;
     else
         # Shutdown gracefully
         SCCACHE_SERVER_PORT="${sccache_port}" \
         sccache --stop-server >/dev/null 2>&1 || true;
         if test -f "${pidfile}"; then
             # Wait for the server to shutdown
-            if command -v pidwait >/dev/null 2>&1; then
+            if command -V pidwait >/dev/null 2>&1; then
                 pidwait --pidfile "${pidfile}" >/dev/null 2>&1 || true;
             else
                 while IFS= read -r pid; do

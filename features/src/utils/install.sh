@@ -22,7 +22,7 @@ PKGS=(
     ca-certificates
 );
 
-if ! command -v python3 >/dev/null 2>&1; then
+if ! command -V python3 >/dev/null 2>&1; then
     PKGS+=(python3 python3-pip);
 elif ! python3 -m pip >/dev/null 2>&1; then
     PKGS+=(python3-pip);
@@ -46,12 +46,12 @@ fi
 python3 -m pip install "${_PIP_INSTALL_ARGS[@]}" "${_PIP_UPGRADE_ARGS[@]}" pip;
 
 # Install yq if not installed
-if ! command -v yq >/dev/null 2>&1; then
+if ! command -V yq >/dev/null 2>&1; then
     YQ_BINARY="yq";
     YQ_BINARY+="_$(uname -s | tr '[:upper:]' '[:lower:]')";
     YQ_BINARY+="_${TARGETARCH:-$(dpkg --print-architecture | awk -F'-' '{print $NF}')}";
 
-    YQ_VERSION=latest;
+    YQ_VERSION=4.46.1;
     find_version_from_git_tags YQ_VERSION https://github.com/mikefarah/yq;
     while ! wget --no-hsts -q -O- "https://github.com/mikefarah/yq/releases/download/v${YQ_VERSION}/${YQ_BINARY}.tar.gz" | tar -C /usr/bin -zf - -x ./${YQ_BINARY} --transform="s/${YQ_BINARY}/yq/"; do
         echo "(!) YQ version ${YQ_VERSION} failed to download. Attempting to fall back one version to retry...";
@@ -196,7 +196,7 @@ find_non_root_user;
 if test -n "${USERNAME:+x}"; then
     USERHOME="$(bash -c "echo ~${USERNAME}")";
 
-    if command -v gh >/dev/null 2>&1; then
+    if command -V gh >/dev/null 2>&1; then
         mkdir -p -m 0755                                         \
             "$USERHOME/.local"                                   \
             "$USERHOME/.local/share"                             \
@@ -229,10 +229,10 @@ fi
 
 # Generate bash completions
 if dpkg -s bash-completion >/dev/null 2>&1; then
-    if command -v gh >/dev/null 2>&1; then
+    if command -V gh >/dev/null 2>&1; then
         gh completion -s bash | tee /etc/bash_completion.d/gh >/dev/null;
     fi
-    if command -v glab >/dev/null 2>&1; then
+    if command -V glab >/dev/null 2>&1; then
         glab completion -s bash | tee /etc/bash_completion.d/glab >/dev/null;
     fi
 fi

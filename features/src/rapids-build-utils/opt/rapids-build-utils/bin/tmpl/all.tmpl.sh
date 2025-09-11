@@ -24,7 +24,7 @@ ${SCRIPT}_all() {
     . devcontainer-utils-debug-output 'rapids_build_utils_debug' '${SCRIPT}-all';
 
     for name in ${NAMES}; do
-        if command -v ${SCRIPT}-${name} >/dev/null 2>&1; then
+        if command -V ${SCRIPT}-${name} >/dev/null 2>&1; then
             ${SCRIPT}-${name} "${OPTS[@]}";
         fi
     done

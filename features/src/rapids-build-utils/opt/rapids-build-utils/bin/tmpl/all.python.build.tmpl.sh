@@ -22,7 +22,7 @@ _build_all_python() {
     . devcontainer-utils-debug-output 'rapids_build_utils_debug' 'build-all build-all-python';
 
     for name in ${NAMES}; do
-        if command -v build-${name}-python >/dev/null 2>&1; then
+        if command -V build-${name}-python >/dev/null 2>&1; then
             build-${name}-python "${OPTS[@]}";
         fi
     done

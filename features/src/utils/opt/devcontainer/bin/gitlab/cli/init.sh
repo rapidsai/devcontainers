@@ -16,7 +16,7 @@ init_gitlab_cli() {
     local -;
     set -euo pipefail;
 
-    if ! command -v glab > /dev/null 2>&1; then
+    if ! command -V glab > /dev/null 2>&1; then
         export GITLAB_USER="";
         return;
     fi
