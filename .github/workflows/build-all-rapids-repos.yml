@@ -36,16 +36,18 @@ jobs:
       pull-requests: read
     with:
       arch: '["amd64", "arm64"]'
-      cuda: '["12.9"]'
+      cuda: '["12.9", "13.0"]'
       node_type: cpu8
       rapids-aux-secret-1: GIST_REPO_READ_ORG_GITHUB_TOKEN
       timeout-minutes: 720
-      # 1. Infinitely retry transient errors
-      # 2. Enable debug logging to track cache misses
-      # 3. Never fallback to locally compiling
-      # 4. Use RAPIDS_AUX_SECRET_1 as the sccache-dist auth token
+      # 1. Prohibit sccache from shutting down automatically
+      # 2. Infinitely retry transient errors
+      # 3. Enable debug logging to track cache misses
+      # 4. Never fallback to locally compiling
+      # 5. Use RAPIDS_AUX_SECRET_1 as the sccache-dist auth token
       env: |
         CONDA_ENV_CREATE_QUIET=1
+        SCCACHE_IDLE_TIMEOUT=0
         SCCACHE_DIST_MAX_RETRIES=inf
         SCCACHE_SERVER_LOG=sccache=debug
         SCCACHE_DIST_FALLBACK_TO_LOCAL_COMPILE=false
@@ -58,16 +60,17 @@ jobs:
         clone-all -j$(nproc) -v -q --clone-upstream --depth 1 --single-branch --shallow-submodules;
 
         # Configure all the C++ libs
-        time configure-all            \
-          -j0                         \
-          -GNinja                     \
-          -Wno-dev                    \
-          -DBUILD_TESTS=ON            \
-          -DBUILD_BENCHMARKS=ON       \
-          -DBUILD_PRIMS_BENCH=ON      \
-          -DBUILD_SHARED_LIBS=ON      \
-          -DRAFT_COMPILE_LIBRARY=ON   \
-          -DBUILD_CUGRAPH_MG_TESTS=ON ;
+        time configure-all                  \
+          -j0                               \
+          -GNinja                           \
+          -Wno-dev                          \
+          -DBUILD_TESTS=ON                  \
+          -DBUILD_BENCHMARKS=ON             \
+          -DBUILD_PRIMS_BENCH=ON            \
+          -DBUILD_SHARED_LIBS=ON            \
+          -DRAFT_COMPILE_LIBRARY=ON         \
+          -DBUILD_CUGRAPH_MG_TESTS=ON       \
+          -DDISABLE_DEPRECATION_WARNINGS=ON ;
 
         # Build all the C++ libs
         time build-all-cpp -j0;

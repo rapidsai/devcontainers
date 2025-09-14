@@ -54,7 +54,7 @@ fi
 # Select images that include at least one of the changed features
 
 linux_images="$(\
-  yq -eMo json matrix.yml \
+  yq --yaml-fix-merge-anchor-to-spec -eMo json matrix.yml \
 | jq -eMc --argjson xs "$features" '
   .include
   | map(.os as $os
@@ -86,7 +86,7 @@ if `# Include all images if full_matrix is true`  \
    [ "${full_matrix}" == "1" ]                    \
 || grep -qE '(windows|matrix\.yml)' <<< "${files}"; then
     windows_images="$(\
-      yq -eMo json matrix.yml \
+      yq --yaml-fix-merge-anchor-to-spec -eMo json matrix.yml \
     | jq -eMc '
       .include
       | map(.os as $os

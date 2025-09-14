@@ -49,7 +49,7 @@ runs:
 
         until devcontainer build \
           --platform "linux/${arch}" \
-          --cache-from "${repo,,}:${tag}" \
+          --no-cache \
           --image-name "${repo,,}:${tag}" \
           --workspace-folder "$(realpath -m ./image)" \
           "${outputs[@]}" 2>&1 \
