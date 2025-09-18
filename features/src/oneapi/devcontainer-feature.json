@@ -1,7 +1,7 @@
 {
   "name": "Intel oneapi toolchain",
   "id": "oneapi",
-  "version": "25.10.2",
+  "version": "25.12.0",
   "description": "A feature to install the Intel oneapi toolchain",
   "options": {
     "version": {
