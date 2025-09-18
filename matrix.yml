@@ -131,6 +131,7 @@ include:
   - { features: [*python, *dood, *gcc_13, { <<: *cuda_curr_max, <<: *cccl_cuda_opts }, *clang_format_cccl, *clangd_dev, *cccl_dev], env: *gcc_env }
   # CTK versions < cuda_curr_max used for python wheel testing:
   # 12.5/12.6 requires gcc <= 13, so all of these python containers are pinned at 13:
+  - { features: [*python, *dood, *gcc_13, { name: "cuda", version: "12.0", <<: *cccl_cuda_opts }, *clang_format_cccl, *clangd_dev, *cccl_dev], env: *gcc_env }
   - { features: [*python, *dood, *gcc_13, { name: "cuda", version: "12.5", <<: *cccl_cuda_opts }, *clang_format_cccl, *clangd_dev, *cccl_dev], env: *gcc_env }
   - { features: [*python, *dood, *gcc_13, { name: "cuda", version: "12.6", <<: *cccl_cuda_opts }, *clang_format_cccl, *clangd_dev, *cccl_dev], env: *gcc_env }
   - { features: [*python, *dood, *gcc_13, { name: "cuda", version: "12.8", <<: *cccl_cuda_opts }, *clang_format_cccl, *clangd_dev, *cccl_dev], env: *gcc_env }
