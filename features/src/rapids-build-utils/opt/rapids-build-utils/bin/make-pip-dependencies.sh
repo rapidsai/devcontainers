@@ -26,15 +26,108 @@
 # shellcheck disable=SC1091
 . rapids-generate-docstring;
 
-generate_requirements() {
-    (
-        (rapids-dependency-file-generator "${@:2}" 2>/dev/null || echo "") \
-      | (grep -v '^#' || [ "$?" == "1" ]) \
-      | tee "${1}" 1>/dev/null;
-    ) & true
+_generate_requirements_txt() {
+    if rapids-dependency-file-generator "$@" 2>/dev/null \
+     | grep -v '^#' 2>/dev/null \
+     | tee "$file" 1>/dev/null; then
+        echo "$file"
+    fi
 }
 
-make_pip_dependencies() {
+_generate_requirements_txts() {
+    local i;
+    local j;
+
+    for ((i=0; i < ${repos_length:-0}; i+=1)); do
+
+        local repo="repos_${i}";
+        local repo_name="${repo}_name";
+        local repo_path="${repo}_path";
+        local name="${!repo_name:-}";
+        local path="${!repo_path:-}";
+
+        if test -n "${name:+x}" \
+        && test -n "${path:+x}" \
+        && test -f ~/"${path}/dependencies.yaml"; then
+
+            echo "Generating ${name}'s repo requirements.txt" 1>&2;
+
+            local dependency_keys=("${key[@]}");
+
+            local repo_dependency_keys_length="${repo}_dependency_keys_length";
+            for ((j=0; j < ${!repo_dependency_keys_length:-0}; j+=1)); do
+                local dependency_key="${repo}_dependency_keys_${j}";
+                dependency_key="${!dependency_key:-}";
+                if test -n "${dependency_key:+x}"; then
+                    dependency_keys+=("${dependency_key}");
+                fi
+            done
+
+            if test ${#dependency_keys[@]} -eq 0; then
+                dependency_keys=(py_build py_run py_test all);
+            fi
+
+            local keys=("${dependency_keys[@]}");
+            local keyi;
+
+            for ((keyi=0; keyi < ${#keys[@]}; keyi+=1)); do
+                local file="${tmpdir}/${name}.${keys[$keyi]}.requirements.txt";
+                pip_reqs_txts+=("${file}");
+                _generate_requirements_txt                 \
+                    --file-key "${keys[$keyi]}"            \
+                    --output requirements                  \
+                    --config ~/"${path}/dependencies.yaml" \
+                    --matrix "${matrix_selectors}"         &
+            done
+
+            local cpp_length="${repo}_cpp_length";
+
+            for ((j=0; j < ${!cpp_length:-0}; j+=1)); do
+                local cpp_name="${repo}_cpp_${j}_name";
+                local cpp_name="lib${!cpp_name}";
+
+                echo "Generating ${cpp_name}'s requirements.txt" 1>&2;
+
+                local keys=("${dependency_keys[@]/%/_${cpp_name//"-"/"_"}}");
+                local keyi;
+
+                for ((keyi=0; keyi < ${#keys[@]}; keyi+=1)); do
+                    local file="${tmpdir}/${name}.${cpp_name}.${keys[$keyi]}.requirements.txt";
+                    pip_reqs_txts+=("${file}");
+                    _generate_requirements_txt                 \
+                        --file-key "${keys[$keyi]}"            \
+                        --output requirements                  \
+                        --config ~/"${path}/dependencies.yaml" \
+                        --matrix "${matrix_selectors}"         &
+                done
+            done
+
+            local py_length="${repo}_python_length";
+
+            for ((j=0; j < ${!py_length:-0}; j+=1)); do
+                local py_name="${repo}_python_${j}_name";
+                local py_name="${!py_name}";
+
+                echo "Generating ${py_name}'s requirements.txt" 1>&2;
+
+                local keys=("${dependency_keys[@]/%/_${py_name//"-"/"_"}}");
+                local keyi;
+
+                for ((keyi=0; keyi < ${#keys[@]}; keyi+=1)); do
+                    local file="${tmpdir}/${name}.${py_name}.${keys[$keyi]}.requirements.txt";
+                    pip_reqs_txts+=("${file}");
+                    _generate_requirements_txt                 \
+                        --file-key "${keys[$keyi]}"            \
+                        --output requirements                  \
+                        --config ~/"${path}/dependencies.yaml" \
+                        --matrix "${matrix_selectors}"         &
+                done
+            done
+        fi
+    done
+}
+
+_make_pip_dependencies() {
     local -;
     set -euo pipefail;
 
@@ -45,7 +138,6 @@ make_pip_dependencies() {
 
     test ${#exclude[@]} -eq 0 && exclude=();
     test ${#include[@]} -eq 0 && include=();
-    test ${#key[@]} -eq 0 && key=(py_build py_run py_test all);
     test ${#matrix_entry[@]} -eq 0 && matrix_entry=();
     test ${#requirement[@]} -eq 0 && requirement=();
 
@@ -90,107 +182,28 @@ make_pip_dependencies() {
     test ${#matrix_entry[@]} -gt 0 && _matrix_selectors+=("${matrix_entry[@]}");
     local -r matrix_selectors=$(IFS=";"; echo "${_matrix_selectors[*]}")
 
-    local pip_reqs_txts=();
+    local -r tmpdir="$(mktemp -d)";
+    # shellcheck disable=SC2064
+    trap "rm -rf '${tmpdir}'" EXIT;
 
     eval "$(rapids-list-repos "${OPTS[@]}")";
 
-    local i;
-
-    for ((i=0; i < ${repos_length:-0}; i+=1)); do
-
-        local repo="repos_${i}";
-        local repo_name="${repo}_name";
-        local repo_path="${repo}_path";
-
-        if [ -f ~/"${!repo_path}/dependencies.yaml" ]; then
-
-            echo "Generating ${!repo_name}'s repo requirements.txt" 1>&2;
-
-            local repo_keys=("${key[@]}");
-            local keyi;
-
-            for ((keyi=0; keyi < ${#repo_keys[@]}; keyi+=1)); do
-                local file="/tmp/${!repo_name}.${repo_keys[$keyi]}.requirements.txt";
-                pip_reqs_txts+=("${file}");
-                generate_requirements                            \
-                    "${file}"                                    \
-                    --file-key "${repo_keys[$keyi]}"             \
-                    --output requirements                        \
-                    --config ~/"${!repo_path}/dependencies.yaml" \
-                    --matrix "${matrix_selectors}"               \
-                    ;
-            done
-
-            local cpp_length="${repo}_cpp_length";
-
-            for ((j=0; j < ${!cpp_length:-0}; j+=1)); do
-                local cpp_name="${repo}_cpp_${j}_name";
-
-                echo "Generating lib${!cpp_name}'s requirements.txt" 1>&2;
-
-                local repo_keys=("${key[@]/%/_lib${!cpp_name//"-"/"_"}}");
-                local keyi;
-
-                for ((keyi=0; keyi < ${#repo_keys[@]}; keyi+=1)); do
-                    local file="/tmp/${!repo_name}.lib${!cpp_name}.${repo_keys[$keyi]}.requirements.txt";
-                    pip_reqs_txts+=("${file}");
-                    generate_requirements                             \
-                        "${file}"                                     \
-                        --file-key "${repo_keys[$keyi]}"              \
-                        --output requirements                         \
-                        --config ~/"${!repo_path}/dependencies.yaml"  \
-                        --matrix "${matrix_selectors}"                \
-                        ;
-                done
-            done
-
-            local py_length="${repo}_python_length";
-
-            for ((j=0; j < ${!py_length:-0}; j+=1)); do
-                local py_name="${repo}_python_${j}_name";
-
-                echo "Generating ${!py_name}'s requirements.txt" 1>&2;
-
-                local repo_keys=("${key[@]/%/_${!py_name//"-"/"_"}}");
-                local keyi;
-
-                for ((keyi=0; keyi < ${#repo_keys[@]}; keyi+=1)); do
-                    local file="/tmp/${!repo_name}.${!py_name}.${repo_keys[$keyi]}.requirements.txt";
-                    pip_reqs_txts+=("${file}");
-                    generate_requirements                            \
-                        "${file}"                                    \
-                        --file-key "${repo_keys[$keyi]}"             \
-                        --output requirements                        \
-                        --config ~/"${!repo_path}/dependencies.yaml" \
-                        --matrix "${matrix_selectors}"               \
-                        ;
-                done
-            done
-        fi
-    done
+    readarray -t pip_reqs_txts < <(_generate_requirements_txts);
 
     if test ${#requirement[@]} -gt 0 || test ${#pip_reqs_txts[@]} -gt 0; then
 
-        for ((i=0; i < ${#pip_reqs_txts[@]}; i+=1)); do
-            while ! test -f "${pip_reqs_txts[$i]}"; do
-                sleep 0.1;
-            done
-        done
-
-        local pip_noinstall=();
+        readarray -t rapids_python_pkg_names < <(rapids-python-pkg-names);
 
         # add all python packages to the noinstall list.
-        for pkg in $(rapids-python-pkg-names); do
-            pip_noinstall+=("${pkg}" "${pkg}-cu.*");
-            if test -z "${pkg##*"-"*}"; then
-                pip_noinstall+=("${pkg//"-"/"_"}" "${pkg//"-"/"_"}-cu.*")
-            fi
-            if test -z "${pkg##*"_"*}"; then
-                pip_noinstall+=("${pkg//"_"/"-"}" "${pkg//"_"/"-"}-cu.*")
-            fi
-        done
+        local -a pip_noinstall=();
+        pip_noinstall+=("${rapids_python_pkg_names[@]}");
+        pip_noinstall+=("${rapids_python_pkg_names[@]//"-"/"_"}");
+        pip_noinstall+=("${rapids_python_pkg_names[@]//"_"/"-"}");
+        pip_noinstall+=("${pip_noinstall[@]/%/"-cu.*"}");
+        pip_noinstall+=("${pip_noinstall[@]/%/"\[.*\]"}");
 
         # Generate a combined requirements.txt file
+        # shellcheck disable=SC2002
         cat "${requirement[@]}" "${pip_reqs_txts[@]}"                                                           \
       | (grep -v '^#' || [ "$?" == "1" ])                                                                       \
       | (grep -v -E '^$' || [ "$?" == "1" ])                                                                    \
@@ -202,9 +215,7 @@ make_pip_dependencies() {
       | sed -E "s/^cupy-cuda[0-9]+x/cupy-cuda${cuda_version_major}x/g"                                          \
       | sed -E "s/^cuda-python.*/cuda-python>=${cuda_version}.0,<$((cuda_version_major+1)).0a0/g"               \
         ;
-
-        rm -f "${pip_reqs_txts[@]}";
     fi
 }
 
-make_pip_dependencies "$@" <&0;
+_make_pip_dependencies "$@" <&0;

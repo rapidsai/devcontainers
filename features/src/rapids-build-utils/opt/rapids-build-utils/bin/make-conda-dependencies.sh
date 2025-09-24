@@ -24,15 +24,105 @@
 # shellcheck disable=SC1091
 . rapids-generate-docstring;
 
-generate_env_yaml() {
-    (
-        (rapids-dependency-file-generator "${@:2}" 2>/dev/null || echo "name: none") \
-      | (grep -v '^#' || [ "$?" == "1" ]) \
-      | tee "${1}" 1>/dev/null;
-    ) & true
+_generate_env_yaml() {
+    if rapids-dependency-file-generator "$@" 2>/dev/null \
+     | grep -v '^#' 2>/dev/null \
+     | tee "$file" 1>/dev/null; then
+        echo "$file"
+    fi
 }
 
-make_conda_dependencies() {
+_generate_env_yamls() {
+    local i;
+    local j;
+
+    for ((i=0; i < ${repos_length:-0}; i+=1)); do
+
+        local repo="repos_${i}";
+        local repo_name="${repo}_name";
+        local repo_path="${repo}_path";
+        local name="${!repo_name:-}";
+        local path="${!repo_path:-}";
+
+        if test -n "${name:+x}" \
+        && test -n "${path:+x}" \
+        && test -f ~/"${path}/dependencies.yaml"; then
+
+            echo "Generating ${name}'s repo conda env yml" 1>&2;
+
+            local dependency_keys=("${key[@]}");
+
+            local repo_dependency_keys_length="${repo}_dependency_keys_length";
+            for ((j=0; j < ${!repo_dependency_keys_length:-0}; j+=1)); do
+                local dependency_key="${repo}_dependency_keys_${j}";
+                dependency_key="${!dependency_key:-}";
+                if test -n "${dependency_key:+x}"; then
+                    dependency_keys+=("${dependency_key}");
+                fi
+            done
+
+            if test ${#dependency_keys[@]} -eq 0; then
+                dependency_keys=(all);
+            fi
+
+            local keys=("${dependency_keys[@]}");
+            local keyi;
+
+            for ((keyi=0; keyi < ${#keys[@]}; keyi+=1)); do
+                local file="${tmpdir}/${name}.${keys[$keyi]}.env.yaml";
+                _generate_env_yaml                         \
+                    --file-key "${keys[$keyi]}"            \
+                    --output conda                         \
+                    --config ~/"${path}/dependencies.yaml" \
+                    --matrix "${matrix_selectors}"         &
+            done
+
+            local cpp_length="${repo}_cpp_length";
+
+            for ((j=0; j < ${!cpp_length:-0}; j+=1)); do
+                local cpp_name="${repo}_cpp_${j}_name";
+                local cpp_name="lib${!cpp_name}";
+
+                echo "Generating ${cpp_name}'s conda env yml" 1>&2;
+
+                local keys=("${dependency_keys[@]/%/_${cpp_name//"-"/"_"}}");
+                local keyi;
+
+                for ((keyi=0; keyi < ${#keys[@]}; keyi+=1)); do
+                    local file="${tmpdir}/${name}.${cpp_name}.${keys[$keyi]}.env.yaml";
+                    _generate_env_yaml                         \
+                        --file-key "${keys[$keyi]}"            \
+                        --output conda                         \
+                        --config ~/"${path}/dependencies.yaml" \
+                        --matrix "${matrix_selectors}"         &
+                done
+            done
+
+            local py_length="${repo}_python_length";
+
+            for ((j=0; j < ${!py_length:-0}; j+=1)); do
+                local py_name="${repo}_python_${j}_name";
+                local py_name="${!py_name}";
+
+                echo "Generating ${py_name}'s conda env yml" 1>&2;
+
+                local keys=("${dependency_keys[@]/%/_${py_name//"-"/"_"}}");
+                local keyi;
+
+                for ((keyi=0; keyi < ${#keys[@]}; keyi+=1)); do
+                    local file="${tmpdir}/${name}.${py_name}.${keys[$keyi]}.env.yaml";
+                    _generate_env_yaml                         \
+                        --file-key "${keys[$keyi]}"            \
+                        --output conda                         \
+                        --config ~/"${path}/dependencies.yaml" \
+                        --matrix "${matrix_selectors}"         &
+                done
+            done
+        fi
+    done
+}
+
+_make_conda_dependencies() {
     local -;
     set -euo pipefail;
 
@@ -45,7 +135,6 @@ make_conda_dependencies() {
 
     test ${#exclude[@]} -eq 0 && exclude=();
     test ${#include[@]} -eq 0 && include=();
-    test ${#key[@]} -eq 0 && key=(all);
     test ${#matrix_entry[@]} -eq 0 && matrix_entry=();
 
     local -a _exclude=();
@@ -76,93 +165,26 @@ make_conda_dependencies() {
     test ${#matrix_entry[@]} -gt 0 && _matrix_selectors+=("${matrix_entry[@]}");
     local -r matrix_selectors=$(IFS=";"; echo "${_matrix_selectors[*]}")
 
-    local conda_env_yamls=();
+    local -r tmpdir="$(mktemp -d)";
+    # shellcheck disable=SC2064
+    trap "rm -rf '${tmpdir}'" EXIT;
 
-    local i;
-
-    for ((i=0; i < ${repos_length:-0}; i+=1)); do
-
-        local repo="repos_${i}";
-        local repo_name="${repo}_name";
-        local repo_path="${repo}_path";
-
-        if [ -f ~/"${!repo_path}/dependencies.yaml" ]; then
-
-            echo "Generating ${!repo_name}'s repo conda env yml" 1>&2;
-
-            local repo_keys=("${key[@]}");
-            local keyi;
-
-            for ((keyi=0; keyi < ${#repo_keys[@]}; keyi+=1)); do
-                local file="/tmp/${!repo_name}.${repo_keys[$keyi]}.env.yaml";
-                conda_env_yamls+=("${file}");
-                generate_env_yaml                                \
-                    "${file}"                                    \
-                    --file-key "${repo_keys[$keyi]}"             \
-                    --output conda                               \
-                    --config ~/"${!repo_path}/dependencies.yaml" \
-                    --matrix "${matrix_selectors}"               \
-                    ;
-            done
-
-            local cpp_length="${repo}_cpp_length";
-
-            for ((j=0; j < ${!cpp_length:-0}; j+=1)); do
-                local cpp_name="${repo}_cpp_${j}_name";
-
-                echo "Generating lib${!cpp_name}'s conda env yml" 1>&2;
-
-                local repo_keys=("${key[@]/%/_lib${!cpp_name//"-"/"_"}}");
-                local keyi;
-
-                for ((keyi=0; keyi < ${#repo_keys[@]}; keyi+=1)); do
-                    local file="/tmp/${!repo_name}.lib${!cpp_name}.${repo_keys[$keyi]}.env.yaml";
-                    conda_env_yamls+=("${file}");
-                    generate_env_yaml                                \
-                        "${file}"                                    \
-                        --file-key "${repo_keys[$keyi]}"             \
-                        --output conda                               \
-                        --config ~/"${!repo_path}/dependencies.yaml" \
-                        --matrix "${matrix_selectors}"               \
-                        ;
-                done
-            done
-
-            local py_length="${repo}_python_length";
-
-            for ((j=0; j < ${!py_length:-0}; j+=1)); do
-                local py_name="${repo}_python_${j}_name";
-
-                echo "Generating ${!py_name}'s conda env yml" 1>&2;
-
-                local repo_keys=("${key[@]/%/_${!py_name//"-"/"_"}}");
-                local keyi;
-
-                for ((keyi=0; keyi < ${#repo_keys[@]}; keyi+=1)); do
-                    local file="/tmp/${!repo_name}.${!py_name}.${repo_keys[$keyi]}.env.yaml";
-                    conda_env_yamls+=("${file}");
-                    generate_env_yaml                                \
-                        "${file}"                                    \
-                        --file-key "${repo_keys[$keyi]}"             \
-                        --output conda                               \
-                        --config ~/"${!repo_path}/dependencies.yaml" \
-                        --matrix "${matrix_selectors}"               \
-                        ;
-                done
-            done
-        fi
-    done
+    readarray -t conda_env_yamls < <(_generate_env_yamls);
 
     if test ${#conda_env_yamls[@]} -gt 0; then
 
-        for ((i=0; i < ${#conda_env_yamls[@]}; i+=1)); do
-            while ! test -f "${conda_env_yamls[$i]}"; do
-                sleep 0.1;
-            done
-        done
+        readarray -t rapids_python_pkg_names < <(rapids-python-pkg-names);
+        readarray -t rapids_python_conda_pkg_names < <(rapids-python-conda-pkg-names);
 
-        # shellcheck disable=SC2207
-        local conda_noinstall=($(rapids-python-pkg-names) $(rapids-python-conda-pkg-names));
+        local -a conda_noinstall=();
+
+        conda_noinstall+=("${rapids_python_pkg_names[@]}");
+        conda_noinstall+=("${rapids_python_pkg_names[@]//"-"/"_"}");
+        conda_noinstall+=("${rapids_python_pkg_names[@]//"_"/"-"}");
+
+        conda_noinstall+=("${rapids_python_conda_pkg_names[@]}");
+        conda_noinstall+=("${rapids_python_conda_pkg_names[@]//"-"/"_"}");
+        conda_noinstall+=("${rapids_python_conda_pkg_names[@]//"_"/"-"}");
 
         # Generate a combined conda env yaml file.
         conda-merge "${conda_env_yamls[@]}"                                                                                   \
@@ -172,9 +194,7 @@ make_conda_dependencies() {
           | ( if test ${#_exclude[@]} -gt 0; then grep -E -v "${_exclude[@]}" || [ "$?" == "1" ]; else cat -; fi            ) \
           | ( if test ${#_include[@]} -gt 0; then grep -E    "${_include[@]}" || [ "$?" == "1" ]; else cat -; fi            ) \
           ;
-
-        rm -f "${conda_env_yamls[@]}";
     fi
 }
 
-make_conda_dependencies "$@" <&0;
+_make_conda_dependencies "$@" <&0;

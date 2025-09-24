@@ -40,7 +40,7 @@ cpack_all() {
     echo ${NAMES} \
   | tr '[:space:]' '\0' \
   | xargs ${v:+-t} -r -0 -P${n_load} -I% bash -c \
-  " if command -v cpack-% >/dev/null 2>&1; then if ! cpack-% -j ${n_arch} ${OPTS[*]@Q} ${v[*]@Q}; then exit 255; fi; fi";
+  " if command -V cpack-% >/dev/null 2>&1; then if ! cpack-% -j ${n_arch} ${OPTS[*]@Q} ${v[*]@Q}; then exit 255; fi; fi";
 }
 
 cpack_all "$@" <&0;

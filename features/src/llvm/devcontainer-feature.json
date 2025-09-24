@@ -1,7 +1,7 @@
 {
   "name": "LLVM compilers and tools",
   "id": "llvm",
-  "version": "25.8.0",
+  "version": "25.10.2",
   "description": "A feature to install LLVM compilers and tools",
   "options": {
     "version": {
@@ -39,7 +39,7 @@
   "updateContentCommand": [
     "/bin/bash",
     "-c",
-    "mkdir -m 0755 -p ~/.config/clangd && cp -u /etc/skel/.config/clangd/config.yaml ~/.config/clangd/config.yaml"
+    "mkdir -m 0755 -p ~/.config/clangd && cp -n /etc/skel/.config/clangd/config.yaml ~/.config/clangd/config.yaml 2>/dev/null || true"
   ],
   "customizations": {
     "vscode": {

@@ -31,7 +31,7 @@ configure_${CPP_LIB}_cpp() {
     local -a cmake_args_="(${CMAKE_ARGS:-})";
     cmake_args_+=(${CPP_CMAKE_ARGS});
 
-    eval "$(_parse_args --take '-G, -v,--verbose' "$@" "${cmake_args_[@]}" <&0)";
+    eval "$(_parse_args --take '-G -v,--verbose' "$@" "${cmake_args_[@]}" <&0)";
 
     if [[ ! -d "${CPP_SRC}" ]]; then
         echo "configure-${CPP_LIB}-cpp: cannot access '${CPP_SRC}': No such directory" >&2;
@@ -56,7 +56,9 @@ configure_${CPP_LIB}_cpp() {
     cmake_args+=(-B "${bin_dir:-${CPP_SRC}/${BIN_DIR}}");
 
     time (
+        echo "Configuring lib${CPP_LIB}";
         export ${CPP_ENV} PATH="$PATH";
+        SCCACHE_NO_DIST_COMPILE=1                         \
         CUDAFLAGS="${CUDAFLAGS:+$CUDAFLAGS }-t=${n_arch}" \
             cmake "${cmake_args[@]}";
         { set +x; } 2>/dev/null; echo -n "lib${CPP_LIB} configure time:";
@@ -71,7 +73,7 @@ configure_${CPP_LIB}_cpp() {
             ;
     fi
 
-    rapids-merge-compile-commands-json > ~/compile_commands.json;
+    rapids-merge-compile-commands-json > ~/compile_commands.json &
 }
 
 configure_${CPP_LIB}_cpp "$@" <&0;

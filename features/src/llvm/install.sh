@@ -61,7 +61,7 @@ fi
 # Remove existing, install, and set default clang/llvm alternatives
 for ((i=0; i < ${#bins[@]}; i+=1)); do
     x=${bins[$i]};
-    if command -v "${x}-${LLVM_VERSION}" >/dev/null 2>&1; then
+    if command -V "${x}-${LLVM_VERSION}" >/dev/null 2>&1; then
         (update-alternatives --install /usr/bin/"${x}" "${x}" "$(which "${x}-${LLVM_VERSION}")" 30);
         (update-alternatives --set "${x}" "$(which "${x}-${LLVM_VERSION}")");
     fi

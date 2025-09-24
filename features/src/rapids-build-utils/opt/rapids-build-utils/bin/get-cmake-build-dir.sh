@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 # Usage:
-#  rapids-get-cmake-build-dir [OPTIONS] [-DCMAKE_BUILD_TYPE=(Release|Debug)] [--] <source_path>...
+#  rapids-get-cmake-build-dir [OPTIONS] [-DCMAKE_BUILD_TYPE=(Debug|MinSizeRel|Release|RelWithDebInfo)] [--] <source_path>...
 #
 # Build a path to the build directory for a C++ or scikit-build-core Python library.
 # If the <source_path> is not null and a valid directory, retarget the `build/(pip|conda)/cuda-X.Y.Z/latest` symlink
@@ -19,7 +19,7 @@
 #  -h,--help                           Print this text.
 #  --skip-links                        Don't update any symlinks
 #  --skip-build-type                   Don't update the symlink pointing to the last component of
-#                                      the build dir path, i.e. "latest -> (debug|release)".
+#                                      the build dir path, i.e. "latest -> (debug|minsizerel|release|relwithdebinfo)".
 #
 # Positional arguments:
 # source_path                          The C++ or Python project source path
@@ -43,18 +43,30 @@ get_cmake_build_dir() {
     if test -n "${src:+x}" && rapids-python-uses-scikit-build "${src}"; then
         echo "${src:+${src}/}$(python -c 'from skbuild import constants; print(constants.CMAKE_BUILD_DIR())')";
     else
-        local -r type="$(rapids-select-cmake-build-type "${OPTS[@]}" "${REST[@]:1}" | tr '[:upper:]' '[:lower:]')";
         local -r cuda="${CUDA_VERSION_MAJOR_MINOR:-}";
-        local bin="build";
-        bin+="${PYTHON_PACKAGE_MANAGER:+/${PYTHON_PACKAGE_MANAGER}}${cuda:+/cuda-${cuda}}";
+        local bin="build${PYTHON_PACKAGE_MANAGER:+/${PYTHON_PACKAGE_MANAGER}}${cuda:+/cuda-${cuda}}";
+        local build_type="$(rapids-select-cmake-build-type "${OPTS[@]}" "${REST[@]:1}" | tr '[:upper:]' '[:lower:]')";
+
+        if ! test -n "${build_type:+x}"; then
+            if test -L "${src}/${bin}/latest"; then
+                build_type="$(basename "$(realpath -m "${src}/${bin}/latest")")";
+            fi
+            case "${build_type:-}" in
+                debug | minsizerel | release | relwithdebinfo)
+                    ;;
+                *)
+                    build_type="release";
+                    ;;
+            esac
+        fi
 
         if test -n "${src:+x}" && test -d "${src:-}"; then
             mkdir -p "${src}/${bin}";
-            if  ! test -n "${skip_links:+x}"; then
+            if ! test -n "${skip_links:+x}"; then
                 if ! test -n "${skip_build_type:+x}" || ! test -L "${src}/${bin}/latest"; then
-                    mkdir -p "${src}/${bin}/${type}";
+                    mkdir -p "${src}/${bin}/${build_type}";
                     cd "${src}/${bin}/" || exit 1;
-                    ln -sfn "${type}" latest;
+                    ln -sfn "${build_type}" latest;
                 fi
                 cd "${src}/build" || exit 1;
                 local component;
@@ -70,7 +82,7 @@ get_cmake_build_dir() {
         if test -n "${skip_build_type:+x}"; then
             echo "${src:+${src}/}${bin}/latest";
         else
-            echo "${src:+${src}/}${bin}/${type}";
+            echo "${src:+${src}/}${bin}/${build_type}";
         fi
     fi
 }

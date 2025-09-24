@@ -7,19 +7,17 @@ _creds_s3_propagate() {
     # shellcheck disable=SC1091
     . devcontainer-utils-debug-output 'devcontainer_utils_debug' 'creds-s3 creds-s3-propagate';
 
-    if ! command -v sccache >/dev/null 2>&1; then
+    if ! command -V sccache >/dev/null 2>&1; then
         return;
     fi
 
     local num_restarts="0";
 
-    if test -n "$(pgrep sccache || echo)"; then
-        sccache --stop-server >/dev/null 2>&1 || true;
-    fi
+    devcontainer-utils-stop-sccache --kill-all;
 
     while true; do
 
-        if sccache --start-server >/dev/null 2>&1; then
+        if devcontainer-utils-start-sccache >/dev/null; then
             if [ "${num_restarts}" -gt "0" ]; then echo "Success!"; fi
             exit 0;
         fi

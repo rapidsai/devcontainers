@@ -1,7 +1,7 @@
 {
   "name": "NVIDIA CCCL development utilities",
   "id": "cccl-dev",
-  "version": "25.8.0",
+  "version": "25.10.2",
   "description": "A feature to install NVIDIA CCCL development utilities",
   "options": {
     "litVersion": {
@@ -12,6 +12,15 @@
       ],
       "default": "latest",
       "description": "lit version to install."
+    },
+    "doxygenVersion": {
+      "type": "string",
+      "proposals": [
+        "latest",
+        "1.9.6"
+      ],
+      "default": "latest",
+      "description": "doxygen version to install."
     }
   }
 }

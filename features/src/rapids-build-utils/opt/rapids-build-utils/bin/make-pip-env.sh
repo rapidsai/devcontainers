@@ -45,7 +45,11 @@ make_pip_env() {
     local -r new_env_path="$(realpath -m "/tmp/${env_file_name}")";
     local -r old_env_path="$(realpath -m "${HOME}/.local/share/venvs/${env_file_name}")";
 
-    rapids-make-pip-dependencies "${OPTS[@]}" > "${new_env_path}";
+    # Create the python env without ninja.
+    # ninja -$(ulimit -n) fails with `ninja: FATAL: pipe: Too many open files`.
+    # This appears to have been fixed 13 years ago (https://github.com/ninja-build/ninja/issues/233),
+    # so that fix needs to be integrated into the kitware pip ninja builds.
+    rapids-make-pip-dependencies --exclude <(echo ninja) "${OPTS[@]}" > "${new_env_path}";
 
     if test -f "${new_env_path}"; then
 
@@ -61,6 +65,7 @@ make_pip_env() {
             . "${HOME}/.local/share/venvs/${env_name}/bin/activate";
             python -m pip install -U pip;
             python -m pip install "${pre[@]}" -U -r "${new_env_path}";
+            python -m pip uninstall -y ninja >/dev/null 2>&1;
         # If the venv does exist but it's different from the generated one,
         # print the diff between the envs and update it
         elif ! diff -BNqw "${old_env_path}" "${new_env_path}" >/dev/null 2>&1; then
@@ -79,6 +84,7 @@ make_pip_env() {
             . "${HOME}/.local/share/venvs/${env_name}/bin/activate";
             python -m pip install -U pip;
             python -m pip install "${pre[@]}" -U -r "${new_env_path}";
+            python -m pip uninstall -y ninja >/dev/null 2>&1;
         fi
 
         cp -a "${new_env_path}" "${old_env_path}";

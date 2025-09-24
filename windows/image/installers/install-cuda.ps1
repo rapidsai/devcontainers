@@ -21,11 +21,7 @@ $mmbVersionTag = "${major}.${minor}.${build}"
 # mm = major minor
 $mmVersionTag = "${major}.${minor}"
 
-$cudaMajorUri = @{
-    "11" = "${mmbVersionTag}/network_installers/cuda_${mmbVersionTag}_win10_network.exe"
-    "12" = "${mmbVersionTag}/network_installers/cuda_${mmbVersionTag}_windows_network.exe"
-}["$major"]
-
+$cudaMajorUri = "${mmbVersionTag}/network_installers/cuda_${mmbVersionTag}_windows_network.exe"
 $cudaVersionUrl = "https://developer.download.nvidia.com/compute/cuda/$cudaMajorUri"
 $cudaComponents =
     "nvcc_$mmVersionTag",
@@ -36,7 +32,19 @@ $cudaComponents =
     "nvrtc_$mmVersionTag",
     "nvrtc_dev_$mmVersionTag",
     "nvml_dev_$mmVersionTag",
-    "nvtx_$mmVersionTag"
+    "nvtx_$mmVersionTag",
+    "cuxxfilt_$mmVersionTag"
+
+if ("${major}" -ge "13") {
+    $cudaComponents += "crt_$mmVersionTag"
+    $cudaComponents += "cuobjdump_$mmVersionTag"
+    $cudaComponents += "nvfatbin_$mmVersionTag"
+    $cudaComponents += "nvjitlink_$mmVersionTag"
+    $cudaComponents += "nvvm_$mmVersionTag"
+    $cudaComponents += "nvptxcompiler_$mmVersionTag"
+}
+
+Write-Output "Installing CUDA Components: ${cudaComponents}"
 
 Invoke-WebRequest -Uri "$cudaVersionUrl" -OutFile "./cuda_network.exe" -UseBasicParsing
 Start-Process -Wait -PassThru -FilePath .\cuda_network.exe -ArgumentList "-s $cudaComponents"

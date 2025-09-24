@@ -31,7 +31,7 @@ clean_all() {
     echo ${NAMES} \
   | tr '[:space:]' '\0' \
   | xargs ${v:+-t} -r -0 -P${n_jobs} -I% bash -c \
-  " if command -v clean-% >/dev/null 2>&1; then if ! clean-% ${OPTS[*]@Q} ${v[*]@Q}; then exit 255; fi; fi";
+  " if command -V clean-% >/dev/null 2>&1; then if ! clean-% ${OPTS[*]@Q} ${v[*]@Q}; then exit 255; fi; fi";
 }
 
 clean_all "$@" <&0;

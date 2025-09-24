@@ -30,7 +30,7 @@ export OSNAME="$(
     echo "$ID$((major - (major % 2)))${minor}";
 )";
 
-VERSION="${CUDA_VERSION:-${VERSION:-12.9.0}}";
+VERSION="${CUDA_VERSION:-${VERSION:-13.0.0}}";
 
 if [[ "$NVARCH" == aarch64 ]]; then
     NVARCH="sbsa";
@@ -95,7 +95,7 @@ if [ "${INSTALLCOMPILERS:-false}" = true ]; then
     PKGS+=("cuda-compiler-${cuda_ver}");
     PKGS+=("cuda-minimal-build-${cuda_ver}");
     PKGS+=("cuda-command-line-tools-${cuda_ver}");
-    if [ "$NVARCH" = x86_64 ]; then
+    if [ "$NVARCH" = x86_64 ] && [ "$cuda_ver_major" -lt 13 ]; then
         PKGS+=("cuda-nvprof-${cuda_ver}");
     fi
 fi

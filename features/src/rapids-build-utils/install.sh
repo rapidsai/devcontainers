@@ -9,7 +9,7 @@ cd "$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )";
 
 PKGS=(bc jq pigz sudo wget gettext-base bash-completion ca-certificates);
 
-if ! command -v python3 >/dev/null 2>&1; then
+if ! command -V python3 >/dev/null 2>&1; then
     PKGS+=(python3 python3-pip);
 elif ! python3 -m pip >/dev/null 2>&1; then
     PKGS+=(python3-pip);
@@ -18,12 +18,12 @@ fi
 check_packages "${PKGS[@]}";
 
 # Install yq if not installed
-if ! command -v yq >/dev/null 2>&1; then
+if ! command -V yq >/dev/null 2>&1; then
     YQ_BINARY="yq";
     YQ_BINARY+="_$(uname -s | tr '[:upper:]' '[:lower:]')";
     YQ_BINARY+="_${TARGETARCH:-$(dpkg --print-architecture | awk -F'-' '{print $NF}')}";
 
-    YQ_VERSION=latest;
+    YQ_VERSION=4.46.1;
     find_version_from_git_tags YQ_VERSION https://github.com/mikefarah/yq;
     while ! wget --no-hsts -q -O- "https://github.com/mikefarah/yq/releases/download/v${YQ_VERSION}/${YQ_BINARY}.tar.gz" | tar -C /usr/bin -zf - -x ./${YQ_BINARY} --transform="s/${YQ_BINARY}/yq/"; do
         echo "(!) YQ version ${YQ_VERSION} failed to download. Attempting to fall back one version to retry...";
@@ -46,7 +46,7 @@ fi
 python3 -m pip install "${_PIP_INSTALL_ARGS[@]}" "${_PIP_UPGRADE_ARGS[@]}" pip;
 # Install RAPIDS dependency file generator, conda-merge, and toml
 python3 -m pip install "${_PIP_INSTALL_ARGS[@]}" \
-    'rapids-dependency-file-generator<1.14' \
+    'rapids-dependency-file-generator' \
     conda-merge \
     toml;
 
@@ -95,11 +95,14 @@ for cmd in "${commands[@]}"; do
 done
 
 # Install bash_completion script
-if command -v devcontainer-utils-generate-bash-completion >/dev/null 2>&1; then
-    devcontainer-utils-generate-bash-completion                          \
-        --out-file /etc/bash_completion.d/rapids-build-utils-completions \
-        ${commands[@]/#/--command rapids-}                               \
-    ;
+if command -V devcontainer-utils-generate-bash-completion >/dev/null 2>&1; then
+    read -ra commands <<< "${commands[*]/#/--command rapids-}";
+    if test "${#commands[@]}" -gt 0; then
+        devcontainer-utils-generate-bash-completion                          \
+            --out-file /etc/bash_completion.d/rapids-build-utils-completions \
+            "${commands[@]}"                                                 \
+        ;
+    fi
 fi
 
 find /opt/rapids-build-utils \

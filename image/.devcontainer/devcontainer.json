@@ -31,7 +31,9 @@
     "ghcr.io/devcontainers/features/github-cli:1.0.12": {},
     "./features/src/gitlab-cli": {},
     "./features/src/cmake": {},
-    "./features/src/ninja": {},
+    "./features/src/ninja": {
+      "version": "1.12.1"
+    },
     "./features/src/sccache": {
       "version": "0.7.7"
     },

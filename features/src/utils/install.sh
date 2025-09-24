@@ -14,6 +14,7 @@ PKGS=(
     sudo
     wget
     socat
+    procps
     tzdata
     gettext-base
     openssh-client
@@ -21,7 +22,7 @@ PKGS=(
     ca-certificates
 );
 
-if ! command -v python3 >/dev/null 2>&1; then
+if ! command -V python3 >/dev/null 2>&1; then
     PKGS+=(python3 python3-pip);
 elif ! python3 -m pip >/dev/null 2>&1; then
     PKGS+=(python3-pip);
@@ -45,12 +46,12 @@ fi
 python3 -m pip install "${_PIP_INSTALL_ARGS[@]}" "${_PIP_UPGRADE_ARGS[@]}" pip;
 
 # Install yq if not installed
-if ! command -v yq >/dev/null 2>&1; then
+if ! command -V yq >/dev/null 2>&1; then
     YQ_BINARY="yq";
     YQ_BINARY+="_$(uname -s | tr '[:upper:]' '[:lower:]')";
     YQ_BINARY+="_${TARGETARCH:-$(dpkg --print-architecture | awk -F'-' '{print $NF}')}";
 
-    YQ_VERSION=latest;
+    YQ_VERSION=4.46.1;
     find_version_from_git_tags YQ_VERSION https://github.com/mikefarah/yq;
     while ! wget --no-hsts -q -O- "https://github.com/mikefarah/yq/releases/download/v${YQ_VERSION}/${YQ_BINARY}.tar.gz" | tar -C /usr/bin -zf - -x ./${YQ_BINARY} --transform="s/${YQ_BINARY}/yq/"; do
         echo "(!) YQ version ${YQ_VERSION} failed to download. Attempting to fall back one version to retry...";
@@ -101,9 +102,16 @@ declare -a commands_and_sources=(
     "init-ssh-deploy-keys               ssh/init-deploy-keys.sh"
     "init-github-cli                    github/cli/init.sh"
     "clone-github-repo                  github/repo/clone.sh"
+    "github-user-scopes                 github/user/scopes.sh"
     "init-gitlab-cli                    gitlab/cli/init.sh"
     "clone-gitlab-repo                  gitlab/repo/clone.sh"
     "print-missing-gitlab-token-warning gitlab/print-missing-token-warning.sh"
+    "install-sccache                    sccache/install.sh"
+    "start-sccache                      sccache/start.sh"
+    "stop-sccache                       sccache/stop.sh"
+    "init-sccache-dist                  sccache/dist/init.sh"
+    "configure-sccache-dist             sccache/dist/configure.sh"
+    "sccache-dist-status                sccache/dist/status.sh"
 )
 
 # Install alternatives
@@ -117,10 +125,13 @@ done
 declare -a commands="($(for pair in "${commands_and_sources[@]}"; do cut -d' ' -f1 <<< "${pair}"; done))";
 
 # Install bash_completion script
-devcontainer-utils-generate-bash-completion                          \
-    --out-file /etc/bash_completion.d/devcontainer-utils-completions \
-    ${commands[@]/#/--command devcontainer-utils-}                   \
-;
+read -ra commands <<< "${commands[*]/#/--command devcontainer-utils-}";
+if test "${#commands[@]}" -gt 0; then
+    devcontainer-utils-generate-bash-completion                          \
+        --out-file /etc/bash_completion.d/devcontainer-utils-completions \
+        "${commands[@]}"                                                 \
+    ;
+fi
 
 find /opt/devcontainer \
     \( -type d -exec chmod 0775 {} \; \
@@ -185,7 +196,7 @@ find_non_root_user;
 if test -n "${USERNAME:+x}"; then
     USERHOME="$(bash -c "echo ~${USERNAME}")";
 
-    if command -v gh >/dev/null 2>&1; then
+    if command -V gh >/dev/null 2>&1; then
         mkdir -p -m 0755                                         \
             "$USERHOME/.local"                                   \
             "$USERHOME/.local/share"                             \
@@ -218,10 +229,10 @@ fi
 
 # Generate bash completions
 if dpkg -s bash-completion >/dev/null 2>&1; then
-    if command -v gh >/dev/null 2>&1; then
+    if command -V gh >/dev/null 2>&1; then
         gh completion -s bash | tee /etc/bash_completion.d/gh >/dev/null;
     fi
-    if command -v glab >/dev/null 2>&1; then
+    if command -V glab >/dev/null 2>&1; then
         glab completion -s bash | tee /etc/bash_completion.d/glab >/dev/null;
     fi
 fi

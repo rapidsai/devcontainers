@@ -21,12 +21,6 @@ runs:
   using: composite
   steps:
 
-    - if: runner.environment == 'self-hosted'
-      name: Setup Node.js
-      uses: actions/setup-node@v4
-      with:
-        node-version: '20'
-
     - id: json
       name: Make image/.devcontainer/devcontainer.json
       shell: bash
@@ -36,7 +30,7 @@ runs:
           '${{ inputs.os }}'                          \
           '${{ inputs.features }}'                    \
           '${{ inputs.container_env }}'               \
-        3>> $GITHUB_OUTPUT                            \
+        3>> "$GITHUB_OUTPUT"                          \
         4> image/.devcontainer/devcontainer.json.out  ;
 
         mv image/.devcontainer/devcontainer.json{.out,};

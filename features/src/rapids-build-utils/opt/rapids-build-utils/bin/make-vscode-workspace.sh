@@ -44,7 +44,6 @@ cpp_lib_dirs() {
 
         local j=0;
         for ((j=0; j < ${!cpp_length:-0}; j+=1)); do
-            # local cpp_name="${repo}_cpp_${j}_name";
             local cpp_sub_dir="${repo}_cpp_${j}_sub_dir";
             echo ~/"${!repo_path:-}/${!cpp_sub_dir:-}";
         done
@@ -75,7 +74,7 @@ make_vscode_workspace() {
     local -;
     set -euo pipefail;
 
-    if command -v devcontainer-utils-debug-output >/dev/null 2>&1; then
+    if command -V devcontainer-utils-debug-output >/dev/null 2>&1; then
         # shellcheck disable=SC1091
         . devcontainer-utils-debug-output 'rapids_build_utils_debug' 'make-vscode-workspace';
     fi
