@@ -42,6 +42,7 @@ $MSBuildPathMap = @{
     "14.41"="$MSBuildPath\17\VC\Auxiliary\Build"
     "14.42"="$MSBuildPath\17\VC\Auxiliary\Build"
     "14.43"="$MSBuildPath\17\VC\Auxiliary\Build"
+    "14.44"="$MSBuildPath\17\VC\Auxiliary\Build"
     "14.50"="$MSBuildPath\18\VC\Auxiliary\Build"
     "latest"="$MSBuildPath\$ENV:INSTALLED_MSVC_VERSION\VC\Auxiliary\Build"
 }
