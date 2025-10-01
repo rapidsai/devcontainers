@@ -1,7 +1,7 @@
 Param(
-    [Parameter(Mandatory=$false)]
+    [Parameter(Mandatory = $false)]
     [string]
-    $cudaVersion="12.9.0"
+    $cudaVersion = "12.9.0"
 )
 
 # Use System.Version to tokenize version
@@ -25,6 +25,7 @@ $cudaMajorUri = "${mmbVersionTag}/network_installers/cuda_${mmbVersionTag}_windo
 $cudaVersionUrl = "https://developer.download.nvidia.com/compute/cuda/$cudaMajorUri"
 $cudaComponents =
     "nvcc_$mmVersionTag",
+    "cublas_$mmVersionTag",
     "curand_$mmVersionTag",
     "curand_dev_$mmVersionTag",
     "cudart_$mmVersionTag",
@@ -33,7 +34,9 @@ $cudaComponents =
     "nvrtc_dev_$mmVersionTag",
     "nvml_dev_$mmVersionTag",
     "nvtx_$mmVersionTag",
-    "cuxxfilt_$mmVersionTag"
+    "cuxxfilt_$mmVersionTag",
+    "nvdisasm_$mmVersionTag",
+    "visual_studio_integration_$mmVersionTag"
 
 if ("${major}" -ge "13") {
     $cudaComponents += "crt_$mmVersionTag"

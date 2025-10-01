@@ -31,6 +31,7 @@ $vsComponentsMap = @{
     "14.41"  = "Microsoft.VisualStudio.Component.VC.14.41.17.11.x86.x64"
     "14.42"  = "Microsoft.VisualStudio.Component.VC.14.42.17.12.x86.x64"
     "14.43"  = "Microsoft.VisualStudio.Component.VC.14.43.17.13.x86.x64"
+    "14.44"  = "Microsoft.VisualStudio.Component.VC.14.44.17.14.x86.x64"
     "14.50"  = "Microsoft.VisualStudio.Component.VC.14.50.18.0.x86.x64"
     "latest" = "Microsoft.VisualStudio.Component.VC.Tools.x86.x64"
 }

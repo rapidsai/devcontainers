@@ -1,10 +1,10 @@
 Param(
-    [Parameter(Mandatory=$true)]
+    [Parameter(Mandatory = $true)]
     [string]
     $cudaVersion
 )
 
-$ErrorActionPreference='Stop'
+$ErrorActionPreference = 'Stop'
 
 ## Make sure the script is local to the directory here.
 Push-location "$PSScriptRoot"
@@ -12,6 +12,8 @@ Push-location "$PSScriptRoot"
 ## Source and install the below
 ./installers/install-cuda.ps1 -cudaVersion $cudaVersion
 ./installers/install-git.ps1
+./installers/install-gh.ps1
+./installers/install-jq.ps1
 ./installers/install-lit.ps1
 ## Must be after lit installation for pip
 ./installers/install-clang-format.ps1
