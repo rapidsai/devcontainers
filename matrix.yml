@@ -167,9 +167,9 @@ include:
 
   # CTK 12.0 doesn't know that it supports 14.40+, use 14.39:
   - { features: [{ <<: *cuda_prev_min, <<: *cccl_cuda_opts }, { name: "cl", version: "14.39" }] } # MSVC 2022
-  - { features: [{ <<: *cuda_prev_max, <<: *cccl_cuda_opts }, { name: "cl", version: "14.43" }] } # MSVC 2022
-  - { features: [{ <<: *cuda_curr_min, <<: *cccl_cuda_opts }, { name: "cl", version: "14.43" }] } # MSVC 2022
-  - { features: [{ <<: *cuda_curr_max, <<: *cccl_cuda_opts }, { name: "cl", version: "14.43" }] } # MSVC 2022
+  - { features: [{ <<: *cuda_prev_max, <<: *cccl_cuda_opts }, { name: "cl", version: "14.44" }] } # MSVC 2022
+  - { features: [{ <<: *cuda_curr_min, <<: *cccl_cuda_opts }, { name: "cl", version: "14.44" }] } # MSVC 2022
+  - { features: [{ <<: *cuda_curr_max, <<: *cccl_cuda_opts }, { name: "cl", version: "14.44" }] } # MSVC 2022
 
 # RAPIDS devcontainers
 

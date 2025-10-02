@@ -24,6 +24,14 @@ try {
     git --version
     TestReturnCode
 
+    Write-Output "Test jq"
+    jq --version
+    TestReturnCode
+
+    Write-Output "Test gh"
+    gh --version
+    TestReturnCode
+
     Write-Output "Test CMake"
     cmake --version
     TestReturnCode

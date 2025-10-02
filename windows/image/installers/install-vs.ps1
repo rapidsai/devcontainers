@@ -1,6 +1,6 @@
 Param(
     [Parameter(Mandatory=$true)]
-    [ValidateSet('15', '16', '17')]
+    [ValidateSet('15', '16', '17', '18')]
     [string]
     $msvcVersion,
     [Parameter(Mandatory=$false)]
@@ -8,13 +8,13 @@ Param(
     $clVersion
 )
 
-
 $msvcPath = "C:\msbuild\$msvcVersion"
 
 $vsComponentsMap = @{
     "15"     = "Microsoft.VisualStudio.Component.Windows10SDK.17763"
     "16"     = "Microsoft.VisualStudio.Component.Windows10SDK.19041"
     "17"     = "Microsoft.VisualStudio.Component.Windows11SDK.22621"
+    "18"     = "Microsoft.VisualStudio.Component.Windows11SDK.22621"
     "14.14"  = "Microsoft.VisualStudio.Component.VC.Tools.14.14"
     "14.15"  = "Microsoft.VisualStudio.Component.VC.Tools.14.15"
     "14.16"  = "Microsoft.VisualStudio.Component.VC.Tools.14.16"
@@ -31,8 +31,18 @@ $vsComponentsMap = @{
     "14.41"  = "Microsoft.VisualStudio.Component.VC.14.41.17.11.x86.x64"
     "14.42"  = "Microsoft.VisualStudio.Component.VC.14.42.17.12.x86.x64"
     "14.43"  = "Microsoft.VisualStudio.Component.VC.14.43.17.13.x86.x64"
+    "14.44"  = "Microsoft.VisualStudio.Component.VC.14.44.17.14.x86.x64"
+    "14.50"  = "Microsoft.VisualStudio.Component.VC.14.50.18.0.x86.x64"
     "latest" = "Microsoft.VisualStudio.Component.VC.Tools.x86.x64"
 }
+
+$channelMap = @{
+    "15"="release"
+    "16"="release"
+    "17"="release"
+    "18"="insiders"
+}
+$channel = $channelMap[$msvcVersion]
 
 # Always install/update core VC tools
 $vsComponent = $vsComponentsMap[$msvcVersion]
@@ -49,7 +59,7 @@ if ($clVersion -eq "14.16") {
     $vsComponentString = "$vsComponentString --add $clComponent"
 }
 
-Invoke-WebRequest -Uri "https://aka.ms/vs/$msvcVersion/release/vs_buildtools.exe" -UseBasicParsing -OutFile .\vs_buildtools.exe
+Invoke-WebRequest -Uri "https://aka.ms/vs/$msvcVersion/$channel/vs_buildtools.exe" -UseBasicParsing -OutFile .\vs_buildtools.exe
 Write-Output "Installing components: $vsComponentString"
 Start-Process -NoNewWindow -PassThru -Wait -FilePath .\vs_buildtools.exe -ArgumentList "install --installWhileDownloading --installPath $msvcPath --wait --norestart --nocache --quiet $vsComponentString"
 
