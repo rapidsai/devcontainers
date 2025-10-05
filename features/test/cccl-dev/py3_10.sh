@@ -20,6 +20,9 @@ echo "lit version: $(lit --version)"
 check "doxygen exists and is on path" which doxygen
 echo "lit version: $(doxygen --version)"
 
+check "zstd exists and is on path" which zstd
+echo "zstd version: $(zstd --version | head -n 1)"
+
 # Report result
 # If any of the checks above exited with a non-zero exit code, the test will fail.
 reportResults

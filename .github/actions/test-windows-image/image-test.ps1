@@ -24,6 +24,10 @@ try {
     git --version
     TestReturnCode
 
+    Write-Output "Test zstd"
+    zstd --version
+    TestReturnCode
+
     Write-Output "Test jq"
     jq --version
     TestReturnCode

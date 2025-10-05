@@ -12,6 +12,7 @@ Push-location "$PSScriptRoot"
 ## Source and install the below
 ./installers/install-cuda.ps1 -cudaVersion $cudaVersion
 ./installers/install-git.ps1
+./installers/install-zstd.ps1
 ./installers/install-gh.ps1
 ./installers/install-jq.ps1
 ./installers/install-lit.ps1
