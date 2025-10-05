@@ -23,34 +23,49 @@ $mmVersionTag = "${major}.${minor}"
 
 $cudaMajorUri = "${mmbVersionTag}/network_installers/cuda_${mmbVersionTag}_windows_network.exe"
 $cudaVersionUrl = "https://developer.download.nvidia.com/compute/cuda/$cudaMajorUri"
-$cudaComponents =
-    "nvcc_$mmVersionTag",
+
+# Keep the following list sorted.
+$cudaComponents = @(
     "cublas_$mmVersionTag",
+    "cublas_dev_$mmVersionTag",
+    "cudart_$mmVersionTag",
+    "cuobjdump_$mmVersionTag",
+    "cupti_$mmVersionTag",
     "curand_$mmVersionTag",
     "curand_dev_$mmVersionTag",
-    "cudart_$mmVersionTag",
-    "cupti_$mmVersionTag",
+    "cusparse_$mmVersionTag",
+    "cusparse_dev_$mmVersionTag",
+    "cuxxfilt_$mmVersionTag",
+    "nvcc_$mmVersionTag",
+    "nvdisasm_$mmVersionTag",
+    "nvjitlink_$mmVersionTag",
+    "nvml_dev_$mmVersionTag",
     "nvrtc_$mmVersionTag",
     "nvrtc_dev_$mmVersionTag",
-    "nvml_dev_$mmVersionTag",
     "nvtx_$mmVersionTag",
-    "cuxxfilt_$mmVersionTag",
-    "nvdisasm_$mmVersionTag",
     "visual_studio_integration_$mmVersionTag"
+)
 
-if ("${major}" -ge "13") {
-    $cudaComponents += "crt_$mmVersionTag"
-    $cudaComponents += "cuobjdump_$mmVersionTag"
+# nvfatbin first appeared as a separate VS component in 12.4.
+if ([int]$major -eq 12 -and [int]$minor -ge 4) {
     $cudaComponents += "nvfatbin_$mmVersionTag"
-    $cudaComponents += "nvjitlink_$mmVersionTag"
+}
+
+# The following components first appeared in 13.0.
+if ([int]$major -ge 13) {
+    $cudaComponents += "crt_$mmVersionTag"
     $cudaComponents += "nvvm_$mmVersionTag"
     $cudaComponents += "nvptxcompiler_$mmVersionTag"
 }
 
-Write-Output "Installing CUDA Components: ${cudaComponents}"
+Write-Output "Installing CUDA Components: $($cudaComponents -join ', ')"
 
 Invoke-WebRequest -Uri "$cudaVersionUrl" -OutFile "./cuda_network.exe" -UseBasicParsing
-Start-Process -Wait -PassThru -FilePath .\cuda_network.exe -ArgumentList "-s $cudaComponents"
+
+# Combine all subpackages into one space-separated string for the -s argument
+$componentArgs = "-s " + ($cudaComponents -join ' ')
+
+Start-Process -Wait -PassThru -FilePath .\cuda_network.exe -ArgumentList $componentArgs
 
 . "$PSScriptRoot/envvars.ps1"
 
