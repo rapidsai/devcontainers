@@ -16,6 +16,10 @@ try {
     cl
     TestReturnCode
 
+    Write-Output "Test sccache"
+    sccache --version
+    TestReturnCode
+
     Write-Output "int main() {return 0;}" > .\test.cpp
     cl .\test.cpp
     TestReturnCode

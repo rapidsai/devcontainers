@@ -1,12 +1,16 @@
+# Fetch the rapidsai fork of sccache:
+Invoke-WebRequest -Uri "https://github.com/rapidsai/sccache/releases/download/v0.10.0-rapids.73/sccache-v0.10.0-rapids.73-x86_64-pc-windows-msvc.zip" -OutFile "./sccache.zip" -UseBasicParsing
+Expand-Archive "./sccache.zip"
+Remove-Item "./sccache.zip"
 
-# First install scoop
-Set-ExecutionPolicy RemoteSigned -Scope CurrentUser
-iex "& {$(irm get.scoop.sh)} -RunAsAdmin"
-
-scoop install sccache
+# Remove the versioned subdirectory:
+$subdir = Get-ChildItem .\sccache -Directory | Select-Object -First 1
+Move-Item "$($subdir.FullName)\*" .\sccache\
+Remove-Item $subdir.FullName -Force
 
 . "$PSScriptRoot/envvars.ps1"
 
+Set-MachineEnvironmentVariable -Append -Variable "PATH" -Value "$(Get-Location)\sccache"
 Set-MachineEnvironmentVariable -Variable "CMAKE_CUDA_COMPILER_LAUNCHER" -Value "sccache"
 Set-MachineEnvironmentVariable -Variable "CMAKE_CXX_COMPILER_LAUNCHER" -Value "sccache"
 Set-MachineEnvironmentVariable -Variable "CMAKE_C_COMPILER_LAUNCHER" -Value "sccache"
