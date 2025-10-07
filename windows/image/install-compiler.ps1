@@ -1,6 +1,6 @@
 Param(
     [Parameter(Mandatory=$true)]
-    [ValidateSet('15', '16', '17')]
+    [ValidateSet('15', '16', '17', '18')]
     [string]
     $msvcVersion,
     [Parameter(Mandatory=$false)]
