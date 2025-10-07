@@ -186,8 +186,9 @@ _make_pip_dependencies() {
     # shellcheck disable=SC2064
     trap "rm -rf '${tmpdir}'" EXIT;
 
-    eval "$(rapids-list-repos "${OPTS[@]}")";
-
+    if [ -z "${SKIP_RAPIDS_AGGREGATE_PIP_INDEXES}" ]; then
+        eval "$(rapids-list-repos "${OPTS[@]}")";
+    fi
     readarray -t pip_reqs_txts < <(_generate_requirements_txts);
 
     if test ${#requirement[@]} -gt 0 || test ${#pip_reqs_txts[@]} -gt 0; then
