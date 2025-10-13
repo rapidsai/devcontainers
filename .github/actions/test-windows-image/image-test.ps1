@@ -4,6 +4,13 @@ function TestReturnCode {
     }
 }
 
+$mismatch_nvcc_cl_flags = @(
+    # Tell NVCC that old msvc is okay
+    '--allow-unsupported-compiler',
+    # Tell MSVC that new nvcc is okay
+    '-D_ALLOW_COMPILER_AND_STL_VERSION_MISMATCH'
+)
+
 $ErrorActionPreference = "Stop"
 
 Push-location "$ENV:TEMP"
@@ -45,11 +52,11 @@ try {
     TestReturnCode
 
     Write-Output "Test NVCC"
-    nvcc --version --allow-unsupported-compiler
+    nvcc --version @mismatch_nvcc_cl_flags
     TestReturnCode
 
     Write-Output "int main() {return 0;}" > .\test.cu
-    nvcc -v .\test.cu --allow-unsupported-compiler
+    nvcc -v .\test.cu @mismatch_nvcc_cl_flags
     TestReturnCode
 }
 catch {
