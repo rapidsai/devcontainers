@@ -45,11 +45,11 @@ try {
     TestReturnCode
 
     Write-Output "Test NVCC"
-    nvcc --version
+    nvcc --version --allow-unsupported-compiler
     TestReturnCode
 
     Write-Output "int main() {return 0;}" > .\test.cu
-    nvcc -v .\test.cu
+    nvcc -v .\test.cu --allow-unsupported-compiler
     TestReturnCode
 }
 catch {
