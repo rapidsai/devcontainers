@@ -23,6 +23,7 @@ Push-location "$PSScriptRoot"
 ./installers/install-sccache.ps1
 ./installers/install-tbb.ps1
 ./installers/install-docker.ps1
+./installers/install-pyenv-win.ps1
 
 ./installers/clear-temp.ps1
 
