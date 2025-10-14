@@ -7,7 +7,7 @@
 #
 # Boolean options:
 #  -h,--help      Print this text.
-#  -k,--kill      SIGKILL the sccache server.
+#  -k,--kill      SIGKILL the sccache server on the given port.
 #  -a,--kill-all  SIGKILL all sccache processes.
 #
 # Options that require values:
