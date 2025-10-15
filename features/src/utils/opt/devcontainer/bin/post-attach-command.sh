@@ -37,5 +37,8 @@ if ! test -n "${SKIP_DEVCONTAINER_UTILS_POST_ATTACH_COMMAND:+x}"; then
             # Update ~/.config/sccache/config to use gh token auth
             devcontainer-utils-init-sccache-dist --enable-sccache-dist-with-github-auth;
         fi
+    elif command -V sccache >/dev/null 2>&1; then
+        # Start the sccache client
+        devcontainer-utils-start-sccache --kill-all;
     fi
 fi
