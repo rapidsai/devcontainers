@@ -52,8 +52,7 @@ ENV LIBCUDF_KERNEL_CACHE_PATH="/home/coder/cudf/cpp/build/${PYTHON_PACKAGE_MANAG
 ENV AWS_ROLE_ARN="arn:aws:iam::279114543810:role/nv-gha-token-sccache-devs"
 ENV SCCACHE_REGION="us-east-2"
 ENV SCCACHE_BUCKET="rapids-sccache-devs"
-# 2hr (1 minute longer than sccache-dist request timeout)
-ENV SCCACHE_IDLE_TIMEOUT=7200
+ENV SCCACHE_IDLE_TIMEOUT=0
 
 ###
 # sccache-dist configuration
