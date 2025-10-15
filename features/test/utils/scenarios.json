@@ -136,5 +136,51 @@
       "./sccache",
       "./utils"
     ]
+  },
+  "ubuntu24.04": {
+    "image": "ubuntu:24.04",
+    "remoteUser": "coder",
+    "containerEnv": {
+      "gh_token": "${localEnv:gh_token}",
+      "vault_host": "${localEnv:vault_host}",
+      "aws_role_arn": "${localEnv:aws_role_arn}",
+      "VAULT_S3_TTL": "${localEnv:VAULT_S3_TTL}",
+      "rw_sccache_bucket": "${localEnv:rw_sccache_bucket}",
+      "rw_sccache_region": "${localEnv:rw_sccache_region}",
+      "sccache_dist_scheduler_url": "${localEnv:sccache_dist_scheduler_url}"
+    },
+    "features": {
+      "ghcr.io/devcontainers/features/common-utils:2": {
+        "uid": "1001",
+        "gid": "1001",
+        "username": "coder",
+        "installZsh": "true",
+        "upgradePackages": "true"
+      },
+      "ghcr.io/devcontainers/features/git:1.3.2": {
+        "ppa": "true",
+        "version": "latest"
+      },
+      "ghcr.io/devcontainers/features/git-lfs:1.2.1": {},
+      "ghcr.io/devcontainers/features/github-cli:1.0.12": {},
+      "gitlab-cli": {},
+      "cmake": {},
+      "ninja": {},
+      "sccache": {
+        "version": "0.7.7"
+      },
+      "utils": {}
+    },
+    "overrideFeatureInstallOrder": [
+      "ghcr.io/devcontainers/features/common-utils",
+      "ghcr.io/devcontainers/features/git",
+      "ghcr.io/devcontainers/features/git-lfs",
+      "ghcr.io/devcontainers/features/github-cli",
+      "./gitlab-cli",
+      "./cmake",
+      "./ninja",
+      "./sccache",
+      "./utils"
+    ]
   }
 }

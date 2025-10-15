@@ -35,7 +35,7 @@ _creds_vault_generate() {
     fi
 
     # Check whether the user is in one of the allowed GitHub orgs
-    local allowed_orgs="${VAULT_GITHUB_ORGS:-nvidia nv-morpheus nv-legate rapids}";
+    local allowed_orgs="${VAULT_GITHUB_ORGS:-nvidia nv-morpheus nv-legate rapidsai}";
     allowed_orgs="${allowed_orgs// /|}";
     allowed_orgs="${allowed_orgs//;/|}";
     allowed_orgs="${allowed_orgs//,/|}";

@@ -6,8 +6,10 @@
 # Start the sccache server in the foreground or background.
 #
 # Boolean options:
-#  -h,--help       Print this text.
 #  -f,--foreground Start the sccache server in the foreground.
+#  -h,--help       Print this text.
+#  -k,--kill      SIGKILL the existing sccache server on the given port.
+#  -a,--kill-all  SIGKILL all sccache processes.
 #
 # Options that require values:
 #  -p,--port <port> Start the sccache server on <port>.
@@ -29,7 +31,7 @@ _start_sccache() {
     local pidfile="/tmp/sccache.${sccache_port}.pid";
 
     # Stop any existing server
-    devcontainer-utils-stop-sccache -p "${sccache_port}";
+    devcontainer-utils-stop-sccache "$@";
 
     local logfile="${SCCACHE_ERROR_LOG:-/tmp/sccache.log}";
     local log_lvl="${SCCACHE_LOG:-${SCCACHE_SERVER_LOG-}}";

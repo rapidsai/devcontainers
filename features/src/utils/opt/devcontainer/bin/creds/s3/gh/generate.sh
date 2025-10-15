@@ -29,7 +29,7 @@ _creds_github_generate() {
     . devcontainer-utils-init-github-cli;
 
     # Check whether the user is in one of the allowed GitHub orgs
-    local allowed_orgs="${AWS_GITHUB_ORGS:-${VAULT_GITHUB_ORGS:-nvidia nv-morpheus nv-legate rapids}}";
+    local allowed_orgs="${AWS_GITHUB_ORGS:-${VAULT_GITHUB_ORGS:-nvidia nv-morpheus nv-legate rapidsai}}";
     allowed_orgs="${allowed_orgs// /|}";
     allowed_orgs="${allowed_orgs//;/|}";
     allowed_orgs="${allowed_orgs//,/|}";

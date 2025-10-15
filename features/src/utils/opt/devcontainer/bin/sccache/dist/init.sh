@@ -75,7 +75,7 @@ _init_sccache_dist() {
     done
 
     # Restart the sccache client with the new configuration
-    devcontainer-utils-start-sccache;
+    devcontainer-utils-start-sccache --kill-all;
 
     # Verify sccache-dist status and configuration
     if sccache --dist-status 2>/dev/null | jq -er '.SchedulerStatus? != null' >/dev/null 2>&1; then

@@ -34,7 +34,7 @@ fi
 # Randomize the sccache server port in case the container is launched with --network=host
 if ! test -n "${SCCACHE_SERVER_PORT:+x}"; then
     reset_envvar SCCACHE_SERVER_PORT;
-    override_envvar SCCACHE_SERVER_PORT "$((4220 + $RANDOM % 4999))";
+    override_envvar SCCACHE_SERVER_PORT "$((4226 + $RANDOM % 4999))";
 fi
 
 sudo mkdir -m 0777 -p /var/log/devcontainer-utils;

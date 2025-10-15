@@ -8,28 +8,25 @@ _creds_s3_propagate() {
     . devcontainer-utils-debug-output 'devcontainer_utils_debug' 'creds-s3 creds-s3-propagate';
 
     if ! command -V sccache >/dev/null 2>&1; then
-        return;
+        return 1;
     fi
 
-    local num_restarts="0";
-
-    devcontainer-utils-stop-sccache --kill-all;
-
-    while true; do
-
-        if devcontainer-utils-start-sccache >/dev/null; then
-            if [ "${num_restarts}" -gt "0" ]; then echo "Success!"; fi
-            exit 0;
+    seq 0 20 | while read -r num_restarts; do
+        if devcontainer-utils-creds-s3-test; then
+            if test "$num_restarts" -gt 0; then
+                echo "Success!";
+            fi
+            return 0;
         fi
 
-        if [ "${num_restarts}" -ge "20" ]; then
-            if [ "${num_restarts}" -gt "0" ]; then echo "Skipping."; fi
-            exit 1;
+        if test "$num_restarts" -ge 20; then
+            if test "$num_restarts" -gt 0; then
+                echo "Skipping.";
+            fi
+            return 1;
         fi
 
-        num_restarts="$((num_restarts + 1))";
-
-        if [ "${num_restarts}" -eq "1" ]; then
+        if test "$num_restarts" -eq 0; then
             echo -n "Waiting for AWS S3 credentials to propagate... ";
         fi
 
