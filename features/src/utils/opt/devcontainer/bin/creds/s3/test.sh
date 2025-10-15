@@ -42,7 +42,7 @@ _creds_s3_test() {
          AWS_ACCESS_KEY_ID="${aws_access_key_id:-}"              \
          AWS_SESSION_TOKEN="${aws_session_token:-}"              \
          AWS_SECRET_ACCESS_KEY="${aws_secret_access_key:-}"      \
-         timeout --preserve-status --kill-after=1m --verbose 30s \
+         timeout --preserve-status --kill-after=1m 30s           \
          devcontainer-utils-start-sccache -p 4220 >/dev/null 2>&1; then
        result=1;
     elif ! SCCACHE_SERVER_PORT=4220 sccache --show-stats 2>/dev/null \
