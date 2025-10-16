@@ -67,7 +67,7 @@ x-cccl-cuda-ext-opts: &cccl_cuda_ext_opts {
   installcuSOLVER: true,
   installcuSPARSE: true,
   installcuFFT: true,
-  installNCCL: false,
+  installNCCL: true,
   installNVRTC: true,
   installcuFile: true,
 }
