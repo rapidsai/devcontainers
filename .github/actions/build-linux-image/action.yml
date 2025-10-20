@@ -8,6 +8,7 @@ inputs:
   repo: {type: string, required: true, description: Image repo}
   push: {type: string, required: true, description: Whether to push the image}
   retries: {type: string, default: '10', description: Number of times to retry the container build}
+  syft_ver: {type: string, required: false, description: Syft version for SBOM feature (default 'latest')}
 
 outputs:
   hash_amd64:
@@ -35,6 +36,7 @@ runs:
         repo: "${{ inputs.repo }}"
         retries: "${{ inputs.retries }}"
         tag: "${{ inputs.tag }}"
+        syft_ver: "${{ inputs.syft_ver }}"
       run: |
         set -euo pipefail;
 
@@ -52,6 +54,7 @@ runs:
           --no-cache \
           --image-name "${repo,,}:${tag}" \
           --workspace-folder "$(realpath -m ./image)" \
+          ${syft_ver:+--build-arg SYFT_VER=${syft_ver}} \
           "${outputs[@]}" 2>&1 \
         | tee "${{ runner.temp }}/${arch}.log" 1>&2
         do

@@ -12,6 +12,10 @@ inputs:
   container_env:
     type: string
     required: false
+  syft_ver:
+    type: string
+    required: false
+    default: latest
 
 outputs:
   tag:
@@ -30,6 +34,7 @@ runs:
           '${{ inputs.os }}'                          \
           '${{ inputs.features }}'                    \
           '${{ inputs.container_env }}'               \
+          '${{ inputs.syft_ver }}'                \
         3>> "$GITHUB_OUTPUT"                          \
         4> image/.devcontainer/devcontainer.json.out  ;
 

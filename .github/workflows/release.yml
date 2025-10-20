@@ -6,6 +6,11 @@ concurrency:
 
 on:
   workflow_dispatch:
+    inputs:
+      syft_ver:
+        description: "Syft version for SBOM generation"
+        required: false
+        default: latest
   push:
     branches:
       - "branch-[0-9][0-9].[0-9][0-9]"
@@ -73,6 +78,7 @@ jobs:
       features: "${{ toJSON(matrix.features) }}"
       container_env: "${{ toJSON(matrix.env) }}"
       repo: "${{ vars.DOCKERHUB_REPOSITORY || github.repository }}"
+      syft_ver: "${{ inputs.syft_ver || 'latest' }}"
 
   release-windows:
     if: needs.image-matrix.outputs.windows != '{"include":[]}'
@@ -89,6 +95,7 @@ jobs:
       features: "${{ toJSON(matrix.features) }}"
       container_env: "${{ toJSON(matrix.env) }}"
       repo: "${{ vars.DOCKERHUB_REPOSITORY || github.repository }}"
+      syft_ver: "${{ inputs.syft_ver || 'latest' }}"
 
   release-features:
     if: needs.features-matrix.outputs.features != '[]' || needs.features-matrix.outputs.scenarios != '[]'

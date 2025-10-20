@@ -24,6 +24,11 @@ on:
         type: string
         required: false
         description: JSON map of default envvars to build into the devcontainer
+      syft_ver:
+        type: string
+        required: false
+        default: latest
+        description: Syft version for SBOM generation
 
 jobs:
 
@@ -75,6 +80,7 @@ jobs:
           repo: "${{ steps.info.outputs.repo }}"
           version: "${{ steps.info.outputs.version }}"
           edition: "${{ matrix.edition }}"
+          syft_ver: "${{ inputs.syft_ver }}"
 
       - name: Test ${{ steps.info.outputs.tag }}
         uses: ./.github/actions/test-windows-image

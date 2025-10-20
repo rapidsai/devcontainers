@@ -6,6 +6,11 @@ concurrency:
 
 on:
   workflow_dispatch:
+    inputs:
+      syft_ver:
+        description: "Syft version for SBOM generation"
+        required: false
+        default: latest
 
 jobs:
 
@@ -67,3 +72,4 @@ jobs:
       features: "${{ toJSON(matrix.features) }}"
       container_env: "${{ toJSON(matrix.env) }}"
       repo: "${{ vars.DOCKERHUB_REPOSITORY || github.repository }}"
+      syft_ver: "${{ inputs.syft_ver || 'latest' }}"

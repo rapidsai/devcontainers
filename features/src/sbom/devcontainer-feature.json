@@ -1,0 +1,19 @@
+{
+  "name": "SBOM",
+  "id": "sbom",
+  "version": "0.1.0",
+  "description": "Generate a CycloneDX SBOM with Syft and store it inside the image.",
+  "options": {
+    "syftVer": {
+      "type": "string",
+      "default": "latest",
+      "description": "Syft version to install (e.g. 1.32.0). Use 'latest' to install the newest release."
+    },
+    "outputPath": {
+      "type": "string",
+      "default": "/sbom/sbom.json",
+      "description": "Absolute path where the SBOM will be written."
+    }
+  }
+}
+

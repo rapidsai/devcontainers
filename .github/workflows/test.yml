@@ -175,6 +175,7 @@ jobs:
       features: "${{ toJSON(matrix.features) }}"
       container_env: "${{ toJSON(matrix.env) }}"
       repo: "${{ vars.DOCKERHUB_REPOSITORY || github.repository }}"
+      syft_ver: "latest"
 
   build-and-test-windows-images:
     if: needs.image-matrix.outputs.windows != '{"include":[]}'
@@ -191,3 +192,4 @@ jobs:
       features: "${{ toJSON(matrix.features) }}"
       container_env: "${{ toJSON(matrix.env) }}"
       repo: "${{ vars.DOCKERHUB_REPOSITORY || github.repository }}"
+      syft_ver: "latest"

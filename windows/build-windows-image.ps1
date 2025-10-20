@@ -19,7 +19,10 @@ Param(
     $repo="local",
     [Parameter(Mandatory=$false)]
     [string]
-    $repoVersion="latest"
+    $repoVersion="latest",
+    [Parameter(Mandatory=$false)]
+    [string]
+    $syftVer="latest"
 )
 
 function TestReturnCode {
@@ -34,6 +37,13 @@ $rootWindowsImage = @{
     "windows2022" = "mcr.microsoft.com/windows/servercore:ltsc2022"
     "windows2019" = "mcr.microsoft.com/windows/servercore:ltsc2019"
 }[$edition]
+
+if ($syftVer -eq "latest") {
+    $latest = Invoke-RestMethod -UseBasicParsing -Uri "https://api.github.com/repos/anchore/syft/releases/latest"
+    $syftVer = $latest.tag_name.TrimStart('v')
+}
+
+$syftArch = if ([System.Runtime.InteropServices.RuntimeInformation]::OSArchitecture -eq [System.Runtime.InteropServices.Architecture]::Arm64) { 'windows_arm64' } else { 'windows_amd64' }
 
 try {
     # Source version matrix
@@ -58,7 +68,7 @@ try {
     Write-Output "ENV:CUDA_VER           $ENV:CUDA_VER"
     Write-Output "ENV:ROOT_IMAGE         $ENV:ROOT_IMAGE"
 
-    docker build --file .\windows.Dockerfile --tag "$ENV:IMAGE_NAME" --isolation "$ENV:ISOLATION" --build-arg MSVC_VER="$ENV:MSVC_VER" --build-arg MSVC_COMPILER_VER="$ENV:MSVC_COMPILER_VER" --build-arg CUDA_VER="$ENV:CUDA_VER" --build-arg ROOT_IMAGE="$ENV:ROOT_IMAGE" .\image
+    docker build --file .\windows.Dockerfile --tag "$ENV:IMAGE_NAME" --isolation "$ENV:ISOLATION" --build-arg MSVC_VER="$ENV:MSVC_VER" --build-arg MSVC_COMPILER_VER="$ENV:MSVC_COMPILER_VER" --build-arg CUDA_VER="$ENV:CUDA_VER" --build-arg ROOT_IMAGE="$ENV:ROOT_IMAGE" --build-arg SYFT_VER="$syftVer" --build-arg SYFT_ARCH="$syftArch" .\image
 }
 catch {
     Pop-Location

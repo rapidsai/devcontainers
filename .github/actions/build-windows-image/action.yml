@@ -32,6 +32,11 @@ inputs:
     required: false
     default: process
     description: Windows isolation mode to target (hyperv or process isolation)
+  syft_ver:
+    type: string
+    required: false
+    default: latest
+    description: Syft version for SBOM generation
 
 runs:
   using: composite
@@ -45,4 +50,5 @@ runs:
           -cudaVersion ${{ inputs.cuda }} `
           -repoVersion ${{ inputs.version }} `
           -isolation ${{ inputs.isolation }} `
-          -edition windows${{ inputs.edition }}
+          -edition windows${{ inputs.edition }} `
+          -syftVer ${{ inputs.syft_ver }}

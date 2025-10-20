@@ -28,12 +28,14 @@
       "installProfilers": true
     },
     "./features/src/utils": {},
-    "./features/src/rapids-build-utils": {}
+    "./features/src/rapids-build-utils": {},
+    "./features/src/sbom": {}
   },
   "overrideFeatureInstallOrder": [
     "./features/src/cuda",
     "./features/src/utils",
-    "./features/src/rapids-build-utils"
+    "./features/src/rapids-build-utils",
+    "./features/src/sbom"
   ],
   "initializeCommand": ["/bin/bash", "-c", "mkdir -m 0755 -p ${localWorkspaceFolder}/../.{aws,cache,config/pip,local/share/${localWorkspaceFolderBasename}-cuda12.9-venvs,log/devcontainer-utils} ${localWorkspaceFolder}/../{rmm,dask-cuda,kvikio,ucxx,cudf,rapidsmpf,raft,cuvs,cumlprims_mg,cuml,cugraph,cugraph-gnn,nx-cugraph}"],
   "postAttachCommand": ["/bin/bash", "-c", "if [ ${CODESPACES:-false} = 'true' ]; then . devcontainer-utils-post-attach-command; fi"],

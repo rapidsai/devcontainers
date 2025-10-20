@@ -6,6 +6,7 @@ cd "$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )/../../../";
 os="${1:-"ubuntu:22.04"}";
 features="${2:-"[]"}";
 container_env="${3:-"null"}";
+syft_ver="${4:-"latest"}";
 
 VERSION="$(git describe --abbrev=0 --tags | sed 's/[a-zA-Z]//g' | cut -d '.' -f -2)";
 tag="$(node -p "$(cat <<EOF
@@ -28,6 +29,7 @@ const json = JSON.parse(readFileSync('image/.devcontainer/devcontainer.json'));
 
 json.build.args.BASE = '${os}';
 json.build.args.RAPIDS_VERSION = '${VERSION}';
+json.build.args.SYFT_VER = '${syft_ver}';
 json.containerEnv = Object.assign(json.containerEnv || {}, ${container_env} || {});
 
 const dups = {};

@@ -24,6 +24,11 @@ on:
         type: string
         required: false
         description: JSON map of default envvars to build into the devcontainer
+      syft_ver:
+        type: string
+        required: false
+        default: latest
+        description: Syft version for SBOM generation
 
 jobs:
 
@@ -55,6 +60,7 @@ jobs:
           os: "${{ inputs.os }}"
           features: "${{ inputs.features }}"
           container_env: "${{ inputs.container_env }}"
+          syft_ver: "${{ inputs.syft_ver }}"
 
       - name: Login to Docker Hub
         uses: docker/login-action@v3
@@ -70,6 +76,7 @@ jobs:
           repo: "${{ inputs.repo }}"
           push: "${{ inputs.push }}"
           tag: "${{ steps.json.outputs.tag }}"
+          syft_ver: "${{ inputs.syft_ver }}"
 
   push-to-dockerhub:
     if: inputs.push == 'true'
