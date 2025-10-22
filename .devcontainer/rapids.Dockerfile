@@ -18,6 +18,8 @@ RUN apt update -y \
     # cuML/cuGraph dependencies
     libblas-dev \
     liblapack-dev \
+    # rapidsmpf dependencies
+    libnuma-dev \
  && rm -rf /tmp/* /var/tmp/* /var/cache/apt/* /var/lib/apt/lists/*;
 
 ENV DEFAULT_VIRTUAL_ENV=rapids
