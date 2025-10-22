@@ -227,12 +227,6 @@ repos:
       sub_dir: python/cugraph
       depends: [cugraph]
       args: {install: *rapids_build_backend_args}
-    - name: cugraph-service-client
-      sub_dir: python/cugraph-service/client
-      args: {install: *rapids_build_backend_args}
-    - name: cugraph-service-server
-      sub_dir: python/cugraph-service/server
-      args: {install: *rapids_build_backend_args}
 
 - name: cugraph-gnn
   path: cugraph-gnn
