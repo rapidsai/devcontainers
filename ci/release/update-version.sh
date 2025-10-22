@@ -45,15 +45,7 @@ for file in $(find .devcontainer -name devcontainer.json); do
   sed_runner "s@rapids-\${localWorkspaceFolderBasename}-[0-9.]*@rapids-\${localWorkspaceFolderBasename}-${NEXT_SHORT_TAG}@g" "${file}"
 done
 
-sed_runner "s/branch-[[:digit:]]\{2\}\.[[:digit:]]\+/branch-${NEXT_SHORT_TAG}/g" ./features/src/rapids-build-utils/opt/rapids-build-utils/manifest.yaml
-sed_runner "s/branch-0.[[:digit:]]\+/branch-${NEXT_UCXX_SHORT_TAG}/g" ./features/src/rapids-build-utils/opt/rapids-build-utils/manifest.yaml
-
 for file in $(find features -name devcontainer-feature.json); do
   tmp=$(mktemp)
   jq --arg ver "$NEXT_FULL_TAG_PEP440" '.version = $ver' "$file" > "$tmp" && mv "$tmp" "$file"
-done
-
-# CI files
-for FILE in .github/workflows/*.yaml .github/workflows/*.yml; do
-  sed_runner "/shared-workflows/ s/@.*/@branch-${NEXT_SHORT_TAG}/g" "${FILE}"
 done
