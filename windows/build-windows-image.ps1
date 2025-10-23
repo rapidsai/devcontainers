@@ -67,3 +67,49 @@ catch {
 finally {
     Pop-Location
 }
+
+$syftVersion = "1.32.0"
+$arch = switch ($env:PROCESSOR_ARCHITECTURE.ToLower()) {
+    "amd64" { "windows_amd64" }
+    "arm64" { "windows_arm64" }
+    default { throw "Unsupported PROCESSOR_ARCHITECTURE '$env:PROCESSOR_ARCHITECTURE'" }
+}
+$syftZipName  = "syft_${syftVersion}_${arch}.zip"
+$syftDownload = "https://github.com/anchore/syft/releases/download/v$syftVersion/$syftZipName"
+$tempRoot    = Join-Path $env:TEMP ("sbom-" + [guid]::NewGuid())
+$syftArchive = Join-Path $tempRoot $syftZipName
+$sbomJson    = Join-Path $tempRoot "sbom.json"
+$contextDir  = Join-Path $tempRoot "context"
+New-Item -ItemType Directory -Path $tempRoot, $contextDir | Out-Null
+
+try {
+    Invoke-WebRequest `
+        -Uri $syftDownload `
+        -OutFile $syftArchive `
+        -UseBasicParsing
+    Expand-Archive -Path $syftArchive -DestinationPath $tempRoot -Force
+
+    $syftExe = Get-ChildItem -Path $tempRoot -Filter syft.exe -Recurse |
+               Select-Object -First 1 |
+               ForEach-Object FullName
+    if (-not $syftExe) {
+        throw "syft.exe not found after extracting $syftZipName"
+    }
+
+    & $syftExe `
+        "docker:$ENV:IMAGE_NAME" `
+        --scope all-layers `
+        "--output" "cyclonedx-json@1.6=$sbomJson"
+
+    Copy-Item -Path $sbomJson -Destination (Join-Path $contextDir "sbom.json")
+    Copy-Item -Path (Join-Path $PSScriptRoot "sbom.Dockerfile") -Destination (Join-Path $contextDir "Dockerfile")
+
+    docker build `
+        --file (Join-Path $contextDir "Dockerfile") `
+        --build-arg BASE_IMAGE=$ENV:IMAGE_NAME `
+        --tag $ENV:IMAGE_NAME `
+        $contextDir
+}
+finally {
+    Remove-Item -Path $tempRoot -Recurse -Force
+}
