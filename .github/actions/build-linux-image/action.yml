@@ -85,7 +85,7 @@ runs:
           exit 1
         fi
 
-        action_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+        action_dir="${GITHUB_ACTION_PATH:-$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)}"
         sbom_dockerfile="${action_dir}/sbom.Dockerfile"
         sbom_log="${RUNNER_TEMP}/sbom-${arch}.log"
 
