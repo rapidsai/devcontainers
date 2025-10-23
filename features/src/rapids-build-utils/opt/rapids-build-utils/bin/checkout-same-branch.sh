@@ -24,11 +24,12 @@ convert-ucx-branch() {
     normalized_branch="${custom_branch}"
 
     if [[ "${repo}" == "ucx"* ]]; then
-        RAPIDS_VERSION=$(echo "${custom_branch}" | awk '{split($0, a, "-"); print a[2]}')
-        if [[ "${RAPIDS_VERSION}" =~ ^[0-9]{2}\.[0-9]{2}$ ]]; then
+        # Only convert branches that match the pattern release/YY.MM
+        if [[ "${custom_branch}" =~ ^release/[0-9]{2}\.[0-9]{2}$ ]]; then
+            RAPIDS_VERSION=$(echo "${custom_branch}" | awk '{split($0, a, "/"); print a[2]}')
             # Get UCX version associated w/ RAPIDS version
             UCX_VERSION="$(curl -sL https://version.gpuci.io/rapids/${RAPIDS_VERSION})"
-            normalized_branch="branch-${UCX_VERSION}"
+            normalized_branch="release/${UCX_VERSION}"
         fi
     fi
 
