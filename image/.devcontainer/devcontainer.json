@@ -10,7 +10,8 @@
   "containerUser": "root",
   "containerEnv": {
     "LANG": "${localEnv:LANG:en_US.UTF-8}",
-    "NVIDIA_DISABLE_REQUIRE": "true"
+    "NVIDIA_DISABLE_REQUIRE": "true",
+    "TERM": "${localEnv:TERM:xterm}"
   },
   "workspaceFolder": "/home/coder",
   "features": {
