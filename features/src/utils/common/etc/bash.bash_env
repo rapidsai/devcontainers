@@ -35,5 +35,3 @@ if [ -n "${BASH_ENV_ETC_PROFILE:-}" ]; then
         . "$BASH_ENV_ETC_PROFILE"
     fi
 fi
-
-export TERM="${TERM:-xterm-256color}"
