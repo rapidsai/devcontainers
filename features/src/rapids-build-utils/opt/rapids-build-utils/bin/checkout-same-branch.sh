@@ -85,7 +85,7 @@ checkout_same_branch() {
         echo \"local repo_branches_\${name}_='\$(                                                     \
             cat <(git -C ~/\${path} ls-remote -h origin | cut -f2 | sed \"s@refs/heads@origin@\")     \
                 <(git -C ~/\${path} ls-remote -h upstream | cut -f2 | sed \"s@refs/heads@upstream@\") \
-          | grep -Pv \"(/pull-request/|master|main)\" | tr '[:space:]' ' '                            \
+          | grep -Pv \"(/pull-request/|master)\" | tr '[:space:]' ' '                                 \
         )'\"                                                                                          \
         " %
     )";
