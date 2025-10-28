@@ -101,6 +101,7 @@ runs:
           --tag "${repo,,}:${tag}" \
           --build-context base="docker-image://${base_image}" \
           --build-arg SYFT_VERSION="1.32.0" \
+          --build-arg SOURCE_IMAGE_NAME="${base_image}" \
           --output "${output}" \
           --file "${sbom_dockerfile}" \
           "${action_dir}" 2>&1 | tee "${sbom_log}"

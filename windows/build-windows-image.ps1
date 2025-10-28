@@ -99,6 +99,7 @@ try {
     & $syftExe `
         "docker:$ENV:IMAGE_NAME" `
         --scope all-layers `
+        --source-name "$ENV:IMAGE_NAME" `
         "--output" "cyclonedx-json@1.6=$sbomJson"
 
     Copy-Item -Path $sbomJson -Destination (Join-Path $contextDir "sbom.json")

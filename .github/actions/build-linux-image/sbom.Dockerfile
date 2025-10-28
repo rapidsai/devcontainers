@@ -1,5 +1,6 @@
 # syntax=docker/dockerfile:1.6
 ARG SYFT_VERSION
+ARG SOURCE_IMAGE_NAME
 
 FROM --platform=$BUILDPLATFORM alpine:3.20 AS syft-base
 ARG BUILDPLATFORM
@@ -20,6 +21,7 @@ FROM syft-base AS sbom
 RUN --mount=type=bind,from=devcontainer-base,source=/,target=/rootfs,ro \
     mkdir -p /out && \
     syft scan \
+      --source-name "${SOURCE_IMAGE_NAME}" \
       --scope all-layers \
       --output cyclonedx-json@1.6=/out/sbom.json \
       dir:/rootfs
