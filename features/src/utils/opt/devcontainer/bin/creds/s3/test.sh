@@ -45,8 +45,10 @@ _creds_s3_test() {
          timeout --preserve-status --kill-after=1m 30s           \
          devcontainer-utils-start-sccache -p 4220 >/dev/null 2>&1; then
        result=1;
-    elif ! SCCACHE_SERVER_PORT=4220 sccache --show-stats 2>/dev/null \
-         | grep -qE 'Cache location \s+ s3'; then
+    elif ! SCCACHE_SERVER_PORT=4220 \
+           sccache --show-stats --stats-format json 2>/dev/null \
+         | jq '.cache_location' \
+         | grep -q 's3,'; then
        result=1;
     fi
 

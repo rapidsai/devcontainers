@@ -57,11 +57,11 @@ _start_sccache() {
             >/dev/null                                          ;
     else
         # Start the sccache server in the background
-        RUST_LOG_STYLE="never"                \
-        SCCACHE_ERROR_LOG="${logfile}"        \
-        SCCACHE_SERVER_LOG="${log_lvl}"       \
-        SCCACHE_SERVER_PORT="${sccache_port}" \
-        sccache --start-server 2>/dev/null    \
+        RUST_LOG_STYLE="never"                  \
+        SCCACHE_ERROR_LOG="${logfile}"          \
+        SCCACHE_SERVER_LOG="${log_lvl}"         \
+        SCCACHE_SERVER_PORT="${sccache_port}"   \
+        sccache --start-server 1>&2 2>/dev/null \
       | tee "$logfile";
         # Write the pid to the pidfile
         pgrep sccache | sort -n | head -n1 | tee "${pidfile}" >/dev/null;
