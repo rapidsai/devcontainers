@@ -89,7 +89,7 @@ expect_s3_cache_is_used() {
 expect_local_disk_cache_is_used() {
     if ! sccache --show-stats --stats-format json \
        | jq '.cache_location' \
-       | grep -q 's3,'; then
+       | grep -q 'Local disk'; then
        sccache --show-stats;
        return 1
     fi
