@@ -207,7 +207,7 @@ repos:
   cpp:
     - name: cugraph
       sub_dir: cpp
-      depends: [rmm, raft]
+      depends: [rmm, ucxx, raft]
       parallelism:
         max_device_obj_memory_usage: 6Gi
     - name: cugraph_etl
