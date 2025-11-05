@@ -78,15 +78,21 @@ write_bad_creds() {
 }
 
 expect_s3_cache_is_used() {
-    local stats="$(sccache --show-stats 2>&1)";
-    grep "Cache location" <<< "${stats}";
-    grep -qE 'Cache location \s+ s3' <<< "${stats}";
+    if ! sccache --show-stats --stats-format json \
+       | jq '.cache_location' \
+       | grep -q 's3,'; then
+       sccache --show-stats;
+       return 1
+    fi
 }
 
 expect_local_disk_cache_is_used() {
-    local stats="$(sccache --show-stats 2>&1)";
-    grep "Cache location" <<< "${stats}";
-    grep -qE 'Cache location \s+ Local disk' <<< "${stats}";
+    if ! sccache --show-stats --stats-format json \
+       | jq '.cache_location' \
+       | grep -q 'Local disk'; then
+       sccache --show-stats;
+       return 1
+    fi
 }
 
 expect_sccache_dist_auth_token_is_gh_token() {
