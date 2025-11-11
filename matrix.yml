@@ -41,7 +41,7 @@ x-openmpi: &openmpi { name: "openmpi", version: "5.0.7" }
 
 x-cccl-dev: &cccl_dev { name: "cccl-dev", hide: true, doxygenVersion: "1.9.6" }
 x-clangd-dev: &clangd_dev { name: "llvm", version: "dev", packages: "clangd", hide: true }
-x-clang-format-cccl: &clang_format_cccl { name: "llvm", version: "21", packages: "clang-format llvm-tools", hide: true }
+x-clang-format-cccl: &clang_format_cccl { name: "llvm", version: "21", packages: "clang-format llvm-tools libc++ libc++abi libunwind", hide: true }
 x-clang-format-rapids: &clang_format_rapids { name: "llvm", version: "16", packages: "clang-format", hide: true }
 # Docker outside of Docker used to build python wheels:
 x-dood: &dood { name: "ghcr.io/devcontainers/features/docker-outside-of-docker:1", moby: false, hide: true}
