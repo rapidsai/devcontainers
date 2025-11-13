@@ -163,7 +163,7 @@ if [ ! -f /etc/apt/trusted.gpg.d/apt.llvm.org.asc ]; then
     wget --no-hsts -qO- https://apt.llvm.org/llvm-snapshot.gpg.key | tee /etc/apt/trusted.gpg.d/apt.llvm.org.asc
 fi
 
-if [[ "${UBUNTU_CODENAME}" != "plucky" ]]; then
+if command -V apt-key >/dev/null 2>&1; then
     if [[ -z "`apt-key list 2> /dev/null | grep -i llvm`" ]]; then
         # Delete the key in the old format
         apt-key del AF4F7421
