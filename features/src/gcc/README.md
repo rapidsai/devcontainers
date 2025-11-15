@@ -7,7 +7,7 @@ A feature to install gcc
 
 ```json
 "features": {
-    "ghcr.io/rapidsai/devcontainers/features/gcc:25": {}
+    "ghcr.io/rapidsai/devcontainers/features/gcc:26": {}
 }
 ```
 

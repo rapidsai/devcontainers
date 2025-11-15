@@ -7,7 +7,7 @@ A feature to install the NVIDIA CUDA Toolkit
 
 ```json
 "features": {
-    "ghcr.io/rapidsai/devcontainers/features/cuda:25": {}
+    "ghcr.io/rapidsai/devcontainers/features/cuda:26": {}
 }
 ```
 

@@ -7,7 +7,7 @@ A feature to install LLVM compilers and tools
 
 ```json
 "features": {
-    "ghcr.io/rapidsai/devcontainers/features/llvm:25": {}
+    "ghcr.io/rapidsai/devcontainers/features/llvm:26": {}
 }
 ```
 
