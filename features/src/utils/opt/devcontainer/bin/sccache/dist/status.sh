@@ -7,6 +7,8 @@
 #
 # Boolean options:
 #  -h,--help      Print this text.
+#  --no-procs     Don't print the number of sccache processes
+#  --no-temps     Don't print the number of sccache tempfiles
 #
 # Options that require values:
 #  -c|--col-width <num>         Max column width in number of characters.
@@ -14,6 +16,7 @@
 #                               (default: $COLUMNS)
 #  -f|--format (csv|tsv|json)   The `sccache --dist-status` output format.
 #                               (default: "json")
+#  -w,--watch <num>             Watch status every <num> seconds (or 1s if <num> is unspecified).
 #
 
 _sccache_dist_status() {
@@ -26,18 +29,41 @@ _sccache_dist_status() {
     # shellcheck disable=SC1091
     . devcontainer-utils-debug-output 'devcontainer_utils_debug' 'sccache sccache-dist-status';
 
-    f="${f:-${format:-json}}";
-    c="${c:-${col_width:-${COLUMNS:-1000000000}}}";
+    if test ${#w[@]} -gt 0 && ! test -n "${w:+x}"; then
+        w="1";
+    fi
 
-    # Print current dist status to verify we're connected
-    sccache 2>/dev/null --dist-status \
-  | {
-        # Passthrough if the format is json
-        if test "$f" = json; then
-            cat - <(echo)
-        else
+    if ! test -n "${__NOWATCH:+x}" && test -n "${w:+x}"; then
+        watch -n "$w" -x bash -c "__NOWATCH=1 devcontainer-utils-sccache-dist-status ${*}"
+    else
 
-            cat - | jq -r -f <(cat <<EOF
+        if ! test -n "${no_procs:+x}"; then
+            echo "sccache procs: $(pgrep sccache | wc -l)"
+        fi
+
+        if ! test -n "${no_temps:+x}"; then
+            echo -n "preprocessed tempfiles: "
+            echo -n "$(ls -All /tmp/.sccache_temp/.tmp* 2>/dev/null | wc -l) "
+            echo " ($(du -ch /tmp/.sccache_temp/.tmp* 2>/dev/null | tail -n1 | cut -f1))"
+
+            echo -n "nvcc internal tempfiles: "
+            echo -n "$(ls -All /tmp/.sccache_temp/nvcc/*/* 2>/dev/null | wc -l)"
+            echo " ($(du -ch /tmp/.sccache_temp/nvcc/* 2>/dev/null | tail -n1 | cut -f1))"
+            echo
+        fi
+
+        f="${f:-${format:-json}}";
+        c="${c:-${col_width:-${COLUMNS:-1000000000}}}";
+
+        # Print current dist status to verify we're connected
+        sccache 2>/dev/null --dist-status \
+      | {
+            # Passthrough if the format is json
+            if test "$f" = json; then
+                cat - <(echo)
+            else
+
+                cat - | jq -r -f <(cat <<EOF
   def truncate_val: (
     . as \$x
     | \$x | length as \$l
@@ -47,10 +73,12 @@ _sccache_dist_status() {
       end
   );
   def info_to_row: {
-    time: now | floor,
+    time: now | strflocaltime("%X"),
     type: (.type // "server"),
     id: .id,
     servers: (if .servers == null then "-" else (.servers | length) end),
+    last_seen: ((.u_time // 0) | tostring | . + "s"),
+    oldest_job: ((.max_job_age // 0) | tostring | . + "s"),
     cpus: .info.occupancy,
     util: ((.info.cpu_usage // 0) * 100 | floor | . / 100 | tostring | . + "%"),
     jobs: (.jobs.loading + .jobs.pending + .jobs.running),
@@ -59,11 +87,10 @@ _sccache_dist_status() {
     running: .jobs.running,
     accepted: .jobs.accepted,
     finished: .jobs.finished,
-    u_time: ((.u_time // 0) | tostring | . + "s")
   };
 
   .SchedulerStatus as [\$x, \$y] | [
-    (\$y + { id: \$x, type: "scheduler", u_time: (\$y.servers // {} | map(.u_time) | min | . // "-" | tostring) }),
+    (\$y + { id: \$x, type: "scheduler", u_time: (\$y.servers // {} | map(.u_time) | min | . // "-" | tostring), max_job_age: (\$y.servers // {} | map(.u_time + .max_job_age) | max | . // "-" | tostring) }),
     (\$y.servers // [] | sort_by(.id)[])
   ]
   | map(info_to_row) as \$rows
@@ -71,22 +98,23 @@ _sccache_dist_status() {
   | (\$rows | map(. as \$row | \$cols | map(\$row[.] | truncate_val))) as \$rows
   | (\$cols | map(truncate_val)), \$rows[] | @csv
 EOF
-)
-        fi
-    } \
-  | {
-        # Passthrough if the format is csv or json
-        # Otherwise, transform the csv into a tsv.
-        if test "$f" = tsv; then
-            if [[ "$(grep DISTRIB_RELEASE= /etc/lsb-release | cut -d= -f2)" > "20.04" ]]; then
-                cat - | sed 's/\"//g' | column -t -s, -R $(seq -s, 1 13)
-            else
-                cat - | sed 's/\"//g' | column -t -s,
+    )
             fi
-        else
-            cat -
-        fi
-    }
+        } \
+      | {
+            # Passthrough if the format is csv or json
+            # Otherwise, transform the csv into a tsv.
+            if test "$f" = tsv; then
+                if [[ "$(grep DISTRIB_RELEASE= /etc/lsb-release | cut -d= -f2)" > "20.04" ]]; then
+                    cat - | sed 's/\"//g' | column -t -s, -R $(seq -s, 1 14)
+                else
+                    cat - | sed 's/\"//g' | column -t -s,
+                fi
+            else
+                cat -
+            fi
+        }
+    fi
 }
 
 _sccache_dist_status "$@" <&0;
