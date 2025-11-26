@@ -41,6 +41,8 @@ _start_sccache() {
     if test -n "${f:-${foreground:+x}}"; then
         # Unset this so sccache outputs to stderr
         unset SCCACHE_ERROR_LOG;
+        # Increase the open file limit so users can do `make -j(ulimit -n)`
+        ulimit -n "$(ulimit -Hn)";
         # Start the sccache server in the foreground
         RUST_LOG_STYLE="always"                                 \
         SCCACHE_NO_DAEMON=1                                     \
@@ -62,7 +64,9 @@ _start_sccache() {
         sccache --start-server 1>&2 2>/dev/null \
       | tee "$logfile";
         # Write the pid to the pidfile
-        pgrep sccache | sort -nr | head -n1 | tee "${pidfile}" >/dev/null;
+        pgrep sccache | sort -n | head -n1 | tee "${pidfile}" >/dev/null;
+        # Increase the open file limit so users can do `make -j(ulimit -n)`
+        prlimit --nofile=$(ulimit -Hn):$(ulimit -Hn) --pid "$(cat "${pidfile}")";
         echo "=== sccache logfile: $logfile ===" >&2;
         echo "=== sccache pidfile: $pidfile ===" >&2;
     fi

@@ -42,8 +42,10 @@ _sccache_dist_status() {
         c="${c:-${col_width:-${COLUMNS:-1000000000}}}";
 
         if [[ "$f" != json ]] && ! test -n "${no_procs:+x}"; then
+            echo "open fds: $(lsof -a -p $(cat /tmp/sccache.*.pid) | wc -l)"
             echo "sccache procs: $(pgrep sccache | wc -l)"
         fi
+
 
         if [[ "$f" != json ]] &&  ! test -n "${no_temps:+x}"; then
             echo -n "preprocessed tempfiles: "
@@ -53,6 +55,15 @@ _sccache_dist_status() {
             echo -n "nvcc internal tempfiles: "
             echo -n "$(ls -All /tmp/.sccache_temp/nvcc/*/* 2>/dev/null | wc -l)"
             echo " ($(du -ch /tmp/.sccache_temp/nvcc/* 2>/dev/null | tail -n1 | cut -f1))"
+            echo
+        fi
+
+        if ! test -n "${no_stats:+x}"; then
+            if test "$f" = json; then
+                sccache --show-stats --stats-format json
+            else
+                sccache --show-stats
+            fi
             echo
         fi
 
@@ -84,14 +95,14 @@ _sccache_dist_status() {
     loading: .jobs.loading,
     pending: .jobs.pending,
     running: .jobs.running,
-    max: ((.max_job_age // 0) | tostring | . + "s"),
+    oldest: ((.max_job_age // 0) | tostring | . + "s"),
     accepted: .jobs.accepted,
     finished: .jobs.finished,
     seen: ((.u_time // 0) | tostring | . + "s"),
   };
 
   .SchedulerStatus as [\$x, \$y] | [
-    (\$y + { id: \$x, type: "scheduler", u_time: (\$y.servers // {} | map(.u_time) | min | . // "-" | tostring), max_job_age: (\$y.servers // {} | map(.u_time + .max_job_age) | max | . // "-" | tostring) }),
+    (\$y + { id: \$x, type: "scheduler", u_time: (\$y.servers // {} | map(.u_time) | min | . // "-" | tostring), max_job_age: (\$y.servers // {} | map(.max_job_age) | max | . // "-" | tostring) }),
     (\$y.servers // [] | sort_by(.id)[])
   ]
   | map(info_to_row) as \$rows
@@ -115,15 +126,6 @@ EOF
                 cat -
             fi
         }
-
-        if ! test -n "${no_stats:+x}"; then
-            echo
-            if test "$f" = json; then
-                sccache --show-stats --stats-format json
-            else
-                sccache --show-stats
-            fi
-        fi
     fi
 }
 
