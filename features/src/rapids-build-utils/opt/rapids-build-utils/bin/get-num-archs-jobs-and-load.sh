@@ -77,7 +77,20 @@ get_num_archs_jobs_and_load() {
     fi
 
     if test "$parallel" -eq 0; then
-        parallel="$(ulimit -n)"
+        # Memory (in KB) used by each `sccache <compiler> ...` invocation from ninja
+        # * 1.5Mb for the shell launched by ninja
+        # * 6.5MiB for each sccache client process
+        local mem_per_sccache_client="$((1024 * 8))"
+        # It's usually around 400-600MiB, but be conservative
+        # and assume the sccache daemon will use 1GiB of RAM
+        local mem_for_sccache_daemon="$((1 * 1024 * 1024))"
+        # Preprocessor invocations take ~300Mb or so
+        local mem_for_preprocessor="$((n_cpus * 300 * 1024))"
+        # Available memory (in KB), for more details see free(1).
+        local mem_avail="$(cat /proc/meminfo | grep MemAvailable | tr -s '[:space:]' | cut -d' ' -f2)"
+        # Total job count is available memory after accounting for `nproc` preprocessor calls
+        # divided by the amount of memory required to invoke the sccache thin client process.
+        parallel="$(((mem_avail - mem_for_preprocessor - mem_for_sccache_daemon) / mem_per_sccache_client))"
     fi
 
     local n_load="$((parallel > n_cpus ? n_cpus : parallel))";
