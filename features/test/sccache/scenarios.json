@@ -27,8 +27,7 @@
     "image": "ubuntu:22.04",
     "features": {
       "sccache": {
-        "repository": "rapidsai/sccache",
-        "version": "latest"
+        "version": "rapids"
       }
     }
   }
