@@ -36,7 +36,8 @@
       "version": "1.12.1"
     },
     "./features/src/sccache": {
-      "version": "rapids"
+      "repository": "rapidsai/sccache",
+      "version": "latest"
     },
     "./features/src/utils": {}
   },
