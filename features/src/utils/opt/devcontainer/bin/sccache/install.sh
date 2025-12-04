@@ -61,9 +61,8 @@ _install_sccache() {
     if test -n "${old_sccache_version##"${new_sccache_version}"}"; then
         # Install sccache to "$sccache_bin_dir"
         echo "Downloading sccache v${new_sccache_version}..." >&2
-        while ! tar -C "$sccache_bin_dir" -z --wildcards --strip-components=1 -x '*/sccache' -f <(
-            wget --no-hsts -q -O- "https://github.com/${github_repo}/releases/download/v${new_sccache_version}/sccache-v${new_sccache_version}-$(uname -m)-unknown-linux-musl.tar.gz"
-        ); do
+        while ! wget --no-hsts -q -O- "https://github.com/${github_repo}/releases/download/v${new_sccache_version}/sccache-v${new_sccache_version}-$(uname -m)-unknown-linux-musl.tar.gz" \
+              | sudo tar -C "$sccache_bin_dir" -zf - --overwrite --wildcards --strip-components=1 -x '*/sccache'; do
             if test "$((attempts++))" -lt 10; then
                 echo "(!) Failed to download sccache v${new_sccache_version}. Retrying (${attempts}/10)..." >&2;
                 sleep 10;
@@ -76,7 +75,7 @@ _install_sccache() {
         echo "Installed $(sccache --version) to $(which sccache)" >&2
     else
         echo "sccache v${new_sccache_version} is already installed, skipping" >&2
-    done
+    fi
 }
 
 _install_sccache "$@" <&0;
