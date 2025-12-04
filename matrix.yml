@@ -92,7 +92,6 @@ include:
 - os: "ubuntu:22.04"
   images:
   - { features: [*python, *dood, *nvhpc_prev, *clang_format_cccl, *clangd_dev, *cccl_dev], env: *nvhpc_env }
-  - { features: [*python, *dood, *nvhpc_curr, *clang_format_cccl, *clangd_dev, *cccl_dev], env: *nvhpc_env }
 
   - { features: [*python, *dood, *gcc_11, { <<: *cuda_prev_min, <<: *cccl_cuda_opts }, *clang_format_cccl, *clangd_dev, *cccl_dev], env: *gcc_env }
   - { features: [*python, *dood, *gcc_11, { <<: *cuda_prev_max, <<: *cccl_cuda_opts }, *clang_format_cccl, *clangd_dev, *cccl_dev], env: *gcc_env }
@@ -133,6 +132,8 @@ include:
 
 - os: "ubuntu:24.04"
   images:
+  - { features: [*python, *dood, *nvhpc_curr, *clang_format_cccl, *clangd_dev, *cccl_dev], env: *nvhpc_env }
+
   - { features: [*python, *dood, *gcc_13, { <<: *cuda_prev_max, <<: *cccl_cuda_opts }, *clang_format_cccl, *clangd_dev, *cccl_dev], env: *gcc_env }
   - { features: [*python, *dood, *gcc_13, { <<: *cuda_curr_min, <<: *cccl_cuda_opts }, *clang_format_cccl, *clangd_dev, *cccl_dev], env: *gcc_env }
   - { features: [*python, *dood, *gcc_13, { <<: *cuda_curr_max, <<: *cccl_cuda_opts }, *clang_format_cccl, *clangd_dev, *cccl_dev], env: *gcc_env }
