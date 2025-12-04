@@ -41,8 +41,8 @@ apt-add-repository -y "deb https://developer.download.nvidia.com/hpc-sdk/ubuntu/
 echo "Installing NVHPC SDK...";
 
 NVHPC_VERSION="${VERSION:-${NVHPCVERSION:-}}";
-NVHPC_VERSION_MAJOR=$(echo "${NVHPC_VERSION}" | cut -d'.' -f1);
-NVHPC_VERSION_MINOR=$(echo "${NVHPC_VERSION}" | cut -d'.' -f2);
+NVHPC_VERSION_MAJOR="$(echo "${NVHPC_VERSION}" | cut -d'.' -f1)";
+NVHPC_VERSION_MINOR="$(echo "${NVHPC_VERSION}" | cut -d'.' -f2)";
 
 pkgs=();
 pkgs+=("nvhpc-${NVHPC_VERSION/./-}");
@@ -53,10 +53,12 @@ if [ "${NVHPC_VERSION_MAJOR}" -le 23 ] \
     pkgs+=("nvhpc-20${NVHPC_VERSION_MAJOR}=${NVHPC_VERSION}");
 fi
 
-check_packages ${pkgs[@]};
+check_packages "${pkgs[@]}";
 
 export NVHPC="/opt/nvidia/hpc_sdk";
 export NVHPC_VERSION="${NVHPC_VERSION}";
+export NVHPC_VERSION_MAJOR="${NVHPC_VERSION_MAJOR}";
+export NVHPC_VERSION_MINOR="${NVHPC_VERSION_MINOR}";
 export NVHPC_ROOT="${NVHPC}/Linux_$(uname -p)/${NVHPC_VERSION}";
 export NVHPC_CUDA_HOME="$(dirname "$(find "$NVHPC_ROOT/cuda" -type f -name 'version.json' | head -n1)")";
 export NVHPC_MODULEFILE_DIRS="($(find "${NVHPC}/" -type d -name modulefiles -exec echo -n \"{}\"\  \;))";

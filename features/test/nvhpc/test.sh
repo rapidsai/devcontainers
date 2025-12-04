@@ -26,8 +26,10 @@ module list 1>&2
 # The 'check' command comes from the dev-container-features-test-lib.
 check "version" bash -c "echo '$NVHPC_VERSION' | grep '25.11'"
 check "installed" stat /opt/nvidia/hpc_sdk
+check "nvcc exists and is on path" which nvcc
 check "nvc++ exists and is on path" which nvc++
 check "mpic++ exists and is on path" which mpic++
+check "mpic++ --version does not error" mpic++ --version
 
 # Report result
 # If any of the checks above exited with a non-zero exit code, the test will fail.
