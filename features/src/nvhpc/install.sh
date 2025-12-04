@@ -77,6 +77,8 @@ bash "${NVHPC_ROOT}/compilers/bin/makelocalrc" \
 vars_=();
 vars_+=('$NVHPC');
 vars_+=('$NVHPC_VERSION');
+vars_+=('$NVHPC_VERSION_MAJOR');
+vars_+=('$NVHPC_VERSION_MINOR');
 vars_+=('$NVHPC_ROOT');
 vars_+=('$NVHPC_CUDA_HOME');
 vars_+=('$NVHPC_MODULEFILE_DIRS');
