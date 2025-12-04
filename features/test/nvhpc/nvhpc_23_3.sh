@@ -12,10 +12,7 @@ set -e
 # Optional: Import test library bundled with the devcontainer CLI
 source dev-container-features-test-lib
 
->&2 echo "NVHPC=$NVHPC"
->&2 echo "NVHPC_ROOT=$NVHPC_ROOT"
->&2 echo "NVHPC_VERSION=$NVHPC_VERSION"
->&2 echo "NVHPC_CUDA_HOME=$NVHPC_CUDA_HOME"
+env | grep NVHPC 1>&2
 ls -all "$NVHPC_ROOT"/ 1>&2
 
 >&2 echo "BASH_ENV=$BASH_ENV"

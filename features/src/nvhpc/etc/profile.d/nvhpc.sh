@@ -21,11 +21,13 @@ if [ -n "${PATH##*"${NVHPC_ROOT}/compilers/bin"*}" ]; then
     # Have to source and manually call hpcx_load for nvhpc>=25.7
     if [ "${NVHPC_VERSION_MAJOR}" -ge 25 ] \
     && [ "${NVHPC_VERSION_MINOR}" -ge 7 ]; then
+        set -x;
         HPCX_INIT="$(find -L "$NVHPC_ROOT"/comm_libs/ -path '*/latest/hpcx-init.sh' -quit)";
         if [ -n "${HPCX_INIT:+x}" ] && [ -s "${HPCX_INIT}" ]; then
             . "$HPCX_INIT";
             hpcx_load;
         fi
         unset HPCX_INIT;
+        set +x;
     fi
 fi
