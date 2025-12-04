@@ -15,6 +15,7 @@ check_packages jq wget ca-certificates bash-completion;
 echo "Installing sccache...";
 
 if test "$SCCACHE_VERSION" = rapids; then
+    SCCACHE_VERSION="latest";
     SCCACHE_REPOSITORY="rapidsai/sccache";
     find_version_from_git_tags SCCACHE_VERSION "https://github.com/$SCCACHE_REPOSITORY" "" "" "-.*" "true";
 elif test "$SCCACHE_VERSION" = latest; then
