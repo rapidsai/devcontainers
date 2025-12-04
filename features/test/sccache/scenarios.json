@@ -22,5 +22,13 @@
         "version": "latest"
       }
     }
+  },
+  "sccache_rapids": {
+    "image": "ubuntu:22.04",
+    "features": {
+      "sccache": {
+        "version": "rapids"
+      }
+    }
   }
 }
