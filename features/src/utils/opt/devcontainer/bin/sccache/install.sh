@@ -40,7 +40,7 @@ _install_sccache() {
     fi
 
     sccache_bin_dir="$(dirname "$(which sccache 2>/dev/null || echo "/usr/bin/sccache")")";
-    old_sccache_version="$(sccache --version | cut -d' ' -f2 || echo "sccache not installed")";
+    old_sccache_version="$(sccache --version 2>/dev/null | cut -d' ' -f2 || echo "sccache not installed")";
 
     attempts=0
     while test "${new_sccache_version:-latest}" = latest; do
