@@ -44,7 +44,7 @@ _install_sccache() {
 
     attempts=0
     while test "${new_sccache_version:-latest}" = latest; do
-        new_sccache_version="$(wget --no-hsts -q -O- "https://api.github.com/repos/${github_repo}/releases/latest" | jq -r '.tag_name | sub("^v"; "")')";
+        new_sccache_version="$(gh api repos/${github_repo}/releases/latest --jq '.tag_name | sub("^v"; "")')";
         if test -n "${new_sccache_version:+x}"; then
             break;
         elif test "$((attempts++))" -lt 10; then
