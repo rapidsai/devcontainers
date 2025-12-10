@@ -53,7 +53,7 @@ clean_${PY_LIB}_python() {
             "${PY_SRC}"/build/{lib,temp,dist,bdist}.${slug,,}-{,cpython}{,-}{${py_ver},${py_ver/./}};
     fi
 
-    python -m pip uninstall --yes "${py_lib}" || true;
+    uninstall-${PY_LIB}-python "@" || true;
 }
 
 clean_${PY_LIB}_python "$@" <&0;
