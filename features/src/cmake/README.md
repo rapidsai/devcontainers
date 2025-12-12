@@ -7,7 +7,7 @@ A feature to install CMake
 
 ```json
 "features": {
-    "ghcr.io/rapidsai/devcontainers/features/cmake:25": {}
+    "ghcr.io/rapidsai/devcontainers/features/cmake:26": {}
 }
 ```
 

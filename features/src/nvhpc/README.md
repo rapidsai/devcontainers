@@ -7,7 +7,7 @@ A feature to install the NVHPC SDK
 
 ```json
 "features": {
-    "ghcr.io/rapidsai/devcontainers/features/nvhpc:25": {}
+    "ghcr.io/rapidsai/devcontainers/features/nvhpc:26": {}
 }
 ```
 
@@ -15,7 +15,7 @@ A feature to install the NVHPC SDK
 
 | Options Id | Description | Type | Default Value |
 |-----|-----|-----|-----|
-| version | Version of NVHPC SDK to install. | string | 25.9 |
+| version | Version of NVHPC SDK to install. | string | 25.11 |
 
 ## Customizations
 

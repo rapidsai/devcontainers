@@ -1,5 +1,5 @@
 # Fetch the rapidsai fork of sccache:
-Invoke-WebRequest -Uri "https://github.com/rapidsai/sccache/releases/download/v0.12.0-rapids.0/sccache-v0.12.0-rapids.0-x86_64-pc-windows-msvc.zip" -OutFile "./sccache.zip" -UseBasicParsing
+Invoke-WebRequest -Uri "https://github.com/rapidsai/sccache/releases/download/v0.12.0-rapids.28/sccache-v0.12.0-rapids.28-x86_64-pc-windows-msvc.zip" -OutFile "./sccache.zip" -UseBasicParsing
 Expand-Archive "./sccache.zip"
 Remove-Item "./sccache.zip"
 

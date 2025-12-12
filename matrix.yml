@@ -1,7 +1,7 @@
 x-cuda-prev-min: &cuda_prev_min { name: "cuda", version: "12.0" }
 x-cuda-prev-max: &cuda_prev_max { name: "cuda", version: "12.9" }
 x-cuda-curr-min: &cuda_curr_min { name: "cuda", version: "13.0" }
-x-cuda-curr-max: &cuda_curr_max { name: "cuda", version: "13.0" }
+x-cuda-curr-max: &cuda_curr_max { name: "cuda", version: "13.1" }
 x-cuda-prev-max-rapids: &cuda_prev_max_rapids { name: "cuda", version: "12.9" }
 x-cuda-curr-max-rapids: &cuda_curr_max_rapids { name: "cuda", version: "13.0" }
 
@@ -28,8 +28,8 @@ x-llvm-20: &llvm_20 { name: "llvm", version: "20" }
 x-llvm-21: &llvm_21 { name: "llvm", version: "21" }
 x-llvm-env: &llvm_env { CC: "clang", CXX: "clang++", CUDAHOSTCXX: "clang++" }
 
-x-nvhpc-prev: &nvhpc_prev { name: "nvhpc", version: "25.7" }
-x-nvhpc-curr: &nvhpc_curr { name: "nvhpc", version: "25.9" }
+x-nvhpc-prev: &nvhpc_prev { name: "nvhpc", version: "25.9" }
+x-nvhpc-curr: &nvhpc_curr { name: "nvhpc", version: "25.11" }
 
 x-nvhpc-env: &nvhpc_env { CC: "nvc", CXX: "nvc++", CUDAHOSTCXX: "nvc++" }
 
@@ -92,7 +92,6 @@ include:
 - os: "ubuntu:22.04"
   images:
   - { features: [*python, *dood, *nvhpc_prev, *clang_format_cccl, *clangd_dev, *cccl_dev], env: *nvhpc_env }
-  - { features: [*python, *dood, *nvhpc_curr, *clang_format_cccl, *clangd_dev, *cccl_dev], env: *nvhpc_env }
 
   - { features: [*python, *dood, *gcc_11, { <<: *cuda_prev_min, <<: *cccl_cuda_opts }, *clang_format_cccl, *clangd_dev, *cccl_dev], env: *gcc_env }
   - { features: [*python, *dood, *gcc_11, { <<: *cuda_prev_max, <<: *cccl_cuda_opts }, *clang_format_cccl, *clangd_dev, *cccl_dev], env: *gcc_env }
@@ -133,6 +132,8 @@ include:
 
 - os: "ubuntu:24.04"
   images:
+  - { features: [*python, *dood, *nvhpc_curr, *clang_format_cccl, *clangd_dev, *cccl_dev], env: *nvhpc_env }
+
   - { features: [*python, *dood, *gcc_13, { <<: *cuda_prev_max, <<: *cccl_cuda_opts }, *clang_format_cccl, *clangd_dev, *cccl_dev], env: *gcc_env }
   - { features: [*python, *dood, *gcc_13, { <<: *cuda_curr_min, <<: *cccl_cuda_opts }, *clang_format_cccl, *clangd_dev, *cccl_dev], env: *gcc_env }
   - { features: [*python, *dood, *gcc_13, { <<: *cuda_curr_max, <<: *cccl_cuda_opts }, *clang_format_cccl, *clangd_dev, *cccl_dev], env: *gcc_env }
@@ -169,6 +170,8 @@ include:
 
   # CTK 12.0 doesn't know that it supports 14.40+, use 14.39:
   - { features: [{ <<: *cuda_prev_min, <<: *cccl_cuda_opts }, { name: "cl", version: "14.39" }] } # MSVC 2022
+  # Build CUDA 12.9 + 14.43 for stdexec:
+  - { features: [{ <<: *cuda_prev_max, <<: *cccl_cuda_opts }, { name: "cl", version: "14.43" }] } # MSVC 2022
   # Still, we build a 12.0 + 14.4X image for python testing infra:
   - { features: [{ <<: *cuda_prev_min, <<: *cccl_cuda_opts }, { name: "cl", version: "14.44" }] } # MSVC 2022
   - { features: [{ <<: *cuda_prev_max, <<: *cccl_cuda_opts }, { name: "cl", version: "14.44" }] } # MSVC 2022

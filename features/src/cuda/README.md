@@ -7,7 +7,7 @@ A feature to install the NVIDIA CUDA Toolkit
 
 ```json
 "features": {
-    "ghcr.io/rapidsai/devcontainers/features/cuda:25": {}
+    "ghcr.io/rapidsai/devcontainers/features/cuda:26": {}
 }
 ```
 
@@ -15,7 +15,7 @@ A feature to install the NVIDIA CUDA Toolkit
 
 | Options Id | Description | Type | Default Value |
 |-----|-----|-----|-----|
-| version | Version of the CUDA Toolkit to install. | string | 13.0 |
+| version | Version of the CUDA Toolkit to install. | string | 13.1 |
 | cuDNNVersion | Version of cuDNN to install. | string | 8 |
 | installCompilers | Install NVIDIA CUDA Compiler (nvcc) | boolean | true |
 | installProfilers | Install NVIDIA NSight Systems Profiler (nsys) | boolean | true |

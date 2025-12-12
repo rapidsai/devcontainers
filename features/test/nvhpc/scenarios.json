@@ -1,0 +1,34 @@
+{
+  "nvhpc_23_3": {
+    "image": "ubuntu:22.04",
+    "features": {
+      "nvhpc": {
+        "version": "23.3"
+      }
+    }
+  },
+  "nvhpc_25_5": {
+    "image": "ubuntu:22.04",
+    "features": {
+      "nvhpc": {
+        "version": "25.5"
+      }
+    }
+  },
+  "nvhpc_25_7": {
+    "image": "ubuntu:22.04",
+    "features": {
+      "nvhpc": {
+        "version": "25.7"
+      }
+    }
+  },
+  "nvhpc_25_11": {
+    "image": "ubuntu:24.04",
+    "features": {
+      "nvhpc": {
+        "version": "25.11"
+      }
+    }
+  }
+}

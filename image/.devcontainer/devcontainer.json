@@ -11,7 +11,7 @@
   "containerEnv": {
     "LANG": "${localEnv:LANG:en_US.UTF-8}",
     "NVIDIA_DISABLE_REQUIRE": "true",
-    "TERM": "${localEnv:TERM:xterm}"
+    "TERM": "${localEnv:TERM:linux}"
   },
   "workspaceFolder": "/home/coder",
   "features": {
@@ -36,7 +36,7 @@
       "version": "1.12.1"
     },
     "./features/src/sccache": {
-      "version": "0.7.7"
+      "version": "rapids"
     },
     "./features/src/utils": {}
   },
