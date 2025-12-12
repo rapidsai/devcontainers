@@ -20,6 +20,8 @@ test_${CPP_LIB}_cpp() {
     # shellcheck disable=SC1091
     . devcontainer-utils-debug-output 'rapids_build_utils_debug' 'test-all test-${NAME} test-${CPP_LIB}-cpp';
 
+    echo -e "\033[1;36mRunning ${CPP_LIB} C++ tests\033[0m";
+
     if [[ ! -d "${SRC_PATH}" ]]; then
         echo "test-${CPP_LIB}-cpp: cannot access '${SRC_PATH}': No such directory" >&2;
         return 1;

@@ -20,6 +20,8 @@ test_${PY_LIB}_python() {
     # shellcheck disable=SC1091
     . devcontainer-utils-debug-output 'rapids_build_utils_debug' 'test-all test-${NAME} test-${PY_LIB}-python';
 
+    echo -e "\033[1;36mRunning ${PY_LIB} Python tests\033[0m";
+
     if [[ ! -d "${SRC_PATH}" ]]; then
         echo "test-${PY_LIB}-python: cannot access '${SRC_PATH}': No such directory" >&2;
         return 1;
