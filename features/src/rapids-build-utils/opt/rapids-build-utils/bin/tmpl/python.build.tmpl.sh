@@ -31,8 +31,6 @@ build_${PY_LIB}_python() {
     # shellcheck disable=SC1091
     . devcontainer-utils-debug-output 'rapids_build_utils_debug' 'build-all build-${NAME} build-${PY_LIB}-python';
 
-    echo -e "\033[1;36mBuilding ${PY_LIB} Python\033[0m";
-
     build-${PY_LIB}-python-${t:-${type:-"editable"}} "${OPTS[@]}";
 }
 
