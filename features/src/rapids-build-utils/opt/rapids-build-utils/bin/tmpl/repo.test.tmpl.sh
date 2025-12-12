@@ -24,12 +24,14 @@ test_${NAME}() {
 
     for lib in ${CPP_LIB}; do
         if command -V test-${lib}-cpp >/dev/null 2>&1; then
+            echo -e "\033[1;36mRunning ${lib} C++ tests\033[0m";
             test-${lib}-cpp "${OPTS[@]}";
         fi
     done
 
     for lib in ${PY_LIB}; do
         if command -V test-${lib}-python >/dev/null 2>&1; then
+            echo -e "\033[1;36mRunning ${lib} Python tests\033[0m";
             test-${lib}-python "${OPTS[@]}";
         fi
     done

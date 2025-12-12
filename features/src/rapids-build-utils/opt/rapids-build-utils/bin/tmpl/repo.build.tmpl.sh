@@ -28,12 +28,14 @@ build_${NAME}() {
 
     for lib in ${CPP_LIB}; do
         if command -V build-${lib}-cpp >/dev/null 2>&1; then
+            echo -e "\033[1;36mBuilding ${lib} C++\033[0m";
             build-${lib}-cpp "${OPTS[@]}";
         fi
     done
 
     for lib in ${PY_LIB}; do
         if command -V build-${lib}-python >/dev/null 2>&1; then
+            echo -e "\033[1;36mBuilding ${lib} Python\033[0m";
             build-${lib}-python-${t:-${type:-"editable"}} "${OPTS[@]}";
         fi
     done
