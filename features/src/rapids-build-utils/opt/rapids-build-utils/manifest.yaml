@@ -16,6 +16,7 @@ repos:
   cpp:
     - name: rmm
       sub_dir: cpp
+      test: ci/run_ctests.sh
   python:
     - name: librmm
       sub_dir: python/librmm
@@ -25,6 +26,7 @@ repos:
       sub_dir: python/rmm
       depends: [rmm]
       args: {install: *rapids_build_backend_args}
+      test: ci/run_pytests.sh
 
 - name: ucxx
   path: ucxx
@@ -57,6 +59,7 @@ repos:
   git: {<<: *git_defaults, repo: dask-cuda}
   python:
     - name: dask-cuda
+      test: ci/run_pytest.sh
 
 - name: kvikio
   path: kvikio
@@ -64,6 +67,7 @@ repos:
   cpp:
     - name: kvikio
       sub_dir: cpp
+      test: ci/run_ctests.sh
   python:
     - name: libkvikio
       sub_dir: python/libkvikio
@@ -73,6 +77,7 @@ repos:
       sub_dir: python/kvikio
       depends: [kvikio]
       args: {install: *rapids_build_backend_args}
+      test: ci/run_pytests.sh
 
 - name: cudf
   path: cudf
@@ -81,9 +86,11 @@ repos:
     - name: cudf
       sub_dir: cpp
       depends: [rmm, kvikio]
+      test: ci/run_cudf_ctests.sh
     - name: cudf_kafka
       sub_dir: cpp/libcudf_kafka
       depends: [cudf]
+      test: ci/run_cudf_kafka_ctests.sh
   python:
     - name: libcudf
       sub_dir: python/libcudf
@@ -93,23 +100,29 @@ repos:
       sub_dir: python/pylibcudf
       depends: [cudf]
       args: {install: *rapids_build_backend_args}
+      test: ci/run_pylibcudf_pytests.sh
     - name: cudf
       sub_dir: python/cudf
       depends: [cudf]
       args: {install: *rapids_build_backend_args}
+      test: ci/run_cudf_pytests.sh
     - name: dask-cudf
       sub_dir: python/dask_cudf
       args: {install: *rapids_build_backend_args}
+      test: ci/run_dask_cudf_pytests.sh
     - name: cudf-polars
       sub_dir: python/cudf_polars
       args: {install: *rapids_build_backend_args}
+      test: ci/run_cudf_polars_pytests.sh
     - name: cudf_kafka
       sub_dir: python/cudf_kafka
       depends: [cudf_kafka]
       args: {install: *rapids_build_backend_args}
+      test: ci/run_cudf_kafka_pytests.sh
     - name: custreamz
       sub_dir: python/custreamz
       args: {install: *rapids_build_backend_args}
+      test: ci/run_custreamz_pytests.sh
 
 - name: rapidsmpf
   path: rapidsmpf
@@ -118,6 +131,7 @@ repos:
     - name: rapidsmpf
       sub_dir: cpp
       depends: [rmm, ucxx, cudf]
+      test: ci/run_ctests.sh
   python:
     - name: librapidsmpf
       sub_dir: python/librapidsmpf
@@ -127,6 +141,7 @@ repos:
       sub_dir: python/rapidsmpf
       depends: [rapidsmpf, ucxx-python]
       args: {install: *rapids_build_backend_args}
+      test: ci/run_pytests.sh
 
 - name: raft
   path: raft
@@ -138,6 +153,7 @@ repos:
       parallelism:
         max_device_obj_memory_usage: 3Gi
       args: {cmake: -DRAFT_COMPILE_LIBRARY=ON}
+      test: ci/run_ctests.sh
   python:
     - name: libraft
       sub_dir: python/libraft
@@ -147,10 +163,12 @@ repos:
       sub_dir: python/pylibraft
       depends: [raft]
       args: {install: *rapids_build_backend_args}
+      test: ci/run_pylibraft_pytests.sh
     - name: raft-dask
       sub_dir: python/raft-dask
       depends: [ucxx, raft]
       args: {install: *rapids_build_backend_args}
+      test: ci/run_raft_dask_pytests.sh
 
 - name: cuvs
   path: cuvs
@@ -162,6 +180,7 @@ repos:
       parallelism:
         max_device_obj_memory_usage: 3Gi
       args: {cmake: -DBUILD_C_LIBRARY=ON}
+      test: ci/run_ctests.sh
   python:
     - name: libcuvs
       sub_dir: python/libcuvs
@@ -171,6 +190,7 @@ repos:
       sub_dir: python/cuvs
       depends: [cuvs]
       args: {install: *rapids_build_backend_args}
+      test: ci/run_cuvs_pytests.sh
 
 - name: cumlprims_mg
   path: cumlprims_mg
@@ -191,6 +211,7 @@ repos:
       depends: [rmm, raft, cumlprims_mg, cuvs]
       parallelism:
         max_device_obj_memory_usage: 3Gi
+      test: ci/run_ctests.sh
   python:
     - name: libcuml
       sub_dir: python/libcuml
@@ -200,6 +221,7 @@ repos:
       sub_dir: python/cuml
       depends: [cuml]
       args: {install: *rapids_build_backend_args}
+      test: ci/run_cuml_singlegpu_pytests.sh
 
 - name: cugraph
   path: cugraph
@@ -210,6 +232,7 @@ repos:
       depends: [rmm, ucxx, raft]
       parallelism:
         max_device_obj_memory_usage: 6Gi
+      test: ci/run_ctests.sh
     - name: cugraph_etl
       sub_dir: cpp/libcugraph_etl
       depends: [cudf, cugraph]
@@ -223,10 +246,12 @@ repos:
       sub_dir: python/pylibcugraph
       depends: [cugraph]
       args: {install: *rapids_build_backend_args}
+      test: ci/run_pylibcugraph_pytests.sh
     - name: cugraph
       sub_dir: python/cugraph
       depends: [cugraph]
       args: {install: *rapids_build_backend_args}
+      test: ci/run_cugraph_pytests.sh
 
 - name: cugraph-gnn
   path: cugraph-gnn
@@ -237,6 +262,7 @@ repos:
       depends: [raft]
       args:
         cmake: -DCMAKE_CUDA_ARCHITECTURES="${CUDAARCHS}"
+      test: ci/run_ctests.sh
   python:
     - name: libwholegraph
       sub_dir: python/libwholegraph
@@ -246,9 +272,11 @@ repos:
       sub_dir: python/pylibwholegraph
       depends: [wholegraph]
       args: {install: *rapids_build_backend_args}
+      test: ci/run_pylibwholegraph_pytests.sh
     - name: cugraph_pyg
       sub_dir: python/cugraph-pyg
       args: {install: *rapids_build_backend_args}
+      test: ci/run_cugraph_pyg_pytests.sh
 
 - name: nx-cugraph
   path: nx-cugraph
