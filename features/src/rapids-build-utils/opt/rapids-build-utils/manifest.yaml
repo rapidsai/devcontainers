@@ -285,3 +285,20 @@ repos:
     - name: nx-cugraph
       sub_dir: .
       args: {install: *rapids_build_backend_args}
+
+- name: cuopt
+  path: cuopt
+  git: {<<: *git_defaults, repo: cuopt, upstream: NVIDIA}
+  cpp:
+    - name: cuopt
+      sub_dir: cpp
+      depends: [rmm, raft]
+  python:
+    - name: libcuopt
+      sub_dir: python/libcuopt
+      depends: [cuopt]
+      args: {install: *rapids_build_backend_args}
+    - name: cuopt
+      sub_dir: python/cuopt
+      depends: [cuopt, cudf, raft]
+      args: {install: *rapids_build_backend_args}
