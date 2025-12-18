@@ -36,6 +36,7 @@ repos:
       sub_dir: cpp
       depends: [rmm]
       args: {cmake: -DUCXX_ENABLE_RMM=ON}
+      test: ci/run_cpp.sh
     - name: ucxx-python
       sub_dir: cpp/python
       depends: [ucxx]
@@ -49,10 +50,12 @@ repos:
       sub_dir: python/ucxx
       depends: [ucxx, ucxx-python]
       args: {cmake: -DFIND_UCXX_PYTHON=ON, install: *rapids_build_backend_args}
+      test: ci/run_python.sh
     - name: distributed-ucxx
       sub_dir: python/distributed-ucxx
       depends: [ucxx, ucxx-python]
       args: {install: *rapids_build_backend_args}
+      test: ci/run_python_distributed.sh
 
 - name: dask-cuda
   path: dask-cuda
