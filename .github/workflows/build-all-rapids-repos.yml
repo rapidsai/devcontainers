@@ -36,7 +36,7 @@ jobs:
       pull-requests: read
     with:
       arch: '["amd64", "arm64"]'
-      cuda: '["12.9", "13.0"]'
+      cuda: '["12.9", "13.1"]'
       node_type: cpu16
       rapids-aux-secret-1: GIST_REPO_READ_ORG_GITHUB_TOKEN
       timeout-minutes: 720
