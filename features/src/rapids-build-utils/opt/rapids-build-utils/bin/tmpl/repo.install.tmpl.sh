@@ -21,6 +21,7 @@ install_${NAME}() {
 
     for lib in ${CPP_LIB}; do
         if command -V install-${lib}-cpp >/dev/null 2>&1; then
+            echo -e "\033[1;36mInstalling ${lib} C++\033[0m";
             install-${lib}-cpp "${OPTS[@]}";
         fi
     done

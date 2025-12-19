@@ -24,6 +24,7 @@ configure_${NAME}() {
 
     for lib in ${CPP_LIB}; do
         if command -V configure-${lib}-cpp >/dev/null 2>&1; then
+            echo -e "\033[1;36mConfiguring ${lib} C++\033[0m";
             configure-${lib}-cpp "${OPTS[@]}";
         fi
     done
