@@ -232,7 +232,7 @@ repos:
   cpp:
     - name: cugraph
       sub_dir: cpp
-      depends: [rmm, ucxx, raft]
+      depends: [rmm, ucxx, raft, cuvs]
       parallelism:
         max_device_obj_memory_usage: 6Gi
       test: ci/run_ctests.sh
