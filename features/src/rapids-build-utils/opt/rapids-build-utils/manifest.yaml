@@ -36,6 +36,7 @@ repos:
       sub_dir: cpp
       depends: [rmm]
       args: {cmake: -DUCXX_ENABLE_RMM=ON}
+      test: ci/run_cpp.sh
     - name: ucxx-python
       sub_dir: cpp/python
       depends: [ucxx]
@@ -49,10 +50,12 @@ repos:
       sub_dir: python/ucxx
       depends: [ucxx, ucxx-python]
       args: {cmake: -DFIND_UCXX_PYTHON=ON, install: *rapids_build_backend_args}
+      test: ci/run_python.sh
     - name: distributed-ucxx
       sub_dir: python/distributed-ucxx
       depends: [ucxx, ucxx-python]
       args: {install: *rapids_build_backend_args}
+      test: ci/run_python_distributed.sh
 
 - name: dask-cuda
   path: dask-cuda
@@ -192,14 +195,6 @@ repos:
       args: {install: *rapids_build_backend_args}
       test: ci/run_cuvs_pytests.sh
 
-- name: cumlprims_mg
-  path: cumlprims_mg
-  git: {<<: *git_defaults, repo: cumlprims_mg}
-  cpp:
-    - name: cumlprims_mg
-      sub_dir: cpp
-      depends: [rmm, raft]
-
 - name: cuml
   path: cuml
   git: {<<: *git_defaults, repo: cuml}
@@ -208,7 +203,7 @@ repos:
   cpp:
     - name: cuml
       sub_dir: cpp
-      depends: [rmm, raft, cumlprims_mg, cuvs]
+      depends: [rmm, raft, cuvs]
       parallelism:
         max_device_obj_memory_usage: 3Gi
       test: ci/run_ctests.sh
@@ -229,7 +224,7 @@ repos:
   cpp:
     - name: cugraph
       sub_dir: cpp
-      depends: [rmm, ucxx, raft]
+      depends: [rmm, ucxx, raft, cuvs]
       parallelism:
         max_device_obj_memory_usage: 6Gi
       test: ci/run_ctests.sh
