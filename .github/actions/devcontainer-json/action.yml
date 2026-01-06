@@ -14,8 +14,10 @@ inputs:
     required: false
 
 outputs:
-  tag:
-    value: ${{ steps.json.outputs.tag }}
+  base_tag:
+    value: ${{ steps.json.outputs.base_tag }}
+  version:
+    value: ${{ steps.json.outputs.version }}
 
 runs:
   using: composite
