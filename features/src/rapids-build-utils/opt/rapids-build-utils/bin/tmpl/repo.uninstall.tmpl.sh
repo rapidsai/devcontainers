@@ -27,12 +27,14 @@ uninstall_${NAME}() {
 
     for lib in ${CPP_LIB}; do
         if command -V uninstall-${lib}-cpp >/dev/null 2>&1; then
+            echo -e "\033[1;36mUninstalling ${lib} C++\033[0m";
             uninstall-${lib}-cpp "${OPTS[@]}";
         fi
     done
 
     for lib in ${PY_LIB}; do
         if command -V uninstall-${lib}-python >/dev/null 2>&1; then
+            echo -e "\033[1;36mUninstalling ${lib} Python\033[0m";
             uninstall-${lib}-python "${OPTS[@]}";
         fi
     done

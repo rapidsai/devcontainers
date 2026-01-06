@@ -132,7 +132,7 @@ if ((${#BASH_SOURCE[@]})) && [ "${BASH_SOURCE[0]}" != "${BASH_SOURCE[${#BASH_SOU
 
         # rm -f "${out}";
 
-        if test -f "${out}"; then return; fi
+        if test -s "${out}"; then return; fi
 
         mkdir -p "$(dirname "${out}")";
 

@@ -27,7 +27,7 @@ jobs:
     if: needs.check-event.outputs.ok == 'true'
     needs: check-event
     secrets: inherit
-    uses: rapidsai/shared-workflows/.github/workflows/build-in-devcontainer.yaml@branch-25.12
+    uses: rapidsai/shared-workflows/.github/workflows/build-in-devcontainer.yaml@main
     permissions:
       actions: read
       packages: read
@@ -37,7 +37,7 @@ jobs:
     with:
       arch: '["amd64", "arm64"]'
       cuda: '["12.9", "13.0"]'
-      node_type: cpu8
+      node_type: cpu16
       rapids-aux-secret-1: GIST_REPO_READ_ORG_GITHUB_TOKEN
       timeout-minutes: 720
       # 1. Prohibit sccache from shutting down automatically
@@ -60,17 +60,16 @@ jobs:
         clone-all -j$(nproc) -v -q --clone-upstream --depth 1 --single-branch --shallow-submodules;
 
         # Configure all the C++ libs
-        time configure-all                  \
-          -j0                               \
-          -GNinja                           \
-          -Wno-dev                          \
-          -DBUILD_TESTS=ON                  \
-          -DBUILD_BENCHMARKS=ON             \
-          -DBUILD_PRIMS_BENCH=ON            \
-          -DBUILD_SHARED_LIBS=ON            \
-          -DRAFT_COMPILE_LIBRARY=ON         \
-          -DBUILD_CUGRAPH_MG_TESTS=ON       \
-          -DDISABLE_DEPRECATION_WARNINGS=ON ;
+        time configure-all            \
+          -j0                         \
+          -GNinja                     \
+          -Wno-dev                    \
+          -DBUILD_TESTS=ON            \
+          -DBUILD_BENCHMARKS=ON       \
+          -DBUILD_PRIMS_BENCH=ON      \
+          -DBUILD_SHARED_LIBS=ON      \
+          -DRAFT_COMPILE_LIBRARY=ON   \
+          -DBUILD_CUGRAPH_MG_TESTS=ON ;
 
         # Build all the C++ libs
         time build-all-cpp -j0;

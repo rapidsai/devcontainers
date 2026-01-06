@@ -182,6 +182,11 @@ if [[ "${PKG[*]}" == "" ]]; then
     PKG+=("lldb-${LLVM_VERSION}");
     PKG+=("lld-${LLVM_VERSION}");
     PKG+=("clangd-${LLVM_VERSION}");
+    PKG+=("libc++-${LLVM_VERSION}-dev");
+    PKG+=("libc++abi-${LLVM_VERSION}-dev");
+    if test "${LLVM_VERSION}" -gt 11; then
+        PKG+=("libunwind-${LLVM_VERSION}-dev");
+    fi
 elif [[ "${PKG[*]}" == "all" ]]; then
     # same as in test-install.sh
     # No worries if we have dups

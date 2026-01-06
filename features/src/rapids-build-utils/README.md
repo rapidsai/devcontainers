@@ -7,7 +7,7 @@ A feature to install the RAPIDS devcontainer build utilities
 
 ```json
 "features": {
-    "ghcr.io/rapidsai/devcontainers/features/rapids-build-utils:25": {}
+    "ghcr.io/rapidsai/devcontainers/features/rapids-build-utils:26": {}
 }
 ```
 

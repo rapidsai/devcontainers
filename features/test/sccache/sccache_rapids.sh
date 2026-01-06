@@ -3,7 +3,7 @@
 # This test can be run with the following command (from the root of this repo)
 # ```
 # npx --package=@devcontainers/cli -c 'devcontainer features test \
-#     --features nvhpc \
+#     --features cuda \
 #     --base-image ubuntu:22.04 .'
 # ```
 
@@ -12,21 +12,12 @@ set -e
 # Optional: Import test library bundled with the devcontainer CLI
 source dev-container-features-test-lib
 
-env | grep NVHPC 1>&2
-ls -all "$NVHPC_ROOT"/ 1>&2
-
->&2 echo "BASH_ENV=$BASH_ENV"
->&2 echo "PATH=$PATH"
-module list 1>&2
-
 # Feature-specific tests
 # The 'check' command comes from the dev-container-features-test-lib.
-check "version" bash -c "echo '$NVHPC_VERSION' | grep '25.11'"
-check "installed" stat /opt/nvidia/hpc_sdk
-check "nvcc exists and is on path" which nvcc
-check "nvc++ exists and is on path" which nvc++
-check "mpic++ exists and is on path" which mpic++
-check "mpic++ --version does not error" mpic++ --version
+check "sccache exists and is on path" which sccache
+echo "sccache version: $(sccache --version)"
+
+check "installed latest RAPIDS sccache" bash -c 'sccache --version | grep -q "rapids"'
 
 # Report result
 # If any of the checks above exited with a non-zero exit code, the test will fail.

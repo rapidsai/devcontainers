@@ -49,7 +49,7 @@ generate_script() {
     if test -n "${bin:+x}"; then
         (
             cat - \
-          | envsubst '$HOME $NAME $SRC_PATH $PY_ENV $PY_SRC $PY_LIB $BIN_DIR $CPP_ENV $CPP_LIB $CPP_SRC $CPP_CMAKE_ARGS $CPP_CPACK_ARGS $CPP_DEPS $CPP_MAX_TOTAL_SYSTEM_MEMORY $CPP_MAX_DEVICE_OBJ_MEMORY_USAGE $CPP_MAX_DEVICE_OBJ_TO_COMPILE_IN_PARALLEL $GIT_TAG $GIT_SSH_URL $GIT_HTTPS_URL $GIT_REPO $GIT_HOST $GIT_UPSTREAM $PIP_WHEEL_ARGS $PIP_INSTALL_ARGS' \
+          | envsubst '$HOME $NAME $SRC_PATH $PY_ENV $PY_SRC $PY_LIB $PY_TEST $BIN_DIR $CPP_ENV $CPP_LIB $CPP_SRC $CPP_TEST $CPP_CMAKE_ARGS $CPP_CPACK_ARGS $CPP_DEPS $CPP_MAX_TOTAL_SYSTEM_MEMORY $CPP_MAX_DEVICE_OBJ_MEMORY_USAGE $CPP_MAX_DEVICE_OBJ_TO_COMPILE_IN_PARALLEL $GIT_TAG $GIT_SSH_URL $GIT_HTTPS_URL $GIT_REPO $GIT_HOST $GIT_UPSTREAM $PIP_WHEEL_ARGS $PIP_INSTALL_ARGS' \
           | tee "${TMP_SCRIPT_DIR}/${bin}" >/dev/null;
 
             chmod +x "${TMP_SCRIPT_DIR}/${bin}";
@@ -150,6 +150,33 @@ generate_python_scripts() {
     done
 }
 
+generate_cpp_test_script() {
+    if test -n "${CPP_TEST:-}" && test -f "${TEMPLATES}/cpp.test.tmpl.sh"; then (
+        # shellcheck disable=SC2002
+        cat "${TEMPLATES}/cpp.test.tmpl.sh" \
+      | generate_script "test-${CPP_LIB}-cpp";
+    ) || true;
+    fi
+}
+
+generate_python_test_script() {
+    if test -n "${PY_TEST:-}" && test -f "${TEMPLATES}/python.test.tmpl.sh"; then (
+        # shellcheck disable=SC2002
+        cat "${TEMPLATES}/python.test.tmpl.sh" \
+      | generate_script "test-${PY_LIB}-python";
+    ) || true;
+    fi
+}
+
+generate_repo_test_script() {
+    if test -f "${TEMPLATES}/repo.test.tmpl.sh"; then (
+        # shellcheck disable=SC2002
+        cat "${TEMPLATES}/repo.test.tmpl.sh" \
+      | generate_script "test-${NAME}";
+    ) || true;
+    fi
+}
+
 generate_scripts() {
     local -;
     set -euo pipefail;
@@ -185,6 +212,7 @@ generate_scripts() {
     local cpp_name;
     local cpp_path;
     local cpp_sub_dir;
+    local cpp_test;
     local cpp_cmake_args;
     local cpp_cpack_args;
     local cpp_depends_length;
@@ -195,6 +223,7 @@ generate_scripts() {
     local py_env;
     local py_path;
     local py_name;
+    local py_test;
     local py_cmake_args;
     local pip_wheel_args;
     local pip_install_args;
@@ -254,6 +283,7 @@ generate_scripts() {
             cpp_env="${repo}_cpp_${j}_env";
             cpp_name="${repo}_cpp_${j}_name";
             cpp_sub_dir="${repo}_cpp_${j}_sub_dir";
+            cpp_test="${repo}_cpp_${j}_test";
             cpp_cmake_args="${repo}_cpp_${j}_args_cmake";
             cpp_cpack_args="${repo}_cpp_${j}_args_cpack";
             cpp_depends_length="${repo}_cpp_${j}_depends_length";
@@ -295,6 +325,7 @@ generate_scripts() {
                 CPP_ENV="${!cpp_env:-}"                                                                     \
                 CPP_LIB="${cpp_name:-}"                                                                     \
                 CPP_SRC="${!cpp_sub_dir:-}"                                                                 \
+                CPP_TEST="${!cpp_test:-}"                                                                   \
                 CPP_DEPS="${cpp_deps[*]}"                                                                   \
                 CPP_CMAKE_ARGS="${!cpp_cmake_args:-}"                                                       \
                 CPP_CPACK_ARGS="${!cpp_cpack_args:-}"                                                       \
@@ -302,6 +333,11 @@ generate_scripts() {
                 CPP_MAX_DEVICE_OBJ_MEMORY_USAGE="${!cpp_max_device_obj_memory_usage:-}"                     \
                 CPP_MAX_DEVICE_OBJ_TO_COMPILE_IN_PARALLEL="${!cpp_max_device_obj_to_compile_in_parallel:-}" \
                 generate_cpp_scripts                                                                        ;
+                NAME="${repo_name:-}"                                                                       \
+                SRC_PATH=~/"${!repo_path:-}"                                                                \
+                CPP_LIB="${cpp_name:-}"                                                                     \
+                CPP_TEST="${!cpp_test:-}"                                                                   \
+                generate_cpp_test_script                                                                    ;
             fi
         done
 
@@ -310,6 +346,7 @@ generate_scripts() {
         for ((j=0; j < ${!py_length:-0}; j+=1)); do
             py_env="${repo}_python_${j}_env";
             py_name="${repo}_python_${j}_name";
+            py_test="${repo}_python_${j}_test";
             py_cmake_args="${repo}_python_${j}_args_cmake";
             pip_wheel_args="${repo}_python_${j}_args_wheel";
             pip_install_args="${repo}_python_${j}_args_install";
@@ -352,6 +389,11 @@ generate_scripts() {
                 PIP_WHEEL_ARGS="${!pip_wheel_args:-}"     \
                 PIP_INSTALL_ARGS="${!pip_install_args:-}" \
                 generate_python_scripts                   ;
+                NAME="${repo_name:-}"                     \
+                SRC_PATH=~/"${!repo_path:-}"              \
+                PY_LIB="${py_name}"                       \
+                PY_TEST="${!py_test:-}"                   \
+                generate_python_test_script               ;
             fi
         done
 
@@ -362,6 +404,10 @@ generate_scripts() {
             PY_LIB="${py_libs[*]@Q}"   \
             CPP_LIB="${cpp_libs[*]@Q}" \
             generate_repo_scripts      ;
+            NAME="${repo_name:-}"      \
+            PY_LIB="${py_libs[*]@Q}"   \
+            CPP_LIB="${cpp_libs[*]@Q}" \
+            generate_repo_test_script  ;
         fi
 
         # Generate a clone script for each repo
@@ -383,7 +429,7 @@ generate_scripts() {
     unset cpp_name_to_path;
 
     if ((${#repo_names[@]} > 0)); then
-        for script in "clone" "clean" "configure" "build" "cpack" "install" "uninstall"; do
+        for script in "clone" "clean" "configure" "build" "cpack" "install" "uninstall" "test"; do
             # Generate a script to run a script for all repos
             NAME="${cloned_repos[0]:-${repo_names[0]:-}}" \
             NAMES="${repo_names[*]@Q}"  \
@@ -392,7 +438,7 @@ generate_scripts() {
             generate_all_script         ;
         done
 
-        for script in "clean" "build"; do
+        for script in "clean" "build" "test"; do
             # Generate a script to run C++ builds for all repos
             NAME="${cpp_names[0]:-${repo_names[0]:-}}" \
             NAMES="${cpp_names[*]@Q}"   \

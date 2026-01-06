@@ -5,13 +5,13 @@
     "args": {
       "CUDA": "13.0",
       "PYTHON_PACKAGE_MANAGER": "conda",
-      "BASE": "rapidsai/devcontainers:25.12-cpp-mambaforge"
+      "BASE": "rapidsai/devcontainers:26.02-cpp-mambaforge"
     }
   },
   "runArgs": [
     "--rm",
     "--name",
-    "${localEnv:USER:anon}-rapids-${localWorkspaceFolderBasename}-25.12-cuda13.0-conda",
+    "${localEnv:USER:anon}-rapids-${localWorkspaceFolderBasename}-26.02-cuda13.0-conda",
     "--ulimit",
     "nofile=500000"
   ],
@@ -47,11 +47,13 @@
     "./features/src/utils",
     "./features/src/rapids-build-utils"
   ],
-  "initializeCommand": ["/bin/bash", "-c", "mkdir -m 0755 -p ${localWorkspaceFolder}/../.{aws,cache,config,conda/pkgs,conda/${localWorkspaceFolderBasename}-cuda13.0-envs,log/devcontainer-utils} ${localWorkspaceFolder}/../{rmm,dask-cuda,kvikio,ucxx,cudf,rapidsmpf,raft,cuvs,cumlprims_mg,cuml,cugraph,cugraph-gnn,nx-cugraph}"],
+  "initializeCommand": ["/bin/bash", "-c", "mkdir -m 0755 -p ${localWorkspaceFolder}/../.{aws,cache,config,conda/pkgs,conda/${localWorkspaceFolderBasename}-cuda13.0-envs,log/devcontainer-utils} ${localWorkspaceFolder}/../{rmm,dask-cuda,kvikio,ucxx,cudf,rapidsmpf,raft,cuvs,cuml,cugraph,cugraph-gnn,nx-cugraph}"],
   "postAttachCommand": ["/bin/bash", "-c", "if [ ${CODESPACES:-false} = 'true' ]; then . devcontainer-utils-post-attach-command; fi"],
   "workspaceFolder": "/home/coder",
   "workspaceMount": "source=${localWorkspaceFolder},target=/home/coder/devcontainers,type=bind,consistency=consistent",
   "mounts": [
+    "source=/etc/timezone,target=/etc/timezone,type=bind,consistency=consistent",
+    "source=/etc/localtime,target=/etc/localtime,type=bind,consistency=consistent",
     "source=${localWorkspaceFolder}/../rmm,target=/home/coder/rmm,type=bind,consistency=consistent",
     "source=${localWorkspaceFolder}/../dask-cuda,target=/home/coder/dask-cuda,type=bind,consistency=consistent",
     "source=${localWorkspaceFolder}/../kvikio,target=/home/coder/kvikio,type=bind,consistency=consistent",
@@ -60,7 +62,6 @@
     "source=${localWorkspaceFolder}/../rapidsmpf,target=/home/coder/rapidsmpf,type=bind,consistency=consistent",
     "source=${localWorkspaceFolder}/../raft,target=/home/coder/raft,type=bind,consistency=consistent",
     "source=${localWorkspaceFolder}/../cuvs,target=/home/coder/cuvs,type=bind,consistency=consistent",
-    "source=${localWorkspaceFolder}/../cumlprims_mg,target=/home/coder/cumlprims_mg,type=bind,consistency=consistent",
     "source=${localWorkspaceFolder}/../cuml,target=/home/coder/cuml,type=bind,consistency=consistent",
     "source=${localWorkspaceFolder}/../cugraph,target=/home/coder/cugraph,type=bind,consistency=consistent",
     "source=${localWorkspaceFolder}/../cugraph-gnn,target=/home/coder/cugraph-gnn,type=bind,consistency=consistent",

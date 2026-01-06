@@ -7,7 +7,7 @@ A feature to install ninja-build
 
 ```json
 "features": {
-    "ghcr.io/rapidsai/devcontainers/features/ninja:25": {}
+    "ghcr.io/rapidsai/devcontainers/features/ninja:26": {}
 }
 ```
 
