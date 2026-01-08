@@ -9,7 +9,7 @@
 # Primary interface:   bash update-version.sh <new_version> [--run-context=main|release]
 # Fallback interface:  [RAPIDS_RUN_CONTEXT=main|release] bash update-version.sh <new_version>
 # CLI arguments take precedence over environment variables
-# Defaults to main when no run-context is not specified
+# Defaults to main when no run-context is specified
 
 set -euo pipefail
 

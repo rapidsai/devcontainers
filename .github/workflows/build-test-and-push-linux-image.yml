@@ -109,7 +109,7 @@ jobs:
           # Create and push the multiarch manifest without RAPIDS version (main branch only)
           if [[ "${ref_name}" == "main" ]]; then
             sleep 5;
-            docker buildx imagetools create --tag "${repo}:${base_tag}" "$hash_amd64" "$hash_arm64";
+            docker buildx imagetools create --tag "${repo}:latest-${base_tag}" "$hash_amd64" "$hash_arm64";
             sleep 5;
-            docker buildx imagetools create --tag "${repo}:${base_tag/%-${os//:/}}" "$hash_amd64" "$hash_arm64";
+            docker buildx imagetools create --tag "${repo}:latest-${base_tag/%-${os//:/}}" "$hash_amd64" "$hash_arm64";
           fi
