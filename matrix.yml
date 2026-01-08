@@ -178,6 +178,12 @@ include:
   - { features: [{ <<: *cuda_curr_min, <<: *cccl_cuda_opts }, { name: "cl", version: "14.44" }] } # MSVC 2022
   - { features: [{ <<: *cuda_curr_max, <<: *cccl_cuda_opts }, { name: "cl", version: "14.44" }] } # MSVC 2022
 
+  # Still, we build a 12.0 + 14.50 image for python testing infra:
+  - { features: [{ <<: *cuda_prev_min, <<: *cccl_cuda_opts }, { name: "cl", version: "14.50" }] } # MSVC 2026
+  - { features: [{ <<: *cuda_prev_max, <<: *cccl_cuda_opts }, { name: "cl", version: "14.50" }] } # MSVC 2026
+  - { features: [{ <<: *cuda_curr_min, <<: *cccl_cuda_opts }, { name: "cl", version: "14.50" }] } # MSVC 2026
+  - { features: [{ <<: *cuda_curr_max, <<: *cccl_cuda_opts }, { name: "cl", version: "14.50" }] } # MSVC 2026
+
 # RAPIDS devcontainers
 
 - os: "ubuntu:24.04"
