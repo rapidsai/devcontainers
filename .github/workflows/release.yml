@@ -23,6 +23,7 @@ jobs:
         name: Check GH Event
         shell: bash
         run: |
+          [[ '${{ github.event_name }}' == 'workflow_dispatch' ]] || \
           [[ '${{ github.event_name }}' == 'push' && '${{ github.repository }}' == 'rapidsai/devcontainers' ]] || \
           [[ '${{ github.event_name }}' == 'schedule' && '${{ github.repository }}' == 'rapidsai/devcontainers' ]] || \
           [[ '${{ github.event_name }}' == 'pull_request' && '${{ github.repository }}' != 'rapidsai/devcontainers' ]] \
