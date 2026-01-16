@@ -13,9 +13,27 @@ on:
       - "v[0-9][0-9].[0-9][0-9].[0-9][0-9]"
 
 jobs:
+  check-event:
+    name: Check GH Event
+    runs-on: ubuntu-latest
+    outputs:
+      ok: ${{ steps.check_gh_event.outputs.ok }}
+    steps:
+      - id: check_gh_event
+        name: Check GH Event
+        shell: bash
+        run: |
+          [[ '${{ github.event_name }}' == 'workflow_dispatch' ]] || \
+          [[ '${{ github.event_name }}' == 'push' && '${{ github.repository }}' == 'rapidsai/devcontainers' ]] || \
+          [[ '${{ github.event_name }}' == 'schedule' && '${{ github.repository }}' == 'rapidsai/devcontainers' ]] || \
+          [[ '${{ github.event_name }}' == 'pull_request' && '${{ github.repository }}' != 'rapidsai/devcontainers' ]] \
+          && echo "ok=true"  | tee -a "$GITHUB_OUTPUT" \
+          || echo "ok=false" | tee -a "$GITHUB_OUTPUT";
 
   features-matrix:
     name: Determine features matrix
+    if: needs.check-event.outputs.ok == 'true'
+    needs: check-event
     runs-on: ubuntu-latest
     outputs:
       features: "${{ steps.matrix.outputs.features }}"
