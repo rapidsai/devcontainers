@@ -37,6 +37,9 @@ runs:
 
         mv image/.devcontainer/devcontainer.json{.out,};
 
+        base_tag=$(grep '^base_tag=' "$GITHUB_OUTPUT" | tail -n1 | cut -d= -f2-)
+        version=$(grep '^version=' "$GITHUB_OUTPUT" | tail -n1 | cut -d= -f2-)
+
         echo "base_tag=${base_tag}";
         echo "version=${version}";
         echo -n "devcontainer=";
