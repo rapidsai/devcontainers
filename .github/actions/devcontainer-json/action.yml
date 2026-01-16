@@ -37,6 +37,7 @@ runs:
 
         mv image/.devcontainer/devcontainer.json{.out,};
 
-        echo "tag=${tag}";
+        echo "base_tag=${base_tag}";
+        echo "version=${version}";
         echo -n "devcontainer=";
         cat "image/.devcontainer/devcontainer.json"
