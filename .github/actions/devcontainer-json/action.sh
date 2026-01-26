@@ -17,9 +17,10 @@ tag="$(node -p "$(cat <<EOF
 })].join('-')
 EOF
 )")";
-tag="${VERSION:-latest}-${tag}-$(echo "${os}" | tr -d :)";
+base_tag="${tag}-$(echo "${os}" | tr -d :)";
 
-echo "tag=${tag}" >&3;
+echo "base_tag=${base_tag}" >&3;
+echo "version=${VERSION:-latest}" >&3;
 
 node -e "$(cat <<EOF
 
