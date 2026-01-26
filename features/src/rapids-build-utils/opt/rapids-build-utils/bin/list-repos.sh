@@ -39,20 +39,20 @@ list_repos() {
         <(IFS=$'\n'; echo "${exclude[*]}" | sort -s) \
     ))";
 
-    if test ${#repo[@]} -gt 0; then
+    if test ${#include[@]} -gt 0; then
         # prefix each element
-        repo=("${repo[@]/#/'.name == "'}");
+        include=("${include[@]/#/'.name == "'}");
         # suffix each element
-        repo=("${repo[@]/%/'" or'}");
-        filters+=("| map(select(${repo[@]} false))");
+        include=("${include[@]/%/'" or'}");
+        filters+=("| map(select(${include[@]} false))");
     fi
 
-    if test ${#omit[@]} -gt 0; then
+    if test ${#exclude[@]} -gt 0; then
         # prefix each element
-        omit=("${omit[@]/#/'.name != "'}");
+        exclude=("${exclude[@]/#/'.name != "'}");
         # suffix each element
-        omit=("${omit[@]/%/'" and'}");
-        filters+=("| map(select(${omit[@]} true))");
+        exclude=("${exclude[@]/%/'" and'}");
+        filters+=("| map(select(${exclude[@]} true))");
     fi
 
     if test -n "${filters:+x}"; then
