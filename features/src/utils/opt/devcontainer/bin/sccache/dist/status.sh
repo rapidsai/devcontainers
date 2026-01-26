@@ -7,6 +7,7 @@
 #
 # Boolean options:
 #  -h,--help      Print this text.
+#  --no-dist      Don't print the sccache-dist stats
 #  --no-procs     Don't print the number of sccache processes
 #  --no-stats     Don't print the sccache stats
 #  --no-temps     Don't print the number of sccache tempfiles
@@ -67,15 +68,16 @@ _sccache_dist_status() {
             echo
         fi
 
-        # Print current dist status to verify we're connected
-        sccache 2>/dev/null --dist-status \
-      | {
-            # Passthrough if the format is json
-            if test "$f" = json; then
-                cat - <(echo)
-            else
+        if ! test -n "${no_dist:+x}"; then
+            # Print current dist status to verify we're connected
+            sccache 2>/dev/null --dist-status \
+          | {
+                # Passthrough if the format is json
+                if test "$f" = json; then
+                    cat - <(echo)
+                else
 
-                cat - | jq -r -f <(cat <<EOF
+                    cat - | jq -r -f <(cat <<EOF
   def truncate_val: (
     . as \$x
     | \$x | length as \$l
@@ -111,21 +113,22 @@ _sccache_dist_status() {
   | (\$cols | map(truncate_val)), \$rows[] | @csv
 EOF
     )
-            fi
-        } \
-      | {
-            # Passthrough if the format is csv or json
-            # Otherwise, transform the csv into a tsv.
-            if test "$f" = tsv; then
-                if [[ "$(grep DISTRIB_RELEASE= /etc/lsb-release | cut -d= -f2)" > "20.04" ]]; then
-                    cat - | sed 's/\"//g' | column -t -s, -R $(seq -s, 1 14)
-                else
-                    cat - | sed 's/\"//g' | column -t -s,
                 fi
-            else
-                cat -
-            fi
-        }
+            } \
+          | {
+                # Passthrough if the format is csv or json
+                # Otherwise, transform the csv into a tsv.
+                if test "$f" = tsv; then
+                    if [[ "$(grep DISTRIB_RELEASE= /etc/lsb-release | cut -d= -f2)" > "20.04" ]]; then
+                        cat - | sed 's/\"//g' | column -t -s, -R $(seq -s, 1 14)
+                    else
+                        cat - | sed 's/\"//g' | column -t -s,
+                    fi
+                else
+                    cat -
+                fi
+            }
+        fi
     fi
 }
 
