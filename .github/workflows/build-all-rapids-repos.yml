@@ -42,9 +42,9 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - { libs: 'rmm kvikio cudf cudf_kafka' }
-          - { libs: 'rmm ucxx raft cuvs cuml'    }
-          - { libs: 'rmm ucxx raft cugraph'      }
+          - { libs: 'rmm kvikio dask-cuda cudf cudf_kafka rapidsmpf'         }
+          - { libs: 'rmm ucxx dask-cuda raft cuvs cuml'                      }
+          - { libs: 'rmm ucxx dask-cuda raft cugraph cugraph-gnn nx-cugraph' }
     with:
       arch: '["amd64", "arm64"]'
       cuda: '["12.9", "13.1"]'
