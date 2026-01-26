@@ -4,6 +4,10 @@ on:
   schedule:
     - cron: '0 0 * * *'
   workflow_call:
+    inputs:
+      env:
+        type: string
+        required: false
 
 jobs:
   check-event:
@@ -48,10 +52,11 @@ jobs:
       env: |
         CONDA_ENV_CREATE_QUIET=1
         SCCACHE_IDLE_TIMEOUT=0
-        SCCACHE_DIST_MAX_RETRIES=inf
         SCCACHE_SERVER_LOG=sccache=debug
+        SCCACHE_DIST_MAX_RETRIES=inf
         SCCACHE_DIST_FALLBACK_TO_LOCAL_COMPILE=false
         SCCACHE_DIST_AUTH_TOKEN_VAR=RAPIDS_AUX_SECRET_1
+        ${{ inputs.env }}
       build_command: |
         # Verify sccache cache location
         sccache --show-adv-stats;
