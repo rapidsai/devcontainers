@@ -30,6 +30,15 @@ list_repos() {
     local query=".repos | {repos: .}";
     local filters=();
 
+    local -a include="(${INCLUDE_REPOS:-} ${repo[@]})";
+    local -a exclude="(${EXCLUDE_REPOS:-} ${omit[@]})";
+    # Remove repos from "include" if they're in "exclude"
+    local -a include="($(                           \
+      comm -23                                      \
+        <(IFS=$'\n'; echo "${include[*]}" | sort -s) \
+        <(IFS=$'\n'; echo "${exclude[*]}" | sort -s) \
+    ))";
+
     if test ${#repo[@]} -gt 0; then
         # prefix each element
         repo=("${repo[@]/#/'.name == "'}");

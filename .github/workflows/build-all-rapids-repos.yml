@@ -27,7 +27,7 @@ jobs:
           || echo "ok=false" | tee -a "$GITHUB_OUTPUT";
 
   build-all-rapids-repos:
-    name: RAPIDS
+    name: ${{ matrix.libs }}
     if: needs.check-event.outputs.ok == 'true'
     needs: check-event
     secrets: inherit
@@ -38,6 +38,13 @@ jobs:
       id-token: write
       contents: read
       pull-requests: read
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - { libs: 'rmm kvikio cudf cudf_kafka' }
+          - { libs: 'rmm ucxx raft cuvs cuml'    }
+          - { libs: 'rmm ucxx raft cugraph'      }
     with:
       arch: '["amd64", "arm64"]'
       cuda: '["12.9", "13.1"]'
@@ -51,6 +58,7 @@ jobs:
       # 5. Use RAPIDS_AUX_SECRET_1 as the sccache-dist auth token
       env: |
         CONDA_ENV_CREATE_QUIET=1
+        INCLUDE_REPOS="${{ matrix.libs }}"
         SCCACHE_IDLE_TIMEOUT=0
         SCCACHE_SERVER_LOG=sccache=debug
         SCCACHE_DIST_MAX_RETRIES=inf
