@@ -8,6 +8,17 @@ on:
       env:
         type: string
         required: false
+      matrix:
+        type: string
+        required: false
+        default: |
+          {
+            "include": [
+              { "libs": "rmm ucxx kvikio dask-cuda cudf cudf_kafka rapidsmpf"    },
+              { "libs": "rmm ucxx dask-cuda raft cuvs cuml"                      },
+              { "libs": "rmm ucxx dask-cuda raft cugraph cugraph-gnn nx-cugraph" }
+            ]
+          }
 
 jobs:
   check-event:
@@ -41,11 +52,7 @@ jobs:
       pull-requests: read
     strategy:
       fail-fast: false
-      matrix:
-        include:
-          - { libs: 'rmm ucxx kvikio dask-cuda cudf cudf_kafka rapidsmpf'    }
-          - { libs: 'rmm ucxx dask-cuda raft cuvs cuml'                      }
-          - { libs: 'rmm ucxx dask-cuda raft cugraph cugraph-gnn nx-cugraph' }
+      matrix: ${{ fromJSON(inputs.matrix) }}
     with:
       arch: '["amd64", "arm64"]'
       cuda: '["12.9", "13.1"]'

@@ -14,6 +14,7 @@ jobs:
     uses: ./.github/workflows/build-all-rapids-repos.yml
     with:
       env: ${{ matrix.env }}
+      matrix: '{ "include": [{ "libs": "" }] }'
     strategy:
       fail-fast: false
       matrix:
@@ -36,6 +37,7 @@ jobs:
     uses: ./.github/workflows/build-all-rapids-repos.yml
     with:
       env: ${{ matrix.env }}
+      matrix: '{ "include": [{ "libs": "" }] }'
     strategy:
       fail-fast: false
       matrix:
