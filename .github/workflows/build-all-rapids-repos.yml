@@ -74,9 +74,6 @@ jobs:
         SCCACHE_DIST_AUTH_TOKEN_VAR=RAPIDS_AUX_SECRET_1
         ${{ inputs.env }}
       build_command: |
-        # Verify sccache cache location
-        sccache --show-adv-stats;
-
         function begin_group() {
           local blue="34"
           echo -e "::group::\e[${blue}m${1:-}\e[0m"
@@ -95,19 +92,22 @@ jobs:
 
         function run_command() {
           local -;
-          local group="${1:-}"
-          shift
-          local command=("$@")
-          local status=0
+          set -euo pipefail;
 
-          begin_group "$group"
-          echo "Working directory: $(pwd)"
-          echo "Running command: ${command[*]}"
-          set +e
-          "${command[@]}" || status=$?
-          set -e
-          end_group "$group" "$status"
-          return "$status"
+          local group="${1:-}";
+          shift;
+          local command=("$@");
+          local exit_code="0";
+
+          begin_group "$group";
+
+          echo "Working directory: $(pwd)";
+          echo "Running command: ${command[*]}";
+          "${command[@]}" || exit_code=$?;
+
+          end_group "$group" "$exit_code"
+
+          return "$exit_code"
         }
 
         if test -n "${DISABLE_SCCACHE:+x}"; then
@@ -127,16 +127,16 @@ jobs:
 
         # Configure all the C++ libs
         run_command "Configure C++ libraries" bash -c "\
-          time configure-all            \
-            -j0                         \
-            -GNinja                     \
-            -Wno-dev                    \
-            -DBUILD_TESTS=ON            \
-            -DBUILD_BENCHMARKS=ON       \
-            -DBUILD_PRIMS_BENCH=ON      \
-            -DBUILD_SHARED_LIBS=ON      \
-            -DRAFT_COMPILE_LIBRARY=ON   \
-            -DBUILD_CUGRAPH_MG_TESTS=ON 2>&1 \
+          time configure-all                           \
+            -j0                                        \
+            -GNinja                                    \
+            -Wno-dev                                   \
+            -DBUILD_TESTS=ON                           \
+            -DBUILD_BENCHMARKS=ON                      \
+            -DBUILD_PRIMS_BENCH=ON                     \
+            -DBUILD_SHARED_LIBS=ON                     \
+            -DRAFT_COMPILE_LIBRARY=ON                  \
+            -DBUILD_CUGRAPH_MG_TESTS=ON 2>&1           \
           | tee -a telemetry-artifacts/build.log";
 
         # Build all the C++ libs
