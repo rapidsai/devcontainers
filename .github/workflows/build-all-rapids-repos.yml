@@ -67,6 +67,7 @@ jobs:
       env: |
         CONDA_ENV_CREATE_QUIET=1
         INCLUDE_REPOS="${{ matrix.libs }}"
+        PARALLEL_LEVEL=0
         SCCACHE_IDLE_TIMEOUT=0
         SCCACHE_SERVER_LOG=sccache=debug
         SCCACHE_DIST_MAX_RETRIES=inf
@@ -128,7 +129,7 @@ jobs:
         # Configure all the C++ libs
         run_command "Configure C++ libraries" bash -c "\
           time configure-all                           \
-            -j0                                        \
+            -j${PARALLEL_LEVEL}                        \
             -GNinja                                    \
             -Wno-dev                                   \
             -DBUILD_TESTS=ON                           \
@@ -141,11 +142,11 @@ jobs:
 
         # Build all the C++ libs
         run_command "Build C++ libraries" bash -c "\
-          time build-all-cpp -j0 -v 2>&1 | tee -a telemetry-artifacts/build.log";
+          time build-all-cpp -j${PARALLEL_LEVEL} -v 2>&1 | tee -a telemetry-artifacts/build.log";
 
         # Build all the Python libs
         run_command "Build Python libraries" bash -c "\
-          time build-all-python -j0 -v 2>&1 | tee -a telemetry-artifacts/build.log";
+          time build-all-python -j${PARALLEL_LEVEL} -v 2>&1 | tee -a telemetry-artifacts/build.log";
 
         # Print cache and dist stats
         run_command "sccache stats" bash -c "\

@@ -21,9 +21,11 @@ jobs:
         include:
           - name: 'no sccache'
             env: |
+              PARALLEL_LEVEL=
               DISABLE_SCCACHE=1
               SCCACHE_NO_CACHE=1
               SCCACHE_NO_DIST_COMPILE=1
+              MAX_DEVICE_OBJ_TO_COMPILE_IN_PARALLEL=1
           - name: 'recache, local'
             env: |
               SCCACHE_RECACHE=1
