@@ -19,14 +19,16 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - name: 'sccache: no, dist: no'
+          - name: 'no sccache'
             env: |
               DISABLE_SCCACHE=1
-          - name: 'sccache: yes, dist: no'
+              SCCACHE_NO_CACHE=1
+              SCCACHE_NO_DIST_COMPILE=1
+          - name: 'recache, local'
             env: |
               SCCACHE_RECACHE=1
               SCCACHE_NO_DIST_COMPILE=1
-          - name: 'sccache: yes, dist: yes'
+          - name: 'recache, remote'
             env: |
               SCCACHE_RECACHE=1
 
@@ -42,9 +44,9 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - name: 'preprocessor cache: no'
-            env: |
-              SCCACHE_S3_USE_PREPROCESSOR_CACHE_MODE=0
-          - name: 'preprocessor cache: yes'
+          - name: 'preprocessor cache'
             env: |
               SCCACHE_S3_USE_PREPROCESSOR_CACHE_MODE=1
+          - name: 'no preprocessor cache'
+            env: |
+              SCCACHE_S3_USE_PREPROCESSOR_CACHE_MODE=0

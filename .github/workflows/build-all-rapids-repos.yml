@@ -77,30 +77,81 @@ jobs:
         # Verify sccache cache location
         sccache --show-adv-stats;
 
+        function begin_group() {
+          local blue="34"
+          echo -e "::group::\e[${blue}m${1:-}\e[0m"
+        }
+
+        function end_group() {
+          local name="${1:-}"
+          local build_status="${2:-0}"
+          local red="31"
+
+          echo "::endgroup::"
+          if [ "$build_status" -ne 0 ]; then
+            echo -e "::error::\e[${red}m ${name} - Failed (⬆️ click above for full log ⬆️)\e[0m"
+          fi
+        }
+
+        function run_command() {
+          local -;
+          local group="${1:-}"
+          shift
+          local command=("$@")
+          local status=0
+
+          begin_group "$group"
+          echo "Working directory: $(pwd)"
+          echo "Running command: ${command[*]}"
+          set +e
+          "${command[@]}" || status=$?
+          set -e
+          end_group "$group" "$status"
+          return "$status"
+        }
+
+        if test -n "${DISABLE_SCCACHE:+x}"; then
+          . /opt/devcontainer/bin/update-envvars.sh;
+          for VAR in RUSTC_WRAPPER CMAKE_C_COMPILER_LAUNCHER CMAKE_CXX_COMPILER_LAUNCHER CMAKE_CUDA_COMPILER_LAUNCHER; do
+            reset_envvar "$VAR";
+            override_envvar "$VAR" "";
+          done
+        fi
+
         # Clone all the repos
-        clone-all -j$(nproc) -v -q --clone-upstream --depth 1 --single-branch --shallow-submodules;
+        run_command "Clone RAPIDS repositories" \
+          clone-all -j$(nproc) -v -q --clone-upstream --depth 1 --single-branch --shallow-submodules --no-update-env;
+
+        run_command "Create RAPIDS python environment" \
+          rapids-post-start-command;
 
         # Configure all the C++ libs
-        time configure-all            \
-          -j0                         \
-          -GNinja                     \
-          -Wno-dev                    \
-          -DBUILD_TESTS=ON            \
-          -DBUILD_BENCHMARKS=ON       \
-          -DBUILD_PRIMS_BENCH=ON      \
-          -DBUILD_SHARED_LIBS=ON      \
-          -DRAFT_COMPILE_LIBRARY=ON   \
-          -DBUILD_CUGRAPH_MG_TESTS=ON ;
+        run_command "Configure C++ libraries" bash -c "\
+          time configure-all            \
+            -j0                         \
+            -GNinja                     \
+            -Wno-dev                    \
+            -DBUILD_TESTS=ON            \
+            -DBUILD_BENCHMARKS=ON       \
+            -DBUILD_PRIMS_BENCH=ON      \
+            -DBUILD_SHARED_LIBS=ON      \
+            -DRAFT_COMPILE_LIBRARY=ON   \
+            -DBUILD_CUGRAPH_MG_TESTS=ON 2>&1 \
+          | tee -a telemetry-artifacts/build.log";
 
         # Build all the C++ libs
-        time build-all-cpp -j0;
+        run_command "Build C++ libraries" bash -c "\
+          time build-all-cpp -j0 -v 2>&1 | tee -a telemetry-artifacts/build.log";
 
         # Build all the Python libs
-        time build-all-python -j0;
+        run_command "Build Python libraries" bash -c "\
+          time build-all-python -j0 -v 2>&1 | tee -a telemetry-artifacts/build.log";
 
         # Print cache and dist stats
-        sccache --show-adv-stats;
+        run_command "sccache stats" bash -c "\
+          sccache --show-adv-stats | tee -a telemetry-artifacts/sccache-stats.txt";
 
         # Print build times
-        find /var/log/devcontainer-utils/ -type f -name 'build-*-time.log' -print0 \
-          | xargs -0 -n1 grep -H real | sed 's/real\t/ /g' || : # Nonfatal if not found
+        run_command "Build times" bash -c "\
+          find /var/log/devcontainer-utils/ -type f -name 'build-*-time.log' -print0 \
+            | xargs -0 -n1 grep -H real | sed 's/real\t/ /g' || :" # Nonfatal if not found
