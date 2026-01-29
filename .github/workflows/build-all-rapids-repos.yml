@@ -142,11 +142,11 @@ jobs:
 
         # Build all the C++ libs
         run_command "Build C++ libraries" bash -c "\
-          time build-all-cpp -j${PARALLEL_LEVEL} -v 2>&1 | tee -a telemetry-artifacts/build.log";
+          time build-all-cpp -j${PARALLEL_LEVEL} 2>&1 | tee -a telemetry-artifacts/build.log";
 
         # Build all the Python libs
         run_command "Build Python libraries" bash -c "\
-          time build-all-python -j${PARALLEL_LEVEL} -v 2>&1 | tee -a telemetry-artifacts/build.log";
+          time build-all-python -j${PARALLEL_LEVEL} 2>&1 | tee -a telemetry-artifacts/build.log";
 
         # Print cache and dist stats
         run_command "sccache stats" bash -c "\
