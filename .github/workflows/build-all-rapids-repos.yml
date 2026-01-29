@@ -8,6 +8,14 @@ on:
       env:
         type: string
         required: false
+      branch:
+        type: string
+        required: false
+        default: main
+      node_type:
+        type: string
+        required: false
+        default: cpu16
       matrix:
         type: string
         required: false
@@ -56,7 +64,7 @@ jobs:
     with:
       arch: '["amd64", "arm64"]'
       cuda: '["12.9", "13.1"]'
-      node_type: cpu16
+      node_type: ${{ inputs.node_type }}
       rapids-aux-secret-1: GIST_REPO_READ_ORG_GITHUB_TOKEN
       timeout-minutes: 720
       # 1. Prohibit sccache from shutting down automatically
@@ -121,7 +129,7 @@ jobs:
 
         # Clone all the repos
         run_command "Clone RAPIDS repositories" \
-          clone-all -j$(nproc) -v -q --clone-upstream --depth 1 --single-branch --shallow-submodules --no-update-env;
+          clone-all -j$(nproc) -b ${{ inputs.branch }} -v -q --clone-upstream --depth 1 --single-branch --shallow-submodules --no-update-env;
 
         run_command "Create RAPIDS python environment" \
           rapids-post-start-command;

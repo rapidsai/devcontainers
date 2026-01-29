@@ -6,6 +6,11 @@ concurrency:
 
 on:
   workflow_dispatch:
+    inputs:
+      branch:
+        type: string
+        required: false
+        default: main
 
 jobs:
   uncached-builds:
@@ -13,8 +18,10 @@ jobs:
     secrets: inherit
     uses: ./.github/workflows/build-all-rapids-repos.yml
     with:
+      branch: ${{ inputs.branch }}
       env: ${{ matrix.env }}
       matrix: '{ "include": [{ "libs": "" }] }'
+      node_type: cpu32
     strategy:
       fail-fast: false
       matrix:
@@ -40,8 +47,10 @@ jobs:
     secrets: inherit
     uses: ./.github/workflows/build-all-rapids-repos.yml
     with:
+      branch: ${{ inputs.branch }}
       env: ${{ matrix.env }}
       matrix: '{ "include": [{ "libs": "" }] }'
+      node_type: cpu32
     strategy:
       fail-fast: false
       matrix:
