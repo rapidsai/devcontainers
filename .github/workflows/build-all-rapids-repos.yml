@@ -4,6 +4,21 @@ on:
   schedule:
     - cron: '0 0 * * *'
   workflow_call:
+    inputs:
+      env:
+        type: string
+        required: false
+      matrix:
+        type: string
+        required: false
+        default: |
+          {
+            "include": [
+              { "libs": "rmm ucxx kvikio dask-cuda cudf cudf_kafka rapidsmpf"    },
+              { "libs": "rmm ucxx dask-cuda raft cuvs cuml"                      },
+              { "libs": "rmm ucxx dask-cuda raft cugraph cugraph-gnn nx-cugraph" }
+            ]
+          }
 
 jobs:
   check-event:
@@ -16,6 +31,7 @@ jobs:
         name: Check GH Event
         shell: bash
         run: |
+          [[ '${{ github.event_name }}' == 'workflow_dispatch' ]] || \
           [[ '${{ github.event_name }}' == 'push' && '${{ github.repository }}' == 'rapidsai/devcontainers' ]] || \
           [[ '${{ github.event_name }}' == 'schedule' && '${{ github.repository }}' == 'rapidsai/devcontainers' ]] || \
           [[ '${{ github.event_name }}' == 'pull_request' && '${{ github.repository }}' != 'rapidsai/devcontainers' ]] \
@@ -23,7 +39,7 @@ jobs:
           || echo "ok=false" | tee -a "$GITHUB_OUTPUT";
 
   build-all-rapids-repos:
-    name: RAPIDS
+    name: ${{ matrix.libs }}
     if: needs.check-event.outputs.ok == 'true'
     needs: check-event
     secrets: inherit
@@ -34,9 +50,12 @@ jobs:
       id-token: write
       contents: read
       pull-requests: read
+    strategy:
+      fail-fast: false
+      matrix: ${{ fromJSON(inputs.matrix) }}
     with:
       arch: '["amd64", "arm64"]'
-      cuda: '["12.9", "13.0"]'
+      cuda: '["12.9", "13.1"]'
       node_type: cpu16
       rapids-aux-secret-1: GIST_REPO_READ_ORG_GITHUB_TOKEN
       timeout-minutes: 720
@@ -47,11 +66,13 @@ jobs:
       # 5. Use RAPIDS_AUX_SECRET_1 as the sccache-dist auth token
       env: |
         CONDA_ENV_CREATE_QUIET=1
+        INCLUDE_REPOS="${{ matrix.libs }}"
         SCCACHE_IDLE_TIMEOUT=0
-        SCCACHE_DIST_MAX_RETRIES=inf
         SCCACHE_SERVER_LOG=sccache=debug
+        SCCACHE_DIST_MAX_RETRIES=inf
         SCCACHE_DIST_FALLBACK_TO_LOCAL_COMPILE=false
         SCCACHE_DIST_AUTH_TOKEN_VAR=RAPIDS_AUX_SECRET_1
+        ${{ inputs.env }}
       build_command: |
         # Verify sccache cache location
         sccache --show-adv-stats;

@@ -1,7 +1,7 @@
 {
   "name": "devcontainer-utils",
   "id": "utils",
-  "version": "26.2.4",
+  "version": "26.4.1",
   "description": "A feature to install RAPIDS devcontainer utility scripts",
   "containerEnv": {
     "BASH_ENV": "/etc/bash.bash_env"

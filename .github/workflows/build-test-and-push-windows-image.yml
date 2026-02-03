@@ -50,12 +50,14 @@ jobs:
           cl="${{ fromJSON(inputs.features)[1].version }}";
           cuda="${{ fromJSON(inputs.features)[0].version }}";
           version="$(git describe --abbrev=0 --tags | sed 's/[a-zA-Z]//g' | cut -d '.' -f -2)";
-          tag_without_os="${version}-cuda${cuda}-cl${cl}";
+          base_tag="cuda${cuda}-cl${cl}";
+          tag_without_os="${version}-${base_tag}";
           cat <<EOF | tee "$GITHUB_OUTPUT"
           cl=${cl}
           cuda=${cuda}
           repo=${repo,,}
           version=${version}
+          base_tag=${base_tag}
           tag_without_os=${tag_without_os}
           tag=${tag_without_os}-${{ inputs.os }}${{ matrix.edition }}
           EOF
@@ -93,3 +95,12 @@ jobs:
           docker image tag ${{ steps.info.outputs.repo }}:${{ steps.info.outputs.tag }} ${{ steps.info.outputs.repo }}:${{ steps.info.outputs.tag_without_os }}
           docker push ${{ steps.info.outputs.repo }}:${{ steps.info.outputs.tag_without_os }}
           docker push ${{ steps.info.outputs.repo }}:${{ steps.info.outputs.tag }}
+
+      - if: inputs.push == 'true' && github.ref_name == 'main'
+        name: Push latest-${{ steps.info.outputs.base_tag }}
+        shell: powershell
+        run: |
+          docker image tag ${{ steps.info.outputs.repo }}:${{ steps.info.outputs.tag }} ${{ steps.info.outputs.repo }}:latest-${{ steps.info.outputs.base_tag }}-${{ inputs.os }}${{ matrix.edition }}
+          docker image tag ${{ steps.info.outputs.repo }}:${{ steps.info.outputs.tag }} ${{ steps.info.outputs.repo }}:latest-${{ steps.info.outputs.base_tag }}
+          docker push ${{ steps.info.outputs.repo }}:latest-${{ steps.info.outputs.base_tag }}-${{ inputs.os }}${{ matrix.edition }}
+          docker push ${{ steps.info.outputs.repo }}:latest-${{ steps.info.outputs.base_tag }}

@@ -59,13 +59,6 @@ build_rapids() {
     ) 2>&1 | maybe_write_build_log raft;
 
     (
-        echo "building cuMLPrims";
-        clean-cumlprims_mg;
-        build-cumlprims_mg --verbose;
-        sccache -s;
-    ) 2>&1 | maybe_write_build_log cumlprims_mg;
-
-    (
         echo "building cuML";
         clean-cuml;
         build-cuml --verbose;

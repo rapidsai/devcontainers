@@ -3,7 +3,7 @@ x-cuda-prev-max: &cuda_prev_max { name: "cuda", version: "12.9" }
 x-cuda-curr-min: &cuda_curr_min { name: "cuda", version: "13.0" }
 x-cuda-curr-max: &cuda_curr_max { name: "cuda", version: "13.1" }
 x-cuda-prev-max-rapids: &cuda_prev_max_rapids { name: "cuda", version: "12.9" }
-x-cuda-curr-max-rapids: &cuda_curr_max_rapids { name: "cuda", version: "13.0" }
+x-cuda-curr-max-rapids: &cuda_curr_max_rapids { name: "cuda", version: "13.1" }
 
 # CUDA 12.0 support stops at gcc 12.
 x-gcc-7: &gcc_7 { name: "gcc", version: "7" }
@@ -40,7 +40,7 @@ x-ucx-rapids: &ucx_rapids { name: "ucx", version: "1.19.0" }
 x-openmpi: &openmpi { name: "openmpi", version: "5.0.7" }
 
 x-cccl-dev: &cccl_dev { name: "cccl-dev", hide: true, doxygenVersion: "1.9.6" }
-x-clangd-dev: &clangd_dev { name: "llvm", version: "dev", packages: "clangd", hide: true }
+x-clangd-dev: &clangd_dev { name: "llvm", version: "22", packages: "clangd", hide: true }
 x-clang-format-cccl: &clang_format_cccl { name: "llvm", version: "21", packages: "clang-format llvm-tools", hide: true }
 x-clang-format-rapids: &clang_format_rapids { name: "llvm", version: "16", packages: "clang-format", hide: true }
 # Docker outside of Docker used to build python wheels:
@@ -177,6 +177,12 @@ include:
   - { features: [{ <<: *cuda_prev_max, <<: *cccl_cuda_opts }, { name: "cl", version: "14.44" }] } # MSVC 2022
   - { features: [{ <<: *cuda_curr_min, <<: *cccl_cuda_opts }, { name: "cl", version: "14.44" }] } # MSVC 2022
   - { features: [{ <<: *cuda_curr_max, <<: *cccl_cuda_opts }, { name: "cl", version: "14.44" }] } # MSVC 2022
+
+  # Still, we build a 12.0 + 14.50 image for python testing infra:
+  - { features: [{ <<: *cuda_prev_min, <<: *cccl_cuda_opts }, { name: "cl", version: "14.50" }] } # MSVC 2026
+  - { features: [{ <<: *cuda_prev_max, <<: *cccl_cuda_opts }, { name: "cl", version: "14.50" }] } # MSVC 2026
+  - { features: [{ <<: *cuda_curr_min, <<: *cccl_cuda_opts }, { name: "cl", version: "14.50" }] } # MSVC 2026
+  - { features: [{ <<: *cuda_curr_max, <<: *cccl_cuda_opts }, { name: "cl", version: "14.50" }] } # MSVC 2026
 
 # RAPIDS devcontainers
 

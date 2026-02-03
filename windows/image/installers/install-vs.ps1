@@ -1,9 +1,9 @@
 Param(
-    [Parameter(Mandatory=$true)]
+    [Parameter(Mandatory = $true)]
     [ValidateSet('15', '16', '17', '18')]
     [string]
     $msvcVersion,
-    [Parameter(Mandatory=$false)]
+    [Parameter(Mandatory = $false)]
     [string]
     $clVersion
 )
@@ -37,10 +37,10 @@ $vsComponentsMap = @{
 }
 
 $channelMap = @{
-    "15"="release"
-    "16"="release"
-    "17"="release"
-    "18"="insiders"
+    "15" = "release"
+    "16" = "release"
+    "17" = "release"
+    "18" = "stable"
 }
 $channel = $channelMap[$msvcVersion]
 
