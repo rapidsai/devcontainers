@@ -28,7 +28,6 @@ rm -rf /opt/conda;
 
 export PATH="/opt/conda/bin:${PATH}";
 
-conda update -n base -c conda-forge conda conda-libmamba-solver;
 conda clean --tarballs --index-cache --packages --yes;
 find /opt/conda -follow -type f -name '*.a' -delete;
 find /opt/conda -follow -type f -name '*.pyc' -delete;
