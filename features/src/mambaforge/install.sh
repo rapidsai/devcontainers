@@ -1,7 +1,7 @@
 #! /usr/bin/env bash
 set -e
 
-MINIFORGE_VERSION="${VERSION:-latest}";
+MINIFORGE_VERSION="${VERSION:-${MINIFORGE_VERSION:-latest}}";
 
 # Ensure we're in this feature's directory during build
 cd "$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )";
