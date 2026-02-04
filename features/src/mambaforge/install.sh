@@ -28,7 +28,7 @@ rm -rf /opt/conda;
 
 export PATH="/opt/conda/bin:${PATH}";
 
-conda update -n base -c conda-forge conda="${MINIFORGE_VERSION%.*}" conda-libmamba-solver;
+conda update -n base -c conda-forge conda-libmamba-solver;
 conda clean --tarballs --index-cache --packages --yes;
 find /opt/conda -follow -type f -name '*.a' -delete;
 find /opt/conda -follow -type f -name '*.pyc' -delete;
