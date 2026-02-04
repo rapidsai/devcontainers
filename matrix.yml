@@ -33,7 +33,7 @@ x-nvhpc-curr: &nvhpc_curr { name: "nvhpc", version: "26.1" }
 
 x-nvhpc-env: &nvhpc_env { CC: "nvc", CXX: "nvc++", CUDAHOSTCXX: "nvc++" }
 
-x-mambaforge: &conda { name: "mambaforge" }
+x-mambaforge: &conda { name: "mambaforge", version: "25.11.0-1" }
 x-python: &python { name: "ghcr.io/devcontainers/features/python:1.7.1", version: "os-provided", installTools: false, enableShared: true, optimize: true, hide: true }
 x-python-rapids: &python_rapids { name: "ghcr.io/devcontainers/features/python:1.7.1", version: "3.13", installTools: false, enableShared: true, optimize: true, hide: true }
 x-ucx-rapids: &ucx_rapids { name: "ucx", version: "1.19.0" }
