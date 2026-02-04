@@ -115,7 +115,7 @@ jobs:
           rapids-post-start-command;
 
         # Configure all the C++ libs
-        run_command "Configure C++ libraries" \
+        run_command "Configure C++ libraries" bash -c "\
           time configure-all \
             -j${PARALLEL_LEVEL} \
             -GNinja \
@@ -125,17 +125,19 @@ jobs:
             -DBUILD_PRIMS_BENCH=ON \
             -DBUILD_SHARED_LIBS=ON \
             -DRAFT_COMPILE_LIBRARY=ON \
-            -DBUILD_CUGRAPH_MG_TESTS=ON
+            -DBUILD_CUGRAPH_MG_TESTS=ON"
 
         for ENVVAR in "SCCACHE_RECACHE=1" \
                       "SCCACHE_S3_USE_PREPROCESSOR_CACHE_MODE=0" \
                       "SCCACHE_S3_USE_PREPROCESSOR_CACHE_MODE=1" ; do
 
           # Build all the C++ libs
-          run_command "Build C++ libraries (${ENVVAR})" time ${ENVVAR} build-all-cpp -j${PARALLEL_LEVEL}
+          run_command "Build C++ libraries (${ENVVAR})" bash -c "
+            time ${ENVVAR} build-all-cpp -j${PARALLEL_LEVEL}"
 
           # Print cache and dist stats
-          run_command "sccache stats (${ENVVAR})" sccache --show-adv-stats
+          run_command "sccache stats (${ENVVAR})" \
+            sccache --show-adv-stats
 
           # Print build times
           run_command "Build times (${ENVVAR})" bash -c "\
