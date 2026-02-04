@@ -108,15 +108,26 @@ jobs:
         }
 
         # Clone all the repos
-        run_command "Clone RAPIDS repositories" \
-          clone-all -j$(nproc) -b ${{ inputs.branch }} -v -q --clone-upstream --depth 1 --single-branch --shallow-submodules --no-update-env;
+        time run_command "Clone RAPIDS repositories" bash -c "\
+          clone-all \
+            -j$(nproc) \
+            -b ${{ inputs.branch }} \
+            -q \
+            -v \
+            --clone-upstream \
+            --depth 1 \
+            --single-branch \
+            --shallow-submodules \
+            --no-update-env \
+          >/dev/null
+          ";
 
-        run_command "Create RAPIDS python environment" \
+        time run_command "Create RAPIDS python environment" \
           rapids-post-start-command;
 
         # Configure all the C++ libs
-        run_command "Configure C++ libraries" bash -c "\
-          time configure-all \
+        time run_command "Configure C++ libraries" bash -c "\
+          configure-all \
             -j${PARALLEL_LEVEL} \
             -GNinja \
             -Wno-dev \
@@ -125,15 +136,16 @@ jobs:
             -DBUILD_PRIMS_BENCH=ON \
             -DBUILD_SHARED_LIBS=ON \
             -DRAFT_COMPILE_LIBRARY=ON \
-            -DBUILD_CUGRAPH_MG_TESTS=ON"
+            -DBUILD_CUGRAPH_MG_TESTS=ON \
+          >/dev/null"
 
         for ENVVAR in "SCCACHE_RECACHE=1" \
                       "SCCACHE_S3_USE_PREPROCESSOR_CACHE_MODE=0" \
                       "SCCACHE_S3_USE_PREPROCESSOR_CACHE_MODE=1" ; do
 
           # Build all the C++ libs
-          run_command "Build C++ libraries (${ENVVAR})" bash -c "
-            time ${ENVVAR} build-all-cpp -j${PARALLEL_LEVEL}"
+          time run_command "Build C++ libraries (${ENVVAR})" bash -c "
+            ${ENVVAR} build-all-cpp -j${PARALLEL_LEVEL} >/dev/null"
 
           # Print cache and dist stats
           run_command "sccache stats (${ENVVAR})" \
