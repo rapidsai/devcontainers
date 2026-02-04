@@ -143,9 +143,15 @@ jobs:
                       "SCCACHE_S3_USE_PREPROCESSOR_CACHE_MODE=0" \
                       "SCCACHE_S3_USE_PREPROCESSOR_CACHE_MODE=1" ; do
 
+          # Restart sccache
+          run_command "Start sccache (${ENVVAR})" bash -c "\
+            env ${ENVVAR} devcontainer-utils-start-sccache --kill-all >/dev/null 2>&1
+          "
+
           # Build all the C++ libs
-          time run_command "Build C++ libraries (${ENVVAR})" bash -c "
-            ${ENVVAR} build-all-cpp -j${PARALLEL_LEVEL} >/dev/null"
+          time run_command "Build C++ libraries (${ENVVAR})" bash -c "\
+            ${ENVVAR} build-all-cpp -j${PARALLEL_LEVEL} >/dev/null
+          "
 
           # Print cache and dist stats
           run_command "sccache stats (${ENVVAR})" \
@@ -154,10 +160,12 @@ jobs:
           # Print build times
           run_command "Build times (${ENVVAR})" bash -c "\
             find /var/log/devcontainer-utils/ -type f -name 'build-*-time.log' -print0 \
-              | xargs -0 -n1 grep -H real | sed 's/real\t/ /g' || :" # Nonfatal if not found
+          | xargs -0 -n1 grep -H real | sed 's/real\t/ /g' || : # Nonfatal if not found
+          "
 
-          # Restart sccache and clean
-          env ${ENVVAR} devcontainer-utils-start-sccache --kill-all >/dev/null 2>&1
-          find /var/log/devcontainer-utils/ -type f -name 'build-*-time.log' -delete >/dev/null 2>&1
-          find ~/ -maxdepth 4 -type l -path '*/cpp/build/latest' -print0 | xargs -P$(nproc) -0 -n1 ninja clean -C >/dev/null 2>&1
+          # Clean
+          run_command "Clean (${ENVVAR})" bash -c "\
+            find /var/log/devcontainer-utils/ -type f -name 'build-*-time.log' -delete >/dev/null 2>&1 || : # Nonfatal if not found
+            find ~/ -maxdepth 4 -type l -path '*/cpp/build/latest' -print0 | xargs -P$(nproc) -0 -n1 ninja clean -C >/dev/null 2>&1 || : # Nonfatal if not found
+          "
         done
