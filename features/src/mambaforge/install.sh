@@ -1,7 +1,7 @@
 #! /usr/bin/env bash
 set -e
 
-MINIFORGE_VERSION="${VERSION:-latest}";
+MINIFORGE_VERSION="${VERSION:-${MINIFORGE_VERSION:-latest}}";
 
 # Ensure we're in this feature's directory during build
 cd "$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )";
@@ -28,7 +28,6 @@ rm -rf /opt/conda;
 
 export PATH="/opt/conda/bin:${PATH}";
 
-conda update -n base -c conda-forge conda conda-libmamba-solver;
 conda clean --tarballs --index-cache --packages --yes;
 find /opt/conda -follow -type f -name '*.a' -delete;
 find /opt/conda -follow -type f -name '*.pyc' -delete;

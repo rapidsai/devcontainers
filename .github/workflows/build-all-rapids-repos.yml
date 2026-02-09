@@ -4,29 +4,6 @@ on:
   schedule:
     - cron: '0 0 * * *'
   workflow_call:
-    inputs:
-      env:
-        type: string
-        required: false
-      branch:
-        type: string
-        required: false
-        default: main
-      node_type:
-        type: string
-        required: false
-        default: cpu16
-      matrix:
-        type: string
-        required: false
-        default: |
-          {
-            "include": [
-              { "libs": "rmm ucxx kvikio dask-cuda cudf cudf_kafka rapidsmpf"    },
-              { "libs": "rmm ucxx dask-cuda raft cuvs cuml"                      },
-              { "libs": "rmm ucxx dask-cuda raft cugraph cugraph-gnn nx-cugraph" }
-            ]
-          }
 
 jobs:
   check-event:
@@ -60,11 +37,16 @@ jobs:
       pull-requests: read
     strategy:
       fail-fast: false
-      matrix: ${{ fromJSON(inputs.matrix) }}
+      matrix:
+        include:
+          - libs: "rmm ucxx kvikio dask-cuda cudf cudf_kafka rapidsmpf"
+          - libs: "rmm ucxx dask-cuda raft cuvs cuml"
+          - libs: "rmm ucxx dask-cuda raft cugraph cugraph-gnn nx-cugraph"
+
     with:
       arch: '["amd64", "arm64"]'
       cuda: '["12.9", "13.1"]'
-      node_type: ${{ inputs.node_type }}
+      node_type: cpu16
       rapids-aux-secret-1: GIST_REPO_READ_ORG_GITHUB_TOKEN
       timeout-minutes: 720
       # 1. Prohibit sccache from shutting down automatically
@@ -81,7 +63,6 @@ jobs:
         SCCACHE_DIST_MAX_RETRIES=inf
         SCCACHE_DIST_FALLBACK_TO_LOCAL_COMPILE=false
         SCCACHE_DIST_AUTH_TOKEN_VAR=RAPIDS_AUX_SECRET_1
-        ${{ inputs.env }}
       build_command: |
         function begin_group() {
           local blue="34"
@@ -129,7 +110,7 @@ jobs:
 
         # Clone all the repos
         run_command "Clone RAPIDS repositories" \
-          clone-all -j$(nproc) -b ${{ inputs.branch }} -v -q --clone-upstream --depth 1 --single-branch --shallow-submodules --no-update-env;
+          clone-all -j$(nproc) -v -q --clone-upstream --depth 1 --single-branch --shallow-submodules --no-update-env;
 
         run_command "Create RAPIDS python environment" \
           rapids-post-start-command;

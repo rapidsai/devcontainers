@@ -19,6 +19,7 @@ EOF
 )")";
 base_tag="${tag}-$(echo "${os}" | tr -d :)";
 
+echo "tag=${tag}" >&3;
 echo "base_tag=${base_tag}" >&3;
 echo "version=${VERSION:-latest}" >&3;
 

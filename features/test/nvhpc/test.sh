@@ -21,7 +21,7 @@ module list 1>&2
 
 # Feature-specific tests
 # The 'check' command comes from the dev-container-features-test-lib.
-check "version" bash -c "echo '$NVHPC_VERSION' | grep '25.11'"
+check "version" bash -c "echo '$NVHPC_VERSION' | grep '26.1'"
 check "installed" stat /opt/nvidia/hpc_sdk
 check "nvcc exists and is on path" which nvcc
 check "nvc++ exists and is on path" which nvc++
