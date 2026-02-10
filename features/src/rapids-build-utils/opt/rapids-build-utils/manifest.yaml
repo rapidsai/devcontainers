@@ -195,6 +195,29 @@ repos:
       args: {install: *rapids_build_backend_args}
       test: ci/run_cuvs_pytests.sh
 
+- name: cuforest
+  path: cuforest
+  git: {<<: *git_defaults, repo: cuforest}
+  dependency_keys:
+    - devcontainers
+  cpp:
+    - name: cuforest
+      sub_dir: cpp
+      depends: [rmm, raft, cuvs]
+      parallelism:
+        max_device_obj_memory_usage: 3Gi
+      test: ci/run_ctests.sh
+  python:
+    - name: libcuforest
+      sub_dir: python/libcuforest
+      depends: [cuforest]
+      args: {install: *rapids_build_backend_args}
+    - name: cuforest
+      sub_dir: python/cuforest
+      depends: [cuforest]
+      args: {install: *rapids_build_backend_args}
+      test: ci/run_cuforest_pytests.sh
+
 - name: cuml
   path: cuml
   git: {<<: *git_defaults, repo: cuml}
