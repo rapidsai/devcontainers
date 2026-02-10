@@ -40,7 +40,7 @@ jobs:
       matrix:
         include:
           - libs: "rmm ucxx kvikio dask-cuda cudf cudf_kafka rapidsmpf"
-          - libs: "rmm ucxx dask-cuda raft cuvs cuml"
+          - libs: "rmm ucxx dask-cuda raft cuvs cuml cuopt"
           - libs: "rmm ucxx dask-cuda raft cugraph cugraph-gnn nx-cugraph"
 
     with:
