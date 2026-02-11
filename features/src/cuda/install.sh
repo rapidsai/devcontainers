@@ -187,9 +187,9 @@ if [ "${INSTALLCUDNN:-false}" = true ]; then
 fi
 
 if "${INSTALLCUDSS:-false}"; then
-    PKGS+=("libcudss0${dev_tag}-cuda-${cuda_ver}");
+    PKGS+=("libcudss0${dev_tag}-cuda-${cuda_ver_major}");
     if ! "${PRUNESTATICLIBS:-false}"; then
-        PKGS+=("libcudss0-static-cuda-${cuda_ver}");
+        PKGS+=("libcudss0-static-cuda-${cuda_ver_major}");
     fi
 fi
 
