@@ -22,6 +22,7 @@
       "cuDNNVersion": "9",
       "installcuBLAS": true,
       "installcuDNN": true,
+      "installcuDSS": true,
       "installcuSOLVER": true,
       "installcuRAND": true,
       "installcuSPARSE": true,

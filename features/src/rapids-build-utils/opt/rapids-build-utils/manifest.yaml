@@ -288,6 +288,8 @@ repos:
     - name: cuopt
       sub_dir: cpp
       depends: [rmm, raft]
+      env: |
+        CUDSS_DIR=/usr
   python:
     - name: libcuopt
       sub_dir: python/libcuopt
