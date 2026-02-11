@@ -47,13 +47,11 @@ jobs:
       arch: '["amd64", "arm64"]'
       cuda: '["12.9", "13.1"]'
       node_type: cpu16
-      rapids-aux-secret-1: GIST_REPO_READ_ORG_GITHUB_TOKEN
       timeout-minutes: 720
       # 1. Prohibit sccache from shutting down automatically
       # 2. Infinitely retry transient errors
       # 3. Enable debug logging to track cache misses
       # 4. Never fallback to locally compiling
-      # 5. Use RAPIDS_AUX_SECRET_1 as the sccache-dist auth token
       env: |
         CONDA_ENV_CREATE_QUIET=1
         INCLUDE_REPOS="${{ matrix.libs }}"
@@ -62,7 +60,6 @@ jobs:
         SCCACHE_SERVER_LOG=sccache=debug
         SCCACHE_DIST_MAX_RETRIES=inf
         SCCACHE_DIST_FALLBACK_TO_LOCAL_COMPILE=false
-        SCCACHE_DIST_AUTH_TOKEN_VAR=RAPIDS_AUX_SECRET_1
       build_command: |
         function begin_group() {
           local blue="34"
@@ -99,14 +96,6 @@ jobs:
 
           return "$exit_code"
         }
-
-        if test -n "${DISABLE_SCCACHE:+x}"; then
-          . /opt/devcontainer/bin/update-envvars.sh;
-          for VAR in RUSTC_WRAPPER CMAKE_C_COMPILER_LAUNCHER CMAKE_CXX_COMPILER_LAUNCHER CMAKE_CUDA_COMPILER_LAUNCHER; do
-            reset_envvar "$VAR";
-            override_envvar "$VAR" "";
-          done
-        fi
 
         # Clone all the repos
         run_command "Clone RAPIDS repositories" \
