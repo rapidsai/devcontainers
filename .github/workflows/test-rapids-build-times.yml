@@ -127,7 +127,7 @@ jobs:
         }
 
         # Clone all the repos
-        time run_command "Clone RAPIDS repositories" bash -c "\
+        time run_command "Clone RAPIDS repositories" bash -ceuo pipefail "\
           RAPIDS_TO_UCXX_BRANCH=\"$(convert_ucx_branch ucxx '${{ inputs.branch }}')\";
           CLONE_ARGS=(-j$(nproc) -q -v --clone-upstream --depth 1 --single-branch --shallow-submodules --no-update-env);
           clone-all  -b \"${{ inputs.branch }}\"    \${CLONE_ARGS[*]} >/dev/null 2>&1;
@@ -136,13 +136,13 @@ jobs:
 
         sleep 1
 
-        time run_command "Create RAPIDS python environment" bash -c "\
+        time run_command "Create RAPIDS python environment" bash -ceuo pipefail "\
           rapids-post-start-command >/dev/null" 2>&1
 
         sleep 1
 
         # Configure all the C++ libs
-        time run_command "Configure C++ libraries" bash -c "\
+        time run_command "Configure C++ libraries" bash -ceuo pipefail "\
           configure-all \
             -j${PARALLEL_LEVEL} \
             -GNinja \
@@ -162,11 +162,11 @@ jobs:
                       "SCCACHE_S3_USE_PREPROCESSOR_CACHE_MODE=1" ; do
 
           # Restart sccache
-          run_command "Start sccache (${ENVVAR})" bash -c "\
+          run_command "Start sccache (${ENVVAR})" bash -ceuo pipefail "\
             ${ENVVAR} devcontainer-utils-start-sccache --kill-all >/dev/null 2>&1"
 
           # Build all the C++ libs
-          time run_command "Build C++ libraries (${ENVVAR})" bash -c "\
+          time run_command "Build C++ libraries (${ENVVAR})" bash -ceuo pipefail "\
             ${ENVVAR} build-all-cpp -j${PARALLEL_LEVEL} >/dev/null" 2>&1
 
           sleep 1
@@ -176,12 +176,12 @@ jobs:
             sccache --show-adv-stats
 
           # Print build times
-          run_command "Build times (${ENVVAR})" bash -c "\
+          run_command "Build times (${ENVVAR})" bash -ceuo pipefail "\
             find /var/log/devcontainer-utils/ -type f -name 'build-*-time.log' -print0 \
           | xargs -0 -n1 grep -H real | sed 's/real\t/ /g' || : # Nonfatal if not found"
 
           # Clean
-          run_command "Clean (${ENVVAR})" bash -c "\
+          run_command "Clean (${ENVVAR})" bash -ceuo pipefail "\
             find /var/log/devcontainer-utils/ -type f -name 'build-*-time.log' -delete >/dev/null 2>&1 || : # Nonfatal if not found
             find ~/ -maxdepth 4 -type l -path '*/cpp/build/latest' -print0 | xargs -P$(nproc) -0 -n1 ninja clean -C >/dev/null 2>&1 || : # Nonfatal if not found"
         done
