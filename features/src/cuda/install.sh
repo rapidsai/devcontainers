@@ -186,6 +186,13 @@ if [ "${INSTALLCUDNN:-false}" = true ]; then
     fi
 fi
 
+if "${INSTALLCUDSS:-false}"; then
+    PKGS+=("libcudss0${dev_tag}-cuda-${cuda_ver}");
+    if ! "${PRUNESTATICLIBS:-false}"; then
+        PKGS+=("libcudss0-static-cuda-${cuda_ver}");
+    fi
+fi
+
 if [ "${INSTALLNCCL:-false}" = true ] \
 && test -n "$(apt-cache search libnccl2 2>/dev/null)" \
 && apt-cache policy libnccl2 2>/dev/null | grep -q "+${cuda_tag}"; then
