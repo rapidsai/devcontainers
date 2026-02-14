@@ -69,10 +69,10 @@ if ! test -L /usr/local/cuda; then
 fi
 
 cuda_ver=$(grep "#define CUDA_VERSION" "${NVHPC_CUDA_HOME}/include/cuda.h" | cut -d' ' -f3);
-export CUDA_VERSION_MAJOR="$((cuda_ver / 1000))";
-export CUDA_VERSION_MINOR="$((cuda_ver / 10 % 100))";
-export CUDA_VERSION_PATCH="$((cuda_ver % 10))";
-export CUDA_VERSION="$CUDA_VERSION_MAJOR.$CUDA_VERSION_MINOR.$CUDA_VERSION_PATCH";
+export NVHPC_CUDA_VERSION_MAJOR="$((cuda_ver / 1000))";
+export NVHPC_CUDA_VERSION_MINOR="$((cuda_ver / 10 % 100))";
+export NVHPC_CUDA_VERSION_PATCH="$((cuda_ver % 10))";
+export NVHPC_CUDA_VERSION="$NVHPC_CUDA_VERSION_MAJOR.$NVHPC_CUDA_VERSION_MINOR.$NVHPC_CUDA_VERSION_PATCH";
 
 bash "${NVHPC_ROOT}/compilers/bin/makelocalrc" \
     -x "${NVHPC_ROOT}/compilers/bin" \
@@ -82,10 +82,10 @@ bash "${NVHPC_ROOT}/compilers/bin/makelocalrc" \
 
 vars_=();
 vars_+=('$NVHPC');
-vars_+=('$CUDA_VERSION');
-vars_+=('$CUDA_VERSION_MAJOR');
-vars_+=('$CUDA_VERSION_MINOR');
-vars_+=('$CUDA_VERSION_PATCH');
+vars_+=('$NVHPC_CUDA_VERSION');
+vars_+=('$NVHPC_CUDA_VERSION_MAJOR');
+vars_+=('$NVHPC_CUDA_VERSION_MINOR');
+vars_+=('$NVHPC_CUDA_VERSION_PATCH');
 vars_+=('$NVHPC_VERSION');
 vars_+=('$NVHPC_VERSION_MAJOR');
 vars_+=('$NVHPC_VERSION_MINOR');
