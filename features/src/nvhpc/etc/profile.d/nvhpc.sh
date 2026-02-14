@@ -9,7 +9,10 @@ if [ -n "${PATH##*"${NVHPC_ROOT}/compilers/bin"*}" ]; then
         fi
     done
     unset NVHPC_MODULEFILES_DIR;
-    for NVHPC_MODULE_NAME in "nvhpc-hpcx/${NVHPC_VERSION}"; do
+    for NVHPC_MODULE_NAME in "nvhpc-hpcx-cuda${CUDA_VERSION_MAJOR}/${NVHPC_VERSION}" \
+                             "nvhpc-hpcx-cuda${CUDA_VERSION_MAJOR}" \
+                             "nvhpc-hpcx/${NVHPC_VERSION}" \
+                             "nvhpc-hpcx"; do
         if ! module list "${NVHPC_MODULE_NAME}" 2>&1 | grep -q 'None found.'; then
             if ! module list 2>&1 | grep -q "${NVHPC_MODULE_NAME}"; then
                 module try-load "${NVHPC_MODULE_NAME}" >/dev/null 2>&1;

@@ -68,6 +68,12 @@ if ! test -L /usr/local/cuda; then
     ln -s "${NVHPC_CUDA_HOME}" /usr/local/cuda;
 fi
 
+cuda_ver=$(grep "#define CUDA_VERSION" "${NVHPC_CUDA_HOME}/include/cuda.h" | cut -d' ' -f3);
+export CUDA_VERSION_MAJOR="$((cuda_ver / 1000))";
+export CUDA_VERSION_MINOR="$((cuda_ver / 10 % 100))";
+export CUDA_VERSION_PATCH="$((cuda_ver % 10))";
+export CUDA_VERSION="$CUDA_VERSION_MAJOR.$CUDA_VERSION_MINOR.$CUDA_VERSION_PATCH";
+
 bash "${NVHPC_ROOT}/compilers/bin/makelocalrc" \
     -x "${NVHPC_ROOT}/compilers/bin" \
     -gcc "$(which gcc)" \
@@ -76,6 +82,10 @@ bash "${NVHPC_ROOT}/compilers/bin/makelocalrc" \
 
 vars_=();
 vars_+=('$NVHPC');
+vars_+=('$CUDA_VERSION');
+vars_+=('$CUDA_VERSION_MAJOR');
+vars_+=('$CUDA_VERSION_MINOR');
+vars_+=('$CUDA_VERSION_PATCH');
 vars_+=('$NVHPC_VERSION');
 vars_+=('$NVHPC_VERSION_MAJOR');
 vars_+=('$NVHPC_VERSION_MINOR');
