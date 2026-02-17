@@ -35,16 +35,12 @@ if ! test "${DEVCONTAINERS_NVHPC_LOADED_BY:-}" = "$(whoami)"; then
     unset NVHPC_MODULE_NAME;
 
     # Have to source and manually call hpcx_load for nvhpc>=25.7
-    if test "${NVHPC_VERSION_MAJOR}" -lt 25 || test "${NVHPC_VERSION_MINOR}" -lt 7; then
-        :
-    else
-        HPCX_INIT="$(find -L "$NVHPC_ROOT"/comm_libs/ -path '*/latest/hpcx-init.sh' -print -quit)";
-        if [ -n "${HPCX_INIT:+x}" ] && [ -s "${HPCX_INIT}" ]; then
-            . "$HPCX_INIT";
-            hpcx_load;
-        fi
-        unset HPCX_INIT;
+    HPCX_INIT="$(find -L "$NVHPC_ROOT"/comm_libs/ -path '*/latest/hpcx-init.sh' -print -quit)";
+    if [ -n "${HPCX_INIT:+x}" ] && [ -s "${HPCX_INIT}" ]; then
+        . "$HPCX_INIT";
+        hpcx_load;
     fi
+    unset HPCX_INIT;
 
     DEVCONTAINERS_NVHPC_LOADED_BY="$(whoami)"
 fi
