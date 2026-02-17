@@ -68,7 +68,7 @@ if ! test -L /usr/local/cuda; then
     ln -s "${NVHPC_CUDA_HOME}" /usr/local/cuda;
 fi
 
-cuda_ver=$(grep "#define CUDA_VERSION" "${NVHPC_CUDA_HOME}/include/cuda.h" | cut -d' ' -f3);
+cuda_ver="$(grep "#define CUDA_VERSION" "${NVHPC_CUDA_HOME}/include/cuda.h" | cut -d' ' -f3)";
 export NVHPC_CUDA_VERSION_MAJOR="$((cuda_ver / 1000))";
 export NVHPC_CUDA_VERSION_MINOR="$((cuda_ver / 10 % 100))";
 export NVHPC_CUDA_VERSION_PATCH="$((cuda_ver % 10))";
@@ -94,11 +94,13 @@ vars_+=('$NVHPC_CUDA_HOME');
 vars_+=('$NVHPC_MODULEFILE_DIRS');
 printf -v vars_ '%s,' "${vars_[@]}";
 
+cp load-nvhpc.sh /etc/profile.d/load-nvhpc._sh
+
 # export envvars in bashrc files
-append_to_etc_bashrc "$(cat <(cat .bashrc | envsubst "${vars_%,}") etc/profile.d/nvhpc.sh)";
-append_to_all_bashrcs "$(cat <(cat .bashrc | envsubst "${vars_%,}") etc/profile.d/nvhpc.sh)";
+append_to_etc_bashrc "$(cat <(cat .bashrc | envsubst "${vars_%,}"))";
+append_to_all_bashrcs "$(cat <(cat .bashrc | envsubst "${vars_%,}"))";
 # export envvars in /etc/profile.d
-add_etc_profile_d_script nvhpc "$(cat <(cat .bashrc | envsubst "${vars_%,}") etc/profile.d/nvhpc.sh)";
+add_etc_profile_d_script nvhpc "$(cat <(cat .bashrc | envsubst "${vars_%,}"))";
 
 # Clean up
 # rm -rf /tmp/*;

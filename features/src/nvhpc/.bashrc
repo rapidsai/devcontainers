@@ -13,3 +13,5 @@ if [ -z "${LIBRARY_PATH:-}" ] \
 || [ -n "${LIBRARY_PATH##*"${NVHPC_CUDA_HOME}/lib64/stubs"*}" ]; then
     export LIBRARY_PATH="${NVHPC_CUDA_HOME}/lib64/stubs${LIBRARY_PATH:+:$LIBRARY_PATH}"
 fi
+
+. /etc/profile.d/load-nvhpc._sh
