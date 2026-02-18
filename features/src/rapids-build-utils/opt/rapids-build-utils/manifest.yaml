@@ -225,13 +225,18 @@ repos:
     - name: cugraph
       sub_dir: cpp
       depends: [rmm, ucxx, raft, cuvs]
-      parallelism:
-        max_device_obj_memory_usage: 6Gi
+      env: |
+        CFLAGS=-D_GLIBCXX_USE_TBB_PAR_BACKEND=0
+        CXXFLAGS=-D_GLIBCXX_USE_TBB_PAR_BACKEND=0
+        CUDAFLAGS=-D_GLIBCXX_USE_TBB_PAR_BACKEND=0
       test: ci/run_ctests.sh
     - name: cugraph_etl
       sub_dir: cpp/libcugraph_etl
       depends: [cudf, cugraph]
-      args: {install: *rapids_build_backend_args}
+      env: |
+        CFLAGS=-D_GLIBCXX_USE_TBB_PAR_BACKEND=0
+        CXXFLAGS=-D_GLIBCXX_USE_TBB_PAR_BACKEND=0
+        CUDAFLAGS=-D_GLIBCXX_USE_TBB_PAR_BACKEND=0
   python:
     - name: libcugraph
       sub_dir: python/libcugraph
