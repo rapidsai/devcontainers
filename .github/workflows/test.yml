@@ -123,7 +123,7 @@ jobs:
         feature: ${{ fromJSON(needs.features-matrix.outputs.features) }}
     with:
       name: "{0}"
-      args: "-f ${{ matrix.feature }} -i ubuntu:22.04 --skip-scenarios"
+      args: "-f ${{ matrix.feature }} -i ubuntu:24.04 --skip-scenarios"
 
   image-matrix:
     name: Determine image matrix
