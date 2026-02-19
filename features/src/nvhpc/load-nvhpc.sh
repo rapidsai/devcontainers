@@ -23,6 +23,11 @@ if ! test "${DEVCONTAINERS_NVHPC_LOADED_BY:-}" = "$(whoami)"; then
     done
     unset NVHPC_MODULEFILES_DIR;
 
+    if ! test -n "${MODULEPATH:+x}"; then
+        MODULEPATH="$(IFS=:; echo "${NVHPC_MODULEFILE_DIRS[*]}")";
+        export MODULEPATH;
+    fi
+
     # Load the NHVPC modules again
     for NVHPC_MODULE_NAME in "nvhpc-hpcx-cuda${NVHPC_CUDA_VERSION_MAJOR}/${NVHPC_VERSION}" \
                              "nvhpc-hpcx/${NVHPC_VERSION}"; do
