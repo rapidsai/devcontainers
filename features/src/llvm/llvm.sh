@@ -38,13 +38,13 @@ if [[ ${#missing_binaries[@]} -gt 0 ]] ; then
 fi
 
 # Set default values for commandline arguments
-DISTRO=$(lsb_release -is)
-VERSION=$(lsb_release -sr)
+DISTRO="$(lsb_release -is)"
+VERSION="$(lsb_release -sr)"
 UBUNTU_CODENAME=""
 CODENAME_FROM_ARGUMENTS=""
 # Obtain VERSION_CODENAME and UBUNTU_CODENAME (for Ubuntu and its derivatives)
 source /etc/os-release
-DISTRO=${DISTRO,,}
+DISTRO="${DISTRO,,}"
 case ${DISTRO} in
     debian)
         if [[ "${VERSION}" == "unstable" ]] || [[ "${VERSION}" == "testing" ]] || [[ "${VERSION_CODENAME}" == "bookworm" ]]; then
@@ -54,23 +54,23 @@ case ${DISTRO} in
             LINKNAME=
         else
             # "stable" Debian release
-            CODENAME=${VERSION_CODENAME}
-            LINKNAME=-${CODENAME}
+            CODENAME="${VERSION_CODENAME}"
+            LINKNAME="-${CODENAME}"
         fi
         ;;
     *)
         # ubuntu and its derivatives
         if [[ -n "${UBUNTU_CODENAME}" ]]; then
-            CODENAME=${UBUNTU_CODENAME}
+            CODENAME="${UBUNTU_CODENAME}"
             if [[ -n "${CODENAME}" ]]; then
-                LINKNAME=-${CODENAME}
+                LINKNAME="-${CODENAME}"
             fi
         fi
         ;;
 esac
 
 # read command line arguments
-LLVM_VERSION=$1;
+LLVM_VERSION="${1:-}";
 PKG=(${*:2});
 
 while getopts ":hm:n:" arg; do
@@ -79,15 +79,15 @@ while getopts ":hm:n:" arg; do
         usage
         ;;
     m)
-        BASE_URL=${OPTARG}
+        BASE_URL="${OPTARG}"
         ;;
     n)
-        CODENAME=${OPTARG}
+        CODENAME="${OPTARG}"
         if [[ "${CODENAME}" == "unstable" ]]; then
             # link name does not apply to unstable repository
             LINKNAME=
         else
-            LINKNAME=-${CODENAME}
+            LINKNAME="-${CODENAME}"
         fi
         CODENAME_FROM_ARGUMENTS="true"
         ;;
@@ -129,18 +129,22 @@ LLVM_VERSION_STRING="${LLVM_VERSION_PATTERNS[$LLVM_VERSION]}"
 # join the repository name
 if [[ -n "${CODENAME}" ]]; then
 
-    retry_count=0;
+    if [ "${LLVM_REPO_VERSION_OVERRIDE:-}" = latest ]; then
+        LLVM_VERSION_STRING=""
+    else
+        retry_count=0;
 
-    while ! wget --no-hsts -q --method=HEAD \
-            "${BASE_URL}/${CODENAME}/dists/llvm-toolchain${LINKNAME}${LLVM_VERSION_PATTERNS[$LLVM_VERSION]}/Release" >/dev/null 2>&1; do
-        if test $(( retry_count++ )) -ge 5; then
-            LLVM_VERSION_STRING=
-            break;
-        fi
-        sleep_time=$((retry_count * 5))
-        echo "Attempt $retry_count failed! Trying again in $sleep_time seconds..."
-        sleep $sleep_time
-    done
+        while ! wget --no-hsts -q --method=HEAD \
+                "${BASE_URL}/${CODENAME}/dists/llvm-toolchain${LINKNAME}${LLVM_VERSION_PATTERNS[$LLVM_VERSION]}/Release" >/dev/null 2>&1; do
+            if test $(( retry_count++ )) -ge 5; then
+                LLVM_VERSION_STRING=""
+                break;
+            fi
+            sleep_time="$((retry_count * 5))"
+            echo "Attempt $retry_count failed! Trying again in $sleep_time seconds..."
+            sleep "$sleep_time"
+        done
+    fi
 
     REPO_NAME="deb ${BASE_URL}/${CODENAME}/  llvm-toolchain${LINKNAME}${LLVM_VERSION_STRING} main"
 

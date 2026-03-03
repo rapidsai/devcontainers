@@ -40,7 +40,7 @@ jobs:
       matrix:
         include:
           - libs: "rmm ucxx kvikio dask-cuda cudf cudf_kafka rapidsmpf"
-          - libs: "rmm ucxx dask-cuda raft cuvs cuml"
+          - libs: "rmm ucxx dask-cuda raft cuvs cuml cuopt"
           - libs: "rmm ucxx dask-cuda raft cugraph cugraph-gnn nx-cugraph"
 
     with:
@@ -105,32 +105,32 @@ jobs:
           rapids-post-start-command;
 
         # Configure all the C++ libs
-        run_command "Configure C++ libraries" bash -c "\
-          time configure-all                           \
-            -j${PARALLEL_LEVEL}                        \
-            -GNinja                                    \
-            -Wno-dev                                   \
-            -DBUILD_TESTS=ON                           \
-            -DBUILD_BENCHMARKS=ON                      \
-            -DBUILD_PRIMS_BENCH=ON                     \
-            -DBUILD_SHARED_LIBS=ON                     \
-            -DRAFT_COMPILE_LIBRARY=ON                  \
-            -DBUILD_CUGRAPH_MG_TESTS=ON 2>&1           \
+        run_command "Configure C++ libraries" bash -ceuo pipefail "\
+          time configure-all \
+            -j${PARALLEL_LEVEL} \
+            -GNinja \
+            -Wno-dev \
+            -DBUILD_TESTS=ON \
+            -DBUILD_BENCHMARKS=ON \
+            -DBUILD_PRIMS_BENCH=ON \
+            -DBUILD_SHARED_LIBS=ON \
+            -DRAFT_COMPILE_LIBRARY=ON \
+            -DBUILD_CUGRAPH_MG_TESTS=ON 2>&1 \
           | tee -a telemetry-artifacts/build.log";
 
         # Build all the C++ libs
-        run_command "Build C++ libraries" bash -c "\
+        run_command "Build C++ libraries" bash -ceuo pipefail "\
           time build-all-cpp -j${PARALLEL_LEVEL} 2>&1 | tee -a telemetry-artifacts/build.log";
 
         # Build all the Python libs
-        run_command "Build Python libraries" bash -c "\
+        run_command "Build Python libraries" bash -ceuo pipefail "\
           time build-all-python -j${PARALLEL_LEVEL} 2>&1 | tee -a telemetry-artifacts/build.log";
 
         # Print cache and dist stats
-        run_command "sccache stats" bash -c "\
+        run_command "sccache stats" bash -ceuo pipefail "\
           sccache --show-adv-stats | tee -a telemetry-artifacts/sccache-stats.txt";
 
         # Print build times
-        run_command "Build times" bash -c "\
+        run_command "Build times" bash -ceuo pipefail "\
           find /var/log/devcontainer-utils/ -type f -name 'build-*-time.log' -print0 \
             | xargs -0 -n1 grep -H real | sed 's/real\t/ /g' || :" # Nonfatal if not found

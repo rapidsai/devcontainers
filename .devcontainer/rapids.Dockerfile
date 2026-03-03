@@ -20,6 +20,12 @@ RUN apt update -y \
     liblapack-dev \
     # rapidsmpf dependencies
     libnuma-dev \
+    # cuOpt dependencies
+    libtbb-dev \
+    libboost-dev \
+    libboost-iostreams-dev \
+    libboost-serialization-dev \
+    libboost-program-options-dev \
  && rm -rf /tmp/* /var/tmp/* /var/cache/apt/* /var/lib/apt/lists/*;
 
 ENV DEFAULT_VIRTUAL_ENV=rapids

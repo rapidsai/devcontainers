@@ -225,13 +225,18 @@ repos:
     - name: cugraph
       sub_dir: cpp
       depends: [rmm, ucxx, raft, cuvs]
-      parallelism:
-        max_device_obj_memory_usage: 6Gi
+      env: |
+        CFLAGS=-D_GLIBCXX_USE_TBB_PAR_BACKEND=0
+        CXXFLAGS=-D_GLIBCXX_USE_TBB_PAR_BACKEND=0
+        CUDAFLAGS=-D_GLIBCXX_USE_TBB_PAR_BACKEND=0
       test: ci/run_ctests.sh
     - name: cugraph_etl
       sub_dir: cpp/libcugraph_etl
       depends: [cudf, cugraph]
-      args: {install: *rapids_build_backend_args}
+      env: |
+        CFLAGS=-D_GLIBCXX_USE_TBB_PAR_BACKEND=0
+        CXXFLAGS=-D_GLIBCXX_USE_TBB_PAR_BACKEND=0
+        CUDAFLAGS=-D_GLIBCXX_USE_TBB_PAR_BACKEND=0
   python:
     - name: libcugraph
       sub_dir: python/libcugraph
@@ -279,4 +284,23 @@ repos:
   python:
     - name: nx-cugraph
       sub_dir: .
+      args: {install: *rapids_build_backend_args}
+
+- name: cuopt
+  path: cuopt
+  git: {<<: *git_defaults, repo: cuopt, upstream: NVIDIA}
+  cpp:
+    - name: cuopt
+      sub_dir: cpp
+      depends: [rmm, raft]
+      env: |
+        CUDSS_DIR=/usr
+  python:
+    - name: libcuopt
+      sub_dir: python/libcuopt
+      depends: [cuopt]
+      args: {install: *rapids_build_backend_args}
+    - name: cuopt
+      sub_dir: python/cuopt
+      depends: [cuopt, cudf, raft]
       args: {install: *rapids_build_backend_args}
