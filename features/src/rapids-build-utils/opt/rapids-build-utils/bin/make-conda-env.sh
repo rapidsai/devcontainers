@@ -55,6 +55,7 @@ make_conda_env() {
             echo "";
 
             conda env create "${q[@]}" -n "${env_name}" -f "${new_env_path}" --solver=libmamba;
+            echo "conda env create exit code: $?" >&2
         # If the conda env does exist but it's different from the generated one,
         # print the diff between the envs and update it
         elif ! diff -BNqw "${old_env_path}" "${new_env_path}" >/dev/null 2>&1; then
@@ -74,6 +75,7 @@ make_conda_env() {
             rm -rf "${HOME}/.conda/envs/${env_name}";
 
             conda env create "${q[@]}" -n "${env_name}" -f "${new_env_path}" --solver=libmamba;
+            echo "conda env create exit code: $?" >&2
         fi
 
         cp -a "${new_env_path}" "${old_env_path}";
