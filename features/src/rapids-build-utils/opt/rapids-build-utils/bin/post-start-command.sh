@@ -7,6 +7,7 @@ if ! test -n "${SKIP_RAPIDS_BUILD_UTILS_POST_START_COMMAND:+x}"; then
     rapids-merge-compile-commands-json > ~/compile_commands.json &
     if test -n "${PYTHON_PACKAGE_MANAGER:+x}"; then
         rapids-make-"${PYTHON_PACKAGE_MANAGER}"-env "$@";
+        echo "rapids-make-"${PYTHON_PACKAGE_MANAGER}"-env exit code: $?" >&2
     fi
     wait
 fi
