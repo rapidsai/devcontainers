@@ -8,9 +8,9 @@
   },
   "postStartCommand": [
     "/bin/bash",
-    "-li",
+    "-lic",
     "+o",
     "history",
-    "rapids-post-start-command"
+    "rapids-post-start-command || true"
   ]
 }
