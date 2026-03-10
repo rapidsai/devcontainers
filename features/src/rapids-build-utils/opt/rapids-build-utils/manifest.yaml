@@ -218,6 +218,29 @@ repos:
       args: {install: *rapids_build_backend_args}
       test: ci/run_cuml_singlegpu_pytests.sh
 
+- name: nvforest
+  path: nvforest
+  git: {<<: *git_defaults, repo: nvforest}
+  dependency_keys:
+    - devcontainers
+  cpp:
+    - name: nvforest
+      sub_dir: cpp
+      depends: [rmm, raft]
+      parallelism:
+        max_device_obj_memory_usage: 3Gi
+      test: ci/run_ctests.sh
+  python:
+    - name: libnvforest
+      sub_dir: python/libnvforest
+      depends: [nvforest]
+      args: {install: *rapids_build_backend_args}
+    - name: nvforest
+      sub_dir: python/nvforest
+      depends: [nvforest]
+      args: {install: *rapids_build_backend_args}
+      test: ci/run_nvforest_pytests.sh
+
 - name: cugraph
   path: cugraph
   git: {<<: *git_defaults, repo: cugraph}

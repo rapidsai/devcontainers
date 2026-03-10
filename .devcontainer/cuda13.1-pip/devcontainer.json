@@ -36,7 +36,7 @@
     "./features/src/utils",
     "./features/src/rapids-build-utils"
   ],
-  "initializeCommand": ["/bin/bash", "-c", "mkdir -m 0755 -p ${localWorkspaceFolder}/../.{aws,cache,config/pip,local/share/${localWorkspaceFolderBasename}-cuda13.1-venvs,log/devcontainer-utils} ${localWorkspaceFolder}/../{rmm,dask-cuda,kvikio,ucxx,cudf,rapidsmpf,raft,cuvs,cuml,cugraph,cugraph-gnn,nx-cugraph,cuopt}"],
+  "initializeCommand": ["/bin/bash", "-c", "mkdir -m 0755 -p ${localWorkspaceFolder}/../.{aws,cache,config/pip,local/share/${localWorkspaceFolderBasename}-cuda13.1-venvs,log/devcontainer-utils} ${localWorkspaceFolder}/../{rmm,dask-cuda,kvikio,ucxx,cudf,rapidsmpf,raft,cuvs,cuml,nvforest,cugraph,cugraph-gnn,nx-cugraph,cuopt}"],
   "postAttachCommand": ["/bin/bash", "-c", "if [ ${CODESPACES:-false} = 'true' ]; then . devcontainer-utils-post-attach-command; fi"],
   "workspaceFolder": "/home/coder",
   "workspaceMount": "source=${localWorkspaceFolder},target=/home/coder/devcontainers,type=bind,consistency=consistent",
@@ -52,6 +52,7 @@
     "source=${localWorkspaceFolder}/../rapidsmpf,target=/home/coder/rapidsmpf,type=bind,consistency=consistent",
     "source=${localWorkspaceFolder}/../cuvs,target=/home/coder/cuvs,type=bind,consistency=consistent",
     "source=${localWorkspaceFolder}/../cuml,target=/home/coder/cuml,type=bind,consistency=consistent",
+    "source=${localWorkspaceFolder}/../nvforest,target=/home/coder/nvforest,type=bind,consistency=consistent",
     "source=${localWorkspaceFolder}/../cugraph,target=/home/coder/cugraph,type=bind,consistency=consistent",
     "source=${localWorkspaceFolder}/../cugraph-gnn,target=/home/coder/cugraph-gnn,type=bind,consistency=consistent",
     "source=${localWorkspaceFolder}/../nx-cugraph,target=/home/coder/nx-cugraph,type=bind,consistency=consistent",
