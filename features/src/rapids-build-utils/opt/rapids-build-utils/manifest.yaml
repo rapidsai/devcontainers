@@ -130,6 +130,8 @@ repos:
 - name: rapidsmpf
   path: rapidsmpf
   git: {<<: *git_defaults, repo: rapidsmpf}
+  dependency_keys:
+    - devcontainers
   cpp:
     - name: rapidsmpf
       sub_dir: cpp
