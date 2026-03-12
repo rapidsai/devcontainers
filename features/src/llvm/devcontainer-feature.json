@@ -1,7 +1,7 @@
 {
   "name": "LLVM compilers and tools",
   "id": "llvm",
-  "version": "26.4.1",
+  "version": "26.6.0",
   "description": "A feature to install LLVM compilers and tools",
   "options": {
     "version": {
@@ -29,7 +29,10 @@
     "repoVersionOverride": {
       "type": "string",
       "default": "",
-      "proposals": ["", "latest"],
+      "proposals": [
+        "",
+        "latest"
+      ],
       "description": "Override the apt repo version component (i.e. `llvm-toolchain-jammy-<ver>`) in case the LLVM repo is in a transitional state and the desired version isn't published to the version-specific URL yet."
     }
   },
