@@ -4,29 +4,6 @@ on:
   schedule:
     - cron: '0 0 * * *'
   workflow_call:
-    inputs:
-      env:
-        type: string
-        required: false
-      branch:
-        type: string
-        required: false
-        default: main
-      node_type:
-        type: string
-        required: false
-        default: cpu16
-      matrix:
-        type: string
-        required: false
-        default: |
-          {
-            "include": [
-              { "libs": "rmm ucxx kvikio dask-cuda cudf cudf_kafka rapidsmpf"    },
-              { "libs": "rmm ucxx dask-cuda raft cuvs cuml"                      },
-              { "libs": "rmm ucxx dask-cuda raft cugraph cugraph-gnn nx-cugraph" }
-            ]
-          }
 
 jobs:
   check-event:
@@ -60,18 +37,21 @@ jobs:
       pull-requests: read
     strategy:
       fail-fast: false
-      matrix: ${{ fromJSON(inputs.matrix) }}
+      matrix:
+        include:
+          - libs: "rmm ucxx kvikio dask-cuda cudf cudf_kafka rapidsmpf"
+          - libs: "rmm ucxx dask-cuda raft cuvs cuml nvforest cuopt"
+          - libs: "rmm ucxx dask-cuda raft cugraph cugraph-gnn nx-cugraph"
+
     with:
       arch: '["amd64", "arm64"]'
       cuda: '["12.9", "13.1"]'
-      node_type: ${{ inputs.node_type }}
-      rapids-aux-secret-1: GIST_REPO_READ_ORG_GITHUB_TOKEN
+      node_type: cpu16
       timeout-minutes: 720
       # 1. Prohibit sccache from shutting down automatically
       # 2. Infinitely retry transient errors
       # 3. Enable debug logging to track cache misses
       # 4. Never fallback to locally compiling
-      # 5. Use RAPIDS_AUX_SECRET_1 as the sccache-dist auth token
       env: |
         CONDA_ENV_CREATE_QUIET=1
         INCLUDE_REPOS="${{ matrix.libs }}"
@@ -80,8 +60,6 @@ jobs:
         SCCACHE_SERVER_LOG=sccache=debug
         SCCACHE_DIST_MAX_RETRIES=inf
         SCCACHE_DIST_FALLBACK_TO_LOCAL_COMPILE=false
-        SCCACHE_DIST_AUTH_TOKEN_VAR=RAPIDS_AUX_SECRET_1
-        ${{ inputs.env }}
       build_command: |
         function begin_group() {
           local blue="34"
@@ -119,48 +97,40 @@ jobs:
           return "$exit_code"
         }
 
-        if test -n "${DISABLE_SCCACHE:+x}"; then
-          . /opt/devcontainer/bin/update-envvars.sh;
-          for VAR in RUSTC_WRAPPER CMAKE_C_COMPILER_LAUNCHER CMAKE_CXX_COMPILER_LAUNCHER CMAKE_CUDA_COMPILER_LAUNCHER; do
-            reset_envvar "$VAR";
-            override_envvar "$VAR" "";
-          done
-        fi
-
         # Clone all the repos
         run_command "Clone RAPIDS repositories" \
-          clone-all -j$(nproc) -b ${{ inputs.branch }} -v -q --clone-upstream --depth 1 --single-branch --shallow-submodules --no-update-env;
+          clone-all -j$(nproc) -v -q --clone-upstream --depth 1 --single-branch --shallow-submodules --no-update-env;
 
         run_command "Create RAPIDS python environment" \
           rapids-post-start-command;
 
         # Configure all the C++ libs
-        run_command "Configure C++ libraries" bash -c "\
-          time configure-all                           \
-            -j${PARALLEL_LEVEL}                        \
-            -GNinja                                    \
-            -Wno-dev                                   \
-            -DBUILD_TESTS=ON                           \
-            -DBUILD_BENCHMARKS=ON                      \
-            -DBUILD_PRIMS_BENCH=ON                     \
-            -DBUILD_SHARED_LIBS=ON                     \
-            -DRAFT_COMPILE_LIBRARY=ON                  \
-            -DBUILD_CUGRAPH_MG_TESTS=ON 2>&1           \
+        run_command "Configure C++ libraries" bash -ceuo pipefail "\
+          time configure-all \
+            -j${PARALLEL_LEVEL} \
+            -GNinja \
+            -Wno-dev \
+            -DBUILD_TESTS=ON \
+            -DBUILD_BENCHMARKS=ON \
+            -DBUILD_PRIMS_BENCH=ON \
+            -DBUILD_SHARED_LIBS=ON \
+            -DRAFT_COMPILE_LIBRARY=ON \
+            -DBUILD_CUGRAPH_MG_TESTS=ON 2>&1 \
           | tee -a telemetry-artifacts/build.log";
 
         # Build all the C++ libs
-        run_command "Build C++ libraries" bash -c "\
+        run_command "Build C++ libraries" bash -ceuo pipefail "\
           time build-all-cpp -j${PARALLEL_LEVEL} 2>&1 | tee -a telemetry-artifacts/build.log";
 
         # Build all the Python libs
-        run_command "Build Python libraries" bash -c "\
+        run_command "Build Python libraries" bash -ceuo pipefail "\
           time build-all-python -j${PARALLEL_LEVEL} 2>&1 | tee -a telemetry-artifacts/build.log";
 
         # Print cache and dist stats
-        run_command "sccache stats" bash -c "\
+        run_command "sccache stats" bash -ceuo pipefail "\
           sccache --show-adv-stats | tee -a telemetry-artifacts/sccache-stats.txt";
 
         # Print build times
-        run_command "Build times" bash -c "\
+        run_command "Build times" bash -ceuo pipefail "\
           find /var/log/devcontainer-utils/ -type f -name 'build-*-time.log' -print0 \
             | xargs -0 -n1 grep -H real | sed 's/real\t/ /g' || :" # Nonfatal if not found

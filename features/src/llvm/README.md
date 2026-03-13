@@ -17,6 +17,7 @@ A feature to install LLVM compilers and tools
 |-----|-----|-----|-----|
 | version | LLVM version to install. | string | dev |
 | packages | LLVM packages to install. | string | all |
+| repoVersionOverride | Override the apt repo version component (i.e. `llvm-toolchain-jammy-<ver>`) in case the LLVM repo is in a transitional state and the desired version isn't published to the version-specific URL yet. | string | - |
 
 ## Customizations
 

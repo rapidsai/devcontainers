@@ -5,13 +5,13 @@
     "args": {
       "CUDA": "12.9",
       "PYTHON_PACKAGE_MANAGER": "conda",
-      "BASE": "rapidsai/devcontainers:26.04-cpp-mambaforge"
+      "BASE": "rapidsai/devcontainers:26.06-cpp-mambaforge"
     }
   },
   "runArgs": [
     "--rm",
     "--name",
-    "${localEnv:USER:anon}-rapids-${localWorkspaceFolderBasename}-26.04-cuda12.9-conda",
+    "${localEnv:USER:anon}-rapids-${localWorkspaceFolderBasename}-26.06-cuda12.9-conda",
     "--ulimit",
     "nofile=500000"
   ],
@@ -47,7 +47,7 @@
     "./features/src/utils",
     "./features/src/rapids-build-utils"
   ],
-  "initializeCommand": ["/bin/bash", "-c", "mkdir -m 0755 -p ${localWorkspaceFolder}/../.{aws,cache,config,conda/pkgs,conda/${localWorkspaceFolderBasename}-cuda12.9-envs,log/devcontainer-utils} ${localWorkspaceFolder}/../{rmm,dask-cuda,kvikio,ucxx,cudf,rapidsmpf,raft,cuvs,cuml,cugraph,cugraph-gnn,nx-cugraph}"],
+  "initializeCommand": ["/bin/bash", "-c", "mkdir -m 0755 -p ${localWorkspaceFolder}/../.{aws,cache,config,conda/pkgs,conda/${localWorkspaceFolderBasename}-cuda12.9-envs,log/devcontainer-utils} ${localWorkspaceFolder}/../{rmm,dask-cuda,kvikio,ucxx,cudf,rapidsmpf,raft,cuvs,cuml,nvforest,cugraph,cugraph-gnn,nx-cugraph,cuopt}"],
   "postAttachCommand": ["/bin/bash", "-c", "if [ ${CODESPACES:-false} = 'true' ]; then . devcontainer-utils-post-attach-command; fi"],
   "workspaceFolder": "/home/coder",
   "workspaceMount": "source=${localWorkspaceFolder},target=/home/coder/devcontainers,type=bind,consistency=consistent",
@@ -63,9 +63,11 @@
     "source=${localWorkspaceFolder}/../raft,target=/home/coder/raft,type=bind,consistency=consistent",
     "source=${localWorkspaceFolder}/../cuvs,target=/home/coder/cuvs,type=bind,consistency=consistent",
     "source=${localWorkspaceFolder}/../cuml,target=/home/coder/cuml,type=bind,consistency=consistent",
+    "source=${localWorkspaceFolder}/../nvforest,target=/home/coder/nvforest,type=bind,consistency=consistent",
     "source=${localWorkspaceFolder}/../cugraph,target=/home/coder/cugraph,type=bind,consistency=consistent",
     "source=${localWorkspaceFolder}/../cugraph-gnn,target=/home/coder/cugraph-gnn,type=bind,consistency=consistent",
     "source=${localWorkspaceFolder}/../nx-cugraph,target=/home/coder/nx-cugraph,type=bind,consistency=consistent",
+    "source=${localWorkspaceFolder}/../cuopt,target=/home/coder/cuopt,type=bind,consistency=consistent",
     "source=${localWorkspaceFolder}/../.aws,target=/home/coder/.aws,type=bind,consistency=consistent",
     "source=${localWorkspaceFolder}/../.cache,target=/home/coder/.cache,type=bind,consistency=consistent",
     "source=${localWorkspaceFolder}/../.config,target=/home/coder/.config,type=bind,consistency=consistent",
