@@ -15,7 +15,7 @@ x-gcc-12: &gcc_12 { name: "gcc", version: "12" }
 x-gcc-13: &gcc_13 { name: "gcc", version: "13" }
 x-gcc-14: &gcc_14 { name: "gcc", version: "14" }
 x-gcc-env: &gcc_env { CC: "gcc", CXX: "g++", CUDAHOSTCXX: "g++" }
-x-gcc-env-rapids: &gcc_env_rapids { CC: "gcc", CXX: "g++", CUDAHOSTCXX: "g++", PYTHON_VERSION: "3.13" }
+x-gcc-env-rapids: &gcc_env_rapids { CC: "gcc", CXX: "g++", CUDAHOSTCXX: "g++", PYTHON_VERSION: "3.14" }
 
 # CUDA 12.0 support stops at clang 14.
 x-llvm-14: &llvm_14 { name: "llvm", version: "14" }
@@ -200,4 +200,4 @@ include:
   - { features: [*python_rapids, *clang_format_rapids, *clangd_dev, *cuda_curr_max_rapids, *ucx_rapids, *openmpi], env: *gcc_env_rapids }
 
   # mambaforge
-  - { features: [*conda], env: { PYTHON_VERSION: "3.13" } }
+  - { features: [*conda], env: { PYTHON_VERSION: "3.14" } }
