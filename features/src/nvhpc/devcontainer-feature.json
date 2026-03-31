@@ -1,12 +1,13 @@
 {
   "name": "NVHPC SDK",
   "id": "nvhpc",
-  "version": "26.6.0",
+  "version": "26.6.1",
   "description": "A feature to install the NVHPC SDK",
   "options": {
     "version": {
       "type": "string",
       "proposals": [
+        "26.3",
         "26.1",
         "25.11",
         "25.9",

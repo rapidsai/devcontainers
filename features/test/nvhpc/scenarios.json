@@ -30,5 +30,13 @@
         "version": "25.11"
       }
     }
+  },
+  "nvhpc_26_1": {
+    "image": "ubuntu:24.04",
+    "features": {
+      "nvhpc": {
+        "version": "26.1"
+      }
+    }
   }
 }
