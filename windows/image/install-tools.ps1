@@ -18,6 +18,7 @@ Push-location "$PSScriptRoot"
 ./installers/install-lit.ps1
 ## Must be after lit installation for pip
 ./installers/install-clang-format.ps1
+./installers/install-clang-tidy.ps1
 ./installers/install-cmake.ps1
 ./installers/install-ninja.ps1
 ./installers/install-sccache.ps1
