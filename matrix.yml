@@ -16,7 +16,7 @@ x-gcc-13: &gcc_13 { name: "gcc", version: "13" }
 x-gcc-14: &gcc_14 { name: "gcc", version: "14" }
 x-gcc-env: &gcc_env { CC: "gcc", CXX: "g++", CUDAHOSTCXX: "g++" }
 x-gcc-rapids: &gcc_rapids { name: "gcc", version: "14", hide: true }
-x-gcc-env-rapids: &gcc_env_rapids { CC: "gcc", CXX: "g++", CUDAHOSTCXX: "g++", PYTHON_VERSION: "3.14" }
+x-gcc-env-rapids: &gcc_env_rapids { CC: "gcc", CXX: "g++", CUDAHOSTCXX: "g++", PYTHON_VERSION: "3.13" }
 
 # CUDA 12.0 support stops at clang 14.
 x-llvm-14: &llvm_14 { name: "llvm", version: "14" }
@@ -36,7 +36,7 @@ x-nvhpc-env: &nvhpc_env { CC: "nvc", CXX: "nvc++", CUDAHOSTCXX: "nvc++" }
 
 x-mambaforge: &conda { name: "mambaforge", miniforge_version: "25.11.0-1" }
 x-python: &python { name: "ghcr.io/devcontainers/features/python:1.7.1", version: "os-provided", installTools: false, enableShared: true, optimize: true, hide: true }
-x-python-rapids: &python_rapids { name: "ghcr.io/devcontainers/features/python:1.7.1", version: "3.14", installTools: false, enableShared: true, optimize: true, hide: true }
+x-python-rapids: &python_rapids { name: "ghcr.io/devcontainers/features/python:1.7.1", version: "3.13", installTools: false, enableShared: true, optimize: true, hide: true }
 x-ucx-rapids: &ucx_rapids { name: "ucx", version: "1.19.0" }
 x-openmpi: &openmpi { name: "openmpi", version: "5.0.7" }
 
