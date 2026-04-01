@@ -28,6 +28,8 @@ RUN apt update -y \
     libboost-program-options-dev \
     libgrpc-dev \
     libgrpc++-dev \
+    libprotobuf-dev \
+    protobuf-compiler-grpc \
  && rm -rf /tmp/* /var/tmp/* /var/cache/apt/* /var/lib/apt/lists/*;
 
 ENV DEFAULT_VIRTUAL_ENV=rapids
