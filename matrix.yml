@@ -46,7 +46,7 @@ x-clangd-dev-jammy: &clangd_dev_jammy { name: "llvm", version: "dev", packages: 
 x-clangd-dev: &clangd_dev { name: "llvm", version: "dev", packages: "clangd", hide: true }
 # Clang utils always available:
 x-clang-extra-cccl: &clang_extra_cccl { name: "llvm", version: "21", packages: "clang-format clang-tidy llvm-tools", hide: true }
-x-clang-extra-rapids: &clang_extra_rapids { name: "llvm", version: "16", packages: "clang-format", hide: true }
+x-clang-extra-rapids: &clang_extra_rapids { name: "llvm", version: "21", packages: "clang-format", hide: true }
 # Docker outside of Docker used to build python wheels:
 x-dood: &dood { name: "ghcr.io/devcontainers/features/docker-outside-of-docker:1", moby: false, hide: true}
 
