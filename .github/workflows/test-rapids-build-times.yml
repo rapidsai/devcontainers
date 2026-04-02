@@ -60,6 +60,7 @@ jobs:
       # 3. Enable debug logging to track cache misses
       # 4. Never fallback to locally compiling
       env: |
+        PYTHON_VERSION=3.13
         CONDA_ENV_CREATE_QUIET=1
         PARALLEL_LEVEL=0
         SCCACHE_IDLE_TIMEOUT=0
