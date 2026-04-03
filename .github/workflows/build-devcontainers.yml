@@ -1,0 +1,58 @@
+name: Build devcontainers
+
+concurrency:
+  group: build-from-${{ github.ref_name }}
+  cancel-in-progress: true
+
+on:
+  workflow_call:
+    inputs:
+      cuda:
+        description: |
+          Stringified JSON array of CUDA versions to run this workflow for.
+          This is used to select .devcontainer/ directories local to wherever this workflow is invoked from.
+          For example, if a repository has directories '.devcontainer/cuda12.9-pip/' and '.devcontainer/cuda13.1-pip/',
+          '["12.9", "13.1"]' could be passed here to build both of those devcontainers in CI.
+        type: string
+        default: '["12.9", "13.1"]'
+      python_package_manager:
+        description: |
+          Stringified JSON array of Python package managers to run devcontainer builds for.
+          One of: '["conda"]', '["pip"]', '["conda", "pip"]'.
+        type: string
+        default: '["conda", "pip"]'
+      push:
+        type: string
+        default: true
+  workflow_dispatch:
+    inputs:
+      cuda:
+        description: |
+          Stringified JSON array of CUDA versions to run this workflow for.
+          This is used to select .devcontainer/ directories local to wherever this workflow is invoked from.
+          For example, if a repository has directories '.devcontainer/cuda12.9-pip/' and '.devcontainer/cuda13.1-pip/',
+          '["12.9", "13.1"]' could be passed here to build both of those devcontainers in CI.
+        type: string
+        default: '["12.9", "13.1"]'
+      python_package_manager:
+        description: |
+          Stringified JSON array of Python package managers to run devcontainer builds for.
+          One of: '["conda"]', '["pip"]', '["conda", "pip"]'.
+        type: string
+        default: '["conda", "pip"]'
+      push:
+        type: string
+        default: true
+
+jobs:
+  build:
+    name: Build devcontainers
+    secrets: inherit
+    uses: rapidsai/shared-workflows/.github/workflows/build-devcontainers.yaml@fea/build-devcontainer
+    permissions:
+      packages: write
+    with:
+      retries: 1
+      cuda: "${{ inputs.cuda }}"
+      python_package_manager: "${{ inputs.python_package_manager }}"
+      push: "${{ inputs.push }}"
