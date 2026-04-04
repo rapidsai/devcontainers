@@ -52,7 +52,6 @@ jobs:
     permissions:
       packages: write
     with:
-      retries: 1
       cuda: "${{ inputs.cuda }}"
       python_package_manager: "${{ inputs.python_package_manager }}"
       push: "${{ inputs.push }}"

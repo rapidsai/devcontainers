@@ -115,3 +115,27 @@ jobs:
     needs: features-matrix
     secrets: inherit
     uses: ./.github/workflows/release-features.yml
+
+  build-devcontainers-after-images-released:
+    if: needs.image-matrix.outputs.linux != '{"include":[]}'
+    needs: [image-matrix, release-linux]
+    name: Build devcontainers
+    secrets: inherit
+    uses: rapidsai/shared-workflows/.github/workflows/build-devcontainers.yaml@fea/build-devcontainer
+    permissions:
+      packages: write
+    with:
+      push: true
+      cuda: '["12.9", "13.0", "13.1"]'
+
+  build-devcontainers-after-features-released:
+    if: needs.image-matrix.outputs.linux == '{"include":[]}' && (needs.features-matrix.outputs.features != '[]' || needs.features-matrix.outputs.scenarios != '[]')
+    needs: [features-matrix, release-features]
+    name: Build devcontainers
+    secrets: inherit
+    uses: rapidsai/shared-workflows/.github/workflows/build-devcontainers.yaml@fea/build-devcontainer
+    permissions:
+      packages: write
+    with:
+      push: true
+      cuda: '["12.9", "13.0", "13.1"]'
