@@ -38,6 +38,7 @@ $cudaComponents = @(
     "cuxxfilt_$mmVersionTag",
     "nvcc_$mmVersionTag",
     "nvdisasm_$mmVersionTag",
+    "nvfatbin_$mmVersionTag",
     "nvjitlink_$mmVersionTag",
     "nvml_dev_$mmVersionTag",
     "nvrtc_$mmVersionTag",
