@@ -50,12 +50,12 @@ _sccache_dist_status() {
 
         if [[ "$f" != json ]] &&  ! test -n "${no_temps:+x}"; then
             echo -n "preprocessed tempfiles: "
-            echo -n "$(ls -All /tmp/.sccache_temp/.tmp* 2>/dev/null | wc -l) "
-            echo " ($(du -ch /tmp/.sccache_temp/.tmp* 2>/dev/null | tail -n1 | cut -f1))"
+            echo -n "$(ls -All /tmp/sccache/.tmp* 2>/dev/null | wc -l) "
+            echo " ($(du -ch /tmp/sccache/.tmp* 2>/dev/null | tail -n1 | cut -f1))"
 
             echo -n "nvcc internal tempfiles: "
-            echo -n "$(ls -All /tmp/.sccache_temp/nvcc/*/* 2>/dev/null | wc -l)"
-            echo " ($(du -ch /tmp/.sccache_temp/nvcc/* 2>/dev/null | tail -n1 | cut -f1))"
+            echo -n "$(ls -All /tmp/sccache/nvcc/.tmp*/* 2>/dev/null | wc -l)"
+            echo " ($(du -ch /tmp/sccache/nvcc/.tmp* 2>/dev/null | tail -n1 | cut -f1))"
             echo
         fi
 
