@@ -14,7 +14,7 @@ x-gcc-11: &gcc_11 { name: "gcc", version: "11" }
 x-gcc-12: &gcc_12 { name: "gcc", version: "12" }
 x-gcc-13: &gcc_13 { name: "gcc", version: "13" }
 x-gcc-14: &gcc_14 { name: "gcc", version: "14" }
-x-gcc-14: &gcc_15 { name: "gcc", version: "15" }
+x-gcc-15: &gcc_15 { name: "gcc", version: "15" }
 x-gcc-env: &gcc_env { CC: "gcc", CXX: "g++", CUDAHOSTCXX: "g++" }
 x-gcc-rapids: &gcc_rapids { name: "gcc", version: "14", hide: true }
 x-gcc-env-rapids: &gcc_env_rapids { CC: "gcc", CXX: "g++", CUDAHOSTCXX: "g++", PYTHON_VERSION: "3.14" }
