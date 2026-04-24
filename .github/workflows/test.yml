@@ -39,7 +39,7 @@ jobs:
       packages: read
       id-token: write
       pull-requests: read
-    secrets: inherit
+    secrets: inherit  # zizmor: ignore[secrets-inherit]
     uses: ./.github/workflows/build-all-rapids-repos.yml
 
   validate-features-json:
@@ -107,7 +107,7 @@ jobs:
     needs: features-matrix
     permissions:
       contents: read
-    secrets: inherit
+    secrets: inherit  # zizmor: ignore[secrets-inherit]
     uses: ./.github/workflows/build-and-test-feature.yml
     with:
       name: "{0}"
@@ -119,7 +119,7 @@ jobs:
     needs: features-matrix
     permissions:
       contents: read
-    secrets: inherit
+    secrets: inherit  # zizmor: ignore[secrets-inherit]
     uses: ./.github/workflows/build-and-test-feature.yml
     strategy:
       fail-fast: false
@@ -135,7 +135,7 @@ jobs:
     needs: features-matrix
     permissions:
       contents: read
-    secrets: inherit
+    secrets: inherit  # zizmor: ignore[secrets-inherit]
     uses: ./.github/workflows/build-and-test-feature.yml
     strategy:
       fail-fast: false
@@ -189,7 +189,7 @@ jobs:
     needs: image-matrix
     permissions:
       contents: read
-    secrets: inherit
+    secrets: inherit  # zizmor: ignore[secrets-inherit]
     uses: ./.github/workflows/build-test-and-push-linux-image.yml
     strategy:
       fail-fast: false
@@ -207,7 +207,7 @@ jobs:
     needs: image-matrix
     permissions:
       contents: read
-    secrets: inherit
+    secrets: inherit  # zizmor: ignore[secrets-inherit]
     uses: ./.github/workflows/build-test-and-push-windows-image.yml
     strategy:
       fail-fast: false

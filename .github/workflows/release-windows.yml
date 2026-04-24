@@ -37,7 +37,7 @@ jobs:
     needs: image-matrix
     permissions:
       contents: read
-    secrets: inherit
+    secrets: inherit  # zizmor: ignore[secrets-inherit]
     uses: ./.github/workflows/build-test-and-push-windows-image.yml
     strategy:
       fail-fast: false
