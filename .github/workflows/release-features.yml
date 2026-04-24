@@ -13,7 +13,7 @@ jobs:
       packages: write
     steps:
       - name: Checkout ${{ github.repository }}
-        uses: actions/checkout@v4
+        uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
 
       - name: Copy common scripts into features
         uses: ./.github/actions/copy-common-scripts
@@ -22,7 +22,7 @@ jobs:
         uses: ./.github/actions/install-devcontainers-cli
 
       - name: Release features
-        uses: devcontainers/action@v1
+        uses: devcontainers/action@1082abd5d2bf3a11abccba70eef98df068277772 # v1
         with:
           generate-docs: true
           publish-features: true
