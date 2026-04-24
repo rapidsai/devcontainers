@@ -38,11 +38,18 @@ runs:
   steps:
     - name: Build ${{ inputs.repo }}:${{ inputs.tag }}
       shell: powershell
+      env:
+        REPO: ${{ inputs.repo }}
+        CL: ${{ inputs.cl }}
+        CUDA: ${{ inputs.cuda }}
+        VERSION: ${{ inputs.version }}
+        ISOLATION: ${{ inputs.isolation }}
+        EDITION: ${{ inputs.edition }}
       run: |
         .\windows\build-windows-image.ps1 `
-          -repo ${{ inputs.repo }} `
-          -clVersion ${{ inputs.cl }} `
-          -cudaVersion ${{ inputs.cuda }} `
-          -repoVersion ${{ inputs.version }} `
-          -isolation ${{ inputs.isolation }} `
-          -edition windows${{ inputs.edition }}
+          -repo $env:REPO `
+          -clVersion $env:CL `
+          -cudaVersion $env:CUDA `
+          -repoVersion $env:VERSION `
+          -isolation $env:ISOLATION `
+          -edition windows$env:EDITION

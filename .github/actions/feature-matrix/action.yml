@@ -41,9 +41,12 @@ runs:
     - name: Determine the feature matrix
       id: matrix
       shell: bash
+      env:
+        FULL_MATRIX: ${{ inputs.full_matrix }}
+        CHANGED_FILES: ${{ steps.changes.outputs.all_changed_and_modified_files }}
       run: |
         bash --noprofile --norc -x -eo pipefail \
           .github/actions/feature-matrix/action.sh \
-          '${{ inputs.full_matrix }}' \
-          '${{ steps.changes.outputs.all_changed_and_modified_files }}' \
+          "$FULL_MATRIX" \
+          "$CHANGED_FILES" \
         | tee -a "$GITHUB_OUTPUT";

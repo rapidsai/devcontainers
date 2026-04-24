@@ -45,8 +45,12 @@ jobs:
       - id: info
         name: Get container info
         shell: bash
+        env:
+          INPUT_REPO: ${{ inputs.repo }}
+          INPUT_OS: ${{ inputs.os }}
+          MATRIX_EDITION: ${{ matrix.edition }}
         run: |
-          repo="${{ inputs.repo }}";
+          repo="$INPUT_REPO";
           cl="${{ fromJSON(inputs.features)[1].version }}";
           cuda="${{ fromJSON(inputs.features)[0].version }}";
           version="$(git describe --abbrev=0 --tags | sed 's/[a-zA-Z]//g' | cut -d '.' -f -2)";
@@ -59,7 +63,7 @@ jobs:
           version=${version}
           base_tag=${base_tag}
           tag_without_os=${tag_without_os}
-          tag=${tag_without_os}-${{ inputs.os }}${{ matrix.edition }}
+          tag=${tag_without_os}-${INPUT_OS}${MATRIX_EDITION}
           EOF
 
       - name: Login to Docker Hub
@@ -91,16 +95,26 @@ jobs:
       - if: inputs.push == 'true'
         name: Push ${{ steps.info.outputs.tag }}
         shell: powershell
+        env:
+          REPO: ${{ steps.info.outputs.repo }}
+          TAG: ${{ steps.info.outputs.tag }}
+          TAG_WITHOUT_OS: ${{ steps.info.outputs.tag_without_os }}
         run: |
-          docker image tag ${{ steps.info.outputs.repo }}:${{ steps.info.outputs.tag }} ${{ steps.info.outputs.repo }}:${{ steps.info.outputs.tag_without_os }}
-          docker push ${{ steps.info.outputs.repo }}:${{ steps.info.outputs.tag_without_os }}
-          docker push ${{ steps.info.outputs.repo }}:${{ steps.info.outputs.tag }}
+          docker image tag ${env:REPO}:${env:TAG} ${env:REPO}:${env:TAG_WITHOUT_OS}
+          docker push ${env:REPO}:${env:TAG_WITHOUT_OS}
+          docker push ${env:REPO}:${env:TAG}
 
       - if: inputs.push == 'true' && github.ref_name == 'main'
         name: Push latest-${{ steps.info.outputs.base_tag }}
         shell: powershell
+        env:
+          REPO: ${{ steps.info.outputs.repo }}
+          TAG: ${{ steps.info.outputs.tag }}
+          BASE_TAG: ${{ steps.info.outputs.base_tag }}
+          INPUT_OS: ${{ inputs.os }}
+          MATRIX_EDITION: ${{ matrix.edition }}
         run: |
-          docker image tag ${{ steps.info.outputs.repo }}:${{ steps.info.outputs.tag }} ${{ steps.info.outputs.repo }}:latest-${{ steps.info.outputs.base_tag }}-${{ inputs.os }}${{ matrix.edition }}
-          docker image tag ${{ steps.info.outputs.repo }}:${{ steps.info.outputs.tag }} ${{ steps.info.outputs.repo }}:latest-${{ steps.info.outputs.base_tag }}
-          docker push ${{ steps.info.outputs.repo }}:latest-${{ steps.info.outputs.base_tag }}-${{ inputs.os }}${{ matrix.edition }}
-          docker push ${{ steps.info.outputs.repo }}:latest-${{ steps.info.outputs.base_tag }}
+          docker image tag ${env:REPO}:${env:TAG} ${env:REPO}:latest-${env:BASE_TAG}-${env:INPUT_OS}${env:MATRIX_EDITION}
+          docker image tag ${env:REPO}:${env:TAG} ${env:REPO}:latest-${env:BASE_TAG}
+          docker push ${env:REPO}:latest-${env:BASE_TAG}-${env:INPUT_OS}${env:MATRIX_EDITION}
+          docker push ${env:REPO}:latest-${env:BASE_TAG}
