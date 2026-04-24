@@ -36,7 +36,7 @@ runs:
     - name: Report changes
       if: inputs.full_matrix != 'true'
       shell: bash
-      run: echo '${{ toJSON(steps.changes.outputs) }}'
+      run: echo '${{ toJSON(steps.changes.outputs) }}' # zizmor: ignore[template-injection]
 
     - name: Determine the feature matrix
       id: matrix

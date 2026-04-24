@@ -7,7 +7,7 @@ runs:
   steps:
     - name: Dump environment
       shell: bash -eo pipefail {0}
-      run: |
+      run: | # zizmor: ignore[template-injection]
         echo "env: ${{ toJSON(env) }}"
         echo "runner: '${{ toJSON(runner) }}'"
 
@@ -21,8 +21,8 @@ runs:
       name: Setup self-hosted runner environment
       shell: bash -eo pipefail {0}
       run: | # zizmor: ignore[github-env]
-        echo "HOME=${{ runner.workspace }}" >> $GITHUB_ENV;
-        echo "TMPDIR=${{ runner.temp }}" >> $GITHUB_ENV;
+        echo "HOME=$RUNNER_WORKSPACE" >> "$GITHUB_ENV";
+        echo "TMPDIR=$RUNNER_TEMP" >> "$GITHUB_ENV";
 
     - if: runner.environment == 'self-hosted'
       name: Setup Node.js

@@ -23,12 +23,12 @@ runs:
               repo: context.repo.repo,
               owner: context.repo.owner,
               pull_number: (() => {
-                switch('${{ github.event_name }}') {
+                switch(context.eventName) {
                   case 'pull_request':
                   case 'pull_request_target':
-                    return '${{ github.ref }}'.split('/')[2];
+                    return context.ref.split('/')[2];
                   case 'push':
-                    const branch = '${{ github.ref_name }}';
+                    const branch = context.ref.replace(/^refs\/(heads|tags)\//, '');
                     if (!branch.match(new RegExp('^pull-request/[0-9]+$'))) {
                       throw new Error(`${branch} does not match PR branch pattern.`);
                     }
