@@ -5,9 +5,12 @@ on:
     - cron: '0 0 * * *'
   workflow_call:
 
+permissions: {}
+
 jobs:
   check-event:
     name: Check GH Event
+    permissions: {}
     runs-on: ubuntu-latest
     outputs:
       ok: ${{ steps.check_gh_event.outputs.ok }}

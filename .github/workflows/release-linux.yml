@@ -7,10 +7,14 @@ concurrency:
 on:
   workflow_dispatch:
 
+permissions: {}
+
 jobs:
 
   features-matrix:
     name: Determine features matrix
+    permissions:
+      contents: read
     runs-on: ubuntu-latest
     outputs:
       features: "${{ steps.matrix.outputs.features }}"
@@ -34,6 +38,8 @@ jobs:
   image-matrix:
     name: Determine image matrix
     needs: features-matrix
+    permissions:
+      contents: read
     runs-on: ubuntu-latest
     outputs:
       linux: ${{ steps.matrix.outputs.linux }}
@@ -56,6 +62,8 @@ jobs:
     if: needs.image-matrix.outputs.linux != '{"include":[]}'
     name: ${{ matrix.name }}
     needs: image-matrix
+    permissions:
+      contents: read
     secrets: inherit
     uses: ./.github/workflows/build-test-and-push-linux-image.yml
     strategy:

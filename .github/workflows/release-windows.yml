@@ -7,10 +7,14 @@ concurrency:
 on:
   workflow_dispatch:
 
+permissions: {}
+
 jobs:
 
   image-matrix:
     name: Determine image matrix
+    permissions:
+      contents: read
     runs-on: ubuntu-latest
     outputs:
       windows: ${{ steps.matrix.outputs.windows }}
@@ -31,6 +35,8 @@ jobs:
     if: needs.image-matrix.outputs.windows != '{"include":[]}'
     name: ${{ matrix.name }}
     needs: image-matrix
+    permissions:
+      contents: read
     secrets: inherit
     uses: ./.github/workflows/build-test-and-push-windows-image.yml
     strategy:

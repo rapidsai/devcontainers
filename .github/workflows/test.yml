@@ -10,9 +10,12 @@ on:
     branches:
       - "pull-request/[0-9]+"
 
+permissions: {}
+
 jobs:
   check-event:
     name: Check PR Event
+    permissions: {}
     runs-on: ubuntu-latest
     outputs:
       ok: ${{ steps.check_pr_event.outputs.ok }}
@@ -30,6 +33,12 @@ jobs:
     if: needs.check-event.outputs.ok == 'true' && github.repository_owner == 'rapidsai'
     name: Build
     needs: check-event
+    permissions:
+      contents: read
+      actions: read
+      packages: read
+      id-token: write
+      pull-requests: read
     secrets: inherit
     uses: ./.github/workflows/build-all-rapids-repos.yml
 
@@ -37,6 +46,8 @@ jobs:
     if: needs.check-event.outputs.ok == 'true'
     name: Validate Features
     needs: check-event
+    permissions:
+      contents: read
     runs-on: ubuntu-latest
     steps:
       - name: Checkout ${{ github.repository }}
@@ -56,6 +67,9 @@ jobs:
   features-matrix:
     name: Determine features matrix
     needs: validate-features-json
+    permissions:
+      contents: read
+      pull-requests: read
     runs-on: ubuntu-latest
     outputs:
       features: ${{ steps.matrix.outputs.features }}
@@ -91,6 +105,8 @@ jobs:
     if: needs.features-matrix.outputs.features != '[]' || needs.features-matrix.outputs.scenarios != '[]'
     name: Feature integration
     needs: features-matrix
+    permissions:
+      contents: read
     secrets: inherit
     uses: ./.github/workflows/build-and-test-feature.yml
     with:
@@ -101,6 +117,8 @@ jobs:
     if: needs.features-matrix.outputs.scenarios != '[]'
     name: Test ${{ matrix.feature }} scenarios
     needs: features-matrix
+    permissions:
+      contents: read
     secrets: inherit
     uses: ./.github/workflows/build-and-test-feature.yml
     strategy:
@@ -115,6 +133,8 @@ jobs:
     if: needs.features-matrix.outputs.features != '[]'
     name: Test ${{ matrix.feature }} feature
     needs: features-matrix
+    permissions:
+      contents: read
     secrets: inherit
     uses: ./.github/workflows/build-and-test-feature.yml
     strategy:
@@ -128,6 +148,9 @@ jobs:
   image-matrix:
     name: Determine image matrix
     needs: features-matrix
+    permissions:
+      contents: read
+      pull-requests: read
     runs-on: ubuntu-latest
     outputs:
       linux: ${{ steps.matrix.outputs.linux }}
@@ -164,6 +187,8 @@ jobs:
     if: needs.image-matrix.outputs.linux != '{"include":[]}'
     name: ${{ matrix.name || 'Linux' }}
     needs: image-matrix
+    permissions:
+      contents: read
     secrets: inherit
     uses: ./.github/workflows/build-test-and-push-linux-image.yml
     strategy:
@@ -180,6 +205,8 @@ jobs:
     if: needs.image-matrix.outputs.windows != '{"include":[]}'
     name: ${{ matrix.name || 'Windows' }}
     needs: image-matrix
+    permissions:
+      contents: read
     secrets: inherit
     uses: ./.github/workflows/build-test-and-push-windows-image.yml
     strategy:
