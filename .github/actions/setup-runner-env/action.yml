@@ -20,7 +20,7 @@ runs:
     - if: runner.environment == 'self-hosted'
       name: Setup self-hosted runner environment
       shell: bash -eo pipefail {0}
-      run: |
+      run: | # zizmor: ignore[github-env]
         echo "HOME=${{ runner.workspace }}" >> $GITHUB_ENV;
         echo "TMPDIR=${{ runner.temp }}" >> $GITHUB_ENV;
 
