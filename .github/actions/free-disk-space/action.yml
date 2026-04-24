@@ -13,6 +13,8 @@ runs:
   steps:
     - name: Free up disk space
       shell: bash --noprofile --norc -x -eo pipefail {0}
+      env:
+        TOOL_CACHE: ${{ inputs.tool_cache }}
       run: |
           df -h;
           docker images;
@@ -37,11 +39,11 @@ runs:
           sudo rm -rf /usr/local/share/chromium;
           sudo rm -rf /usr/local/share/powershell;
           sudo rm -rf /home/linuxbrew/.linuxbrew;
-          sudo rm -rf ${{ inputs.tool_cache }}/go;
-          sudo rm -rf ${{ inputs.tool_cache }}/Ruby;
-          sudo rm -rf ${{ inputs.tool_cache }}/PyPy;
-          sudo rm -rf ${{ inputs.tool_cache }}/CodeQL;
-          sudo rm -rf ${{ inputs.tool_cache }}/Python;
+          sudo rm -rf $TOOL_CACHE/go;
+          sudo rm -rf $TOOL_CACHE/Ruby;
+          sudo rm -rf $TOOL_CACHE/PyPy;
+          sudo rm -rf $TOOL_CACHE/CodeQL;
+          sudo rm -rf $TOOL_CACHE/Python;
           docker rmi $(docker image ls -aq) || true;
           docker images;
           df -h;
