@@ -29,6 +29,20 @@ jobs:
           && echo "ok=true"  | tee -a "$GITHUB_OUTPUT" \
           || echo "ok=false" | tee -a "$GITHUB_OUTPUT";
 
+  pre-commit:
+    name: pre-commit
+    permissions:
+      contents: read
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout ${{ github.repository }}
+        uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
+        with:
+          persist-credentials: false
+
+      - name: Run pre-commit
+        run: pip install pre-commit && pre-commit run --all-files
+
   build-all-rapids-repos:
     if: needs.check-event.outputs.ok == 'true' && github.repository_owner == 'rapidsai'
     name: Build
