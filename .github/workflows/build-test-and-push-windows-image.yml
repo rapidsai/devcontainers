@@ -37,7 +37,7 @@ jobs:
           - { edition: "2022", runner: "${{ github.repository != 'rapidsai/devcontainers' && 'windows-2022' || 'windows-amd64-cpu4' }}" }
     steps:
       - name: Checkout ${{ github.repository }}
-        uses: actions/checkout@v4
+        uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
         with:
           fetch-depth: 0
           persist-credentials: false
@@ -45,10 +45,15 @@ jobs:
       - id: info
         name: Get container info
         shell: bash
+        env:
+          INPUT_REPO: ${{ inputs.repo }}
+          INPUT_OS: ${{ inputs.os }}
+          MATRIX_EDITION: ${{ matrix.edition }}
+          INPUT_FEATURES: ${{ inputs.features }}
         run: |
-          repo="${{ inputs.repo }}";
-          cl="${{ fromJSON(inputs.features)[1].version }}";
-          cuda="${{ fromJSON(inputs.features)[0].version }}";
+          repo="$INPUT_REPO";
+          cl="$(echo "$INPUT_FEATURES" | jq -r '.[1].version')";
+          cuda="$(echo "$INPUT_FEATURES" | jq -r '.[0].version')";
           version="$(git describe --abbrev=0 --tags | sed 's/[a-zA-Z]//g' | cut -d '.' -f -2)";
           base_tag="cuda${cuda}-cl${cl}";
           tag_without_os="${version}-${base_tag}";
@@ -59,11 +64,11 @@ jobs:
           version=${version}
           base_tag=${base_tag}
           tag_without_os=${tag_without_os}
-          tag=${tag_without_os}-${{ inputs.os }}${{ matrix.edition }}
+          tag=${tag_without_os}-${INPUT_OS}${MATRIX_EDITION}
           EOF
 
       - name: Login to Docker Hub
-        uses: docker/login-action@v3
+        uses: docker/login-action@c94ce9fb468520275223c153574b00df6fe4bcc9 # v3
         with:
           username: ${{ secrets.GPUCIBOT_DOCKERHUB_USER || vars.DOCKERHUB_USER }}
           password: ${{ secrets.GPUCIBOT_DOCKERHUB_TOKEN || secrets.DOCKERHUB_TOKEN }}
@@ -91,16 +96,26 @@ jobs:
       - if: inputs.push == 'true'
         name: Push ${{ steps.info.outputs.tag }}
         shell: powershell
+        env:
+          REPO: ${{ steps.info.outputs.repo }}
+          TAG: ${{ steps.info.outputs.tag }}
+          TAG_WITHOUT_OS: ${{ steps.info.outputs.tag_without_os }}
         run: |
-          docker image tag ${{ steps.info.outputs.repo }}:${{ steps.info.outputs.tag }} ${{ steps.info.outputs.repo }}:${{ steps.info.outputs.tag_without_os }}
-          docker push ${{ steps.info.outputs.repo }}:${{ steps.info.outputs.tag_without_os }}
-          docker push ${{ steps.info.outputs.repo }}:${{ steps.info.outputs.tag }}
+          docker image tag ${env:REPO}:${env:TAG} ${env:REPO}:${env:TAG_WITHOUT_OS}
+          docker push ${env:REPO}:${env:TAG_WITHOUT_OS}
+          docker push ${env:REPO}:${env:TAG}
 
       - if: inputs.push == 'true' && github.ref_name == 'main'
         name: Push latest-${{ steps.info.outputs.base_tag }}
         shell: powershell
+        env:
+          REPO: ${{ steps.info.outputs.repo }}
+          TAG: ${{ steps.info.outputs.tag }}
+          BASE_TAG: ${{ steps.info.outputs.base_tag }}
+          INPUT_OS: ${{ inputs.os }}
+          MATRIX_EDITION: ${{ matrix.edition }}
         run: |
-          docker image tag ${{ steps.info.outputs.repo }}:${{ steps.info.outputs.tag }} ${{ steps.info.outputs.repo }}:latest-${{ steps.info.outputs.base_tag }}-${{ inputs.os }}${{ matrix.edition }}
-          docker image tag ${{ steps.info.outputs.repo }}:${{ steps.info.outputs.tag }} ${{ steps.info.outputs.repo }}:latest-${{ steps.info.outputs.base_tag }}
-          docker push ${{ steps.info.outputs.repo }}:latest-${{ steps.info.outputs.base_tag }}-${{ inputs.os }}${{ matrix.edition }}
-          docker push ${{ steps.info.outputs.repo }}:latest-${{ steps.info.outputs.base_tag }}
+          docker image tag ${env:REPO}:${env:TAG} ${env:REPO}:latest-${env:BASE_TAG}-${env:INPUT_OS}${env:MATRIX_EDITION}
+          docker image tag ${env:REPO}:${env:TAG} ${env:REPO}:latest-${env:BASE_TAG}
+          docker push ${env:REPO}:latest-${env:BASE_TAG}-${env:INPUT_OS}${env:MATRIX_EDITION}
+          docker push ${env:REPO}:latest-${env:BASE_TAG}

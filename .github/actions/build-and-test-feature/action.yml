@@ -25,10 +25,11 @@ runs:
     - name: Test feature
       shell: bash
       run: |
-        devcontainer features test ${{ inputs.args }} ./features;
+        devcontainer features test $ARGS ./features;
       env:
         NODE_NO_WARNINGS: 1
         VAULT_S3_TTL: "900" # 15 minutes
+        ARGS: ${{ inputs.args }}
         gh_token: "${{ inputs.gh_token }}"
         aws_role_arn: "${{ inputs.aws_role_arn }}"
         rw_sccache_bucket: "${{ inputs.rw_sccache_bucket }}"
