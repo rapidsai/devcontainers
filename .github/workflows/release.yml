@@ -13,9 +13,12 @@ on:
     tags:
       - "v[0-9][0-9].[0-9][0-9].[0-9][0-9]"
 
+permissions: {}
+
 jobs:
   check-event:
     name: Check GH Event
+    permissions: {}
     runs-on: ubuntu-latest
     outputs:
       ok: ${{ steps.check_gh_event.outputs.ok }}
@@ -35,13 +38,15 @@ jobs:
     name: Determine features matrix
     if: needs.check-event.outputs.ok == 'true'
     needs: check-event
+    permissions:
+      contents: read
     runs-on: ubuntu-latest
     outputs:
       features: "${{ steps.matrix.outputs.features }}"
       scenarios: "${{ steps.matrix.outputs.scenarios }}"
     steps:
       - name: "Checkout ${{ github.repository }}"
-        uses: actions/checkout@v6
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
         with:
           fetch-depth: 0
           persist-credentials: false
@@ -58,13 +63,15 @@ jobs:
   image-matrix:
     name: Determine image matrix
     needs: features-matrix
+    permissions:
+      contents: read
     runs-on: ubuntu-latest
     outputs:
       linux: ${{ steps.matrix.outputs.linux }}
       windows: ${{ steps.matrix.outputs.windows }}
     steps:
       - name: Checkout ${{ github.repository }}
-        uses: actions/checkout@v6
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
         with:
           fetch-depth: 0
           persist-credentials: false
@@ -81,7 +88,9 @@ jobs:
     if: needs.image-matrix.outputs.linux != '{"include":[]}'
     name: ${{ matrix.name || 'Linux' }}
     needs: image-matrix
-    secrets: inherit
+    permissions:
+      contents: read
+    secrets: inherit  # zizmor: ignore[secrets-inherit]
     uses: ./.github/workflows/build-test-and-push-linux-image.yml
     strategy:
       fail-fast: false
@@ -97,7 +106,9 @@ jobs:
     if: needs.image-matrix.outputs.windows != '{"include":[]}'
     name: ${{ matrix.name || 'Windows' }}
     needs: image-matrix
-    secrets: inherit
+    permissions:
+      contents: read
+    secrets: inherit  # zizmor: ignore[secrets-inherit]
     uses: ./.github/workflows/build-test-and-push-windows-image.yml
     strategy:
       fail-fast: false
@@ -113,7 +124,10 @@ jobs:
     if: needs.features-matrix.outputs.features != '[]' || needs.features-matrix.outputs.scenarios != '[]'
     name: Features
     needs: features-matrix
-    secrets: inherit
+    permissions:
+      contents: read
+      packages: write
+    secrets: inherit  # zizmor: ignore[secrets-inherit]
     uses: ./.github/workflows/release-features.yml
 
   build-devcontainers-after-images-released:

@@ -18,6 +18,7 @@
     "--ulimit",
     "nofile=500000"
   ],
+  "containerEnv": {"PYTHON_VERSION": "3.13"},
   "hostRequirements": {"gpu": "optional"},
   "features": {
     "./features/src/cuda": {
