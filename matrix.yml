@@ -173,6 +173,9 @@ include:
   - { features: [*python, *dood, *llvm_21, { <<: *cuda_prev_max, <<: *cccl_cuda_ext_opts }, *clang_extra_cccl, *clangd_dev, *cccl_dev], env: *llvm_env }
   - { features: [*python, *dood, *llvm_21, { <<: *cuda_curr_min, <<: *cccl_cuda_ext_opts }, *clang_extra_cccl, *clangd_dev, *cccl_dev], env: *llvm_env }
   - { features: [*python, *dood, *llvm_21, { <<: *cuda_curr_max, <<: *cccl_cuda_ext_opts }, *clang_extra_cccl, *clangd_dev, *cccl_dev], env: *llvm_env }
+  - { features: [*python, *dood, *llvm_22, { <<: *cuda_prev_max, <<: *cccl_cuda_ext_opts }, *clang_extra_cccl, *clangd_dev, *cccl_dev], env: *llvm_env }
+  - { features: [*python, *dood, *llvm_22, { <<: *cuda_curr_min, <<: *cccl_cuda_ext_opts }, *clang_extra_cccl, *clangd_dev, *cccl_dev], env: *llvm_env }
+  - { features: [*python, *dood, *llvm_22, { <<: *cuda_curr_max, <<: *cccl_cuda_ext_opts }, *clang_extra_cccl, *clangd_dev, *cccl_dev], env: *llvm_env }
 
 - os: "windows"
   images:
