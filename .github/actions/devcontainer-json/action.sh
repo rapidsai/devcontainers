@@ -7,7 +7,7 @@ os="${1:-"ubuntu:22.04"}";
 features="${2:-"[]"}";
 container_env="${3:-"null"}";
 
-VERSION="$(git describe --abbrev=0 --tags | sed 's/[a-zA-Z]//g' | cut -d '.' -f -2)";
+VERSION="$(git describe --abbrev=0 --tags --first-parent | sed 's/[a-zA-Z]//g' | cut -d '.' -f -2)";
 tag="$(node -p "$(cat <<EOF
 ['cpp', ...${features}.filter((x) => !x.hide).map(({ name = '', version = '', suffix = '' }) => {
     if (name.includes(':')) {
