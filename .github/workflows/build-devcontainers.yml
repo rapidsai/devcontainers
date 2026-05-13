@@ -41,7 +41,7 @@ on:
         type: string
         default: '["conda", "pip"]'
       push:
-        type: string
+        type: boolean
         default: true
 
 jobs:
@@ -54,4 +54,4 @@ jobs:
     with:
       cuda: "${{ inputs.cuda }}"
       python_package_manager: "${{ inputs.python_package_manager }}"
-      push: "${{ inputs.push }}"
+      push: ${{ inputs.push }}
