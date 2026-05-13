@@ -54,7 +54,7 @@ jobs:
           repo="$INPUT_REPO";
           cl="$(echo "$INPUT_FEATURES" | jq -r '.[1].version')";
           cuda="$(echo "$INPUT_FEATURES" | jq -r '.[0].version')";
-          version="$(git describe --abbrev=0 --tags | sed 's/[a-zA-Z]//g' | cut -d '.' -f -2)";
+          version="$(git describe --abbrev=0 --tags --first-parent | sed 's/[a-zA-Z]//g' | cut -d '.' -f -2)";
           base_tag="cuda${cuda}-cl${cl}";
           tag_without_os="${version}-${base_tag}";
           cat <<EOF | tee "$GITHUB_OUTPUT"
