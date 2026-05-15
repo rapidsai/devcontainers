@@ -17,25 +17,6 @@
 # shellcheck disable=SC1091
 . rapids-generate-docstring;
 
-# Function to convert ucxx branch names
-convert-ucxx-branch() {
-    repo=$1
-    custom_branch=$2
-    normalized_branch="${custom_branch}"
-
-    if [[ "${repo}" == "ucxx" ]]; then
-        # Only convert branches that match the pattern release/YY.MM
-        if [[ "${custom_branch}" =~ ^release/[0-9]{2}\.[0-9]{2}$ ]]; then
-            RAPIDS_VERSION=$(echo "${custom_branch}" | awk '{split($0, a, "/"); print a[2]}')
-            # Get UCX version associated w/ RAPIDS version
-            UCX_VERSION="$(curl -sL https://version.gpuci.io/rapids/${RAPIDS_VERSION})"
-            normalized_branch="release/${UCX_VERSION}"
-        fi
-    fi
-
-    echo "${normalized_branch}"
-}
-
 checkout_same_branch() {
     local -;
     set -euo pipefail;
@@ -155,10 +136,10 @@ checkout_same_branch() {
 
         # Apply normalization for ucxx repositories
         local repo_name_val="${!repo_name}";
-        local normalized_branch;
-        normalized_branch=$(convert-ucxx-branch "${repo_name_val}" "${branch}");
 
         if [[ "${repo_name_val}" == "ucxx" ]]; then
+            local normalized_branch;
+            normalized_branch=$(rapids-convert-ucxx-branch "${branch}");
             echo "Using normalized branch '${normalized_branch}' for repository '${repo_name_val}'";
             branch="${normalized_branch}";
         fi
