@@ -101,23 +101,9 @@ jobs:
           return "$exit_code"
         }
 
-        function rapids_to_ucxx_branch() {
-          local rapids_branch="$1"
-
-          if [[ "${rapids_branch}" =~ ^release/[0-9]{2}\.[0-9]{2}$ ]]; then
-            local rapids_version="${rapids_branch#release/}"
-            echo "release/$(curl -sL "https://version.gpuci.io/rapids/${rapids_version}")"
-          else
-            echo "${rapids_branch}"
-          fi
-        }
-
         # Clone all the repos
         run_command "Clone RAPIDS repositories" \
           clone-all -j$(nproc) -v -q --branch "$(< RAPIDS_BRANCH)" --clone-upstream --depth 1 --single-branch --shallow-submodules --no-update-env;
-
-        run_command "Clone UCXX repository" \
-          clone-ucxx -j$(nproc) -v -q --branch "$(rapids_to_ucxx_branch "$(< RAPIDS_BRANCH)")" --clone-upstream --depth 1 --single-branch --shallow-submodules --no-update-env;
 
         run_command "Create RAPIDS python environment" \
           rapids-post-start-command;

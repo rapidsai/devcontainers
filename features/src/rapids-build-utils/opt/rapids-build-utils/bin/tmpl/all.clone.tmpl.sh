@@ -11,6 +11,7 @@
 #                               (default: false)
 #
 # Options that require values:
+#  -b,--branch <branch_or_tag>  Check the repos out to <branch_or_tag>.
 #  -j,--parallel <num>          Clone <num> repos in parallel.
 #                               (default: 1)
 
@@ -21,7 +22,7 @@ clone_all() {
     local -;
     set -euo pipefail;
 
-    eval "$(_parse_args --take '-j,--parallel -v,--verbose --no-update-env' "$@" <&0)";
+    eval "$(_parse_args --take '-b,--branch -j,--parallel -v,--verbose --no-update-env' "$@" <&0)";
 
     eval "$(rapids-get-num-archs-jobs-and-load --archs 1 --max-device-obj-memory-usage 1 "$@")";
 
@@ -36,7 +37,23 @@ clone_all() {
     echo ${NAMES} \
   | tr '[:space:]' '\0' \
   | xargs ${v:+-t} ${_o} -r -0 -P${n_jobs} -I% bash -c \
-  " if command -V clone-% >/dev/null 2>&1; then if ! clone-% -j ${n_arch} --no-update-env ${OPTS[*]@Q} ${v[*]@Q}; then exit 255; fi; fi";
+  '
+    repo="$1";
+    branch="$2";
+    n_arch="$3";
+    shift 3;
+    branch_args=();
+    if test -n "${branch:+x}"; then
+        if [[ "${repo}" == "ucxx" && "${branch}" =~ ^release/[0-9]{2}\.[0-9]{2}$ ]]; then
+            rapids_version="${branch#release/}";
+            branch="release/$(curl -sL "https://version.gpuci.io/rapids/${rapids_version}")";
+        fi;
+        branch_args=(--branch "${branch}");
+    fi;
+    if command -V "clone-${repo}" >/dev/null 2>&1; then
+        if ! "clone-${repo}" -j "${n_arch}" --no-update-env "${branch_args[@]}" "$@"; then exit 255; fi;
+    fi
+  ' _ % "${branch[0]:-}" "${n_arch}" ${OPTS[*]@Q} ${v[*]@Q};
 
     if ! test -n "${no_update_env:+x}"; then
         rapids-post-start-command;
