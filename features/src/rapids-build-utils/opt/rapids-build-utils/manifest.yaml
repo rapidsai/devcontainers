@@ -325,6 +325,7 @@ repos:
       sub_dir: python/libcuopt
       depends: [cuopt]
       args: {install: *rapids_build_backend_args}
+      test: ci/run_ctests.sh
     - name: cuopt
       sub_dir: python/cuopt
       depends: [cuopt, cudf, raft]
