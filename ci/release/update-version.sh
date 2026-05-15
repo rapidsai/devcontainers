@@ -81,13 +81,16 @@ NEXT_FULL_TAG_PEP440=$(python -c "from packaging.version import Version; print(V
 
 # Log update context
 if [[ "${RUN_CONTEXT}" == "main" ]]; then
+    RAPIDS_BRANCH_NAME="main"
     echo "Preparing development branch update $CURRENT_TAG => $NEXT_FULL_TAG (targeting main branch)"
 elif [[ "${RUN_CONTEXT}" == "release" ]]; then
+    RAPIDS_BRANCH_NAME="release/${NEXT_SHORT_TAG}"
     echo "Preparing release branch update $CURRENT_TAG => $NEXT_FULL_TAG (targeting release/${NEXT_SHORT_TAG} branch)"
 fi
 
 # Centralized version file update
 echo "${NEXT_FULL_TAG}" > VERSION
+echo "${RAPIDS_BRANCH_NAME}" > RAPIDS_BRANCH
 
 # Inplace sed replace; workaround for Linux and Mac
 function sed_runner() {
