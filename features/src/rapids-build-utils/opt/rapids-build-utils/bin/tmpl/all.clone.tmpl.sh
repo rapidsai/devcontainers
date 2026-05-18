@@ -52,7 +52,7 @@ clone_all() {
     if command -V "clone-${repo}" >/dev/null 2>&1; then
         if ! "clone-${repo}" -j "${n_arch}" --no-update-env "${branch_args[@]}" "$@"; then exit 255; fi;
     fi
-  ' _ % "${branch[0]:-}" "${n_arch}" "${OPTS[@]}" "${v[@]}";
+  ' _ % "${branch[0]:-}" "${n_arch}" ${OPTS[*]@Q} ${v[*]@Q};
 
     if ! test -n "${no_update_env:+x}"; then
         rapids-post-start-command;
