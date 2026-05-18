@@ -76,13 +76,17 @@ NEXT_SHORT_TAG=${NEXT_MAJOR}.${NEXT_MINOR}
 NEXT_FULL_TAG=${NEXT_MAJOR}.${NEXT_MINOR}.${NEXT_PATCH}
 
 # Need to distutils-normalize the versions for some use cases
-NEXT_SHORT_TAG_PEP440=$(python -c "from packaging.version import Version; print(Version('${NEXT_SHORT_TAG}'))")
-NEXT_FULL_TAG_PEP440=$(python -c "from packaging.version import Version; print(Version('${NEXT_FULL_TAG}'))")
+NEXT_SHORT_TAG_PEP440=$(python3 -c "from packaging.version import Version; print(Version('${NEXT_SHORT_TAG}'))")
+NEXT_FULL_TAG_PEP440=$(python3 -c "from packaging.version import Version; print(Version('${NEXT_FULL_TAG}'))")
 
 # Log update context
 if [[ "${RUN_CONTEXT}" == "main" ]]; then
+    RAPIDS_BRANCH_NAME="main"
+    UCXX_BRANCH_NAME="main"
     echo "Preparing development branch update $CURRENT_TAG => $NEXT_FULL_TAG (targeting main branch)"
 elif [[ "${RUN_CONTEXT}" == "release" ]]; then
+    RAPIDS_BRANCH_NAME="release/${NEXT_SHORT_TAG}"
+    UCXX_BRANCH_NAME="release/$(curl -sL "https://version.gpuci.io/rapids/${NEXT_SHORT_TAG}")"
     echo "Preparing release branch update $CURRENT_TAG => $NEXT_FULL_TAG (targeting release/${NEXT_SHORT_TAG} branch)"
 fi
 
@@ -106,3 +110,6 @@ for file in $(find features -name devcontainer-feature.json); do
   tmp=$(mktemp)
   jq --arg ver "$NEXT_FULL_TAG_PEP440" '.version = $ver' "$file" > "$tmp" && mv "$tmp" "$file"
 done
+
+yq -i --yaml-fix-merge-anchor-to-spec ".x-git-defaults.tag = \"$RAPIDS_BRANCH_NAME\"" features/src/rapids-build-utils/opt/rapids-build-utils/manifest.yaml
+yq -i --yaml-fix-merge-anchor-to-spec "(.repos[] | select(.name == \"ucxx\") | .git.tag) = \"$UCXX_BRANCH_NAME\"" features/src/rapids-build-utils/opt/rapids-build-utils/manifest.yaml
