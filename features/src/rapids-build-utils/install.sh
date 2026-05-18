@@ -56,7 +56,7 @@ cp -ar ./opt/rapids-build-utils /opt/;
 
 declare -a commands=(
     checkout-same-branch
-    convert-ucxx-branch
+    maybe-clean-build-dir
     generate-docstring
     generate-scripts
     get-cmake-build-dir
@@ -68,7 +68,6 @@ declare -a commands=(
     make-pip-env
     make-vscode-workspace
     merge-compile-commands-json
-    maybe-clean-build-dir
     post-attach-command
     post-start-command
     pull-repositories

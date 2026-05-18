@@ -44,8 +44,9 @@ clone_all() {
     shift 3;
     branch_args=();
     if test -n "${branch:+x}"; then
-        if [[ "${repo}" == "ucxx" ]]; then
-            branch="$(rapids-convert-ucxx-branch "${branch}")";
+        if [[ "${repo}" == "ucxx" && "${branch}" =~ ^release/[0-9]{2}\.[0-9]{2}$ ]]; then
+            rapids_version="${branch#release/}";
+            branch="release/$(curl -sL "https://version.gpuci.io/rapids/${rapids_version}")";
         fi;
         branch_args=(--branch "${branch}");
     fi;
