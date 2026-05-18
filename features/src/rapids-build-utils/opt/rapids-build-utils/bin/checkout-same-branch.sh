@@ -23,7 +23,7 @@ convert-ucx-branch() {
     custom_branch=$2
     normalized_branch="${custom_branch}"
 
-    if [[ "${repo}" == "ucx"* ]]; then
+    if [[ "${repo}" == "ucxx" ]]; then
         # Only convert branches that match the pattern release/YY.MM
         if [[ "${custom_branch}" =~ ^release/[0-9]{2}\.[0-9]{2}$ ]]; then
             RAPIDS_VERSION=$(echo "${custom_branch}" | awk '{split($0, a, "/"); print a[2]}')
@@ -68,7 +68,7 @@ checkout_same_branch() {
         local path="${!repo_path}";
 
         # Skip ucxx repositories when determining common branches
-        if [[ "${name}" == "ucx"* ]]; then
+        if [[ "${name}" == "ucxx" ]]; then
             continue;
         fi
 
@@ -158,7 +158,7 @@ checkout_same_branch() {
         local normalized_branch;
         normalized_branch=$(convert-ucx-branch "${repo_name_val}" "${branch}");
 
-        if [[ "${repo_name_val}" == "ucx"* ]]; then
+        if [[ "${repo_name_val}" == "ucxx" ]]; then
             echo "Using normalized branch '${normalized_branch}' for repository '${repo_name_val}'";
             branch="${normalized_branch}";
         fi
