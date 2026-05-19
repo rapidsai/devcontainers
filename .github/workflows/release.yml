@@ -46,7 +46,7 @@ jobs:
       scenarios: "${{ steps.matrix.outputs.scenarios }}"
     steps:
       - name: "Checkout ${{ github.repository }}"
-        uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
         with:
           fetch-depth: 0
           persist-credentials: false
@@ -71,7 +71,7 @@ jobs:
       windows: ${{ steps.matrix.outputs.windows }}
     steps:
       - name: Checkout ${{ github.repository }}
-        uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
         with:
           fetch-depth: 0
           persist-credentials: false
@@ -129,3 +129,27 @@ jobs:
       packages: write
     secrets: inherit  # zizmor: ignore[secrets-inherit]
     uses: ./.github/workflows/release-features.yml
+
+  build-devcontainers-after-images-released:
+    if: needs.image-matrix.outputs.linux != '{"include":[]}'
+    needs: [image-matrix, release-linux]
+    name: Build devcontainers
+    secrets: inherit
+    uses: rapidsai/shared-workflows/.github/workflows/build-devcontainers.yaml@fea/build-devcontainer
+    permissions:
+      packages: write
+    with:
+      push: true
+      cuda: '["12.9", "13.0", "13.1"]'
+
+  build-devcontainers-after-features-released:
+    if: needs.image-matrix.outputs.linux == '{"include":[]}' && (needs.features-matrix.outputs.features != '[]' || needs.features-matrix.outputs.scenarios != '[]')
+    needs: [features-matrix, release-features]
+    name: Build devcontainers
+    secrets: inherit
+    uses: rapidsai/shared-workflows/.github/workflows/build-devcontainers.yaml@fea/build-devcontainer
+    permissions:
+      packages: write
+    with:
+      push: true
+      cuda: '["12.9", "13.0", "13.1"]'
