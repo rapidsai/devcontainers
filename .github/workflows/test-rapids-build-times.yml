@@ -12,9 +12,12 @@ on:
         required: false
         default: cpu32
 
+permissions: {}
+
 jobs:
   check-event:
     name: Check GH Event
+    permissions: {}
     runs-on: ubuntu-latest
     outputs:
       ok: ${{ steps.check_gh_event.outputs.ok }}
@@ -31,8 +34,8 @@ jobs:
     name: ${{ matrix.name }}
     if: needs.check-event.outputs.ok == 'true'
     needs: check-event
-    secrets: inherit
-    uses: rapidsai/shared-workflows/.github/workflows/build-in-devcontainer.yaml@main
+    secrets: inherit  # zizmor: ignore[secrets-inherit]
+    uses: rapidsai/shared-workflows/.github/workflows/build-in-devcontainer.yaml@main  # zizmor: ignore[unpinned-uses]
     permissions:
       actions: read
       packages: read

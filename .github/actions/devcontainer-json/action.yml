@@ -26,12 +26,16 @@ runs:
     - id: json
       name: Make image/.devcontainer/devcontainer.json
       shell: bash
+      env:
+        INPUT_OS: ${{ inputs.os }}
+        INPUT_FEATURES: ${{ inputs.features }}
+        INPUT_CONTAINER_ENV: ${{ inputs.container_env }}
       run: |
         bash --noprofile --norc -x -eo pipefail       \
           .github/actions/devcontainer-json/action.sh \
-          '${{ inputs.os }}'                          \
-          '${{ inputs.features }}'                    \
-          '${{ inputs.container_env }}'               \
+          "$INPUT_OS"                                 \
+          "$INPUT_FEATURES"                           \
+          "$INPUT_CONTAINER_ENV"                      \
         3>> "$GITHUB_OUTPUT"                          \
         4> image/.devcontainer/devcontainer.json.out  ;
 

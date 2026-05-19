@@ -1,7 +1,10 @@
 name: Trigger Breaking Change Notifications
 
 on:
-  pull_request_target:
+  # needs to be pull_request_target so the webhook token is available. no code
+  # gets checked out, only metadata, so there is no risk to executing this from
+  # fork PRs
+  pull_request_target: # zizmor: ignore[dangerous-triggers]
     types:
       - closed
       - reopened
@@ -11,8 +14,9 @@ on:
 jobs:
   trigger-notifier:
     if: contains(github.event.pull_request.labels.*.name, 'breaking')
-    secrets: inherit
-    uses: rapidsai/shared-workflows/.github/workflows/breaking-change-alert.yaml@main
+    permissions: {}
+    secrets: inherit  # zizmor: ignore[secrets-inherit]
+    uses: rapidsai/shared-workflows/.github/workflows/breaking-change-alert.yaml@main  # zizmor: ignore[unpinned-uses]
     with:
       sender_login: ${{ github.event.sender.login }}
       sender_avatar: ${{ github.event.sender.avatar_url }}

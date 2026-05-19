@@ -7,16 +7,20 @@ concurrency:
 on:
   workflow_dispatch:
 
+permissions: {}
+
 jobs:
 
   image-matrix:
     name: Determine image matrix
+    permissions:
+      contents: read
     runs-on: ubuntu-latest
     outputs:
       windows: ${{ steps.matrix.outputs.windows }}
     steps:
       - name: Checkout ${{ github.repository }}
-        uses: actions/checkout@v4
+        uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
         with:
           fetch-depth: 0
           persist-credentials: false
@@ -31,7 +35,9 @@ jobs:
     if: needs.image-matrix.outputs.windows != '{"include":[]}'
     name: ${{ matrix.name }}
     needs: image-matrix
-    secrets: inherit
+    permissions:
+      contents: read
+    secrets: inherit  # zizmor: ignore[secrets-inherit]
     uses: ./.github/workflows/build-test-and-push-windows-image.yml
     strategy:
       fail-fast: false
