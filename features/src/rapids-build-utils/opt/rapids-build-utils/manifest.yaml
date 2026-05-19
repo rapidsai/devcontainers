@@ -1,331 +1,315 @@
 x-git-defaults: &git_defaults
-    host: github
-    tag: main
-    upstream: rapidsai
-
+  host: github
+  tag: main
+  upstream: rapidsai
 x-rapids-build-backend-args: &rapids_build_backend_args |
   --config-settings "skbuild.strict-config=false"
   --config-settings "rapidsai.disable-cuda=true"
   --config-settings "rapidsai.matrix-entry=cuda=${CUDA_VERSION_MAJOR_MINOR}"
-
 repos:
-
-- name: rmm
-  path: rmm
-  git: {<<: *git_defaults, repo: rmm}
-  cpp:
-    - name: rmm
-      sub_dir: cpp
-      test: ci/run_ctests.sh
-  python:
-    - name: librmm
-      sub_dir: python/librmm
-      depends: [rmm]
-      args: {install: *rapids_build_backend_args}
-    - name: rmm
-      sub_dir: python/rmm
-      depends: [rmm]
-      args: {install: *rapids_build_backend_args}
-      test: ci/run_pytests.sh
-
-- name: ucxx
-  path: ucxx
-  git: {<<: *git_defaults, repo: ucxx, tag: main}
-  cpp:
-    - name: ucxx
-      sub_dir: cpp
-      depends: [rmm]
-      args: {cmake: -DUCXX_ENABLE_RMM=ON}
-      test: ci/run_cpp.sh
-    - name: ucxx-python
-      sub_dir: cpp/python
-      depends: [ucxx]
-      args: {cmake: -DFIND_UCXX_CPP=ON}
-  python:
-    - name: libucxx
-      sub_dir: python/libucxx
-      args: {cmake: -DFIND_UCXX_PYTHON=ON, install: *rapids_build_backend_args}
-      depends: [ucxx, ucxx-python]
-    - name: ucxx
-      sub_dir: python/ucxx
-      depends: [ucxx, ucxx-python]
-      args: {cmake: -DFIND_UCXX_PYTHON=ON, install: *rapids_build_backend_args}
-      test: ci/run_python.sh
-    - name: distributed-ucxx
-      sub_dir: python/distributed-ucxx
-      depends: [ucxx, ucxx-python]
-      args: {install: *rapids_build_backend_args}
-      test: ci/run_python_distributed.sh
-
-- name: dask-cuda
-  path: dask-cuda
-  git: {<<: *git_defaults, repo: dask-cuda}
-  python:
-    - name: dask-cuda
-      test: ci/run_pytest.sh
-
-- name: kvikio
-  path: kvikio
-  git: {<<: *git_defaults, repo: kvikio}
-  cpp:
-    - name: kvikio
-      sub_dir: cpp
-      test: ci/run_ctests.sh
-  python:
-    - name: libkvikio
-      sub_dir: python/libkvikio
-      depends: [kvikio]
-      args: {install: *rapids_build_backend_args}
-    - name: kvikio
-      sub_dir: python/kvikio
-      depends: [kvikio]
-      args: {install: *rapids_build_backend_args}
-      test: ci/run_pytests.sh
-
-- name: cudf
-  path: cudf
-  git: {<<: *git_defaults, repo: cudf}
-  cpp:
-    - name: cudf
-      sub_dir: cpp
-      depends: [rmm, kvikio]
-      test: ci/run_cudf_ctests.sh
-    - name: cudf_kafka
-      sub_dir: cpp/libcudf_kafka
-      depends: [cudf]
-      test: ci/run_cudf_kafka_ctests.sh
-  python:
-    - name: libcudf
-      sub_dir: python/libcudf
-      depends: [cudf]
-      args: {install: *rapids_build_backend_args}
-    - name: pylibcudf
-      sub_dir: python/pylibcudf
-      depends: [cudf]
-      args: {install: *rapids_build_backend_args}
-      test: ci/run_pylibcudf_pytests.sh
-    - name: cudf
-      sub_dir: python/cudf
-      depends: [cudf]
-      args: {install: *rapids_build_backend_args}
-      test: ci/run_cudf_pytests.sh
-    - name: dask-cudf
-      sub_dir: python/dask_cudf
-      args: {install: *rapids_build_backend_args}
-      test: ci/run_dask_cudf_pytests.sh
-    - name: cudf-polars
-      sub_dir: python/cudf_polars
-      args: {install: *rapids_build_backend_args}
-      test: ci/run_cudf_polars_pytests.sh
-    - name: cudf_kafka
-      sub_dir: python/cudf_kafka
-      depends: [cudf_kafka]
-      args: {install: *rapids_build_backend_args}
-      test: ci/run_cudf_kafka_pytests.sh
-    - name: custreamz
-      sub_dir: python/custreamz
-      args: {install: *rapids_build_backend_args}
-      test: ci/run_custreamz_pytests.sh
-
-- name: rapidsmpf
-  path: rapidsmpf
-  git: {<<: *git_defaults, repo: rapidsmpf}
-  dependency_keys:
-    - devcontainers
-  cpp:
-    - name: rapidsmpf
-      sub_dir: cpp
-      depends: [rmm, ucxx, cudf]
-      test: ci/run_ctests.sh
-  python:
-    - name: librapidsmpf
-      sub_dir: python/librapidsmpf
-      depends: [rapidsmpf]
-      args: {install: *rapids_build_backend_args}
-    - name: rapidsmpf
-      sub_dir: python/rapidsmpf
-      depends: [rapidsmpf, ucxx-python]
-      args: {install: *rapids_build_backend_args}
-      test: ci/run_pytests.sh
-
-- name: raft
-  path: raft
-  git: {<<: *git_defaults, repo: raft}
-  cpp:
-    - name: raft
-      sub_dir: cpp
-      depends: [rmm]
-      parallelism:
-        max_device_obj_memory_usage: 3Gi
-      args: {cmake: -DRAFT_COMPILE_LIBRARY=ON}
-      test: ci/run_ctests.sh
-  python:
-    - name: libraft
-      sub_dir: python/libraft
-      depends: [raft]
-      args: {install: *rapids_build_backend_args}
-    - name: pylibraft
-      sub_dir: python/pylibraft
-      depends: [raft]
-      args: {install: *rapids_build_backend_args}
-      test: ci/run_pylibraft_pytests.sh
-    - name: raft-dask
-      sub_dir: python/raft-dask
-      depends: [ucxx, raft]
-      args: {install: *rapids_build_backend_args}
-      test: ci/run_raft_dask_pytests.sh
-
-- name: cuvs
-  path: cuvs
-  git: {<<: *git_defaults, repo: cuvs}
-  cpp:
-    - name: cuvs
-      sub_dir: cpp
-      depends: [rmm, raft]
-      parallelism:
-        max_device_obj_memory_usage: 3Gi
-      args: {cmake: -DBUILD_C_LIBRARY=ON}
-      test: ci/run_ctests.sh
-  python:
-    - name: libcuvs
-      sub_dir: python/libcuvs
-      depends: [cuvs]
-      args: {install: *rapids_build_backend_args}
-    - name: cuvs
-      sub_dir: python/cuvs
-      depends: [cuvs]
-      args: {install: *rapids_build_backend_args}
-      test: ci/run_cuvs_pytests.sh
-
-- name: cuml
-  path: cuml
-  git: {<<: *git_defaults, repo: cuml}
-  dependency_keys:
-    - devcontainers
-  cpp:
-    - name: cuml
-      sub_dir: cpp
-      depends: [rmm, raft, cuvs]
-      parallelism:
-        max_device_obj_memory_usage: 3Gi
-      test: ci/run_ctests.sh
-  python:
-    - name: libcuml
-      sub_dir: python/libcuml
-      depends: [cuml]
-      args: {install: *rapids_build_backend_args}
-    - name: cuml
-      sub_dir: python/cuml
-      depends: [cuml]
-      args: {install: *rapids_build_backend_args}
-      test: ci/run_cuml_singlegpu_pytests.sh
-
-- name: nvforest
-  path: nvforest
-  git: {<<: *git_defaults, repo: nvforest}
-  dependency_keys:
-    - devcontainers
-  cpp:
-    - name: nvforest
-      sub_dir: cpp
-      depends: [rmm, raft]
-      parallelism:
-        max_device_obj_memory_usage: 3Gi
-      test: ci/run_ctests.sh
-  python:
-    - name: libnvforest
-      sub_dir: python/libnvforest
-      depends: [nvforest]
-      args: {install: *rapids_build_backend_args}
-    - name: nvforest
-      sub_dir: python/nvforest
-      depends: [nvforest]
-      args: {install: *rapids_build_backend_args}
-      test: ci/run_nvforest_pytests.sh
-
-- name: cugraph
-  path: cugraph
-  git: {<<: *git_defaults, repo: cugraph}
-  cpp:
-    - name: cugraph
-      sub_dir: cpp
-      depends: [rmm, ucxx, raft, cuvs]
-      env: |
-        CFLAGS=-D_GLIBCXX_USE_TBB_PAR_BACKEND=0
-        CXXFLAGS=-D_GLIBCXX_USE_TBB_PAR_BACKEND=0
-        CUDAFLAGS=-D_GLIBCXX_USE_TBB_PAR_BACKEND=0
-      test: ci/run_ctests.sh
-    - name: cugraph_etl
-      sub_dir: cpp/libcugraph_etl
-      depends: [cudf, cugraph]
-      env: |
-        CFLAGS=-D_GLIBCXX_USE_TBB_PAR_BACKEND=0
-        CXXFLAGS=-D_GLIBCXX_USE_TBB_PAR_BACKEND=0
-        CUDAFLAGS=-D_GLIBCXX_USE_TBB_PAR_BACKEND=0
-  python:
-    - name: libcugraph
-      sub_dir: python/libcugraph
-      depends: [cugraph]
-      args: {install: *rapids_build_backend_args}
-    - name: pylibcugraph
-      sub_dir: python/pylibcugraph
-      depends: [cugraph]
-      args: {install: *rapids_build_backend_args}
-      test: ci/run_pylibcugraph_pytests.sh
-    - name: cugraph
-      sub_dir: python/cugraph
-      depends: [cugraph]
-      args: {install: *rapids_build_backend_args}
-      test: ci/run_cugraph_pytests.sh
-
-- name: cugraph-gnn
-  path: cugraph-gnn
-  git: {<<: *git_defaults, repo: cugraph-gnn}
-  cpp:
-    - name: wholegraph
-      sub_dir: cpp
-      depends: [raft]
-      args:
-        cmake: -DCMAKE_CUDA_ARCHITECTURES="${CUDAARCHS}"
-      test: ci/run_ctests.sh
-  python:
-    - name: libwholegraph
-      sub_dir: python/libwholegraph
-      depends: [wholegraph]
-      args: {install: *rapids_build_backend_args}
-    - name: pylibwholegraph
-      sub_dir: python/pylibwholegraph
-      depends: [wholegraph]
-      args: {install: *rapids_build_backend_args}
-      test: ci/run_pylibwholegraph_pytests.sh
-    - name: cugraph_pyg
-      sub_dir: python/cugraph-pyg
-      args: {install: *rapids_build_backend_args}
-      test: ci/run_cugraph_pyg_pytests.sh
-
-- name: nx-cugraph
-  path: nx-cugraph
-  git: {<<: *git_defaults, repo: nx-cugraph}
-  python:
-    - name: nx-cugraph
-      sub_dir: .
-      args: {install: *rapids_build_backend_args}
-
-- name: cuopt
-  path: cuopt
-  git: {<<: *git_defaults, repo: cuopt, upstream: NVIDIA}
-  cpp:
-    - name: cuopt
-      sub_dir: cpp
-      depends: [rmm, raft]
-      env: |
-        CUDSS_DIR=/usr
-  python:
-    - name: libcuopt
-      sub_dir: python/libcuopt
-      depends: [cuopt]
-      args: {install: *rapids_build_backend_args}
-    - name: cuopt
-      sub_dir: python/cuopt
-      depends: [cuopt, cudf, raft]
-      args: {install: *rapids_build_backend_args}
+  - name: rmm
+    path: rmm
+    git: {!!merge <<: *git_defaults, repo: rmm}
+    cpp:
+      - name: rmm
+        sub_dir: cpp
+        test: ci/run_ctests.sh
+    python:
+      - name: librmm
+        sub_dir: python/librmm
+        depends: [rmm]
+        args: {install: *rapids_build_backend_args}
+      - name: rmm
+        sub_dir: python/rmm
+        depends: [rmm]
+        args: {install: *rapids_build_backend_args}
+        test: ci/run_pytests.sh
+  - name: ucxx
+    path: ucxx
+    git: {!!merge <<: *git_defaults, repo: ucxx, tag: main}
+    cpp:
+      - name: ucxx
+        sub_dir: cpp
+        depends: [rmm]
+        args: {cmake: -DUCXX_ENABLE_RMM=ON}
+        test: ci/run_cpp.sh
+      - name: ucxx-python
+        sub_dir: cpp/python
+        depends: [ucxx]
+        args: {cmake: -DFIND_UCXX_CPP=ON}
+    python:
+      - name: libucxx
+        sub_dir: python/libucxx
+        args: {cmake: -DFIND_UCXX_PYTHON=ON, install: *rapids_build_backend_args}
+        depends: [ucxx, ucxx-python]
+      - name: ucxx
+        sub_dir: python/ucxx
+        depends: [ucxx, ucxx-python]
+        args: {cmake: -DFIND_UCXX_PYTHON=ON, install: *rapids_build_backend_args}
+        test: ci/run_python.sh
+      - name: distributed-ucxx
+        sub_dir: python/distributed-ucxx
+        depends: [ucxx, ucxx-python]
+        args: {install: *rapids_build_backend_args}
+        test: ci/run_python_distributed.sh
+  - name: dask-cuda
+    path: dask-cuda
+    git: {!!merge <<: *git_defaults, repo: dask-cuda}
+    python:
+      - name: dask-cuda
+        test: ci/run_pytest.sh
+  - name: kvikio
+    path: kvikio
+    git: {!!merge <<: *git_defaults, repo: kvikio}
+    cpp:
+      - name: kvikio
+        sub_dir: cpp
+        test: ci/run_ctests.sh
+    python:
+      - name: libkvikio
+        sub_dir: python/libkvikio
+        depends: [kvikio]
+        args: {install: *rapids_build_backend_args}
+      - name: kvikio
+        sub_dir: python/kvikio
+        depends: [kvikio]
+        args: {install: *rapids_build_backend_args}
+        test: ci/run_pytests.sh
+  - name: cudf
+    path: cudf
+    git: {!!merge <<: *git_defaults, repo: cudf}
+    cpp:
+      - name: cudf
+        sub_dir: cpp
+        depends: [rmm, kvikio]
+        test: ci/run_cudf_ctests.sh
+      - name: cudf_kafka
+        sub_dir: cpp/libcudf_kafka
+        depends: [cudf]
+        test: ci/run_cudf_kafka_ctests.sh
+    python:
+      - name: libcudf
+        sub_dir: python/libcudf
+        depends: [cudf]
+        args: {install: *rapids_build_backend_args}
+      - name: pylibcudf
+        sub_dir: python/pylibcudf
+        depends: [cudf]
+        args: {install: *rapids_build_backend_args}
+        test: ci/run_pylibcudf_pytests.sh
+      - name: cudf
+        sub_dir: python/cudf
+        depends: [cudf]
+        args: {install: *rapids_build_backend_args}
+        test: ci/run_cudf_pytests.sh
+      - name: dask-cudf
+        sub_dir: python/dask_cudf
+        args: {install: *rapids_build_backend_args}
+        test: ci/run_dask_cudf_pytests.sh
+      - name: cudf-polars
+        sub_dir: python/cudf_polars
+        args: {install: *rapids_build_backend_args}
+        test: ci/run_cudf_polars_pytests.sh
+      - name: cudf_kafka
+        sub_dir: python/cudf_kafka
+        depends: [cudf_kafka]
+        args: {install: *rapids_build_backend_args}
+        test: ci/run_cudf_kafka_pytests.sh
+      - name: custreamz
+        sub_dir: python/custreamz
+        args: {install: *rapids_build_backend_args}
+        test: ci/run_custreamz_pytests.sh
+  - name: rapidsmpf
+    path: rapidsmpf
+    git: {!!merge <<: *git_defaults, repo: rapidsmpf}
+    dependency_keys:
+      - devcontainers
+    cpp:
+      - name: rapidsmpf
+        sub_dir: cpp
+        depends: [rmm, ucxx, cudf]
+        test: ci/run_ctests.sh
+    python:
+      - name: librapidsmpf
+        sub_dir: python/librapidsmpf
+        depends: [rapidsmpf]
+        args: {install: *rapids_build_backend_args}
+      - name: rapidsmpf
+        sub_dir: python/rapidsmpf
+        depends: [rapidsmpf, ucxx-python]
+        args: {install: *rapids_build_backend_args}
+        test: ci/run_pytests.sh
+  - name: raft
+    path: raft
+    git: {!!merge <<: *git_defaults, repo: raft}
+    cpp:
+      - name: raft
+        sub_dir: cpp
+        depends: [rmm]
+        parallelism:
+          max_device_obj_memory_usage: 3Gi
+        args: {cmake: -DRAFT_COMPILE_LIBRARY=ON}
+        test: ci/run_ctests.sh
+    python:
+      - name: libraft
+        sub_dir: python/libraft
+        depends: [raft]
+        args: {install: *rapids_build_backend_args}
+      - name: pylibraft
+        sub_dir: python/pylibraft
+        depends: [raft]
+        args: {install: *rapids_build_backend_args}
+        test: ci/run_pylibraft_pytests.sh
+      - name: raft-dask
+        sub_dir: python/raft-dask
+        depends: [ucxx, raft]
+        args: {install: *rapids_build_backend_args}
+        test: ci/run_raft_dask_pytests.sh
+  - name: cuvs
+    path: cuvs
+    git: {!!merge <<: *git_defaults, repo: cuvs}
+    cpp:
+      - name: cuvs
+        sub_dir: cpp
+        depends: [rmm, raft]
+        parallelism:
+          max_device_obj_memory_usage: 3Gi
+        args: {cmake: -DBUILD_C_LIBRARY=ON}
+        test: ci/run_ctests.sh
+    python:
+      - name: libcuvs
+        sub_dir: python/libcuvs
+        depends: [cuvs]
+        args: {install: *rapids_build_backend_args}
+      - name: cuvs
+        sub_dir: python/cuvs
+        depends: [cuvs]
+        args: {install: *rapids_build_backend_args}
+        test: ci/run_cuvs_pytests.sh
+  - name: cuml
+    path: cuml
+    git: {!!merge <<: *git_defaults, repo: cuml}
+    dependency_keys:
+      - devcontainers
+    cpp:
+      - name: cuml
+        sub_dir: cpp
+        depends: [rmm, raft, cuvs]
+        parallelism:
+          max_device_obj_memory_usage: 3Gi
+        test: ci/run_ctests.sh
+    python:
+      - name: libcuml
+        sub_dir: python/libcuml
+        depends: [cuml]
+        args: {install: *rapids_build_backend_args}
+      - name: cuml
+        sub_dir: python/cuml
+        depends: [cuml]
+        args: {install: *rapids_build_backend_args}
+        test: ci/run_cuml_singlegpu_pytests.sh
+  - name: nvforest
+    path: nvforest
+    git: {!!merge <<: *git_defaults, repo: nvforest}
+    dependency_keys:
+      - devcontainers
+    cpp:
+      - name: nvforest
+        sub_dir: cpp
+        depends: [rmm, raft]
+        parallelism:
+          max_device_obj_memory_usage: 3Gi
+        test: ci/run_ctests.sh
+    python:
+      - name: libnvforest
+        sub_dir: python/libnvforest
+        depends: [nvforest]
+        args: {install: *rapids_build_backend_args}
+      - name: nvforest
+        sub_dir: python/nvforest
+        depends: [nvforest]
+        args: {install: *rapids_build_backend_args}
+        test: ci/run_nvforest_pytests.sh
+  - name: cugraph
+    path: cugraph
+    git: {!!merge <<: *git_defaults, repo: cugraph}
+    cpp:
+      - name: cugraph
+        sub_dir: cpp
+        depends: [rmm, ucxx, raft, cuvs]
+        env: |
+          CFLAGS=-D_GLIBCXX_USE_TBB_PAR_BACKEND=0
+          CXXFLAGS=-D_GLIBCXX_USE_TBB_PAR_BACKEND=0
+          CUDAFLAGS=-D_GLIBCXX_USE_TBB_PAR_BACKEND=0
+        test: ci/run_ctests.sh
+      - name: cugraph_etl
+        sub_dir: cpp/libcugraph_etl
+        depends: [cudf, cugraph]
+        env: |
+          CFLAGS=-D_GLIBCXX_USE_TBB_PAR_BACKEND=0
+          CXXFLAGS=-D_GLIBCXX_USE_TBB_PAR_BACKEND=0
+          CUDAFLAGS=-D_GLIBCXX_USE_TBB_PAR_BACKEND=0
+    python:
+      - name: libcugraph
+        sub_dir: python/libcugraph
+        depends: [cugraph]
+        args: {install: *rapids_build_backend_args}
+      - name: pylibcugraph
+        sub_dir: python/pylibcugraph
+        depends: [cugraph]
+        args: {install: *rapids_build_backend_args}
+        test: ci/run_pylibcugraph_pytests.sh
+      - name: cugraph
+        sub_dir: python/cugraph
+        depends: [cugraph]
+        args: {install: *rapids_build_backend_args}
+        test: ci/run_cugraph_pytests.sh
+  - name: cugraph-gnn
+    path: cugraph-gnn
+    git: {!!merge <<: *git_defaults, repo: cugraph-gnn}
+    cpp:
+      - name: wholegraph
+        sub_dir: cpp
+        depends: [raft]
+        args:
+          cmake: -DCMAKE_CUDA_ARCHITECTURES="${CUDAARCHS}"
+        test: ci/run_ctests.sh
+    python:
+      - name: libwholegraph
+        sub_dir: python/libwholegraph
+        depends: [wholegraph]
+        args: {install: *rapids_build_backend_args}
+      - name: pylibwholegraph
+        sub_dir: python/pylibwholegraph
+        depends: [wholegraph]
+        args: {install: *rapids_build_backend_args}
+        test: ci/run_pylibwholegraph_pytests.sh
+      - name: cugraph_pyg
+        sub_dir: python/cugraph-pyg
+        args: {install: *rapids_build_backend_args}
+        test: ci/run_cugraph_pyg_pytests.sh
+  - name: nx-cugraph
+    path: nx-cugraph
+    git: {!!merge <<: *git_defaults, repo: nx-cugraph}
+    python:
+      - name: nx-cugraph
+        sub_dir: .
+        args: {install: *rapids_build_backend_args}
+  - name: cuopt
+    path: cuopt
+    git: {!!merge <<: *git_defaults, repo: cuopt, upstream: NVIDIA}
+    cpp:
+      - name: cuopt
+        sub_dir: cpp
+        depends: [rmm, raft]
+        env: |
+          CUDSS_DIR=/usr
+    python:
+      - name: libcuopt
+        sub_dir: python/libcuopt
+        depends: [cuopt]
+        args: {install: *rapids_build_backend_args}
+      - name: cuopt
+        sub_dir: python/cuopt
+        depends: [cuopt, cudf, raft]
+        args: {install: *rapids_build_backend_args}
