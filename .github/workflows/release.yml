@@ -134,8 +134,8 @@ jobs:
     if: needs.image-matrix.outputs.linux != '{"include":[]}'
     needs: [image-matrix, release-linux]
     name: Build devcontainers
-    secrets: inherit
-    uses: rapidsai/shared-workflows/.github/workflows/build-devcontainers.yaml@fea/build-devcontainer
+    secrets: inherit  # zizmor: ignore[secrets-inherit]
+    uses: rapidsai/shared-workflows/.github/workflows/build-devcontainers.yaml@main  # zizmor: ignore[unpinned-uses]
     permissions:
       packages: write
     with:
@@ -146,8 +146,8 @@ jobs:
     if: needs.image-matrix.outputs.linux == '{"include":[]}' && (needs.features-matrix.outputs.features != '[]' || needs.features-matrix.outputs.scenarios != '[]')
     needs: [features-matrix, release-features]
     name: Build devcontainers
-    secrets: inherit
-    uses: rapidsai/shared-workflows/.github/workflows/build-devcontainers.yaml@fea/build-devcontainer
+    secrets: inherit  # zizmor: ignore[secrets-inherit]
+    uses: rapidsai/shared-workflows/.github/workflows/build-devcontainers.yaml@main  # zizmor: ignore[unpinned-uses]
     permissions:
       packages: write
     with:

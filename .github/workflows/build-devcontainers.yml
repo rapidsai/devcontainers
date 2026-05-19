@@ -47,8 +47,8 @@ on:
 jobs:
   build:
     name: Build devcontainers
-    secrets: inherit
-    uses: rapidsai/shared-workflows/.github/workflows/build-devcontainers.yaml@fea/build-devcontainer
+    secrets: inherit  # zizmor: ignore[secrets-inherit]
+    uses: rapidsai/shared-workflows/.github/workflows/build-devcontainers.yaml@main  # zizmor: ignore[unpinned-uses]
     permissions:
       packages: write
     with:
