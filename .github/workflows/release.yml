@@ -144,7 +144,7 @@ jobs:
 
   build-devcontainers-after-features-released:
     if: needs.image-matrix.outputs.linux == '{"include":[]}' && (needs.features-matrix.outputs.features != '[]' || needs.features-matrix.outputs.scenarios != '[]')
-    needs: [features-matrix, release-features]
+    needs: [image-matrix, features-matrix, release-features]
     name: Build devcontainers
     secrets: inherit  # zizmor: ignore[secrets-inherit]
     uses: rapidsai/shared-workflows/.github/workflows/build-devcontainers.yaml@main  # zizmor: ignore[unpinned-uses]
