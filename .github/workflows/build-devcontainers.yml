@@ -11,10 +11,10 @@ on:
         description: |
           Stringified JSON array of CUDA versions to run this workflow for.
           This is used to select .devcontainer/ directories local to wherever this workflow is invoked from.
-          For example, if a repository has directories '.devcontainer/cuda12.9-pip/' and '.devcontainer/cuda13.1-pip/',
-          '["12.9", "13.1"]' could be passed here to build both of those devcontainers in CI.
+          For example, if a repository has directories '.devcontainer/cuda12.9-pip/' and '.devcontainer/cuda13.2-pip/',
+          '["12.9", "13.2"]' could be passed here to build both of those devcontainers in CI.
         type: string
-        default: '["12.9", "13.1"]'
+        default: '["12.9", "13.2"]'
       python_package_manager:
         description: |
           Stringified JSON array of Python package managers to run devcontainer builds for.
@@ -30,10 +30,10 @@ on:
         description: |
           Stringified JSON array of CUDA versions to run this workflow for.
           This is used to select .devcontainer/ directories local to wherever this workflow is invoked from.
-          For example, if a repository has directories '.devcontainer/cuda12.9-pip/' and '.devcontainer/cuda13.1-pip/',
-          '["12.9", "13.1"]' could be passed here to build both of those devcontainers in CI.
+          For example, if a repository has directories '.devcontainer/cuda12.9-pip/' and '.devcontainer/cuda13.2-pip/',
+          '["12.9", "13.2"]' could be passed here to build both of those devcontainers in CI.
         type: string
-        default: '["12.9", "13.1"]'
+        default: '["12.9", "13.2"]'
       python_package_manager:
         description: |
           Stringified JSON array of Python package managers to run devcontainer builds for.
