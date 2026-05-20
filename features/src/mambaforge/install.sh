@@ -33,6 +33,14 @@ find /opt/conda -follow -type f -name '*.a' -delete;
 find /opt/conda -follow -type f -name '*.pyc' -delete;
 conda clean --force-pkgs-dirs --all --yes;
 
+mkdir -p /etc/conda
+cat <<"EOF" > /etc/conda/.condarc
+pkg_dirs:
+  - ~/.conda/pkgs
+envs_dirs:
+  - ~/.conda/envs
+EOF
+
 # Activate conda in /etc/bash.bashrc
 append_to_etc_bashrc "$(cat<< EOF
 for x in "conda" "mamba"; do
