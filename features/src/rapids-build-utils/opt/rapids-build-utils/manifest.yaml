@@ -31,7 +31,7 @@ repos:
       - name: ucxx
         sub_dir: cpp
         depends: [rmm]
-        args: {cmake: -DUCXX_ENABLE_CCCL=ON}
+        args: {cmake: -DUCXX_ENABLE_RMM=ON -DUCXX_ENABLE_CCCL=ON}
         test: ci/run_cpp.sh
       - name: ucxx-python
         sub_dir: cpp/python
