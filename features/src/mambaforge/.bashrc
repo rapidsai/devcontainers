@@ -1,6 +1,6 @@
 export MAMBA_NO_BANNER="${MAMBA_NO_BANNER:-1}";
-export CONDA_PKGS_DIRS="${CONDA_PKGS_DIRS:-${HOME}/.conda/pkgs}";
-export MAMBA_PKGS_DIRS="${CONDA_PKGS_DIRS}";
+export CONDA_PKG_DIRS="${CONDA_PKG_DIRS:-${HOME}/.conda/pkgs}";
+export MAMBA_PKG_DIRS="${CONDA_PKG_DIRS}";
 
 # Temporarily allow unbound variables for conda activation.
 nounseton="$(shopt -o nounset | tr -d '[:blank:]')";
