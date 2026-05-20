@@ -55,10 +55,7 @@ EOF
 # Create and/or replace mamba.sh with a version that doesn't print warnings to stdout (https://github.com/mamba-org/mamba/pull/3788)
 # This also protects us when mamba decides to remove this file, which is a decision that is incompatible with this feature.
 cat <<"EOF" > /opt/conda/etc/profile.d/mamba.sh
-# if [ -z "${MAMBA_ROOT_PREFIX:-}" ]; then
-#     export MAMBA_ROOT_PREFIX="${CONDA_PREFIX:-/opt/conda}"
-# fi
-export MAMBA_ROOT_PREFIX="${CONDA_PREFIX:-/opt/conda}"
+export MAMBA_ROOT_PREFIX="${HOME/.conda}"
 __mamba_setup="$("/opt/conda/bin/mamba" shell hook --shell posix 2> /dev/null)"
 if [ $? -eq 0 ]; then
     eval "$__mamba_setup"
