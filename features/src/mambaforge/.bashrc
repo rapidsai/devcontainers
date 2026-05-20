@@ -1,10 +1,11 @@
 export MAMBA_NO_BANNER="${MAMBA_NO_BANNER:-1}";
 export CONDA_PKGS_DIRS="${CONDA_PKGS_DIRS:-${HOME}/.conda/pkgs}";
+export MAMBA_PKGS_DIRS="${CONDA_PKGS_DIRS}";
 
 # Temporarily allow unbound variables for conda activation.
 nounseton="$(shopt -o nounset | tr -d '[:blank:]')";
 set +u;
-for default_conda_env_name in ${DEFAULT_CONDA_ENV:-} ${CONDA_DEFAULT_ENV:-} base; do
+for default_conda_env_name in "${DEFAULT_CONDA_ENV:-}" "${CONDA_DEFAULT_ENV:-}" "${MAMBA_DEFAULT_ENV:-}" base; do
     if [ -z "${default_conda_env_name:-}" ]; then continue; fi
     if grep -qF "(${default_conda_env_name})" <<< "${CONDA_PROMPT_MODIFIER:-}"; then break; fi
     if conda activate "${default_conda_env_name}" 2>/dev/null; then break; else continue; fi
