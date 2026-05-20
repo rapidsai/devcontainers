@@ -54,7 +54,7 @@ make_conda_env() {
             cat "${new_env_path}";
             echo "";
 
-            conda env create "${q[@]}" -n "${env_name}" -f "${new_env_path}" --solver=libmamba;
+            mamba env create "${q[@]}" -n "${env_name}" -f "${new_env_path}";
         # If the conda env does exist but it's different from the generated one,
         # print the diff between the envs and update it
         elif ! diff -BNqw "${old_env_path}" "${new_env_path}" >/dev/null 2>&1; then
@@ -73,7 +73,7 @@ make_conda_env() {
             # We mount in the package cache, so this should still be fast in most cases.
             rm -rf "${HOME}/.conda/envs/${env_name}";
 
-            conda env create "${q[@]}" -n "${env_name}" -f "${new_env_path}" --solver=libmamba;
+            mamba env create "${q[@]}" -n "${env_name}" -f "${new_env_path}";
         fi
 
         cp -a "${new_env_path}" "${old_env_path}";
