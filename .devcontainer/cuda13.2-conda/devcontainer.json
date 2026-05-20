@@ -43,13 +43,11 @@
       "installnvJPEG": false,
       "pruneStaticLibs": true
     },
-    "./features/src/mambaforge": {},
     "./features/src/utils": {},
     "./features/src/rapids-build-utils": {}
   },
   "overrideFeatureInstallOrder": [
     "./features/src/cuda",
-    "./features/src/mambaforge",
     "./features/src/utils",
     "./features/src/rapids-build-utils"
   ],
