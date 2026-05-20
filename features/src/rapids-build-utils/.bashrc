@@ -1,4 +1,5 @@
 export CONDA_ALWAYS_YES="true";
+export MAMBA_ALWAYS_YES="true";
 export CC="${CC:-"/usr/bin/gcc"}";
 export CXX="${CXX:-"/usr/bin/g++"}";
 export CUDAHOSTCXX="${CXX}";
