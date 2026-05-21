@@ -194,7 +194,7 @@ repos:
     cpp:
       - name: cuml
         sub_dir: cpp
-        depends: [rmm, raft, cuvs]
+        depends: [rmm, raft, cuvs, nvforest]
         parallelism:
           max_device_obj_memory_usage: 3Gi
         test: ci/run_ctests.sh
