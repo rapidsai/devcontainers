@@ -186,28 +186,6 @@ repos:
         depends: [cuvs]
         args: {install: *rapids_build_backend_args}
         test: ci/run_cuvs_pytests.sh
-  - name: cuml
-    path: cuml
-    git: {!!merge <<: *git_defaults, repo: cuml}
-    dependency_keys:
-      - devcontainers
-    cpp:
-      - name: cuml
-        sub_dir: cpp
-        depends: [rmm, raft, cuvs]
-        parallelism:
-          max_device_obj_memory_usage: 3Gi
-        test: ci/run_ctests.sh
-    python:
-      - name: libcuml
-        sub_dir: python/libcuml
-        depends: [cuml]
-        args: {install: *rapids_build_backend_args}
-      - name: cuml
-        sub_dir: python/cuml
-        depends: [cuml]
-        args: {install: *rapids_build_backend_args}
-        test: ci/run_cuml_singlegpu_pytests.sh
   - name: nvforest
     path: nvforest
     git: {!!merge <<: *git_defaults, repo: nvforest}
@@ -230,6 +208,28 @@ repos:
         depends: [nvforest]
         args: {install: *rapids_build_backend_args}
         test: ci/run_nvforest_pytests.sh
+  - name: cuml
+    path: cuml
+    git: {!!merge <<: *git_defaults, repo: cuml}
+    dependency_keys:
+      - devcontainers
+    cpp:
+      - name: cuml
+        sub_dir: cpp
+        depends: [rmm, raft, cuvs, nvforest]
+        parallelism:
+          max_device_obj_memory_usage: 3Gi
+        test: ci/run_ctests.sh
+    python:
+      - name: libcuml
+        sub_dir: python/libcuml
+        depends: [cuml]
+        args: {install: *rapids_build_backend_args}
+      - name: cuml
+        sub_dir: python/cuml
+        depends: [cuml]
+        args: {install: *rapids_build_backend_args}
+        test: ci/run_cuml_singlegpu_pytests.sh
   - name: cugraph
     path: cugraph
     git: {!!merge <<: *git_defaults, repo: cugraph}
