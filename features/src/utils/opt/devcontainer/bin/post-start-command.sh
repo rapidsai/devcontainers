@@ -7,15 +7,16 @@ if ! test -n "${SKIP_DEVCONTAINER_UTILS_POST_START_COMMAND:+x}"; then
 
     # Fast parallel `chown -R`
     find ~/ /var/log/devcontainer-utils/ -not -user coder -print0 2>/dev/null \
-  | sudo xargs -0 -r -n1 -P"$(nproc --all)" chown "$(id -u):$(id -g)" 2>/dev/null \
- || true;
-
-    # shellcheck disable=SC1091
-    . devcontainer-utils-init-git;
+  | sudo xargs -0 -r -n1 -P"$(nproc --all)" chown "$(id -u):$(id -g)" 2>/dev/null &
 
     # Install latest sccache client
     devcontainer-utils-install-sccache                   \
         --repo "${SCCACHE_REPOSITORY:-rapidsai/sccache}" \
         --version "${SCCACHE_VERSION:-rapids}"           \
     ;
+
+    wait || :
+
+    # shellcheck disable=SC1091
+    . devcontainer-utils-init-git;
 fi
