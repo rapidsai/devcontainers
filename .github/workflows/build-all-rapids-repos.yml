@@ -27,7 +27,7 @@ jobs:
           || echo "ok=false" | tee -a "$GITHUB_OUTPUT";
 
   build-all-rapids-repos:
-    name: ${{ matrix.libs }}
+    name: ${{ matrix.libs || 'all' }}
     if: needs.check-event.outputs.ok == 'true'
     needs: check-event
     secrets: inherit  # zizmor: ignore[secrets-inherit]
@@ -45,6 +45,7 @@ jobs:
           - libs: "rmm ucxx kvikio dask-cuda cudf cudf_kafka rapidsmpf"
           - libs: "rmm ucxx dask-cuda raft cuvs nvforest cuml cuopt"
           - libs: "rmm ucxx dask-cuda raft cuvs cugraph cugraph-gnn nx-cugraph"
+          - libs: ""
 
     with:
       arch: '["amd64", "arm64"]'
