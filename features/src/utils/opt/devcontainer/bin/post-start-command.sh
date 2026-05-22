@@ -12,4 +12,10 @@ if ! test -n "${SKIP_DEVCONTAINER_UTILS_POST_START_COMMAND:+x}"; then
 
     # shellcheck disable=SC1091
     . devcontainer-utils-init-git;
+
+    # Install latest sccache client
+    devcontainer-utils-install-sccache                   \
+        --repo "${SCCACHE_REPOSITORY:-rapidsai/sccache}" \
+        --version "${SCCACHE_VERSION:-rapids}"           \
+    ;
 fi
