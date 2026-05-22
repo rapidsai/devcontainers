@@ -65,8 +65,10 @@ _start_sccache() {
         sccache --start-server 1>&2 2>/dev/null \
       | tee "$logfile";
 
-        # Wait till the pidfile exists and is not empty
-        until test -s "${pidfile}"; do sleep 1; done
+        # If the pidfile doesn't exist, write it
+        if ! test -s "${pidfile}"; then
+            pgrep sccache | sort -n | head -n1 | tee "${pidfile}" >/dev/null;
+        fi
 
         # Increase the open file limit so users can do `make -j(ulimit -n)`
         prlimit --nofile=$(ulimit -Hn):$(ulimit -Hn) --pid "$(cat "${pidfile}")";

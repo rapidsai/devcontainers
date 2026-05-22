@@ -35,6 +35,6 @@ if ! test -n "${SKIP_DEVCONTAINER_UTILS_POST_ATTACH_COMMAND:+x}"; then
         fi
     elif command -V sccache >/dev/null 2>&1; then
         # Start the sccache client
-        devcontainer-utils-start-sccache --kill-all;
+        devcontainer-utils-start-sccache;
     fi
 fi

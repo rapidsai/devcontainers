@@ -9,11 +9,13 @@ if ! test -n "${SKIP_DEVCONTAINER_UTILS_POST_START_COMMAND:+x}"; then
     find ~/ /var/log/devcontainer-utils/ -not -user coder -print0 2>/dev/null \
   | sudo xargs -0 -r -n1 -P"$(nproc --all)" chown "$(id -u):$(id -g)" 2>/dev/null &
 
-    # Install latest sccache client
-    devcontainer-utils-install-sccache                   \
-        --repo "${SCCACHE_REPOSITORY:-rapidsai/sccache}" \
-        --version "${SCCACHE_VERSION:-rapids}"           \
-    ;
+    if test -n "${DEVCONTAINER_UTILS_ENABLE_SCCACHE_DIST:+x}"; then
+        # Install latest sccache client
+        devcontainer-utils-install-sccache                   \
+            --repo "${SCCACHE_REPOSITORY:-rapidsai/sccache}" \
+            --version "${SCCACHE_VERSION:-rapids}"           \
+        ;
+    fi
 
     wait || :
 
