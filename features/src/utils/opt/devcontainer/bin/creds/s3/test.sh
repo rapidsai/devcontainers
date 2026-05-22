@@ -32,7 +32,10 @@ _creds_s3_test() {
     local aws_session_token="${AWS_SESSION_TOKEN:-"$(sed -n 's/aws_session_token=//p' ~/.aws/credentials 2>/dev/null)"}";
     local aws_secret_access_key="${AWS_SECRET_ACCESS_KEY:-"$(sed -n 's/aws_secret_access_key=//p' ~/.aws/credentials 2>/dev/null)"}";
 
-    devcontainer-utils-stop-sccache --kill -p 4220 || true;
+    if ! timeout --preserve-status --kill-after=20s 15s \
+         devcontainer-utils-stop-sccache -p 4220; then
+         devcontainer-utils-stop-sccache -p 4220 --kill || :
+    fi
 
     local result=0;
 
@@ -52,7 +55,12 @@ _creds_s3_test() {
        result=1;
     fi
 
-    devcontainer-utils-stop-sccache --kill -p 4220 || true;
+    devcontainer-utils-stop-sccache --kill -p 4220 || :
+
+    if ! timeout --preserve-status --kill-after=20s 15s \
+         devcontainer-utils-stop-sccache -p 4220; then
+         devcontainer-utils-stop-sccache -p 4220 --kill || :
+    fi
 
     if test "$result" -eq 0; then
         local logfile="${SCCACHE_ERROR_LOG:-/tmp/sccache.log}";

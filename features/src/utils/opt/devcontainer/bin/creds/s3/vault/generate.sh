@@ -11,27 +11,17 @@ _creds_vault_generate() {
 
     if ! test -n "${VAULT_HOST:+x}" \
     || ! test -n "${SCCACHE_BUCKET:+x}"; then
-        exit 1;
+        return 1;
     fi
 
     SCCACHE_REGION="${SCCACHE_REGION:-${AWS_DEFAULT_REGION:-}}";
-
-    # Remove existing credentials in case vault declines to issue new ones.
-    if test -w ~/.aws; then
-        rm -rf ~/.aws/{stamp,config,credentials};
-    fi
-
-    devcontainer-utils-creds-s3-persist - <<< " \
-        --bucket '${SCCACHE_BUCKET:-}'          \
-        --region '${SCCACHE_REGION:-}'          \
-    ";
 
     # Initialize the GitHub CLI with the appropriate user scopes
     # shellcheck disable=SC1091
     . devcontainer-utils-init-github-cli;
 
     if ! test -n "${GITHUB_USER:+x}"; then
-        exit 1;
+        return 1;
     fi
 
     # Check whether the user is in one of the allowed GitHub orgs
@@ -47,7 +37,7 @@ _creds_vault_generate() {
     )";
 
     if test "${#user_orgs}" -eq 0; then
-        exit 1;
+        return 1;
     fi
 
     cat <<____EOF | tee -a /var/log/devcontainer-utils/creds-s3.log
@@ -65,7 +55,7 @@ ____EOF
         cat <<________EOF | tee -a /var/log/devcontainer-utils/creds-s3.log >&2
 Your GitHub user was not recognized by vault. Skipping.
 ________EOF
-        exit 1;
+        return 1;
     fi
 
     cat <<____EOF | tee -a /var/log/devcontainer-utils/creds-s3.log
@@ -97,14 +87,14 @@ ____EOF
         cat <<________EOF | tee -a /var/log/devcontainer-utils/creds-s3.log >&2
 Failed to retrieve AWS S3 credentials. Skipping.
 ________EOF
-        exit 1;
+        return 1;
     fi
 
     if grep -qE "^null$" <<< "${aws_secret_access_key:-null}"; then
         cat <<________EOF | tee -a /var/log/devcontainer-utils/creds-s3.log >&2
 Failed to retrieve AWS S3 credentials. Skipping.
 ________EOF
-        exit 1;
+        return 1;
     fi
 
     cat <<____EOF | tee -a /var/log/devcontainer-utils/creds-s3.log
@@ -127,7 +117,22 @@ ____EOF
     fi
 }
 
-_creds_vault_generate "$@";
+if ! _creds_vault_generate "$@" <&0; then
+
+    # Remove existing credentials in case vault declines to issue new ones.
+    if test -w ~/.aws; then
+        rm -rf ~/.aws/{stamp,config,credentials};
+    fi
+
+    devcontainer-utils-creds-s3-persist - <<<                 \
+        --bucket="${SCCACHE_BUCKET:-}"                        \
+        --region="${SCCACHE_REGION:-${AWS_DEFAULT_REGION:-}}" ;
+
+    # shellcheck disable=SC1090
+    . /etc/profile.d/*-devcontainer-utils.sh;
+
+    exit 1;
+fi
 
 # shellcheck disable=SC1090
 . /etc/profile.d/*-devcontainer-utils.sh;

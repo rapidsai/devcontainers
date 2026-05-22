@@ -91,19 +91,19 @@ ________EOF
 
     if ! grep -qE "^$" <<< "${aws_secret_access_key:-}"; then
         if test -w ~/.aws/credentials; then
-            reset_envvar "AWS_SESSION_TOKEN";
+            reset_envvar "AWS_SECRET_ACCESS_KEY";
             cat <<< "aws_secret_access_key=${aws_secret_access_key}" >> ~/.aws/credentials
         else
-            export_envvar "AWS_SESSION_TOKEN" "${aws_secret_access_key}";
+            export_envvar "AWS_SECRET_ACCESS_KEY" "${aws_secret_access_key}";
         fi
     fi
 
     if ! grep -qE "^$" <<< "${aws_session_token:-}"; then
         if test -w ~/.aws/credentials; then
-            reset_envvar "AWS_SECRET_ACCESS_KEY";
+            reset_envvar "AWS_SESSION_TOKEN";
             cat <<< "aws_session_token=${aws_session_token}" >> ~/.aws/credentials
         else
-            export_envvar "AWS_SECRET_ACCESS_KEY" "${aws_session_token}";
+            export_envvar "AWS_SESSION_TOKEN" "${aws_session_token}";
         fi
     fi
 

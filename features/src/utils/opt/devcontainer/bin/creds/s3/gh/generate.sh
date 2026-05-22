@@ -10,19 +10,8 @@ _creds_github_generate() {
     if ! test -n "${AWS_ROLE_ARN:+x}" \
     || ! test -n "${SCCACHE_BUCKET:+x}" \
     || ! gh nv-gha-aws --help >/dev/null 2>&1; then
-        exit 1;
+        return 1;
     fi
-
-    # Remove existing credentials in case nv-gha-aws declines to issue new ones.
-    if test -w ~/.aws; then
-        rm -rf ~/.aws/{stamp,config,credentials};
-    fi
-
-    SCCACHE_REGION="${SCCACHE_REGION:-${AWS_DEFAULT_REGION:-}}";
-
-    devcontainer-utils-creds-s3-persist - <<< \
-        --bucket="${SCCACHE_BUCKET:-}"        \
-        --region="${SCCACHE_REGION:-}"        ;
 
     # Initialize the GitHub CLI with the appropriate user scopes
     # shellcheck disable=SC1091
@@ -41,7 +30,7 @@ _creds_github_generate() {
     ))";
 
     if test "${#user_orgs[@]}" -eq 0; then
-        exit 1;
+        return 1;
     fi
 
     local org;
@@ -55,6 +44,8 @@ _creds_github_generate() {
         --idp-url "${AWS_IDP_URL:-https://token.gha-runners.nvidia.com}"
     );
 
+    mkdir -p ~/.aws;
+
     for org in "${user_orgs[@]}"; do
         generated_at="$(date '+%s')";
         if gh nv-gha-aws org "${org}" "${nv_gha_aws_args[@]}" >"${HOME}/.aws/credentials" 2>>/var/log/devcontainer-utils/creds-s3.log; then
@@ -67,7 +58,25 @@ _creds_github_generate() {
         fi
     done
 
-    exit 1;
+    return 1;
 }
 
-_creds_github_generate "$@" <&0;
+if ! _creds_github_generate "$@" <&0; then
+
+    # Remove existing credentials in case nv-gha-aws declines to issue new ones.
+    if test -w ~/.aws; then
+        rm -rf ~/.aws/{stamp,config,credentials};
+    fi
+
+    devcontainer-utils-creds-s3-persist - <<<                 \
+        --bucket="${SCCACHE_BUCKET:-}"                        \
+        --region="${SCCACHE_REGION:-${AWS_DEFAULT_REGION:-}}" ;
+
+    # shellcheck disable=SC1090
+    . /etc/profile.d/*-devcontainer-utils.sh;
+
+    exit 1;
+fi
+
+# shellcheck disable=SC1090
+. /etc/profile.d/*-devcontainer-utils.sh;

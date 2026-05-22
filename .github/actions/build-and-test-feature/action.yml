@@ -5,6 +5,7 @@ description: Test feature
 inputs:
   args: {type: string, required: true}
   gh_token: {type: string, defaut: '', required: false}
+  aws_idp_url: {type: string, defaut: '', required: false}
   aws_role_arn: {type: string, defaut: '', required: false}
   rw_sccache_bucket: {type: string, defaut: '', required: false}
   rw_sccache_region: {type: string, defaut: '', required: false}
@@ -31,6 +32,7 @@ runs:
         VAULT_S3_TTL: "900" # 15 minutes
         ARGS: ${{ inputs.args }}
         gh_token: "${{ inputs.gh_token }}"
+        aws_idp_url: "${{ inputs.aws_idp_url }}"
         aws_role_arn: "${{ inputs.aws_role_arn }}"
         rw_sccache_bucket: "${{ inputs.rw_sccache_bucket }}"
         rw_sccache_region: "${{ inputs.rw_sccache_region }}"
