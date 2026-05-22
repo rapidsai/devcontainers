@@ -5,6 +5,7 @@
     "containerEnv": {
       "gh_token": "${localEnv:gh_token}",
       "vault_host": "${localEnv:vault_host}",
+      "aws_idp_url": "${localEnv:aws_idp_url}",
       "aws_role_arn": "${localEnv:aws_role_arn}",
       "VAULT_S3_TTL": "${localEnv:VAULT_S3_TTL}",
       "rw_sccache_bucket": "${localEnv:rw_sccache_bucket}",
@@ -51,6 +52,7 @@
     "containerEnv": {
       "gh_token": "${localEnv:gh_token}",
       "vault_host": "${localEnv:vault_host}",
+      "aws_idp_url": "${localEnv:aws_idp_url}",
       "aws_role_arn": "${localEnv:aws_role_arn}",
       "VAULT_S3_TTL": "${localEnv:VAULT_S3_TTL}",
       "rw_sccache_bucket": "${localEnv:rw_sccache_bucket}",
@@ -97,6 +99,7 @@
     "containerEnv": {
       "gh_token": "${localEnv:gh_token}",
       "vault_host": "${localEnv:vault_host}",
+      "aws_idp_url": "${localEnv:aws_idp_url}",
       "aws_role_arn": "${localEnv:aws_role_arn}",
       "VAULT_S3_TTL": "${localEnv:VAULT_S3_TTL}",
       "rw_sccache_bucket": "${localEnv:rw_sccache_bucket}",
@@ -143,6 +146,7 @@
     "containerEnv": {
       "gh_token": "${localEnv:gh_token}",
       "vault_host": "${localEnv:vault_host}",
+      "aws_idp_url": "${localEnv:aws_idp_url}",
       "aws_role_arn": "${localEnv:aws_role_arn}",
       "VAULT_S3_TTL": "${localEnv:VAULT_S3_TTL}",
       "rw_sccache_bucket": "${localEnv:rw_sccache_bucket}",

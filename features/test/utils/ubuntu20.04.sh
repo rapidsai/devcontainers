@@ -214,6 +214,7 @@ if test -n "${gh_token:+x}" \
     no_creds_with_GH_TOKEN_AWS_ROLE_ARN_and_SCCACHE_BUCKET_should_generate_credentials() {
         reset_state;
         GH_TOKEN="${gh_token}" \
+        AWS_IDP_URL="${aws_idp_url:-}" \
         AWS_ROLE_ARN="${aws_role_arn}" \
         SCCACHE_BUCKET="${rw_sccache_bucket}" \
         SCCACHE_REGION="${rw_sccache_region}" \
@@ -229,6 +230,7 @@ if test -n "${gh_token:+x}" \
         reset_state;
         cp -ar /tmp/.aws ~/;
         GH_TOKEN="${gh_token}" \
+        AWS_IDP_URL="${aws_idp_url:-}" \
         AWS_ROLE_ARN="${aws_role_arn}" \
         SCCACHE_BUCKET="${rw_sccache_bucket}" \
         SCCACHE_REGION="${rw_sccache_region}" \
@@ -255,6 +257,7 @@ if test -n "${gh_token:+x}" \
         reset_state;
         write_bad_creds;
         GH_TOKEN="${gh_token}" \
+        AWS_IDP_URL="${aws_idp_url:-}" \
         AWS_ROLE_ARN="${aws_role_arn}" \
         SCCACHE_BUCKET="${rw_sccache_bucket}" \
         SCCACHE_REGION="${rw_sccache_region}" \
