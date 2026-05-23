@@ -22,10 +22,8 @@ RUN apt update -y \
     libnuma-dev \
     # cuOpt dependencies
     libtbb-dev \
-    libboost-dev \
     libboost-iostreams-dev \
     libboost-serialization-dev \
-    libboost-program-options-dev \
     libgrpc-dev \
     libgrpc++-dev \
     libprotobuf-dev \

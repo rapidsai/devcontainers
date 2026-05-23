@@ -304,6 +304,7 @@ repos:
         depends: [rmm, raft]
         env: |
           CUDSS_DIR=/usr
+        test: ci/run_ctests.sh
     python:
       - name: libcuopt
         sub_dir: python/libcuopt
