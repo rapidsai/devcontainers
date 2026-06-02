@@ -87,6 +87,9 @@ repos:
         sub_dir: cpp/libcudf_kafka
         depends: [cudf]
         test: ci/run_cudf_kafka_ctests.sh
+      - name: cudf_streaming
+        sub_dir: cpp/libcudf_streaming
+        depends: [cudf, rapidsmpf]
     python:
       - name: libcudf
         sub_dir: python/libcudf
@@ -119,6 +122,10 @@ repos:
         sub_dir: python/custreamz
         args: {install: *rapids_build_backend_args}
         test: ci/run_custreamz_pytests.sh
+      - name: libcudf_streaming
+        sub_dir: python/libcudf_streaming
+        depends: [cudf_streaming]
+        args: {install: *rapids_build_backend_args}
   - name: rapidsmpf
     path: rapidsmpf
     git: {!!merge <<: *git_defaults, repo: rapidsmpf}
