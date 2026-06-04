@@ -75,6 +75,26 @@ repos:
         depends: [kvikio]
         args: {install: *rapids_build_backend_args}
         test: ci/run_pytests.sh
+  - name: rapidsmpf
+    path: rapidsmpf
+    git: {!!merge <<: *git_defaults, repo: rapidsmpf}
+    dependency_keys:
+      - devcontainers
+    cpp:
+      - name: rapidsmpf
+        sub_dir: cpp
+        depends: [rmm, ucxx]
+        test: ci/run_ctests.sh
+    python:
+      - name: librapidsmpf
+        sub_dir: python/librapidsmpf
+        depends: [rapidsmpf]
+        args: {install: *rapids_build_backend_args}
+      - name: rapidsmpf
+        sub_dir: python/rapidsmpf
+        depends: [rapidsmpf, ucxx-python]
+        args: {install: *rapids_build_backend_args}
+        test: ci/run_pytests.sh
   - name: cudf
     path: cudf
     git: {!!merge <<: *git_defaults, repo: cudf}
@@ -87,6 +107,9 @@ repos:
         sub_dir: cpp/libcudf_kafka
         depends: [cudf]
         test: ci/run_cudf_kafka_ctests.sh
+      - name: cudf_streaming
+        sub_dir: cpp/libcudf_streaming
+        depends: [cudf, rapidsmpf]
     python:
       - name: libcudf
         sub_dir: python/libcudf
@@ -119,26 +142,14 @@ repos:
         sub_dir: python/custreamz
         args: {install: *rapids_build_backend_args}
         test: ci/run_custreamz_pytests.sh
-  - name: rapidsmpf
-    path: rapidsmpf
-    git: {!!merge <<: *git_defaults, repo: rapidsmpf}
-    dependency_keys:
-      - devcontainers
-    cpp:
-      - name: rapidsmpf
-        sub_dir: cpp
-        depends: [rmm, ucxx, cudf]
-        test: ci/run_ctests.sh
-    python:
-      - name: librapidsmpf
-        sub_dir: python/librapidsmpf
-        depends: [rapidsmpf]
+      - name: libcudf_streaming
+        sub_dir: python/libcudf_streaming
+        depends: [cudf_streaming]
         args: {install: *rapids_build_backend_args}
-      - name: rapidsmpf
-        sub_dir: python/rapidsmpf
-        depends: [rapidsmpf, ucxx-python]
+      - name: cudf-streaming
+        sub_dir: python/cudf_streaming
+        depends: [cudf_streaming]
         args: {install: *rapids_build_backend_args}
-        test: ci/run_pytests.sh
   - name: raft
     path: raft
     git: {!!merge <<: *git_defaults, repo: raft}
