@@ -146,6 +146,10 @@ repos:
         sub_dir: python/libcudf_streaming
         depends: [cudf_streaming]
         args: {install: *rapids_build_backend_args}
+      - name: cudf-streaming
+        sub_dir: python/cudf_streaming
+        depends: [cudf_streaming]
+        args: {install: *rapids_build_backend_args}
   - name: raft
     path: raft
     git: {!!merge <<: *git_defaults, repo: raft}
