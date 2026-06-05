@@ -16,6 +16,11 @@
 # shellcheck disable=SC1091
 . rapids-generate-docstring;
 
+repo_exists() {
+    local repo_path="${1:-}";
+    git -C "${repo_path}" rev-parse --is-inside-work-tree >/dev/null 2>&1;
+}
+
 _get_library_paths() {
     local i;
     local j;
@@ -27,7 +32,7 @@ _get_library_paths() {
         local cpp_length="${repo}_cpp_length";
         local py_length="${repo}_python_length";
 
-        if test -d ~/"${!repo_path:-}/.git"; then
+        if repo_exists ~/"${!repo_path:-}"; then
 
             for ((j=0; j < ${!cpp_length:-0}; j+=1)); do
                 local cpp_sub_dir="${repo}_cpp_${j}_sub_dir";

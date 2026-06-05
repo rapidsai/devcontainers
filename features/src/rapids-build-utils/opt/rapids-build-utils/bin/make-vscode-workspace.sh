@@ -19,7 +19,7 @@ get_repos() {
 }
 
 with_git_dirs() {
-    cat - | xargs -r -d'\n' -I% bash -c 'if [ -d ~/%/.git ]; then echo %; fi;';
+    cat - | xargs -r -d'\n' -I% bash -c 'if git -C ~/% rev-parse --is-inside-work-tree >/dev/null 2>&1; then echo %; fi;';
 }
 
 lib_entries() {
