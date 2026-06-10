@@ -65,6 +65,7 @@ ENV SCCACHE_REGION="us-east-2"
 ENV SCCACHE_BUCKET="rapids-sccache-devs"
 ENV SCCACHE_S3_USE_PREPROCESSOR_CACHE_MODE=true
 ENV SCCACHE_IDLE_TIMEOUT=0
+ENV SCCACHE_SERVER_LOG=sccache=debug
 
 ###
 # sccache-dist configuration
