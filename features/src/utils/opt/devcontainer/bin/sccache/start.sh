@@ -62,7 +62,7 @@ _start_sccache() {
         SCCACHE_ERROR_LOG="${logfile}"          \
         SCCACHE_SERVER_LOG="${log_lvl}"         \
         SCCACHE_SERVER_PORT="${sccache_port}"   \
-        sccache --start-server 1>&2 2>/dev/null \
+        sccache --start-server 1>&2             \
       | tee "$logfile";
 
         # If the pidfile doesn't exist, write it

@@ -46,6 +46,10 @@ _creds_github_generate() {
 
     mkdir -p ~/.aws;
 
+    if test -w ~/.aws; then
+        rm -f ~/.aws/stamp;
+    fi
+
     for org in "${user_orgs[@]}"; do
         generated_at="$(date '+%s')";
         if gh nv-gha-aws org "${org}" "${nv_gha_aws_args[@]}" >"${HOME}/.aws/credentials" 2>>/var/log/devcontainer-utils/creds-s3.log; then
