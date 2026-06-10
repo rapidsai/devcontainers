@@ -49,7 +49,7 @@ jobs:
 
     with:
       arch: '["amd64", "arm64"]'
-      cuda: '["12.9", "13.2"]'
+      cuda: '["12.9", "13.3"]'
       node_type: cpu16
       timeout-minutes: 720
       # 1. Prohibit sccache from shutting down automatically
