@@ -17,6 +17,11 @@
 # shellcheck disable=SC1091
 . rapids-generate-docstring;
 
+repo_exists() {
+    local repo_path="${1:-}";
+    git -C "${repo_path}" rev-parse --is-inside-work-tree >/dev/null 2>&1;
+}
+
 # Function to convert ucx branch names
 convert-ucx-branch() {
     repo=$1
@@ -61,7 +66,7 @@ checkout_same_branch() {
         local repo="repos_${i}";
         local repo_name="${repo}_name";
         local repo_path="${repo}_path";
-        if [[ ! -d ~/"${!repo_path:-}/.git" ]]; then
+        if ! repo_exists ~/"${!repo_path:-}"; then
             continue;
         fi
         local name="${!repo_name}";
@@ -146,7 +151,7 @@ checkout_same_branch() {
         local repo_name="${repo}_name";
         local repo_path="${repo}_path";
 
-        if [[ ! -d ~/"${!repo_path:-}/.git" ]]; then
+        if ! repo_exists ~/"${!repo_path:-}"; then
             continue;
         fi
 

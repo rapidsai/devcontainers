@@ -96,6 +96,11 @@ generate_all_script() {
     fi
 }
 
+repo_exists() {
+    local repo_path="${1:-}";
+    git -C "${repo_path}" rev-parse --is-inside-work-tree >/dev/null 2>&1;
+}
+
 generate_clone_script() {
     if test -f "${TEMPLATES}/repo.clone.tmpl.sh"; then (
         # shellcheck disable=SC2002
@@ -269,7 +274,7 @@ generate_scripts() {
         repo_name="${!repo_name,,}";
         repo_names+=("${repo_name}");
 
-        if [[ -d ~/"${!repo_path:-}/.git" ]]; then
+        if repo_exists ~/"${!repo_path:-}"; then
             cloned_repos+=("${repo_name}");
         fi
 
@@ -318,7 +323,7 @@ generate_scripts() {
 
             cpp_name_to_deps["${cpp_name}"]="${cpp_deps[*]}";
 
-            if [[ -d ~/"${!repo_path:-}/.git" ]]; then
+            if repo_exists ~/"${!repo_path:-}"; then
                 NAME="${repo_name:-}"                                                                       \
                 SRC_PATH=~/"${!repo_path:-}"                                                                \
                 BIN_DIR="${bin_dir}"                                                                        \
@@ -377,7 +382,7 @@ generate_scripts() {
             py_name="${!py_name:-}";
             py_libs+=("${py_name}");
 
-            if [[ -d ~/"${!repo_path:-}/.git" ]]; then
+            if repo_exists ~/"${!repo_path:-}"; then
                 NAME="${repo_name:-}"                     \
                 BIN_DIR="${bin_dir}"                      \
                 SRC_PATH=~/"${!repo_path:-}"              \
@@ -399,7 +404,7 @@ generate_scripts() {
 
         py_names+=("${py_libs[@]}");
 
-        if [[ -d ~/"${!repo_path:-}/.git" ]]; then
+        if repo_exists ~/"${!repo_path:-}"; then
             NAME="${repo_name:-}"      \
             PY_LIB="${py_libs[*]@Q}"   \
             CPP_LIB="${cpp_libs[*]@Q}" \

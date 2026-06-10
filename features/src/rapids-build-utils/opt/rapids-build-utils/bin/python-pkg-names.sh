@@ -14,6 +14,11 @@
 # shellcheck disable=SC1091
 . rapids-generate-docstring;
 
+repo_exists() {
+    local repo_path="${1:-}";
+    git -C "${repo_path}" rev-parse --is-inside-work-tree >/dev/null 2>&1;
+}
+
 python_pkg_names() {
     local -;
     set -euo pipefail;
@@ -34,7 +39,7 @@ python_pkg_names() {
         local repo_path="${repo}_path";
         local py_length="${repo}_python_length";
 
-        if test -d ~/"${!repo_path:-}/.git"; then
+        if repo_exists ~/"${!repo_path:-}"; then
             for ((j=0; j < ${!py_length:-0}; j+=1)); do
                 local py_name="${repo}_python_${j}_name";
                 echo "${!py_name}";
