@@ -58,7 +58,7 @@ x-cccl-cuda-opts: &cccl_cuda_opts {
   installCUDARuntime: true,
   installcuRAND: true,
   installcuTensor: false,
-  installNCCL: false,
+  installNCCL: true,
   installNVRTC: true,
   installcuFile: true,
 }
