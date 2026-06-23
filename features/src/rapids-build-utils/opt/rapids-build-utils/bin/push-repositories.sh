@@ -14,6 +14,11 @@
 # shellcheck disable=SC1091
 . rapids-generate-docstring;
 
+repo_exists() {
+    local repo_path="${1:-}";
+    git -C "${repo_path}" rev-parse --is-inside-work-tree >/dev/null 2>&1;
+}
+
 push_repositories() {
     local -;
     set -euo pipefail;
@@ -31,7 +36,7 @@ push_repositories() {
         local repo_name="${repo}_name";
         local repo_path="${repo}_path";
 
-        if [[ ! -d ~/"${!repo_path:-}/.git" ]]; then
+        if ! repo_exists ~/"${!repo_path:-}"; then
             continue;
         fi
 

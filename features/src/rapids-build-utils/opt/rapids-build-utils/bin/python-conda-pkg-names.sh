@@ -17,6 +17,11 @@
 # shellcheck disable=SC1091
 . rapids-generate-docstring;
 
+repo_exists() {
+    local repo_path="${1:-}";
+    git -C "${repo_path}" rev-parse --is-inside-work-tree >/dev/null 2>&1;
+}
+
 _python_conda_pkg_names() {
     local -;
     set -euo pipefail;
@@ -35,7 +40,7 @@ _python_conda_pkg_names() {
         local repo="repos_${i}";
         local repo_path="${repo}_path";
 
-        if test -d ~/"${!repo_path:-}/.git"; then
+        if repo_exists ~/"${!repo_path:-}"; then
             # the regex will continue until morale improves
             find ~/"${!repo_path}/"            \
               -type f                          \

@@ -33,6 +33,11 @@ clone_git_repo() {
     local origin;
     local directory;
 
+    repo_exists() {
+        local repo_path="${1:-}";
+        git -C "${repo_path}" rev-parse --is-inside-work-tree >/dev/null 2>&1;
+    }
+
     local nargs="${#REST[@]}";
 
     if test "${nargs}" -gt 1; then
@@ -52,7 +57,7 @@ clone_git_repo() {
         local re="(ssh:\/\/|https:\/\/)?(git@)?(.*\.com)[:\/](.*)";
         if [[ "${origin}" =~ ${re} ]]; then
             directory="$(basename "${BASH_REMATCH[4]//.git/}")";
-        elif test -d "${origin}" && test -d "${origin}"/.git; then
+        elif test -d "${origin}" && repo_exists "${origin}"; then
             directory="$(basename "${origin}")";
         else
             echo "fatal: '${origin}' is not a git repository" 1>&2;
@@ -66,7 +71,7 @@ clone_git_repo() {
     upstream="${upstream:-"${origin}"}";
     directory="$(realpath -m "${directory}")";
 
-    if ! test -d "${directory}"/.git; then
+    if ! repo_exists "${directory}"; then
         git clone "${qj[@]}" "${OPTS[@]}" -- "${origin}" "${directory}";
     fi
 
