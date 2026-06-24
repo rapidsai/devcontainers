@@ -58,6 +58,7 @@ try {
     Write-Output "ENV:CUDA_VER           $ENV:CUDA_VER"
     Write-Output "ENV:ROOT_IMAGE         $ENV:ROOT_IMAGE"
 
+    docker pull "$ENV:ROOT_IMAGE"
     docker build --file .\windows.Dockerfile --tag "$ENV:IMAGE_NAME" --isolation "$ENV:ISOLATION" --build-arg MSVC_VER="$ENV:MSVC_VER" --build-arg MSVC_COMPILER_VER="$ENV:MSVC_COMPILER_VER" --build-arg CUDA_VER="$ENV:CUDA_VER" --build-arg ROOT_IMAGE="$ENV:ROOT_IMAGE" .\image
 }
 catch {
