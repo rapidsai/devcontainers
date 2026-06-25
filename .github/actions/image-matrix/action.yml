@@ -59,6 +59,6 @@ runs:
           .github/actions/image-matrix/action.sh \
           "$FULL_MATRIX" \
           "$FEATURES" \
-          "$SCENARIOS" \
+          "$(jq 'map(.feature)' <<< "$SCENARIOS")" \
           "$CHANGED_FILES" \
         | tee -a $GITHUB_OUTPUT;

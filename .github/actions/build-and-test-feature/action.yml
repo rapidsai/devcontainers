@@ -4,6 +4,7 @@ description: Test feature
 
 inputs:
   args: {type: string, required: true}
+  scenario: {type: string, required: false}
   gh_token: {type: string, defaut: '', required: false}
   aws_idp_url: {type: string, defaut: '', required: false}
   aws_role_arn: {type: string, defaut: '', required: false}
@@ -26,11 +27,12 @@ runs:
     - name: Test feature
       shell: bash
       run: |
-        devcontainer features test $ARGS ./features;
+        devcontainer features test --project-folder ./features $ARGS ${SCENARIO:+--filter "$SCENARIO"}
       env:
         NODE_NO_WARNINGS: 1
         VAULT_S3_TTL: "900" # 15 minutes
         ARGS: ${{ inputs.args }}
+        SCENARIO: "${{ inputs.scenario }}"
         gh_token: "${{ inputs.gh_token }}"
         aws_idp_url: "${{ inputs.aws_idp_url }}"
         aws_role_arn: "${{ inputs.aws_role_arn }}"
