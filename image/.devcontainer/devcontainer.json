@@ -29,10 +29,7 @@
     "ghcr.io/devcontainers/features/git-lfs:1.2.1": {
       "autoPull": false
     },
-    "ghcr.io/devcontainers/features/github-cli:1.1.0": {
-      "extensions": "nv-gha-runners/gh-nv-gha-aws",
-      "username": "coder"
-    },
+    "ghcr.io/devcontainers/features/github-cli:1.1.0": {},
     "./features/src/gitlab-cli": {},
     "./features/src/cmake": {},
     "./features/src/ninja": {
