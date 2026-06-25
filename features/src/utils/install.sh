@@ -197,24 +197,42 @@ find_non_root_user;
 if test -n "${USERNAME:+x}"; then
     USERHOME="$(bash -c "echo ~${USERNAME}")";
 
+    #
+    # Install gh-nv-gha-aws CLI extension
+    # Doesn't do `gh extension install nv-gha-runners/gh-nv-gha-aws`,
+    # because that hits GH API rate limits in CI
+    #
+    if command -V gh >/dev/null 2>&1; then
+        # Install for the container user (i.e. root) and non-root remote user (i.e. coder)
+        for DIR in "/root" "${USERHOME}"; do
+            mkdir -p -m 0755                                    \
+                "$DIR/.local"                                   \
+                "$DIR/.local/share"                             \
+                "$DIR/.local/share/gh"                          \
+                "$DIR/.local/share/gh/extensions"               \
+                "$DIR/.local/share/gh/extensions/gh-nv-gha-aws" ;
+            NV_GHA_AWS_VERSION=latest
+            find_version_from_git_tags NV_GHA_AWS_VERSION https://github.com/nv-gha-runners/gh-nv-gha-aws;
+            wget --no-hsts -q -O "$DIR/.local/share/gh/extensions/gh-nv-gha-aws/gh-nv-gha-aws" \
+                "https://github.com/nv-gha-runners/gh-nv-gha-aws/releases/download/v${NV_GHA_AWS_VERSION}/gh-nv-gha-aws_v${NV_GHA_AWS_VERSION}_linux-$(dpkg --print-architecture | awk -F'-' '{print $NF}')";
+            chmod 0755 "$DIR/.local/share/gh/extensions/gh-nv-gha-aws/gh-nv-gha-aws";
+            cat <<EOF >"$DIR/.local/share/gh/extensions/gh-nv-gha-aws/manifest.yml"
+owner: nv-gha-runners
+name: gh-nv-gha-aws
+host: github.com
+tag: v${NV_GHA_AWS_VERSION}
+ispinned: false
+path: $DIR/.local/share/gh/extensions/gh-nv-gha-aws/gh-nv-gha-aws
+EOF
+        done
+    fi
+
     # Add user to the crontab group
     usermod -aG crontab "${USERNAME}";
     # Allow user to edit the crontab
     echo "${USERNAME}" >> /etc/cron.allow;
     # Ensure the user owns their homedir
     chown -R "${USERNAME}:${USERNAME}" "${USERHOME}";
-
-    # Install gh-nv-gha-aws CLI extension
-    if command -V gh >/dev/null 2>&1; then
-        # Install for the container user (i.e. root)
-        if ! gh nv-gha-aws --help >/dev/null 2>&1; then
-            gh extension install nv-gha-runners/gh-nv-gha-aws;
-        fi
-        # Install for the non-root remote user (i.e. coder)
-        if ! su - "${USERNAME}" -c 'gh nv-gha-aws --help' >/dev/null 2>&1; then
-            su - "${USERNAME}" -c 'gh extension install nv-gha-runners/gh-nv-gha-aws';
-        fi
-    fi
 fi
 
 # Generate bash completions
