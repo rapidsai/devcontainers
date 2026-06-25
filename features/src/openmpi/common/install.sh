@@ -37,7 +37,8 @@ fi
 
 # Remove unnecessary "$HOME/.local/bin" at the end of the path
 # shellcheck disable=SC2016
-if grep -qxF 'if [[ "${PATH}" != *"$HOME/.local/bin"* ]]; then export PATH="${PATH}:$HOME/.local/bin"; fi' /etc/bash.bashrc; then
+if test -f /etc/bash.bashrc \
+&& grep -qxF 'if [[ "${PATH}" != *"$HOME/.local/bin"* ]]; then export PATH="${PATH}:$HOME/.local/bin"; fi' /etc/bash.bashrc; then
    grep -vxF \
     'if [[ "${PATH}" != *"$HOME/.local/bin"* ]]; then export PATH="${PATH}:$HOME/.local/bin"; fi' \
     /etc/bash.bashrc \
@@ -45,7 +46,11 @@ if grep -qxF 'if [[ "${PATH}" != *"$HOME/.local/bin"* ]]; then export PATH="${PA
  && mv /etc/bash.bashrc{.new,};
 fi
 
-cp /etc/skel/.profile /root/.profile;
+if test -f /etc/skel/.profile; then
+    cp /etc/skel/.profile /root/.profile;
+else
+    touch /root/.profile;
+fi
 echo 'mesg n 2> /dev/null || true' >> /root/.profile;
 
 for_each_user_profile "$(cat <<"EOF"

@@ -85,7 +85,7 @@ prepend_to_all_bashrcs() {
 export -f prepend_to_all_bashrcs;
 
 append_to_etc_profile() {
-    if [[ "$(cat /etc/profile)" != *"$1"* ]]; then
+    if [ -f "/etc/profile" ] && [[ "$(cat /etc/profile)" != *"$1"* ]]; then
         echo "Appending to /etc/profile...";
         echo -e "$1" >> /etc/profile;
     fi
@@ -94,7 +94,7 @@ append_to_etc_profile() {
 export -f append_to_etc_profile;
 
 prepend_to_etc_profile() {
-    if [[ "$(cat /etc/profile)" != *"$1"* ]]; then
+    if [ -f "/etc/profile" ] && [[ "$(cat /etc/profile)" != *"$1"* ]]; then
         echo "Prepending to /etc/profile...";
         echo -e "$1\n$(cat /etc/profile)" > /etc/profile;
     fi
@@ -103,7 +103,7 @@ prepend_to_etc_profile() {
 export -f prepend_to_etc_profile;
 
 append_to_etc_bashrc() {
-    if [[ "$(cat /etc/bash.bashrc)" != *"$1"* ]]; then
+    if [ -f "/etc/bash.bashrc" ] && [[ "$(cat /etc/bash.bashrc)" != *"$1"* ]]; then
         echo "Appending to /etc/bash.bashrc...";
         echo -e "$1" >> /etc/bash.bashrc;
     fi
@@ -112,7 +112,7 @@ append_to_etc_bashrc() {
 export -f append_to_etc_bashrc;
 
 prepend_to_etc_bashrc() {
-    if [[ "$(cat /etc/bash.bashrc)" != *"$1"* ]]; then
+    if [ -f "/etc/bash.bashrc" ] && [[ "$(cat /etc/bash.bashrc)" != *"$1"* ]]; then
         echo "Prepending to /etc/bash.bashrc...";
         echo -e "$1\n$(cat /etc/bash.bashrc)" > /etc/bash.bashrc;
     fi
