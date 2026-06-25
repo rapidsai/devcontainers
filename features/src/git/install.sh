@@ -7,6 +7,12 @@
 # Docs: https://github.com/microsoft/vscode-dev-containers/blob/main/script-library/docs/git-from-src.md
 # Maintainer: The VS Code and Codespaces Teams
 
+# Ensure we're in this feature's directory during build
+cd "$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )";
+
+# install global/common scripts
+. ./common/install.sh;
+
 GIT_VERSION=${VERSION} # 'system' checks the base image first, else installs 'latest'
 USE_PPA_IF_AVAILABLE=${PPA}
 
@@ -287,28 +293,8 @@ fi
 
 # Partial version matching
 if [ "$(echo "${GIT_VERSION}" | grep -o '\.' | wc -l)" != "2" ]; then
-    requested_version="${GIT_VERSION}"
-    response_output_file=$(mktemp)
-    trap 'rm "$response_output_file"' EXIT
-
-    http_code=$(curl --silent --output $response_output_file --write-out "%{http_code}" -sSL -H "Accept: application/vnd.github.v3+json" "https://api.github.com/repos/git/git/tags")
-    version_content=$(cat "$response_output_file")
-    if [[ ${http_code} -lt 200 || ${http_code} -gt 299 ]] ; then
-        echo "$version_content" >&2
-        exit 1
-    fi
-    version_list="$(echo "$version_content" | grep -oP '"name":\s*"v\K[0-9]+\.[0-9]+\.[0-9]+"' | tr -d '"' | sort -rV )"
-    if [ "${requested_version}" = "latest" ] || [ "${requested_version}" = "lts" ] || [ "${requested_version}" = "current" ]; then
-        GIT_VERSION="$(echo "${version_list}" | head -n 1)"
-    else
-        set +e
-        GIT_VERSION="$(echo "${version_list}" | grep -E -m 1 "^${requested_version//./\\.}([\\.\\s]|$)")"
-        set -e
-    fi
-    if [ -z "${GIT_VERSION}" ] || ! echo "${version_list}" | grep "^${GIT_VERSION//./\\.}$" > /dev/null 2>&1; then
-        echo "Invalid git version: ${requested_version}" >&2
-        exit 1
-    fi
+    check_packages git
+    find_version_from_git_tags GIT_VERSION https://github.com/git/git;
 fi
 
 echo "Downloading source for ${GIT_VERSION}..."
