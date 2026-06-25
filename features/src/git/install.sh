@@ -11,7 +11,7 @@
 cd "$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )";
 
 # install global/common scripts
-. ./common/install.sh;
+. ./common/find-version-from-git-tags.sh;
 
 GIT_VERSION=${VERSION} # 'system' checks the base image first, else installs 'latest'
 USE_PPA_IF_AVAILABLE=${PPA}
@@ -294,7 +294,7 @@ fi
 # Partial version matching
 if [ "$(echo "${GIT_VERSION}" | grep -o '\.' | wc -l)" != "2" ]; then
     check_packages git
-    find_version_from_git_tags GIT_VERSION https://github.com/git/git;
+    _find_version_from_git_tags GIT_VERSION https://github.com/git/git;
 fi
 
 echo "Downloading source for ${GIT_VERSION}..."
