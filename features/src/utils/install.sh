@@ -195,12 +195,25 @@ rm -rf /root/.config/{clangd,pip};
 find_non_root_user;
 
 if test -n "${USERNAME:+x}"; then
+    USERHOME="$(bash -c "echo ~${USERNAME}")";
+
+    if command -V gh >/dev/null 2>&1; then
+        # Install for the container user (i.e. root)
+        if ! gh nv-gha-aws --help >/dev/null 2>&1; then
+            gh extension install nv-gha-runners/gh-nv-gha-aws
+        fi
+        # Install for the non-root remote user (i.e. coder)
+        if ! su - "${USERNAME}" -c 'gh nv-gha-aws --help' >/dev/null 2>&1; then
+            su - "${USERNAME}" -c 'gh extension install nv-gha-runners/gh-nv-gha-aws';
+        fi
+    fi
+
     # Add user to the crontab group
     usermod -aG crontab "${USERNAME}";
     # Allow user to edit the crontab
     echo "${USERNAME}" >> /etc/cron.allow;
     # Ensure the user owns their homedir
-    chown -R "${USERNAME}:${USERNAME}" "$(bash -c "echo ~${USERNAME}")";
+    chown -R "${USERNAME}:${USERNAME}" "${USERHOME}";
 fi
 
 # Generate bash completions
