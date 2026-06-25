@@ -27,8 +27,6 @@ make_pip_env() {
     # shellcheck disable=SC1091
     . devcontainer-utils-debug-output 'rapids_build_utils_debug' 'make-pip-env';
 
-    test ${#pre[@]} -eq 0 && pre=(--pre);
-
     if test -n "${no_pre:+x}"; then
         pre=();
     fi
