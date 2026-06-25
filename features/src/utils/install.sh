@@ -195,37 +195,12 @@ rm -rf /root/.config/{clangd,pip};
 find_non_root_user;
 
 if test -n "${USERNAME:+x}"; then
-    USERHOME="$(bash -c "echo ~${USERNAME}")";
-
-    if command -V gh >/dev/null 2>&1; then
-        mkdir -p -m 0755                                         \
-            "$USERHOME/.local"                                   \
-            "$USERHOME/.local/share"                             \
-            "$USERHOME/.local/share/gh"                          \
-            "$USERHOME/.local/share/gh/extensions"               \
-            "$USERHOME/.local/share/gh/extensions/gh-nv-gha-aws" \
-            ;
-        NV_GHA_AWS_VERSION=latest
-        find_version_from_git_tags NV_GHA_AWS_VERSION https://github.com/nv-gha-runners/gh-nv-gha-aws;
-        wget --no-hsts -q -O "$USERHOME/.local/share/gh/extensions/gh-nv-gha-aws/gh-nv-gha-aws" \
-            "https://github.com/nv-gha-runners/gh-nv-gha-aws/releases/download/v${NV_GHA_AWS_VERSION}/gh-nv-gha-aws_v${NV_GHA_AWS_VERSION}_linux-$(dpkg --print-architecture | awk -F'-' '{print $NF}')";
-        chmod 0755 "$USERHOME/.local/share/gh/extensions/gh-nv-gha-aws/gh-nv-gha-aws";
-        cat <<EOF >"$USERHOME/.local/share/gh/extensions/gh-nv-gha-aws/manifest.yml"
-owner: nv-gha-runners
-name: gh-nv-gha-aws
-host: github.com
-tag: v${NV_GHA_AWS_VERSION}
-ispinned: false
-path: $USERHOME/.local/share/gh/extensions/gh-nv-gha-aws/gh-nv-gha-aws
-EOF
-    fi
-
     # Add user to the crontab group
     usermod -aG crontab "${USERNAME}";
     # Allow user to edit the crontab
     echo "${USERNAME}" >> /etc/cron.allow;
     # Ensure the user owns their homedir
-    chown -R "${USERNAME}:${USERNAME}" "${USERHOME}";
+    chown -R "${USERNAME}:${USERNAME}" "$(bash -c "echo ~${USERNAME}")";
 fi
 
 # Generate bash completions
