@@ -30,6 +30,13 @@ export OSNAME="$(
     echo "$ID$((major - (major % 2)))${minor}";
 )";
 
+export OSNAME_PREV="$(
+    . /etc/os-release;
+    major="$(cut -d'.' -f1 <<< "${VERSION_ID}")";
+    minor="$(cut -d'.' -f2 <<< "${VERSION_ID}")";
+    echo "$ID$((major - (major % 2) - 2))${minor}";
+)";
+
 VERSION="${CUDA_VERSION:-${VERSION:-13.3.0}}";
 
 if [[ "$NVARCH" == aarch64 ]]; then
@@ -200,22 +207,32 @@ if [ "${INSTALLNCCL:-false}" = true ] \
 fi
 
 if [ "${INSTALLCUTENSOR:-false}" = true ]; then
-    # HACK: libcutensor-dev isn't currently in the ubuntu22.04 repo,
-    # but is in ubuntu20.04. Detect this and download the 20.04 deb.
-    if ! dpkg -s libcutensor-dev > /dev/null 2>&1; then
-        # If `libcutensor-deb` is available in the apt repo, install it
-        if ! dpkg -p libcutensor-dev 2>&1 | grep -q "not available" >/dev/null 2>&1; then
+    # If `libcutensor-dev` is available in the apt repo, install it
+    if dpkg -p libcutensor-dev 2>&1 | grep -q "not available" >/dev/null 2>&1; then
+        # HACK:
+        # If libcutensor-dev isn't in the apt repo for the current OS
+        # version, download and install it from the prev version repo
+        CUTENSOR_DEBS=()
+        prev_cuda_repo="${cuda_repo_base}/${OSNAME_PREV}/${NVARCH}";
+        CUTENSOR_DEBS+=($(get_cuda_deb "${prev_cuda_repo}" libcutensor1 2>/dev/null || :));
+        CUTENSOR_DEBS+=($(get_cuda_deb "${prev_cuda_repo}" libcutensor2 2>/dev/null || :));
+        if test "${#CUTENSOR_DEBS[@]}" -eq 0 || [ "${INSTALLDEVPACKAGES:-false}" = true ]; then
+            CUTENSOR_DEBS+=($(get_cuda_deb "${prev_cuda_repo}" libcutensor-dev 2>/dev/null || :));
+        fi
+        if test "${#CUTENSOR_DEBS[@]}" -eq 0; then
+            echo "Error: No matching .deb found for libcutensor or libcutensor-dev" >&2
+            exit 1;
+        fi
+        PKGS+=("${CUTENSOR_DEBS[@]}")
+    else
+        if dpkg -s libcutensor1 >/dev/null 2>&1; then
             PKGS+=("libcutensor1");
-            if [ "${INSTALLDEVPACKAGES:-false}" = true ]; then
-                PKGS+=("libcutensor-dev");
-            fi
-        else
-            # If it's not in the apt repo for the current OS version, install it from the 20.04 repo
-            focal_cuda_repo="${cuda_repo_base}/ubuntu2004/${NVARCH}";
-            PKGS+=("$(get_cuda_deb "${focal_cuda_repo}" libcutensor1)");
-            if [ "${INSTALLDEVPACKAGES:-false}" = true ]; then
-                PKGS+=("$(get_cuda_deb "${focal_cuda_repo}" libcutensor-dev)");
-            fi
+        fi
+        if dpkg -s libcutensor2 >/dev/null 2>&1; then
+            PKGS+=("libcutensor2");
+        fi
+        if [ "${INSTALLDEVPACKAGES:-false}" = true ]; then
+            PKGS+=("libcutensor-dev");
         fi
     fi
 fi
