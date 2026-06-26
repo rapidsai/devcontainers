@@ -61,7 +61,7 @@ if ! dpkg -s gnupg2 ${lldb_pkg} python3-minimal pkg-config > /dev/null 2>&1; the
     apt-get install -y --no-install-recommends ${lldb_pkg} python3-minimal libpython3.? pkg-config;
 fi
 
-architecture="${TARGETARCH:-$(dpkg --print-architecture | awk -F'-' '{print $NF}')}";
+architecture="${TARGETARCH:-$(uname -m | sed -e 's/x86_/amd/' -e 's/aarch/arm/')}";
 download_architecture="${architecture}";
 
 case ${download_architecture} in

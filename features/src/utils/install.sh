@@ -49,7 +49,7 @@ python3 -m pip install "${_PIP_INSTALL_ARGS[@]}" "${_PIP_UPGRADE_ARGS[@]}" pip;
 if ! command -V yq >/dev/null 2>&1; then
     YQ_BINARY="yq";
     YQ_BINARY+="_$(uname -s | tr '[:upper:]' '[:lower:]')";
-    YQ_BINARY+="_${TARGETARCH:-$(dpkg --print-architecture | awk -F'-' '{print $NF}')}";
+    YQ_BINARY+="_${TARGETARCH:-$(uname -m | sed -e 's/x86_/amd/' -e 's/aarch/arm/')}";
 
     YQ_VERSION=4.46.1;
     find_version_from_git_tags YQ_VERSION https://github.com/mikefarah/yq;
@@ -214,7 +214,7 @@ if test -n "${USERNAME:+x}"; then
             NV_GHA_AWS_VERSION=latest
             find_version_from_git_tags NV_GHA_AWS_VERSION https://github.com/nv-gha-runners/gh-nv-gha-aws;
             wget --no-hsts -q -O "$DIR/.local/share/gh/extensions/gh-nv-gha-aws/gh-nv-gha-aws" \
-                "https://github.com/nv-gha-runners/gh-nv-gha-aws/releases/download/v${NV_GHA_AWS_VERSION}/gh-nv-gha-aws_v${NV_GHA_AWS_VERSION}_linux-$(dpkg --print-architecture | awk -F'-' '{print $NF}')";
+                "https://github.com/nv-gha-runners/gh-nv-gha-aws/releases/download/v${NV_GHA_AWS_VERSION}/gh-nv-gha-aws_v${NV_GHA_AWS_VERSION}_linux-$(uname -m | sed -e 's/x86_/amd/' -e 's/aarch/arm/')";
             chmod 0755 "$DIR/.local/share/gh/extensions/gh-nv-gha-aws/gh-nv-gha-aws";
             cat <<EOF >"$DIR/.local/share/gh/extensions/gh-nv-gha-aws/manifest.yml"
 owner: nv-gha-runners

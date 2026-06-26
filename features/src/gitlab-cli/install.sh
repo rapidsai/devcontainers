@@ -23,7 +23,7 @@ gitlab_cli_file_name() {
     if [[ "${CLI_VERSION}" < "1.47.0" ]]; then
         arch="${arch:-$(uname -m)}";
     else
-        arch="${arch:-$(dpkg --print-architecture | awk -F'-' '{print $NF}')}";
+        arch="${arch:-$(uname -m | sed -e 's/x86_/amd/' -e 's/aarch/arm/')}";
         os="${os,,}";
     fi
 

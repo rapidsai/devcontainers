@@ -240,7 +240,10 @@ if ([ "${GIT_VERSION}" = "latest" ] || [ "${GIT_VERSION}" = "lts" ] || [ "${GIT_
     echo "Using PPA to install latest git..."
     check_packages apt-transport-https curl ca-certificates gnupg2 dirmngr
     receive_gpg_keys GIT_CORE_PPA_ARCHIVE_GPG_KEY /usr/share/keyrings/gitcoreppa-archive-keyring.gpg
-    echo -e "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/gitcoreppa-archive-keyring.gpg] http://ppa.launchpad.net/git-core/ppa/ubuntu ${VERSION_CODENAME} main\ndeb-src [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/gitcoreppa-archive-keyring.gpg] http://ppa.launchpad.net/git-core/ppa/ubuntu ${VERSION_CODENAME} main" > /etc/apt/sources.list.d/git-core-ppa.list
+    cat <<EOF > /etc/apt/sources.list.d/git-core-ppa.list
+deb [arch=$(uname -m | sed -e 's/x86_/amd/' -e 's/aarch/arm/') signed-by=/usr/share/keyrings/gitcoreppa-archive-keyring.gpg] http://ppa.launchpad.net/git-core/ppa/ubuntu ${VERSION_CODENAME} main
+deb-src [arch=$(uname -m | sed -e 's/x86_/amd/' -e 's/aarch/arm/') signed-by=/usr/share/keyrings/gitcoreppa-archive-keyring.gpg] http://ppa.launchpad.net/git-core/ppa/ubuntu ${VERSION_CODENAME} main
+EOF
     ${INSTALL_CMD} update
     ${INSTALL_CMD} -y install --no-install-recommends git
     rm -rf "/tmp/tmp-gnupg"

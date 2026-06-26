@@ -27,12 +27,12 @@ GCC_VERSION="${VERSION:-${GCC_VERSION_DEFAULT}}";
 if [[ "${GCC_VERSION}" != "${GCC_VERSION_DEFAULT}" ]]; then
     curl -fsSL --compressed "https://keyserver.ubuntu.com/pks/lookup?op=get&search=0xC8EC952E2A0E1FBDC5090F6A2C277A0A352154E5" | gpg --dearmor --yes -o /etc/apt/trusted.gpg.d/ubuntu-toolchain-r.gpg
     cat <<EOF >/etc/apt/sources.list.d/ubuntu-toolchain-r-test.list
-deb [arch=$(dpkg --print-architecture)] https://ppa.launchpadcontent.net/ubuntu-toolchain-r/test/ubuntu $(. /etc/os-release; echo ${VERSION_CODENAME}) main
-deb-src [arch=$(dpkg --print-architecture)] https://ppa.launchpadcontent.net/ubuntu-toolchain-r/test/ubuntu $(. /etc/os-release; echo ${VERSION_CODENAME}) main
+deb [arch=$(uname -m | sed -e 's/x86_/amd/' -e 's/aarch/arm/')] https://ppa.launchpadcontent.net/ubuntu-toolchain-r/test/ubuntu $(. /etc/os-release; echo ${VERSION_CODENAME}) main
+deb-src [arch=$(uname -m | sed -e 's/x86_/amd/' -e 's/aarch/arm/')] https://ppa.launchpadcontent.net/ubuntu-toolchain-r/test/ubuntu $(. /etc/os-release; echo ${VERSION_CODENAME}) main
 EOF
     cat <<EOF >/etc/apt/sources.list.d/ubuntu-toolchain-r-ppa.list
-deb [arch=$(dpkg --print-architecture)] https://ppa.launchpadcontent.net/ubuntu-toolchain-r/ppa/ubuntu $(. /etc/os-release; echo ${VERSION_CODENAME}) main
-deb-src [arch=$(dpkg --print-architecture)] https://ppa.launchpadcontent.net/ubuntu-toolchain-r/ppa/ubuntu $(. /etc/os-release; echo ${VERSION_CODENAME}) main
+deb [arch=$(uname -m | sed -e 's/x86_/amd/' -e 's/aarch/arm/')] https://ppa.launchpadcontent.net/ubuntu-toolchain-r/ppa/ubuntu $(. /etc/os-release; echo ${VERSION_CODENAME}) main
+deb-src [arch=$(uname -m | sed -e 's/x86_/amd/' -e 's/aarch/arm/')] https://ppa.launchpadcontent.net/ubuntu-toolchain-r/ppa/ubuntu $(. /etc/os-release; echo ${VERSION_CODENAME}) main
 EOF
     apt update
     # Install gcc-${GCC_VERSION}

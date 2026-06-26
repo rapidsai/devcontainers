@@ -21,7 +21,7 @@ check_packages "${PKGS[@]}";
 if ! command -V yq >/dev/null 2>&1; then
     YQ_BINARY="yq";
     YQ_BINARY+="_$(uname -s | tr '[:upper:]' '[:lower:]')";
-    YQ_BINARY+="_${TARGETARCH:-$(dpkg --print-architecture | awk -F'-' '{print $NF}')}";
+    YQ_BINARY+="_${TARGETARCH:-$(uname -m | sed -e 's/x86_/amd/' -e 's/aarch/arm/')}";
 
     YQ_VERSION=4.46.1;
     find_version_from_git_tags YQ_VERSION https://github.com/mikefarah/yq;
