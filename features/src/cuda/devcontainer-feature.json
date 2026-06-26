@@ -1,12 +1,14 @@
 {
   "name": "CUDA Toolkit",
   "id": "cuda",
-  "version": "26.2.0",
+  "version": "26.8.1",
   "description": "A feature to install the NVIDIA CUDA Toolkit",
   "options": {
     "version": {
       "type": "string",
       "proposals": [
+        "13.3",
+        "13.2",
         "13.1",
         "13.0",
         "12.9",
@@ -27,7 +29,7 @@
         "11.2",
         "11.1"
       ],
-      "default": "13.1",
+      "default": "13.3",
       "description": "Version of the CUDA Toolkit to install."
     },
     "cuDNNVersion": {
@@ -63,6 +65,11 @@
       "type": "boolean",
       "default": false,
       "description": "Install CUDA Deep Neural Network Library (cuDNN)"
+    },
+    "installcuDSS": {
+      "type": "boolean",
+      "default": false,
+      "description": "Install CUDA Direct Solver of Sparse Linear Systems (cuDSS)"
     },
     "installcuTensor": {
       "type": "boolean",

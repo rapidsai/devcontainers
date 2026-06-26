@@ -12,10 +12,12 @@ build_devcontainer() {
     # Generate the devcontainer
     eval "$(./scripts/generate.sh "$@" | xargs -r -d'\n' -I% echo -n local %\;)";
 
-    echo "tag=${tag-}" >&2;
-    echo "workspace=${workspace-}" >&2;
+    echo "tag=${tag:-}" >&2;
+    echo "workspace=${workspace:-}" >&2;
 
-    if ! test -n "${workspace-}" || ! test -n "${tag-}"; then exit 1; fi;
+    if ! test -n "${workspace:-}" || ! test -n "${tag:-}"; then exit 1; fi;
+
+    tag="${version:-latest}-${tag}";
 
     # Print the generated devcontainer JSON
     cat "${workspace}/.devcontainer/devcontainer.json" >&2;

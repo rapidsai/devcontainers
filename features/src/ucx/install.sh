@@ -51,9 +51,17 @@ install_ucx_release() {
     mkdir /tmp/ucx;
     tar -C /tmp/ucx -xvjf /tmp/ucx.tar.bz2;
     apt_get_update;
-    DEBIAN_FRONTEND=noninteractive apt-get -y install --no-install-recommends /tmp/ucx/*.deb || true;
-    DEBIAN_FRONTEND=noninteractive apt-get -y --fix-broken install;
-    DEBIAN_FRONTEND=noninteractive apt-get -y autoremove;
+    # Remove `libnvidia-compute` from ucx-cuda dependencies
+    local ucx_cuda_deb="$(find /tmp/ucx/ -type f -name 'ucx-cuda*.deb' -print -quit)";
+    if test -n "${ucx_cuda_deb:+x}"; then
+        dpkg-deb -R "$ucx_cuda_deb" /tmp/ucx/ucx-cuda;
+        sed -i 's/libnvidia-compute | libnvidia-ml1.*, //g' /tmp/ucx/ucx-cuda/DEBIAN/control;
+        dpkg-deb -b /tmp/ucx/ucx-cuda "$ucx_cuda_deb"; # Rebuild
+        dpkg-deb -I "$ucx_cuda_deb";
+    fi
+    DEBIAN_FRONTEND=noninteractive apt install -y --no-install-recommends /tmp/ucx/*.deb || true;
+    DEBIAN_FRONTEND=noninteractive apt install -y --fix-broken;
+    DEBIAN_FRONTEND=noninteractive apt autoremove -y;
 }
 
 build_and_install_ucx() {
@@ -91,8 +99,8 @@ build_and_install_ucx() {
     )
 
     if test ${#PKG_TO_REMOVE[@]} -gt 0; then
-        DEBIAN_FRONTEND=noninteractive apt-get -y remove "${PKG_TO_REMOVE[@]}";
-        DEBIAN_FRONTEND=noninteractive apt-get -y autoremove;
+        DEBIAN_FRONTEND=noninteractive apt remove -y "${PKG_TO_REMOVE[@]}";
+        DEBIAN_FRONTEND=noninteractive apt autoremove -y;
     fi
 }
 

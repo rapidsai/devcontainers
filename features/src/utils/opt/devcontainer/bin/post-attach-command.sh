@@ -17,10 +17,6 @@ if ! test -n "${SKIP_DEVCONTAINER_UTILS_POST_ATTACH_COMMAND:+x}"; then
 
     # Update sccache client configuration to enable/disable sccache-dist
     if test -n "${DEVCONTAINER_UTILS_ENABLE_SCCACHE_DIST:+x}"; then
-        devcontainer-utils-install-sccache                   \
-            --repo "${SCCACHE_REPOSITORY:-rapidsai/sccache}" \
-            --version "${SCCACHE_VERSION:-rapids}"           \
-        ;
         if test -n "${SCCACHE_DIST_AUTH_TOKEN:+x}"; then
             devcontainer-utils-init-sccache-dist        \
                 --enable-sccache-dist - <<< "           \
@@ -39,6 +35,6 @@ if ! test -n "${SKIP_DEVCONTAINER_UTILS_POST_ATTACH_COMMAND:+x}"; then
         fi
     elif command -V sccache >/dev/null 2>&1; then
         # Start the sccache client
-        devcontainer-utils-start-sccache --kill-all;
+        devcontainer-utils-start-sccache;
     fi
 fi

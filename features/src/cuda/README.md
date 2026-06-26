@@ -22,6 +22,7 @@ A feature to install the NVIDIA CUDA Toolkit
 | installCTKLibraries | Shortcut to install all CUDA Toolkit Libraries | boolean | true |
 | installDevPackages | Whether to install the CUDA dev packages (static libraries + headers) | boolean | true |
 | installcuDNN | Install CUDA Deep Neural Network Library (cuDNN) | boolean | false |
+| installcuDSS | Install CUDA Direct Solver of Sparse Linear Systems (cuDSS) | boolean | false |
 | installcuTensor | Install CUDA Tensor Linear Algebra Library (cuTensor) | boolean | false |
 | installNCCL | Install NVIDIA Collective Communications Library (NCCL) | boolean | true |
 | installCUDARuntime | Install CUDA Runtime Library (cudart) | boolean | true |

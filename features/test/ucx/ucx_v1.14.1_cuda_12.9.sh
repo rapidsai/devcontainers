@@ -24,6 +24,8 @@ ucx_info -v;
 
 check "ucx version" bash -c "echo '$UCX_VERSION' | grep '$(ucx_info -v | head -n1 | cut -d' ' -f4)'";
 
+check "libnvidia-compute is not installed" bash -c "! dpkg -s libnvidia-compute";
+
 # Report result
 # If any of the checks above exited with a non-zero exit code, the test will fail.
 reportResults

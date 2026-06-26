@@ -44,16 +44,21 @@ runs:
     - name: Report changes
       if: inputs.full_matrix != 'true'
       shell: bash
-      run: echo '${{ toJSON(steps.changes.outputs) }}'
+      run: echo '${{ toJSON(steps.changes.outputs) }}' # zizmor: ignore[template-injection]
 
     - name: Determine the image matrix
       id: matrix
       shell: bash
+      env:
+        FULL_MATRIX: ${{ inputs.full_matrix }}
+        FEATURES: ${{ inputs.features || '[]' }}
+        SCENARIOS: ${{ inputs.scenarios || '[]' }}
+        CHANGED_FILES: ${{ steps.changes.outputs.all_changed_and_modified_files }}
       run: |
         bash --noprofile --norc -x -eo pipefail \
           .github/actions/image-matrix/action.sh \
-          '${{ inputs.full_matrix }}' \
-          '${{ inputs.features || '[]' }}' \
-          '${{ inputs.scenarios || '[]' }}' \
-          '${{ steps.changes.outputs.all_changed_and_modified_files }}' \
+          "$FULL_MATRIX" \
+          "$FEATURES" \
+          "$SCENARIOS" \
+          "$CHANGED_FILES" \
         | tee -a $GITHUB_OUTPUT;

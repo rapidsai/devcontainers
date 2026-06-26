@@ -17,13 +17,18 @@
 # shellcheck disable=SC1091
 . rapids-generate-docstring;
 
+repo_exists() {
+    local repo_path="${1:-}";
+    git -C "${repo_path}" rev-parse --is-inside-work-tree >/dev/null 2>&1;
+}
+
 # Function to convert ucx branch names
 convert-ucx-branch() {
     repo=$1
     custom_branch=$2
     normalized_branch="${custom_branch}"
 
-    if [[ "${repo}" == "ucx"* ]]; then
+    if [[ "${repo}" == "ucxx" ]]; then
         # Only convert branches that match the pattern release/YY.MM
         if [[ "${custom_branch}" =~ ^release/[0-9]{2}\.[0-9]{2}$ ]]; then
             RAPIDS_VERSION=$(echo "${custom_branch}" | awk '{split($0, a, "/"); print a[2]}')
@@ -61,14 +66,14 @@ checkout_same_branch() {
         local repo="repos_${i}";
         local repo_name="${repo}_name";
         local repo_path="${repo}_path";
-        if [[ ! -d ~/"${!repo_path:-}/.git" ]]; then
+        if ! repo_exists ~/"${!repo_path:-}"; then
             continue;
         fi
         local name="${!repo_name}";
         local path="${!repo_path}";
 
         # Skip ucxx repositories when determining common branches
-        if [[ "${name}" == "ucx"* ]]; then
+        if [[ "${name}" == "ucxx" ]]; then
             continue;
         fi
 
@@ -146,7 +151,7 @@ checkout_same_branch() {
         local repo_name="${repo}_name";
         local repo_path="${repo}_path";
 
-        if [[ ! -d ~/"${!repo_path:-}/.git" ]]; then
+        if ! repo_exists ~/"${!repo_path:-}"; then
             continue;
         fi
 
@@ -158,7 +163,7 @@ checkout_same_branch() {
         local normalized_branch;
         normalized_branch=$(convert-ucx-branch "${repo_name_val}" "${branch}");
 
-        if [[ "${repo_name_val}" == "ucx"* ]]; then
+        if [[ "${repo_name_val}" == "ucxx" ]]; then
             echo "Using normalized branch '${normalized_branch}' for repository '${repo_name_val}'";
             branch="${normalized_branch}";
         fi

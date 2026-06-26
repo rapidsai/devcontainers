@@ -30,7 +30,7 @@ export OSNAME="$(
     echo "$ID$((major - (major % 2)))${minor}";
 )";
 
-VERSION="${CUDA_VERSION:-${VERSION:-13.1.0}}";
+VERSION="${CUDA_VERSION:-${VERSION:-13.3.0}}";
 
 if [[ "$NVARCH" == aarch64 ]]; then
     NVARCH="sbsa";
@@ -184,6 +184,10 @@ if [ "${INSTALLCUDNN:-false}" = true ]; then
             PKGS+=("libcudnn${CUDNNVERSION}-dev-cuda-${cuda_ver_major}");
         fi
     fi
+fi
+
+if "${INSTALLCUDSS:-false}"; then
+    PKGS+=("cudss-cuda-${cuda_ver_major}");
 fi
 
 if [ "${INSTALLNCCL:-false}" = true ] \

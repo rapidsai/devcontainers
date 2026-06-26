@@ -30,7 +30,7 @@ _creds_s3_schedule() {
 
         cat <<________EOF | tee -a /var/log/devcontainer-utils/creds-s3.log
 $(date --date="@${now}")
-Scheduling cron to regerate S3 creds $(date -u --date="@$((ttime - now))" '+%T') from now.
+Scheduling cron to regenerate S3 creds $(date -u --date="@$((ttime - now))" '+%T') from now.
 ________EOF
 
         cat <<________EOF | crontab -u "$(whoami)" -

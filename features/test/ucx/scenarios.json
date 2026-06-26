@@ -1,9 +1,15 @@
 {
-  "ucx_v1.14.1_cuda": {
+  "ucx_v1.14.1_cuda_12.9": {
     "image": "ubuntu:22.04",
     "features": {
       "cuda": {
-        "version": "12.9"
+        "version": "12.9",
+        "installCompilers": true,
+        "installProfilers": false,
+        "installCTKLibraries": false,
+        "installDevPackages": false,
+        "installNCCL": false,
+        "installCUDARuntime": true
       },
       "ucx": {
         "version": "1.14.1"
@@ -14,14 +20,62 @@
       "./ucx"
     ]
   },
-  "ucx_v1.15.0-rc3_cuda": {
+  "ucx_v1.15.0-rc3_cuda_12.9": {
     "image": "ubuntu:22.04",
     "features": {
       "cuda": {
-        "version": "12.9"
+        "version": "12.9",
+        "installCompilers": true,
+        "installProfilers": false,
+        "installCTKLibraries": false,
+        "installDevPackages": false,
+        "installNCCL": false,
+        "installCUDARuntime": true
       },
       "ucx": {
         "version": "1.15.0-rc3"
+      }
+    },
+    "overrideFeatureInstallOrder": [
+      "./cuda",
+      "./ucx"
+    ]
+  },
+  "ucx_v1.19.0_cuda_12.9": {
+    "image": "ubuntu:22.04",
+    "features": {
+      "cuda": {
+        "version": "12.9",
+        "installCompilers": true,
+        "installProfilers": false,
+        "installCTKLibraries": false,
+        "installDevPackages": false,
+        "installNCCL": false,
+        "installCUDARuntime": true
+      },
+      "ucx": {
+        "version": "1.19.0"
+      }
+    },
+    "overrideFeatureInstallOrder": [
+      "./cuda",
+      "./ucx"
+    ]
+  },
+  "ucx_v1.19.0_cuda_13.1": {
+    "image": "ubuntu:22.04",
+    "features": {
+      "cuda": {
+        "version": "13.1",
+        "installCompilers": true,
+        "installProfilers": false,
+        "installCTKLibraries": false,
+        "installDevPackages": false,
+        "installNCCL": false,
+        "installCUDARuntime": true
+      },
+      "ucx": {
+        "version": "1.19.0"
       }
     },
     "overrideFeatureInstallOrder": [

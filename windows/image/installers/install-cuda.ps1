@@ -54,6 +54,7 @@ if ([int]$major -eq 12 -and [int]$minor -ge 4) {
 # The following components first appeared in 13.0.
 if ([int]$major -ge 13) {
     $cudaComponents += "crt_$mmVersionTag"
+    $cudaComponents += "nvfatbin_$mmVersionTag"
     $cudaComponents += "nvvm_$mmVersionTag"
     $cudaComponents += "nvptxcompiler_$mmVersionTag"
 }

@@ -9,20 +9,44 @@ on:
   push:
     branches:
       - "main"
+      - "release/v[0-9][0-9].[0-9][0-9].[0-9][0-9]"
     tags:
       - "v[0-9][0-9].[0-9][0-9].[0-9][0-9]"
 
+permissions: {}
+
 jobs:
+  check-event:
+    name: Check GH Event
+    permissions: {}
+    runs-on: ubuntu-latest
+    outputs:
+      ok: ${{ steps.check_gh_event.outputs.ok }}
+    steps:
+      - id: check_gh_event
+        name: Check GH Event
+        shell: bash
+        run: |
+          [[ '${{ github.event_name }}' == 'workflow_dispatch' ]] || \
+          [[ '${{ github.event_name }}' == 'push' && '${{ github.repository }}' == 'rapidsai/devcontainers' ]] || \
+          [[ '${{ github.event_name }}' == 'schedule' && '${{ github.repository }}' == 'rapidsai/devcontainers' ]] || \
+          [[ '${{ github.event_name }}' == 'pull_request' && '${{ github.repository }}' != 'rapidsai/devcontainers' ]] \
+          && echo "ok=true"  | tee -a "$GITHUB_OUTPUT" \
+          || echo "ok=false" | tee -a "$GITHUB_OUTPUT";
 
   features-matrix:
     name: Determine features matrix
+    if: needs.check-event.outputs.ok == 'true'
+    needs: check-event
+    permissions:
+      contents: read
     runs-on: ubuntu-latest
     outputs:
       features: "${{ steps.matrix.outputs.features }}"
       scenarios: "${{ steps.matrix.outputs.scenarios }}"
     steps:
       - name: "Checkout ${{ github.repository }}"
-        uses: actions/checkout@v4
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
         with:
           fetch-depth: 0
           persist-credentials: false
@@ -39,13 +63,15 @@ jobs:
   image-matrix:
     name: Determine image matrix
     needs: features-matrix
+    permissions:
+      contents: read
     runs-on: ubuntu-latest
     outputs:
       linux: ${{ steps.matrix.outputs.linux }}
       windows: ${{ steps.matrix.outputs.windows }}
     steps:
       - name: Checkout ${{ github.repository }}
-        uses: actions/checkout@v4
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
         with:
           fetch-depth: 0
           persist-credentials: false
@@ -62,7 +88,9 @@ jobs:
     if: needs.image-matrix.outputs.linux != '{"include":[]}'
     name: ${{ matrix.name || 'Linux' }}
     needs: image-matrix
-    secrets: inherit
+    permissions:
+      contents: read
+    secrets: inherit  # zizmor: ignore[secrets-inherit]
     uses: ./.github/workflows/build-test-and-push-linux-image.yml
     strategy:
       fail-fast: false
@@ -78,7 +106,9 @@ jobs:
     if: needs.image-matrix.outputs.windows != '{"include":[]}'
     name: ${{ matrix.name || 'Windows' }}
     needs: image-matrix
-    secrets: inherit
+    permissions:
+      contents: read
+    secrets: inherit  # zizmor: ignore[secrets-inherit]
     uses: ./.github/workflows/build-test-and-push-windows-image.yml
     strategy:
       fail-fast: false
@@ -94,5 +124,32 @@ jobs:
     if: needs.features-matrix.outputs.features != '[]' || needs.features-matrix.outputs.scenarios != '[]'
     name: Features
     needs: features-matrix
-    secrets: inherit
+    permissions:
+      contents: read
+      packages: write
+    secrets: inherit  # zizmor: ignore[secrets-inherit]
     uses: ./.github/workflows/release-features.yml
+
+  build-devcontainers-after-images-released:
+    if: needs.image-matrix.outputs.linux != '{"include":[]}'
+    needs: [image-matrix, release-linux]
+    name: Build devcontainers
+    secrets: inherit  # zizmor: ignore[secrets-inherit]
+    uses: rapidsai/shared-workflows/.github/workflows/build-devcontainers.yaml@main  # zizmor: ignore[unpinned-uses]
+    permissions:
+      packages: write
+    with:
+      push: true
+      cuda: '["12.9", "13.3"]'
+
+  build-devcontainers-after-features-released:
+    if: needs.image-matrix.outputs.linux == '{"include":[]}' && (needs.features-matrix.outputs.features != '[]' || needs.features-matrix.outputs.scenarios != '[]')
+    needs: [image-matrix, features-matrix, release-features]
+    name: Build devcontainers
+    secrets: inherit  # zizmor: ignore[secrets-inherit]
+    uses: rapidsai/shared-workflows/.github/workflows/build-devcontainers.yaml@main  # zizmor: ignore[unpinned-uses]
+    permissions:
+      packages: write
+    with:
+      push: true
+      cuda: '["12.9", "13.3"]'

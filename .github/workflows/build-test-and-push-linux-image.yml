@@ -37,10 +37,11 @@ jobs:
     outputs:
       hash_amd64: ${{ steps.build.outputs.hash_amd64 }}
       hash_arm64: ${{ steps.build.outputs.hash_arm64 }}
-      tag: ${{ steps.json.outputs.tag }}
+      base_tag: ${{ steps.json.outputs.base_tag }}
+      version: ${{ steps.json.outputs.version }}
     steps:
       - name: Checkout ${{ github.repository }}
-        uses: actions/checkout@v4
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
         with:
           fetch-depth: 0
           persist-credentials: false
@@ -57,19 +58,19 @@ jobs:
           container_env: "${{ inputs.container_env }}"
 
       - name: Login to Docker Hub
-        uses: docker/login-action@v3
+        uses: docker/login-action@4907a6ddec9925e35a0a9e82d7399ccc52663121 # v4
         with:
           username: ${{ secrets.GPUCIBOT_DOCKERHUB_USER || vars.DOCKERHUB_USER }}
           password: ${{ secrets.GPUCIBOT_DOCKERHUB_TOKEN || secrets.DOCKERHUB_TOKEN }}
 
       - id: build
-        name: Build ${{ steps.json.outputs.tag }}-${{ matrix.arch }}
+        name: Build ${{ steps.json.outputs.version }}-${{ steps.json.outputs.base_tag }}-${{ matrix.arch }}
         uses: ./.github/actions/build-linux-image
         with:
           arch: "${{ matrix.arch }}"
           repo: "${{ inputs.repo }}"
           push: "${{ inputs.push }}"
-          tag: "${{ steps.json.outputs.tag }}"
+          tag: "${{ steps.json.outputs.version }}-${{ steps.json.outputs.base_tag }}"
 
   push-to-dockerhub:
     if: inputs.push == 'true'
@@ -79,7 +80,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Login to Docker Hub
-        uses: docker/login-action@v3
+        uses: docker/login-action@4907a6ddec9925e35a0a9e82d7399ccc52663121 # v4
         with:
           username: ${{ secrets.GPUCIBOT_DOCKERHUB_USER || vars.DOCKERHUB_USER }}
           password: ${{ secrets.GPUCIBOT_DOCKERHUB_TOKEN || secrets.DOCKERHUB_TOKEN }}
@@ -89,11 +90,15 @@ jobs:
         env:
           hash_amd64: "${{ needs.build-test-and-upload.outputs.hash_amd64 }}"
           hash_arm64: "${{ needs.build-test-and-upload.outputs.hash_arm64 }}"
-          name: "${{ inputs.repo }}:${{ needs.build-test-and-upload.outputs.tag }}"
+          repo: "${{ inputs.repo }}"
+          base_tag: "${{ needs.build-test-and-upload.outputs.base_tag }}"
+          version: "${{ needs.build-test-and-upload.outputs.version }}"
           os: "${{ inputs.os }}"
+          ref_name: "${{ github.ref_name }}"
         run: |
-          # Ensure name is lowercase
-          name="${name,,}";
+          # Ensure repo is lowercase
+          repo="${repo,,}";
+          name="${repo}:${version}-${base_tag}";
           docker manifest rm "${name}" || true;
           sleep 5;
           # Create and push the multiarch manifest
@@ -101,3 +106,10 @@ jobs:
           sleep 5;
           # Create and push the multiarch manifest without the OS in the tag
           docker buildx imagetools create --tag "${name/%-${os//:/}}" "$hash_amd64" "$hash_arm64";
+          # Create and push the multiarch manifest without RAPIDS version (main branch only)
+          if [[ "${ref_name}" == "main" ]]; then
+            sleep 5;
+            docker buildx imagetools create --tag "${repo}:latest-${base_tag}" "$hash_amd64" "$hash_arm64";
+            sleep 5;
+            docker buildx imagetools create --tag "${repo}:latest-${base_tag/%-${os//:/}}" "$hash_amd64" "$hash_arm64";
+          fi

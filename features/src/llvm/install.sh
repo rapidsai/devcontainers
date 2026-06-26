@@ -8,6 +8,7 @@ cd "$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )";
 . ./common/install.sh;
 
 LLVM_VERSION="${VERSION:-}";
+export LLVM_REPO_VERSION_OVERRIDE="${REPOVERSIONOVERRIDE:-}";
 
 check_packages                  \
     git                         \
