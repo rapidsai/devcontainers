@@ -1,25 +1,25 @@
 # clVersion, cudaVersion, OS edition, isolation mode
 Param(
-    [Parameter(Mandatory = $true)]
+    [Parameter(Mandatory=$true)]
     [string]
-    $clVersion = "latest",
-    [Parameter(Mandatory = $false)]
+    $clVersion="latest",
+    [Parameter(Mandatory=$false)]
     [string]
-    $cudaVersion = "latest",
-    [Parameter(Mandatory = $false)]
-    [ValidateSet('windows2019', 'windows2022', 'windows2025')]
+    $cudaVersion="latest",
+    [Parameter(Mandatory=$false)]
+    [ValidateSet('windows2019', 'windows2022')]
     [string]
-    $edition = "windows",
-    [Parameter(Mandatory = $false)]
+    $edition="windows",
+    [Parameter(Mandatory=$false)]
     [ValidateSet('hyperv', 'process')]
     [string]
-    $isolation = "hyperv",
-    [Parameter(Mandatory = $false)]
+    $isolation="hyperv",
+    [Parameter(Mandatory=$false)]
     [string]
-    $repo = "local",
-    [Parameter(Mandatory = $false)]
+    $repo="local",
+    [Parameter(Mandatory=$false)]
     [string]
-    $repoVersion = "latest"
+    $repoVersion="latest"
 )
 
 function TestReturnCode {
@@ -31,7 +31,6 @@ function TestReturnCode {
 Push-location "$PSScriptRoot"
 
 $rootWindowsImage = @{
-    "windows2025" = "mcr.microsoft.com/windows/servercore:ltsc2025"
     "windows2022" = "mcr.microsoft.com/windows/servercore:ltsc2022"
     "windows2019" = "mcr.microsoft.com/windows/servercore:ltsc2019"
 }[$edition]
@@ -42,13 +41,13 @@ try {
 
     $vsVer = $vsYearToVer[$vsCompilersToYear[$clVersion]]
     # Override defaults in .env.
-    $ENV:IMAGE_NAME = "$(.\generate-image-name.ps1 -clVersion $clVersion -cudaVersion $cudaVersion -edition $edition -repo $repo -repoVersion $repoVersion)"
-    $ENV:ISOLATION = "$isolation"
-    $ENV:MSVC_VER = "$vsVer"
-    $ENV:MSVC_COMPILER_VER = "$clVersion"
-    $ENV:CUDA_VER = "$cudaVersion"
-    $ENV:ROOT_IMAGE = "$rootWindowsImage"
-    $ENV:BUILDKIT_PROGRESS = "plain"
+    $ENV:IMAGE_NAME="$(.\generate-image-name.ps1 -clVersion $clVersion -cudaVersion $cudaVersion -edition $edition -repo $repo -repoVersion $repoVersion)"
+    $ENV:ISOLATION="$isolation"
+    $ENV:MSVC_VER="$vsVer"
+    $ENV:MSVC_COMPILER_VER="$clVersion"
+    $ENV:CUDA_VER="$cudaVersion"
+    $ENV:ROOT_IMAGE="$rootWindowsImage"
+    $ENV:BUILDKIT_PROGRESS="plain"
 
     Write-Output "Building $ENV:IMAGE_NAME"
     Write-Output "with args:"
@@ -59,18 +58,7 @@ try {
     Write-Output "ENV:CUDA_VER           $ENV:CUDA_VER"
     Write-Output "ENV:ROOT_IMAGE         $ENV:ROOT_IMAGE"
 
-    ctr i pull "$ENV:ROOT_IMAGE"
-    buildctl build `
-        --frontend=dockerfile.v0 `
-        --local dockerfile=.\ `
-        --opt filename=windows.Dockerfile `
-        --local context=.\image `
-        --output "type=image,name=$ENV:IMAGE_NAME,compression=zstd,force-compression=true,platform=windows/amd64" `
-        --opt build-arg:MSVC_VER="$ENV:MSVC_VER" `
-        --opt build-arg:MSVC_COMPILER_VER="$ENV:MSVC_COMPILER_VER" `
-        --opt build-arg:CUDA_VER="$ENV:CUDA_VER" `
-        --opt build-arg:ROOT_IMAGE="$ENV:ROOT_IMAGE" `
-        .\image
+    docker build --file .\windows.Dockerfile --tag "$ENV:IMAGE_NAME" --isolation "$ENV:ISOLATION" --build-arg MSVC_VER="$ENV:MSVC_VER" --build-arg MSVC_COMPILER_VER="$ENV:MSVC_COMPILER_VER" --build-arg CUDA_VER="$ENV:CUDA_VER" --build-arg ROOT_IMAGE="$ENV:ROOT_IMAGE" .\image
 }
 catch {
     Pop-Location
