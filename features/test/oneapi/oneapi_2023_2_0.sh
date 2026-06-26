@@ -12,7 +12,7 @@ set -e
 # Optional: Import test library bundled with the devcontainer CLI
 source dev-container-features-test-lib
 
-if [[ "$(uname -p)" == "x86_64" ]]; then
+if [[ "$(uname -m)" == "x86_64" ]]; then
     # Feature-specific tests
     # The 'check' command comes from the dev-container-features-test-lib.
 

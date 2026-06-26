@@ -19,7 +19,7 @@ fi
 
 _name="ninja-linux";
 
-if test "$(uname -p)" = "aarch64"; then
+if test "$(uname -m)" = "aarch64"; then
     _name+="-aarch64";
 fi
 

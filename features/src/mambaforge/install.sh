@@ -19,7 +19,7 @@ if [[ "$MINIFORGE_VERSION" == latest ]]; then
 fi
 
 wget --no-hsts -q -O /tmp/miniforge.sh \
-    "https://github.com/conda-forge/miniforge/releases/download/${MINIFORGE_VERSION}/Miniforge3-${MINIFORGE_VERSION}-Linux-$(uname -p).sh";
+    "https://github.com/conda-forge/miniforge/releases/download/${MINIFORGE_VERSION}/Miniforge3-${MINIFORGE_VERSION}-Linux-$(uname -m).sh";
 echo "Installing Miniforge...";
 
 # Install Miniforge

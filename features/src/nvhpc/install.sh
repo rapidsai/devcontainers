@@ -59,7 +59,7 @@ export NVHPC="/opt/nvidia/hpc_sdk";
 export NVHPC_VERSION="${NVHPC_VERSION}";
 export NVHPC_VERSION_MAJOR="${NVHPC_VERSION_MAJOR}";
 export NVHPC_VERSION_MINOR="${NVHPC_VERSION_MINOR}";
-export NVHPC_ROOT="${NVHPC}/Linux_$(uname -p)/${NVHPC_VERSION}";
+export NVHPC_ROOT="${NVHPC}/Linux_$(uname -m)/${NVHPC_VERSION}";
 export NVHPC_CUDA_HOME="$(dirname "$(find "$NVHPC_ROOT/cuda" -type f -name 'version.json' | head -n1)")";
 export NVHPC_MODULEFILE_DIRS="($(find "${NVHPC}/" -type d -name modulefiles -exec echo -n \"{}\"\  \;))";
 

@@ -36,14 +36,14 @@ download_ucx_release() {
         slug+="-mofed5-cuda${cuda}";
     fi
 
-    if [ "$(uname -p)" = "x86_64" ]; then
+    if [ "$(uname -m)" = "x86_64" ]; then
         # https://github.com/openucx/ucx/releases/download/v1.15.0-rc3/ucx-1.15.0-rc3-ubuntu22.04-mofed5-cuda12-x86_64.tar.bz2
-        if ! wget --no-hsts -q -O /tmp/ucx.tar.bz2 "https://github.com/openucx/ucx/releases/download/v${UCX_VERSION}/${slug}-$(uname -p).tar.bz2"; then
+        if ! wget --no-hsts -q -O /tmp/ucx.tar.bz2 "https://github.com/openucx/ucx/releases/download/v${UCX_VERSION}/${slug}-$(uname -m).tar.bz2"; then
             # https://github.com/openucx/ucx/releases/download/v1.14.1/ucx-1.14.1-ubuntu22.04-mofed5-cuda12.tar.bz2
             wget --no-hsts -q -O /tmp/ucx.tar.bz2 "https://github.com/openucx/ucx/releases/download/v${UCX_VERSION}/${slug}.tar.bz2";
         fi
     else
-        wget --no-hsts -q -O /tmp/ucx.tar.bz2 "https://github.com/openucx/ucx/releases/download/v${UCX_VERSION}/${slug}-$(uname -p).tar.bz2";
+        wget --no-hsts -q -O /tmp/ucx.tar.bz2 "https://github.com/openucx/ucx/releases/download/v${UCX_VERSION}/${slug}-$(uname -m).tar.bz2";
     fi
 }
 

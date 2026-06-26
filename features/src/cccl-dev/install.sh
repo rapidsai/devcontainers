@@ -32,7 +32,7 @@ PKG=("gettext-base" "libtbb-dev" "pbzip2" "zstd" "wget");
 PKG_TO_REMOVE=();
 
 # Install gcc and g++ because we have to build psutil wheel for non-x86
-if [[ "$(uname -p)" != "x86_64" ]]; then
+if [[ "$(uname -m)" != "x86_64" ]]; then
     if ! command -V gcc >/dev/null 2>&1; then PKG_TO_REMOVE+=("gcc"); fi
     if ! command -V g++ >/dev/null 2>&1; then PKG_TO_REMOVE+=("g++"); fi
 fi

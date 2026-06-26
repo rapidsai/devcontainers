@@ -22,7 +22,7 @@ check_packages                 \
 
 echo "Downloading CUDA keyring...";
 
-export NVARCH="$(uname -p)";
+export NVARCH="$(uname -m)";
 export OSNAME="$(
     . /etc/os-release;
     major="$(cut -d'.' -f1 <<< "${VERSION_ID}")";
