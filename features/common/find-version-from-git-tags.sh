@@ -48,7 +48,7 @@ _find_version_from_git_tags() {
         local regex="${prefix}\\K[0-9]+${last_part}$"
 
         if ! test -v _find_version_from_git_tags_cache["$variable_name"]; then
-            local remote_upstream_fetch="$(git --no-pager config get --global remote.upstream.fetch 2>/dev/null)"
+            local remote_upstream_fetch="$(git --no-pager config get remote.upstream.fetch)"
             if test -n "${remote_upstream_fetch:+x}"; then
                 git config unset --global remote.upstream.fetch || true
             fi
