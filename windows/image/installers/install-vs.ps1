@@ -1,67 +1,61 @@
 Param(
-    [Parameter(Mandatory=$true)]
+    [Parameter(Mandatory = $true)]
     [ValidateSet('15', '16', '17', '18')]
     [string]
     $msvcVersion,
-    [Parameter(Mandatory=$false)]
+    [Parameter(Mandatory = $false)]
     [string]
-    $clVersion
+    $clVersion = "latest"
 )
 
 $msvcPath = "C:\msbuild\$msvcVersion"
 
-$vsComponentsMap = @{
-    "15"     = "Microsoft.VisualStudio.Component.Windows10SDK.17763"
-    "16"     = "Microsoft.VisualStudio.Component.Windows10SDK.19041"
-    "17"     = "Microsoft.VisualStudio.Component.Windows11SDK.22621"
-    "18"     = "Microsoft.VisualStudio.Component.Windows11SDK.22621"
-    "14.14"  = "Microsoft.VisualStudio.Component.VC.Tools.14.14"
-    "14.15"  = "Microsoft.VisualStudio.Component.VC.Tools.14.15"
-    "14.16"  = "Microsoft.VisualStudio.Component.VC.Tools.14.16"
-    "14.27"  = "Microsoft.VisualStudio.Component.VC.14.27.x86.x64"
-    "14.28"  = "Microsoft.VisualStudio.Component.VC.14.28.x86.x64"
-    "14.29"  = "Microsoft.VisualStudio.Component.VC.14.29.x86.x64"
-    "14.34"  = "Microsoft.VisualStudio.Component.VC.14.34.17.4.x86.x64"
-    "14.35"  = "Microsoft.VisualStudio.Component.VC.14.35.17.5.x86.x64"
-    "14.36"  = "Microsoft.VisualStudio.Component.VC.14.36.17.6.x86.x64"
-    "14.37"  = "Microsoft.VisualStudio.Component.VC.14.37.17.7.x86.x64"
-    "14.38"  = "Microsoft.VisualStudio.Component.VC.14.38.17.8.x86.x64"
-    "14.39"  = "Microsoft.VisualStudio.Component.VC.14.39.17.9.x86.x64"
-    "14.40"  = "Microsoft.VisualStudio.Component.VC.14.40.17.10.x86.x64"
-    "14.41"  = "Microsoft.VisualStudio.Component.VC.14.41.17.11.x86.x64"
-    "14.42"  = "Microsoft.VisualStudio.Component.VC.14.42.17.12.x86.x64"
-    "14.43"  = "Microsoft.VisualStudio.Component.VC.14.43.17.13.x86.x64"
-    "14.44"  = "Microsoft.VisualStudio.Component.VC.14.44.17.14.x86.x64"
-    "14.50"  = "Microsoft.VisualStudio.Component.VC.14.50.18.0.x86.x64"
-    "latest" = "Microsoft.VisualStudio.Component.VC.Tools.x86.x64"
-}
+$vsComponentVersion = @{
+    "14.27"  = "14.27"
+    "14.28"  = "14.28"
+    "14.29"  = "14.29"
+    "14.34"  = "14.34.17.4"
+    "14.35"  = "14.35.17.5"
+    "14.36"  = "14.36.17.6"
+    "14.37"  = "14.37.17.7"
+    "14.38"  = "14.38.17.8"
+    "14.39"  = "14.39.17.9"
+    "14.40"  = "14.40.17.10"
+    "14.41"  = "14.41.17.11"
+    "14.42"  = "14.42.17.12"
+    "14.43"  = "14.43.17.13"
+    "14.44"  = "14.44.17.14"
+    "14.50"  = "14.50.18.0"
+    "latest" = "14.50.18.0"
+}[$clVersion]
 
-$channelMap = @{
-    "15"="release"
-    "16"="release"
-    "17"="release"
-    "18"="insiders"
-}
-$channel = $channelMap[$msvcVersion]
+$sdkComponent = @{
+    "15" = "Microsoft.VisualStudio.Component.Windows10SDK.17763"
+    "16" = "Microsoft.VisualStudio.Component.Windows10SDK.19041"
+    "17" = "Microsoft.VisualStudio.Component.Windows11SDK.22621"
+    "18" = "Microsoft.VisualStudio.Component.Windows11SDK.22621"
+}[$msvcVersion]
 
-# Always install/update core VC tools
-$vsComponent = $vsComponentsMap[$msvcVersion]
-$vsComponentString = "--add Microsoft.VisualStudio.Component.VC.Tools.x86.x64 --add $vsComponent"
+$channel = @{
+    "15" = "release"
+    "16" = "release"
+    "17" = "release"
+    "18" = "release"
+}[$msvcVersion]
 
-if ($clVersion) {
-    $clComponent = $vsComponentsMap[$clVersion]
-    $vsComponentString = "$vsComponentString --add $clComponent"
-}
-
-# 14.16 alone does not install build tools
-if ($clVersion -eq "14.16") {
-    $clComponent = $vsComponentsMap["14.15"]
-    $vsComponentString = "$vsComponentString --add $clComponent"
-}
+$requiredVsComponents = (
+    "Microsoft.VisualStudio.Component.VC.${vsComponentVersion}.x86.x64",
+    "Microsoft.VisualStudio.Component.VC.${vsComponentVersion}.ATL",
+    "Microsoft.VisualStudio.Component.VC.${vsComponentVersion}.ATLMFC",
+    "Microsoft.VisualStudio.Component.VC.Llvm.Clang",
+    "Microsoft.VisualStudio.Component.VC.Llvm.ClangToolset",
+    "Microsoft.VisualStudio.Component.VC.Tools.x86.x64",
+    $sdkComponent
+) -replace '^(?<comp>.*)$', ' --add ${comp}' -join ""
 
 Invoke-WebRequest -Uri "https://aka.ms/vs/$msvcVersion/$channel/vs_buildtools.exe" -UseBasicParsing -OutFile .\vs_buildtools.exe
 Write-Output "Installing components: $vsComponentString"
-Start-Process -NoNewWindow -PassThru -Wait -FilePath .\vs_buildtools.exe -ArgumentList "install --installWhileDownloading --installPath $msvcPath --wait --norestart --nocache --quiet $vsComponentString"
+Start-Process -NoNewWindow -PassThru -Wait -FilePath .\vs_buildtools.exe -ArgumentList "install --installWhileDownloading --installPath $msvcPath --wait --norestart --nocache --quiet $requiredVsComponents"
 
 # Add VS to the global environment
 . "$PSScriptRoot/build-env.ps1" -vcver "$clVersion"
