@@ -36,11 +36,14 @@ $sdkComponent = @{
     "18" = "Microsoft.VisualStudio.Component.Windows11SDK.22621"
 }[$msvcVersion]
 
+# 15,16,17 are release
+# 18 is insiders or stable
+# ??? why
 $channel = @{
     "15" = "release"
     "16" = "release"
     "17" = "release"
-    "18" = "release"
+    "18" = "stable"
 }[$msvcVersion]
 
 $requiredVsComponents = (
@@ -51,11 +54,15 @@ $requiredVsComponents = (
     "Microsoft.VisualStudio.Component.VC.Llvm.ClangToolset",
     "Microsoft.VisualStudio.Component.VC.Tools.x86.x64",
     $sdkComponent
-) -replace '^(?<comp>.*)$', ' --add ${comp}' -join ""
+)
 
-Invoke-WebRequest -Uri "https://aka.ms/vs/$msvcVersion/$channel/vs_buildtools.exe" -UseBasicParsing -OutFile .\vs_buildtools.exe
-Write-Output "Installing components: $vsComponentString"
-Start-Process -NoNewWindow -PassThru -Wait -FilePath .\vs_buildtools.exe -ArgumentList "install --installWhileDownloading --installPath $msvcPath --wait --norestart --nocache --quiet $requiredVsComponents"
+$components = $requiredVsComponents -replace '^(?<comp>.*)$', ' --add ${comp}' -join ""
+$vsBtUrl = "https://aka.ms/vs/$msvcVersion/$channel/vs_buildtools.exe"
+Write-Output "Downloading build tools from: $vsBtUrl"
+Invoke-WebRequest -Uri $vsBtUrl -UseBasicParsing -OutFile .\vs_buildtools.exe
+
+Write-Output "Installing components: $requiredVsComponents"
+Start-Process -NoNewWindow -PassThru -Wait -FilePath .\vs_buildtools.exe -ArgumentList "install --installWhileDownloading --installPath $msvcPath $components --wait --norestart --nocache --quiet"
 
 # Add VS to the global environment
 . "$PSScriptRoot/build-env.ps1" -vcver "$clVersion"
