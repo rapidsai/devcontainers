@@ -20,11 +20,12 @@ gitlab_cli_file_name() {
     local os="$(uname -s)";
     local arch="${TARGETARCH:-}";
 
-    if [[ "${CLI_VERSION}" < "1.47.0" ]]; then
-        arch="${arch:-$(uname -m)}";
-    else
+    # If v1.47.0 or newer, use the new URL scheme
+    if echo -e "${CLI_VERSION}\n1.47.0" | sort -V | head -n1 | grep -q '1.47.0'; then
         arch="${arch:-$(dpkg --print-architecture | awk -F'-' '{print $NF}')}";
         os="${os,,}";
+    else
+        arch="${arch:-$(uname -m)}";
     fi
 
     echo "glab_${CLI_VERSION}_${os}_${arch}.deb";
