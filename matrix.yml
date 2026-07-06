@@ -90,10 +90,10 @@ include:
   - { features: [*python, *dood, *gcc_9, { <<: *cuda_prev_min, <<: *cccl_cuda_opts }, *clang_extra_cccl, *clangd_dev_bionic, *cccl_dev], env: *gcc_env }
   - { features: [*python, *dood, *gcc_9, { <<: *cuda_prev_max, <<: *cccl_cuda_opts }, *clang_extra_cccl, *clangd_dev_bionic, *cccl_dev], env: *gcc_env }
   - { features: [*python, *dood, *gcc_10, { <<: *cuda_prev_min, <<: *cccl_cuda_opts }, *clang_extra_cccl, *clangd_dev_bionic, *cccl_dev], env: *gcc_env }
-  - { features: [*python, *dood, *gcc_10, { <<: *cuda_prev_max, <<: *cccl_cuda_opts }, *clang_extra_cccl, *clangd_dev_bionic, *cccl_dev], env: *gcc_env }
+  - { features: [*python, *dood, *gcc_10, { <<: *cuda_prev_max, <<: *cccl_cuda_opts }, *clang_extra_cccl, *clangd_dev_bionic, *cccl_dev, *openmpi], env: *gcc_env }
 
   - { features: [*python, *dood, *llvm_14, { <<: *cuda_prev_min, <<: *cccl_cuda_opts }, *clang_extra_cccl, *clangd_dev_bionic, *cccl_dev], env: *llvm_env }
-  - { features: [*python, *dood, *llvm_14, { <<: *cuda_prev_max, <<: *cccl_cuda_opts }, *clang_extra_cccl, *clangd_dev_bionic, *cccl_dev], env: *llvm_env }
+  - { features: [*python, *dood, *llvm_14, { <<: *cuda_prev_max, <<: *cccl_cuda_opts }, *clang_extra_cccl, *clangd_dev_bionic, *cccl_dev, *openmpi], env: *llvm_env }
 
 - os: "ubuntu:22.04"
   images:
@@ -104,7 +104,7 @@ include:
   - { features: [*python, *dood, *gcc_12, { <<: *cuda_prev_min, <<: *cccl_cuda_opts }, *clang_extra_cccl, *clangd_dev_jammy, *cccl_dev], env: *gcc_env }
   - { features: [*python, *dood, *gcc_12, { <<: *cuda_prev_max, <<: *cccl_cuda_opts }, *clang_extra_cccl, *clangd_dev_jammy, *cccl_dev], env: *gcc_env }
   - { features: [*python, *dood, *gcc_12, { <<: *cuda_curr_min, <<: *cccl_cuda_opts }, *clang_extra_cccl, *clangd_dev_jammy, *cccl_dev], env: *gcc_env }
-  - { features: [*python, *dood, *gcc_12, { <<: *cuda_curr_max, <<: *cccl_cuda_opts }, *clang_extra_cccl, *clangd_dev_jammy, *cccl_dev], env: *gcc_env }
+  - { features: [*python, *dood, *gcc_12, { <<: *cuda_curr_max, <<: *cccl_cuda_opts }, *clang_extra_cccl, *clangd_dev_jammy, *cccl_dev, *openmpi], env: *gcc_env }
 
   # This is only used for testing python -- CTKk 12.0 + gcc13 don't play nice together, but
   # that doesn't matter for running python tests, and pinning all python jobs at 13 simplifies
@@ -133,7 +133,7 @@ include:
   - { features: [*python, *dood, *llvm_19, { <<: *cuda_curr_max, <<: *cccl_cuda_opts }, *clang_extra_cccl, *clangd_dev_jammy, *cccl_dev], env: *llvm_env }
   - { features: [*python, *dood, *llvm_20, { <<: *cuda_prev_min, <<: *cccl_cuda_opts }, *clang_extra_cccl, *clangd_dev_jammy, *cccl_dev], env: *llvm_env }
   - { features: [*python, *dood, *llvm_21, { <<: *cuda_prev_min, <<: *cccl_cuda_opts }, *clang_extra_cccl, *clangd_dev_jammy, *cccl_dev], env: *llvm_env }
-  - { features: [*python, *dood, *llvm_22, { <<: *cuda_prev_min, <<: *cccl_cuda_opts }, *clang_extra_cccl, *clangd_dev_jammy, *cccl_dev], env: *llvm_env }
+  - { features: [*python, *dood, *llvm_22, { <<: *cuda_prev_min, <<: *cccl_cuda_opts }, *clang_extra_cccl, *clangd_dev_jammy, *cccl_dev, *openmpi], env: *llvm_env }
 
 - os: "ubuntu:24.04"
   images:
@@ -150,7 +150,7 @@ include:
 
   - { features: [*python, *dood, *gcc_15, { <<: *cuda_prev_max, <<: *cccl_cuda_opts }, *clang_extra_cccl, *clangd_dev, *cccl_dev], env: *gcc_env }
   - { features: [*python, *dood, *gcc_15, { <<: *cuda_curr_min, <<: *cccl_cuda_opts }, *clang_extra_cccl, *clangd_dev, *cccl_dev], env: *gcc_env }
-  - { features: [*python, *dood, *gcc_15, { <<: *cuda_curr_max, <<: *cccl_cuda_opts }, *clang_extra_cccl, *clangd_dev, *cccl_dev], env: *gcc_env }
+  - { features: [*python, *dood, *gcc_15, { <<: *cuda_curr_max, <<: *cccl_cuda_opts }, *clang_extra_cccl, *clangd_dev, *cccl_dev, *openmpi], env: *gcc_env }
 
   - { features: [*python, *dood, *llvm_20, { <<: *cuda_prev_max, <<: *cccl_cuda_opts }, *clang_extra_cccl, *clangd_dev, *cccl_dev], env: *llvm_env }
   - { features: [*python, *dood, *llvm_20, { <<: *cuda_curr_min, <<: *cccl_cuda_opts }, *clang_extra_cccl, *clangd_dev, *cccl_dev], env: *llvm_env }
@@ -159,7 +159,7 @@ include:
   - { features: [*python, *dood, *llvm_21, { <<: *cuda_curr_min, <<: *cccl_cuda_opts }, *clang_extra_cccl, *clangd_dev, *cccl_dev], env: *llvm_env }
   - { features: [*python, *dood, *llvm_21, { <<: *cuda_curr_max, <<: *cccl_cuda_opts }, *clang_extra_cccl, *clangd_dev, *cccl_dev], env: *llvm_env }
   - { features: [*python, *dood, *llvm_22, { <<: *cuda_prev_max, <<: *cccl_cuda_opts }, *clang_extra_cccl, *clangd_dev, *cccl_dev], env: *llvm_env }
-  - { features: [*python, *dood, *llvm_22, { <<: *cuda_curr_max, <<: *cccl_cuda_opts }, *clang_extra_cccl, *clangd_dev, *cccl_dev], env: *llvm_env }
+  - { features: [*python, *dood, *llvm_22, { <<: *cuda_curr_max, <<: *cccl_cuda_opts }, *clang_extra_cccl, *clangd_dev, *cccl_dev, *openmpi], env: *llvm_env }
 
   # cuda-ext images:
   - { features: [*python, *dood, *gcc_14,  { <<: *cuda_prev_max, <<: *cccl_cuda_ext_opts }, *clang_extra_cccl, *clangd_dev, *cccl_dev], env: *gcc_env }
@@ -167,7 +167,7 @@ include:
   - { features: [*python, *dood, *gcc_14,  { <<: *cuda_curr_max, <<: *cccl_cuda_ext_opts }, *clang_extra_cccl, *clangd_dev, *cccl_dev], env: *gcc_env }
   - { features: [*python, *dood, *gcc_15,  { <<: *cuda_prev_max, <<: *cccl_cuda_ext_opts }, *clang_extra_cccl, *clangd_dev, *cccl_dev], env: *gcc_env }
   - { features: [*python, *dood, *gcc_15,  { <<: *cuda_curr_min, <<: *cccl_cuda_ext_opts }, *clang_extra_cccl, *clangd_dev, *cccl_dev], env: *gcc_env }
-  - { features: [*python, *dood, *gcc_15,  { <<: *cuda_curr_max, <<: *cccl_cuda_ext_opts }, *clang_extra_cccl, *clangd_dev, *cccl_dev], env: *gcc_env }
+  - { features: [*python, *dood, *gcc_15,  { <<: *cuda_curr_max, <<: *cccl_cuda_ext_opts }, *clang_extra_cccl, *clangd_dev, *cccl_dev, *openmpi], env: *gcc_env }
   - { features: [*python, *dood, *llvm_20, { <<: *cuda_prev_max, <<: *cccl_cuda_ext_opts }, *clang_extra_cccl, *clangd_dev, *cccl_dev], env: *llvm_env }
   - { features: [*python, *dood, *llvm_20, { <<: *cuda_curr_min, <<: *cccl_cuda_ext_opts }, *clang_extra_cccl, *clangd_dev, *cccl_dev], env: *llvm_env }
   - { features: [*python, *dood, *llvm_20, { <<: *cuda_curr_max, <<: *cccl_cuda_ext_opts }, *clang_extra_cccl, *clangd_dev, *cccl_dev], env: *llvm_env }
@@ -176,7 +176,7 @@ include:
   - { features: [*python, *dood, *llvm_21, { <<: *cuda_curr_max, <<: *cccl_cuda_ext_opts }, *clang_extra_cccl, *clangd_dev, *cccl_dev], env: *llvm_env }
   - { features: [*python, *dood, *llvm_22, { <<: *cuda_prev_max, <<: *cccl_cuda_ext_opts }, *clang_extra_cccl, *clangd_dev, *cccl_dev], env: *llvm_env }
   - { features: [*python, *dood, *llvm_22, { <<: *cuda_curr_min, <<: *cccl_cuda_ext_opts }, *clang_extra_cccl, *clangd_dev, *cccl_dev], env: *llvm_env }
-  - { features: [*python, *dood, *llvm_22, { <<: *cuda_curr_max, <<: *cccl_cuda_ext_opts }, *clang_extra_cccl, *clangd_dev, *cccl_dev], env: *llvm_env }
+  - { features: [*python, *dood, *llvm_22, { <<: *cuda_curr_max, <<: *cccl_cuda_ext_opts }, *clang_extra_cccl, *clangd_dev, *cccl_dev, *openmpi], env: *llvm_env }
 
 - os: "windows"
   images:
