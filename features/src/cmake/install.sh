@@ -26,7 +26,7 @@ fi
 echo "Installing CMake...";
 
 # Install CMake
-tar -C /usr -xzvf "/tmp/cmake_${CMAKE_VERSION}.tar.gz" --strip-components=1
+cat "/tmp/cmake_${CMAKE_VERSION}.tar.gz" | tar -C /usr -xzvf - --strip-components=1
 
 # Clean up
 # rm -rf /tmp/*;
