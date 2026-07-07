@@ -7,7 +7,7 @@ Install an up-to-date version of Git, built from source as needed. Useful for wh
 
 ```json
 "features": {
-    "ghcr.io/devcontainers/features/git:1": {}
+    "ghcr.io/rapidsai/devcontainers/features/git:1": {}
 }
 ```
 
@@ -29,4 +29,4 @@ This Feature should work on recent versions of Alpine, Debian/Ubuntu, RedHat Ent
 
 ---
 
-_Note: This file was auto-generated from the [devcontainer-feature.json](https://github.com/devcontainers/features/blob/main/src/git/devcontainer-feature.json).  Add additional notes to a `NOTES.md`._
+_Note: This file was auto-generated from the [devcontainer-feature.json](https://github.com/rapidsai/devcontainers/blob/main/features/src/git/devcontainer-feature.json).  Add additional notes to a `NOTES.md`._
