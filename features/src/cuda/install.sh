@@ -194,15 +194,7 @@ if [ "${INSTALLCUDNN:-false}" = true ]; then
 fi
 
 if "${INSTALLCUDSS:-false}"; then
-    if dpkg -s "cudss-cuda-${cuda_ver_major}" >/dev/null 2>&1; then
-        PKGS+=("cudss-cuda-${cuda_ver_major}");
-    else
-        # HACK:
-        # If cudss-cuda-${cuda_ver_major} isn't in the apt repo for the current OS
-        # version, download and install it from the prev version repo
-        prev_cuda_repo="${cuda_repo_base}/${OSNAME_PREV}/${NVARCH}";
-        PKGS+=($(get_cuda_deb "${prev_cuda_repo}" "cudss-cuda-${cuda_ver_major}"));
-    fi
+    PKGS+=("cudss-cuda-${cuda_ver_major}");
 fi
 
 if [ "${INSTALLNCCL:-false}" = true ] \

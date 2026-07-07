@@ -7,14 +7,5 @@
         "installcuDNN": true
       }
     }
-  },
-  "cuda_13-ubuntu26.04": {
-    "image": "ubuntu:26.04",
-    "features": {
-      "cuda": {
-        "version": "13.3",
-        "installcuDSS": true
-      }
-    }
   }
 }
