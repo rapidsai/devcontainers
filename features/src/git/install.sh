@@ -306,6 +306,9 @@ echo "Building..."
 cd /tmp/git-${GIT_VERSION}
 git_options=("prefix=/usr/local")
 git_options+=("sysconfdir=/etc")
+if ! command -V cargo >/dev/null 2>&1; then
+    git_options+=("NO_RUST=YesPlease")
+fi
 git_options+=("USE_LIBPCRE=YesPlease")
 if [ "${ADJUSTED_ID}" = "alpine" ]; then
     # ref. <https://github.com/alpinelinux/aports/blob/32ac93ffb642031b88ba8639fbb3abb324169dea/main/git/APKBUILD#L126>
