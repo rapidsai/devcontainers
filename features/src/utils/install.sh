@@ -49,7 +49,7 @@ python3 -m pip install "${_PIP_INSTALL_ARGS[@]}" "${_PIP_UPGRADE_ARGS[@]}" pip;
 if ! command -V yq >/dev/null 2>&1; then
     YQ_BINARY="yq";
     YQ_BINARY+="_$(uname -s | tr '[:upper:]' '[:lower:]')";
-    YQ_BINARY+="_${TARGETARCH:-$(dpkg --print-architecture | awk -F'-' '{print $NF}')}";
+    YQ_BINARY+="_${TARGETARCH:-$(uname -m | sed -e 's/x86_/amd/' -e 's/aarch/arm/')}";
 
     YQ_VERSION=4.46.1;
     find_version_from_git_tags YQ_VERSION https://github.com/mikefarah/yq;
@@ -197,27 +197,34 @@ find_non_root_user;
 if test -n "${USERNAME:+x}"; then
     USERHOME="$(bash -c "echo ~${USERNAME}")";
 
+    #
+    # Install gh-nv-gha-aws CLI extension
+    # Doesn't do `gh extension install nv-gha-runners/gh-nv-gha-aws`,
+    # because that hits GH API rate limits in CI
+    #
     if command -V gh >/dev/null 2>&1; then
-        mkdir -p -m 0755                                         \
-            "$USERHOME/.local"                                   \
-            "$USERHOME/.local/share"                             \
-            "$USERHOME/.local/share/gh"                          \
-            "$USERHOME/.local/share/gh/extensions"               \
-            "$USERHOME/.local/share/gh/extensions/gh-nv-gha-aws" \
-            ;
-        NV_GHA_AWS_VERSION=latest
-        find_version_from_git_tags NV_GHA_AWS_VERSION https://github.com/nv-gha-runners/gh-nv-gha-aws;
-        wget --no-hsts -q -O "$USERHOME/.local/share/gh/extensions/gh-nv-gha-aws/gh-nv-gha-aws" \
-            "https://github.com/nv-gha-runners/gh-nv-gha-aws/releases/download/v${NV_GHA_AWS_VERSION}/gh-nv-gha-aws_v${NV_GHA_AWS_VERSION}_linux-$(dpkg --print-architecture | awk -F'-' '{print $NF}')";
-        chmod 0755 "$USERHOME/.local/share/gh/extensions/gh-nv-gha-aws/gh-nv-gha-aws";
-        cat <<EOF >"$USERHOME/.local/share/gh/extensions/gh-nv-gha-aws/manifest.yml"
+        # Install for the container user (i.e. root) and non-root remote user (i.e. coder)
+        for DIR in "/root" "${USERHOME}"; do
+            mkdir -p -m 0755                                    \
+                "$DIR/.local"                                   \
+                "$DIR/.local/share"                             \
+                "$DIR/.local/share/gh"                          \
+                "$DIR/.local/share/gh/extensions"               \
+                "$DIR/.local/share/gh/extensions/gh-nv-gha-aws" ;
+            NV_GHA_AWS_VERSION=latest
+            find_version_from_git_tags NV_GHA_AWS_VERSION https://github.com/nv-gha-runners/gh-nv-gha-aws;
+            wget --no-hsts -q -O "$DIR/.local/share/gh/extensions/gh-nv-gha-aws/gh-nv-gha-aws" \
+                "https://github.com/nv-gha-runners/gh-nv-gha-aws/releases/download/v${NV_GHA_AWS_VERSION}/gh-nv-gha-aws_v${NV_GHA_AWS_VERSION}_linux-$(uname -m | sed -e 's/x86_/amd/' -e 's/aarch/arm/')";
+            chmod 0755 "$DIR/.local/share/gh/extensions/gh-nv-gha-aws/gh-nv-gha-aws";
+            cat <<EOF >"$DIR/.local/share/gh/extensions/gh-nv-gha-aws/manifest.yml"
 owner: nv-gha-runners
 name: gh-nv-gha-aws
 host: github.com
 tag: v${NV_GHA_AWS_VERSION}
 ispinned: false
-path: $USERHOME/.local/share/gh/extensions/gh-nv-gha-aws/gh-nv-gha-aws
+path: $DIR/.local/share/gh/extensions/gh-nv-gha-aws/gh-nv-gha-aws
 EOF
+        done
     fi
 
     # Add user to the crontab group

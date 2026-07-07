@@ -2,7 +2,7 @@
 set -e
 
 # Intel only publishes its compilers for x86
-if [[ "$(uname -p)" != "x86_64" ]]; then
+if [[ "$(uname -m)" != "x86_64" ]]; then
     exit 0;
 fi
 

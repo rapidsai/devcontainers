@@ -10,19 +10,24 @@ on:
       args:
         type: string
         required: true
+      scenarios:
+        type: string
+        default: '[""]'
+        required: false
 
 jobs:
 
   test:
-    name: ${{ format(inputs.name, matrix.arch) }}
+    name: ${{ format(inputs.name, matrix.arch, matrix.scenario || '') }}
     runs-on: ${{ fromJSON(github.repository != 'rapidsai/devcontainers' && '"ubuntu-latest"' || format('"linux-{0}-cpu4"', matrix.arch)) }}
     strategy:
       fail-fast: false
       matrix:
         arch: [amd64, arm64]
+        scenario: ${{ fromJSON(inputs.scenarios || '[""]') }}
     steps:
       - name: Checkout ${{ github.repository }}
-        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
+        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
         with:
           persist-credentials: false
 
@@ -36,9 +41,10 @@ jobs:
         uses: ./.github/actions/build-and-test-feature
         with:
           args: "${{ inputs.args }}"
+          scenario: "${{ matrix.scenario }}"
           gh_token: "${{ secrets.GIST_REPO_READ_ORG_GITHUB_TOKEN }}"
           aws_idp_url: ${{ secrets.GIST_REPO_READ_ORG_GITHUB_TOKEN && 'https://token.rapids.nvidia.com' || '' }}
           aws_role_arn: "${{ secrets.GIST_REPO_READ_ORG_GITHUB_TOKEN && 'arn:aws:iam::279114543810:role/rapids-token-sccache-devs' || '' }}"
           rw_sccache_bucket: "${{ secrets.GIST_REPO_READ_ORG_GITHUB_TOKEN && 'rapids-sccache-devs' || '' }}"
           rw_sccache_region: "${{ vars.AWS_REGION }}"
-          sccache_dist_scheduler_url: "sccache.rapids.nvidia.com"
+          sccache_dist_scheduler_url: "https://sccache.rapids.nvidia.com"

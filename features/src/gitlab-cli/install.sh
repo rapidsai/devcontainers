@@ -22,7 +22,7 @@ gitlab_cli_file_name() {
 
     # If v1.47.0 or newer, use the new URL scheme
     if echo -e "${CLI_VERSION}\n1.47.0" | sort -V | head -n1 | grep -q '1.47.0'; then
-        arch="${arch:-$(dpkg --print-architecture | awk -F'-' '{print $NF}')}";
+        arch="${arch:-$(uname -m | sed -e 's/x86_/amd/' -e 's/aarch/arm/')}";
         os="${os,,}";
     else
         arch="${arch:-$(uname -m)}";

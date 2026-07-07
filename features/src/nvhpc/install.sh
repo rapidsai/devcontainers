@@ -36,7 +36,7 @@ chmod 0644 /etc/apt/trusted.gpg.d/*.gpg || true;
 echo "Adding NVHPC SDK apt repository...";
 
 # Install NVHPC-SDK apt repository
-apt-add-repository -y "deb https://developer.download.nvidia.com/hpc-sdk/ubuntu/$(dpkg-architecture -q DEB_BUILD_ARCH) /";
+apt-add-repository -y "deb https://developer.download.nvidia.com/hpc-sdk/ubuntu/$(uname -m | sed -e 's/x86_/amd/' -e 's/aarch/arm/') /";
 
 echo "Installing NVHPC SDK...";
 
@@ -59,7 +59,7 @@ export NVHPC="/opt/nvidia/hpc_sdk";
 export NVHPC_VERSION="${NVHPC_VERSION}";
 export NVHPC_VERSION_MAJOR="${NVHPC_VERSION_MAJOR}";
 export NVHPC_VERSION_MINOR="${NVHPC_VERSION_MINOR}";
-export NVHPC_ROOT="${NVHPC}/Linux_$(uname -p)/${NVHPC_VERSION}";
+export NVHPC_ROOT="${NVHPC}/Linux_$(uname -m)/${NVHPC_VERSION}";
 export NVHPC_CUDA_HOME="$(dirname "$(find "$NVHPC_ROOT/cuda" -type f -name 'version.json' | head -n1)")";
 export NVHPC_MODULEFILE_DIRS="($(find "${NVHPC}/" -type d -name modulefiles -exec echo -n \"{}\"\  \;))";
 
