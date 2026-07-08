@@ -22,7 +22,7 @@
       "installZsh": "true",
       "upgradePackages": "true"
     },
-    "./features/src/git": {
+    "ghcr.io/devcontainers/features/git:1": {
       "ppa": "true",
       "version": "latest"
     },
@@ -42,7 +42,7 @@
   },
   "overrideFeatureInstallOrder": [
     "ghcr.io/devcontainers/features/common-utils",
-    "./features/src/git",
+    "ghcr.io/devcontainers/features/git",
     "ghcr.io/devcontainers/features/git-lfs",
     "ghcr.io/devcontainers/features/github-cli",
     "./features/src/gitlab-cli",
