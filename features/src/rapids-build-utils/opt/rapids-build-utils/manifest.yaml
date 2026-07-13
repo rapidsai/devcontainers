@@ -152,7 +152,7 @@ repos:
         args: {install: *rapids_build_backend_args}
   - name: raft
     path: raft
-    git: {!!merge <<: *git_defaults, repo: raft}
+    git: {!!merge <<: *git_defaults, repo: raft, upstream: NVIDIA}
     cpp:
       - name: raft
         sub_dir: cpp
@@ -178,7 +178,7 @@ repos:
         test: ci/run_raft_dask_pytests.sh
   - name: cuvs
     path: cuvs
-    git: {!!merge <<: *git_defaults, repo: cuvs}
+    git: {!!merge <<: *git_defaults, repo: cuvs, upstream: NVIDIA}
     cpp:
       - name: cuvs
         sub_dir: cpp
