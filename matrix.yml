@@ -47,7 +47,10 @@ x-clangd-dev-bionic: &clangd_dev_bionic { name: "llvm", version: "19", packages:
 x-clangd-dev-jammy: &clangd_dev_jammy { name: "llvm", version: "dev", packages: "clangd", hide: true }
 x-clangd-dev: &clangd_dev { name: "llvm", version: "dev", packages: "clangd", hide: true }
 # Clang utils always available:
-x-clang-extra-cccl: &clang_extra_cccl { name: "llvm", version: "21", packages: "clang-format clang-tidy llvm-tools", hide: true }
+x-clang-extra-cccl: &clang_extra_cccl { name: "llvm", version: "22", packages: "clang-format clang-tidy llvm-tools", hide: true }
+# apt.llvm.org's focal (20.04) arm64 repo is missing clang-format/clang-tidy/llvm-tools for LLVM 22,
+# so pin the CCCL clang utils to 21 (fully published for focal on both arches) on 20.04.
+x-clang-extra-cccl-focal: &clang_extra_cccl_focal { name: "llvm", version: "21", packages: "clang-format clang-tidy llvm-tools", hide: true }
 x-clang-extra-rapids: &clang_extra_rapids { name: "llvm", version: "21", packages: "clang-format", hide: true }
 # Docker outside of Docker used to build python wheels:
 x-dood: &dood { name: "ghcr.io/devcontainers/features/docker-outside-of-docker:1", moby: false, hide: true}
@@ -83,17 +86,17 @@ include:
 
 - os: "ubuntu:20.04"
   images:
-  - { features: [*python, *dood, *gcc_7,   *clang_extra_cccl, *clangd_dev_bionic, { <<: *cuda_prev_min, <<: *cccl_cuda_opts }, *cccl_dev], env: *gcc_env }
-  - { features: [*python, *dood, *gcc_7,   *clang_extra_cccl, *clangd_dev_bionic, { <<: *cuda_prev_max, <<: *cccl_cuda_opts }, *cccl_dev], env: *gcc_env }
-  - { features: [*python, *dood, *gcc_8,   *clang_extra_cccl, *clangd_dev_bionic, { <<: *cuda_prev_min, <<: *cccl_cuda_opts }, *cccl_dev], env: *gcc_env }
-  - { features: [*python, *dood, *gcc_8,   *clang_extra_cccl, *clangd_dev_bionic, { <<: *cuda_prev_max, <<: *cccl_cuda_opts }, *cccl_dev], env: *gcc_env }
-  - { features: [*python, *dood, *gcc_9,   *clang_extra_cccl, *clangd_dev_bionic, { <<: *cuda_prev_min, <<: *cccl_cuda_opts }, *cccl_dev], env: *gcc_env }
-  - { features: [*python, *dood, *gcc_9,   *clang_extra_cccl, *clangd_dev_bionic, { <<: *cuda_prev_max, <<: *cccl_cuda_opts }, *cccl_dev], env: *gcc_env }
-  - { features: [*python, *dood, *gcc_10,  *clang_extra_cccl, *clangd_dev_bionic, { <<: *cuda_prev_min, <<: *cccl_cuda_opts }, *cccl_dev], env: *gcc_env }
-  - { features: [*python, *dood, *gcc_10,  *clang_extra_cccl, *clangd_dev_bionic, { <<: *cuda_prev_max, <<: *cccl_cuda_opts }, *cccl_dev], env: *gcc_env }
+  - { features: [*python, *dood, *gcc_7,   *clang_extra_cccl_focal, *clangd_dev_bionic, { <<: *cuda_prev_min, <<: *cccl_cuda_opts }, *cccl_dev], env: *gcc_env }
+  - { features: [*python, *dood, *gcc_7,   *clang_extra_cccl_focal, *clangd_dev_bionic, { <<: *cuda_prev_max, <<: *cccl_cuda_opts }, *cccl_dev], env: *gcc_env }
+  - { features: [*python, *dood, *gcc_8,   *clang_extra_cccl_focal, *clangd_dev_bionic, { <<: *cuda_prev_min, <<: *cccl_cuda_opts }, *cccl_dev], env: *gcc_env }
+  - { features: [*python, *dood, *gcc_8,   *clang_extra_cccl_focal, *clangd_dev_bionic, { <<: *cuda_prev_max, <<: *cccl_cuda_opts }, *cccl_dev], env: *gcc_env }
+  - { features: [*python, *dood, *gcc_9,   *clang_extra_cccl_focal, *clangd_dev_bionic, { <<: *cuda_prev_min, <<: *cccl_cuda_opts }, *cccl_dev], env: *gcc_env }
+  - { features: [*python, *dood, *gcc_9,   *clang_extra_cccl_focal, *clangd_dev_bionic, { <<: *cuda_prev_max, <<: *cccl_cuda_opts }, *cccl_dev], env: *gcc_env }
+  - { features: [*python, *dood, *gcc_10,  *clang_extra_cccl_focal, *clangd_dev_bionic, { <<: *cuda_prev_min, <<: *cccl_cuda_opts }, *cccl_dev], env: *gcc_env }
+  - { features: [*python, *dood, *gcc_10,  *clang_extra_cccl_focal, *clangd_dev_bionic, { <<: *cuda_prev_max, <<: *cccl_cuda_opts }, *cccl_dev], env: *gcc_env }
 
-  - { features: [*python, *dood, *llvm_14, *clang_extra_cccl, *clangd_dev_bionic, { <<: *cuda_prev_min, <<: *cccl_cuda_opts }, *cccl_dev], env: *llvm_env }
-  - { features: [*python, *dood, *llvm_14, *clang_extra_cccl, *clangd_dev_bionic, { <<: *cuda_prev_max, <<: *cccl_cuda_opts }, *cccl_dev], env: *llvm_env }
+  - { features: [*python, *dood, *llvm_14, *clang_extra_cccl_focal, *clangd_dev_bionic, { <<: *cuda_prev_min, <<: *cccl_cuda_opts }, *cccl_dev], env: *llvm_env }
+  - { features: [*python, *dood, *llvm_14, *clang_extra_cccl_focal, *clangd_dev_bionic, { <<: *cuda_prev_max, <<: *cccl_cuda_opts }, *cccl_dev], env: *llvm_env }
 
 - os: "ubuntu:22.04"
   images:
