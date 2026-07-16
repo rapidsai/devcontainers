@@ -86,6 +86,12 @@ append_to_all_bashrcs "$(cat .bashrc | envsubst '$LIT_VERSION $DOXYGEN_VERSION $
 # export envvars in /etc/profile.d
 add_etc_profile_d_script cccl-dev "$(cat .bashrc | envsubst '$LIT_VERSION $DOXYGEN_VERSION $USERHOME')";
 
+cccl_dir="${USERHOME}/cccl"
+# install global lldbinit and gdbinit, append in case there is a pre-existing one
+# installed by the OS or packages
+cat .lldbinit | sed -e "s%@CCCL_DIR@%${cccl_dir}%" >> "${USERHOME}/.lldbinit";
+cat .gdbinit | sed -e "s%@CCCL_DIR@%${cccl_dir}%" >> "${USERHOME}/.gdbinit";
+
 # Clean up
 # rm -rf /tmp/*;
 rm -rf /var/tmp/*;
