@@ -5,7 +5,10 @@ if  [ -f "${USERHOME}/.local/share/venvs/cccl/bin/activate" ] \
  && [ -z "${VIRTUAL_ENV:-}" -o "${VIRTUAL_ENV}" != "${USERHOME}/.local/share/venvs/cccl" ]; then
     . "${USERHOME}/.local/share/venvs/cccl/bin/activate";
 elif [ -n "${VIRTUAL_ENV_PROMPT:-}" ]; then
-    if ! echo "${PS1:-}" | grep -qF "${VIRTUAL_ENV_PROMPT}"; then
+    if ! echo "${VIRTUAL_ENV_PROMPT}" | grep -qE "(.*) "  \
+    && ! echo "${PS1:-}" | grep -qF "(${VIRTUAL_ENV_PROMPT}) "; then
+        export PS1="(${VIRTUAL_ENV_PROMPT}) ${PS1:-}";
+    elif ! echo "${PS1:-}" | grep -qF "${VIRTUAL_ENV_PROMPT}"; then
         export PS1="${VIRTUAL_ENV_PROMPT}${PS1:-}";
     fi
 fi
