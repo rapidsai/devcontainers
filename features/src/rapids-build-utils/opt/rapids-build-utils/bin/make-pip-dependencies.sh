@@ -27,16 +27,45 @@
 . rapids-generate-docstring;
 
 _generate_requirements_txt() {
-    if rapids-dependency-file-generator "$@" 2>/dev/null \
-     | grep -v '^#' 2>/dev/null \
-     | tee "$file" 1>/dev/null; then
-        echo "$file"
+    local file="$1";
+    local status;
+    shift;
+
+    if rapids-dependency-file-generator "$@" > "${file}.generated"; then
+        if sed '/^#/d' "${file}.generated" > "$file"; then
+            return 0;
+        else
+            status=$?;
+            echo "Failed to filter generated requirements for ${file##*/}" 1>&2;
+            return "${status}";
+        fi
+    else
+        status=$?;
+        echo "Failed to generate requirements for ${file##*/}" 1>&2;
+        return "${status}";
     fi
+}
+
+_list_contains() {
+    local requested_value="$1";
+    shift;
+
+    local value;
+    for value in "$@"; do
+        if test "${requested_value}" == "${value}"; then
+            return 0;
+        fi
+    done
+
+    return 1;
 }
 
 _generate_requirements_txts() {
     local i;
     local j;
+    local generation_failed=0;
+    local -a generated_files=();
+    local -a generation_pids=();
 
     for ((i=0; i < ${repos_length:-0}; i+=1)); do
 
@@ -49,6 +78,20 @@ _generate_requirements_txts() {
         if test -n "${name:+x}" \
         && test -n "${path:+x}" \
         && test -f ~/"${path}/dependencies.yaml"; then
+
+            local config=~/"${path}/dependencies.yaml";
+            local available_file_keys_output;
+            local -a available_file_keys=();
+
+            if available_file_keys_output="$(yq -r '.files | keys | .[]' "${config}")"; then
+                if test -n "${available_file_keys_output:+x}"; then
+                    readarray -t available_file_keys <<< "${available_file_keys_output}";
+                fi
+            else
+                echo "Failed to read dependency file keys from ${config}" 1>&2;
+                generation_failed=1;
+                continue;
+            fi
 
             echo "Generating ${name}'s repo requirements.txt" 1>&2;
 
@@ -71,13 +114,20 @@ _generate_requirements_txts() {
             local keyi;
 
             for ((keyi=0; keyi < ${#keys[@]}; keyi+=1)); do
+                if ! _list_contains "${keys[$keyi]}" "${available_file_keys[@]}"; then
+                    continue;
+                fi
                 local file="${tmpdir}/${name}.${keys[$keyi]}.requirements.txt";
-                pip_reqs_txts+=("${file}");
-                _generate_requirements_txt                 \
+                if _list_contains "${file}" "${generated_files[@]}"; then
+                    continue;
+                fi
+                generated_files+=("${file}");
+                _generate_requirements_txt "${file}"       \
                     --file-key "${keys[$keyi]}"            \
                     --output requirements                  \
-                    --config ~/"${path}/dependencies.yaml" \
+                    --config "${config}"                   \
                     --matrix "${matrix_selectors}"         &
+                generation_pids+=("$!");
             done
 
             local cpp_length="${repo}_cpp_length";
@@ -92,13 +142,20 @@ _generate_requirements_txts() {
                 local keyi;
 
                 for ((keyi=0; keyi < ${#keys[@]}; keyi+=1)); do
+                    if ! _list_contains "${keys[$keyi]}" "${available_file_keys[@]}"; then
+                        continue;
+                    fi
                     local file="${tmpdir}/${name}.${cpp_name}.${keys[$keyi]}.requirements.txt";
-                    pip_reqs_txts+=("${file}");
-                    _generate_requirements_txt                 \
+                    if _list_contains "${file}" "${generated_files[@]}"; then
+                        continue;
+                    fi
+                    generated_files+=("${file}");
+                    _generate_requirements_txt "${file}"       \
                         --file-key "${keys[$keyi]}"            \
                         --output requirements                  \
-                        --config ~/"${path}/dependencies.yaml" \
+                        --config "${config}"                   \
                         --matrix "${matrix_selectors}"         &
+                    generation_pids+=("$!");
                 done
             done
 
@@ -114,15 +171,41 @@ _generate_requirements_txts() {
                 local keyi;
 
                 for ((keyi=0; keyi < ${#keys[@]}; keyi+=1)); do
+                    if ! _list_contains "${keys[$keyi]}" "${available_file_keys[@]}"; then
+                        continue;
+                    fi
                     local file="${tmpdir}/${name}.${py_name}.${keys[$keyi]}.requirements.txt";
-                    pip_reqs_txts+=("${file}");
-                    _generate_requirements_txt                 \
+                    if _list_contains "${file}" "${generated_files[@]}"; then
+                        continue;
+                    fi
+                    generated_files+=("${file}");
+                    _generate_requirements_txt "${file}"       \
                         --file-key "${keys[$keyi]}"            \
                         --output requirements                  \
-                        --config ~/"${path}/dependencies.yaml" \
+                        --config "${config}"                   \
                         --matrix "${matrix_selectors}"         &
+                    generation_pids+=("$!");
                 done
             done
+        fi
+    done
+
+    local pid;
+    for pid in "${generation_pids[@]}"; do
+        if ! wait "${pid}"; then
+            generation_failed=1;
+        fi
+    done
+
+    if test "${generation_failed}" -ne 0; then
+        echo "Failed to generate one or more requirements files" 1>&2;
+        return 1;
+    fi
+
+    local file;
+    for file in "${generated_files[@]}"; do
+        if test -s "${file}"; then
+            pip_reqs_txts+=("${file}");
         fi
     done
 }
@@ -188,7 +271,10 @@ _make_pip_dependencies() {
 
     eval "$(rapids-list-repos "${OPTS[@]}")";
 
-    readarray -t pip_reqs_txts < <(_generate_requirements_txts);
+    local -a pip_reqs_txts=();
+    if ! _generate_requirements_txts; then
+        return 1;
+    fi
 
     if test ${#requirement[@]} -gt 0 || test ${#pip_reqs_txts[@]} -gt 0; then
 
