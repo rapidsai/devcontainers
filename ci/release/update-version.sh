@@ -103,6 +103,7 @@ sed_runner "s|features/\([[:alnum:]]\+\):[[:digit:]]\+\.[[:digit:]]\+\"|features
 
 for file in $(find .devcontainer -name devcontainer.json); do
   sed_runner "s|rapidsai/devcontainers:.*-cpp|rapidsai/devcontainers:${NEXT_SHORT_TAG}-cpp|g" "$file"
+  sed_runner "s|ghcr.io/rapidsai/devcontainers/devcontainer:\([0-9\.]*\)|ghcr.io/rapidsai/devcontainers/devcontainer:${NEXT_SHORT_TAG}|g" "$file"
   sed_runner "s@rapids-\${localWorkspaceFolderBasename}-[0-9.]*@rapids-\${localWorkspaceFolderBasename}-${NEXT_SHORT_TAG}@g" "${file}"
 done
 
