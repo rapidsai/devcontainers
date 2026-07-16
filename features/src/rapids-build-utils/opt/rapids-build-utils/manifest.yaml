@@ -1,6 +1,6 @@
 x-git-defaults: &git_defaults
   host: github
-  tag: main
+  tag: release/26.08
   upstream: rapidsai
 x-rapids-build-backend-args: &rapids_build_backend_args |
   --config-settings "skbuild.strict-config=false"
@@ -26,7 +26,7 @@ repos:
         test: ci/run_pytests.sh
   - name: ucxx
     path: ucxx
-    git: {!!merge <<: *git_defaults, repo: ucxx, tag: main}
+    git: {!!merge <<: *git_defaults, repo: ucxx, tag: release/0.51}
     cpp:
       - name: ucxx
         sub_dir: cpp
