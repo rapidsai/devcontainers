@@ -12,6 +12,8 @@ UPDATE_RC="${UPDATERC:-"true"}";
 UPDATE_RUST="${UPDATERUST:-"false"}";
 RUST_VERSION="${VERSION:-"latest"}";
 RUSTUP_PROFILE="${PROFILE:-"minimal"}";
+RUSTUP_TARGETS="${TARGETS:-""}"
+IFS=',' read -ra components <<< "${COMPONENTS:-rust-analyzer,rust-src,rustfmt,clippy}"
 
 # Ensure we're in this feature's directory during build
 cd "$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )";
@@ -128,9 +130,27 @@ if [ "${UPDATE_RUST}" = "true" ]; then
     rustup update 2>&1;
 fi
 
-echo "Installing common Rust dependencies...";
+# Install Rust components
+echo "Installing Rust components..."
+for component in "${components[@]}"; do
+    # Trim leading and trailing whitespace
+    component="${component#"${component%%[![:space:]]*}"}" && component="${component%"${component##*[![:space:]]}"}"
+    if [ -n "${component}" ]; then
+        echo "Installing Rust component: ${component}"
+        if ! rustup component add "${component}" 2>&1; then
+            echo "Warning: Failed to install component '${component}'. It may not be available for this toolchain." >&2
+            exit 1
+        fi
+    fi
+done
 
-rustup component add rust-analyzer rust-src rustfmt clippy 2>&1;
+if [ -n "${RUSTUP_TARGETS}" ]; then
+    IFS=',' read -ra targets <<< "${RUSTUP_TARGETS}"
+    for target in "${targets[@]}"; do
+        echo "Installing additional Rust target $target"
+        rustup target add "$target" 2>&1
+    done
+fi
 
 # Add CARGO_HOME, RUSTUP_HOME and bin directory into bashrc/zshrc files (unless disabled)
 if [ "${UPDATE_RC}" = "true" ]; then
