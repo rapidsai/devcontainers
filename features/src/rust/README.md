@@ -17,6 +17,8 @@ Installs Rust, common Rust utilities, and their required dependencies
 |-----|-----|-----|-----|
 | version | Select or enter a version of Rust to install. | string | latest |
 | profile | Select a rustup install profile. | string | minimal |
+| targets | Optional comma separated list of additional Rust targets to install. | string | - |
+| components | Optional, comma separated list of Rust components to be installed | string | rust-analyzer,rust-src,rustfmt,clippy |
 | updateRc | - | boolean | true |
 | updateRust | - | boolean | false |
 
