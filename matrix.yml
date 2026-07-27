@@ -20,15 +20,15 @@ x-gcc-rapids: &gcc_rapids { name: "gcc", version: "14", hide: true }
 x-gcc-env-rapids: &gcc_env_rapids { CC: "gcc", CXX: "g++", CUDAHOSTCXX: "g++", PYTHON_VERSION: "3.14" }
 
 # CUDA 12.0 support stops at clang 14.
-x-llvm-14: &llvm_14 { name: "llvm", version: "14" }
-x-llvm-15: &llvm_15 { name: "llvm", version: "15" }
-x-llvm-16: &llvm_16 { name: "llvm", version: "16" }
-x-llvm-17: &llvm_17 { name: "llvm", version: "17" }
-x-llvm-18: &llvm_18 { name: "llvm", version: "18" }
-x-llvm-19: &llvm_19 { name: "llvm", version: "19" }
-x-llvm-20: &llvm_20 { name: "llvm", version: "20" }
-x-llvm-21: &llvm_21 { name: "llvm", version: "21" }
-x-llvm-22: &llvm_22 { name: "llvm", version: "22"}
+x-llvm-14: &llvm_14 { name: "llvm", version: "14", setLLVMVersion: true }
+x-llvm-15: &llvm_15 { name: "llvm", version: "15", setLLVMVersion: true }
+x-llvm-16: &llvm_16 { name: "llvm", version: "16", setLLVMVersion: true }
+x-llvm-17: &llvm_17 { name: "llvm", version: "17", setLLVMVersion: true }
+x-llvm-18: &llvm_18 { name: "llvm", version: "18", setLLVMVersion: true }
+x-llvm-19: &llvm_19 { name: "llvm", version: "19", setLLVMVersion: true }
+x-llvm-20: &llvm_20 { name: "llvm", version: "20", setLLVMVersion: true }
+x-llvm-21: &llvm_21 { name: "llvm", version: "21", setLLVMVersion: true }
+x-llvm-22: &llvm_22 { name: "llvm", version: "22", setLLVMVersion: true }
 x-llvm-env: &llvm_env { CC: "clang", CXX: "clang++", CUDAHOSTCXX: "clang++" }
 
 x-nvhpc-prev: &nvhpc_prev { name: "nvhpc", version: "26.3" }
