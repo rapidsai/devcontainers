@@ -8,7 +8,7 @@ cd "$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )";
 . ./common/install.sh;
 
 LLVM_VERSION="${VERSION:-}";
-SET_LLVM_VERSION="${SETLLVMVERSION:-false}";
+SET_LLVM_VERSION="${SETLLVMVERSION:-true}";
 export LLVM_REPO_VERSION_OVERRIDE="${REPOVERSIONOVERRIDE:-}";
 
 check_packages                  \
@@ -69,7 +69,7 @@ for ((i=0; i < ${#bins[@]}; i+=1)); do
     fi
 done
 
-if "${SET_LLVM_VERSION:-false}"; then
+if "${SET_LLVM_VERSION:-true}"; then
     export LLVM_VERSION="${LLVM_VERSION}";
 
     # export envvars in bashrc files
