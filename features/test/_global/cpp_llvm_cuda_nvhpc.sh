@@ -55,7 +55,7 @@ ls -all "$NVHPC_ROOT"/ 1>&2;
 
 module list 1>&2;
 
-check "version" bash -c "echo '$NVHPC_VERSION' | grep '24.5'";
+check "version" bash -c "echo '$NVHPC_VERSION' | grep '26.5'";
 check "installed" stat /opt/nvidia/hpc_sdk;
 check "nvc++ exists and is on path" which nvc++;
 

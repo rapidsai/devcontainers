@@ -8,6 +8,7 @@ cd "$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )";
 . ./common/install.sh;
 
 LLVM_VERSION="${VERSION:-}";
+SET_LLVM_VERSION="${SETLLVMVERSION:-true}";
 export LLVM_REPO_VERSION_OVERRIDE="${REPOVERSIONOVERRIDE:-}";
 
 check_packages                  \
@@ -68,13 +69,15 @@ for ((i=0; i < ${#bins[@]}; i+=1)); do
     fi
 done
 
-export LLVM_VERSION="${LLVM_VERSION}";
+if "${SET_LLVM_VERSION:-true}"; then
+    export LLVM_VERSION="${LLVM_VERSION}";
 
-# export envvars in bashrc files
-append_to_etc_bashrc "$(cat .bashrc | envsubst)";
-append_to_all_bashrcs "$(cat .bashrc | envsubst)";
-# export envvars in /etc/profile.d
-add_etc_profile_d_script llvm "$(cat .bashrc | envsubst)";
+    # export envvars in bashrc files
+    append_to_etc_bashrc "$(cat .bashrc | envsubst)";
+    append_to_all_bashrcs "$(cat .bashrc | envsubst)";
+    # export envvars in /etc/profile.d
+    add_etc_profile_d_script llvm "$(cat .bashrc | envsubst)";
+fi
 
 # Clean up
 # rm -rf /tmp/*;
