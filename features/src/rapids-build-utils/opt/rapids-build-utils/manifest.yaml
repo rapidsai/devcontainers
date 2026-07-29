@@ -5,7 +5,7 @@ x-git-defaults: &git_defaults
 x-rapids-build-backend-args: &rapids_build_backend_args |
   --config-settings "skbuild.strict-config=false"
   --config-settings "rapidsai.disable-cuda=true"
-  --config-settings "rapidsai.matrix-entry=cuda=${CUDA_VERSION_MAJOR_MINOR};use_cuda_wheels=true;cuda_suffixed=false"
+  --config-settings "rapidsai.matrix-entry=cuda=${CUDA_VERSION_MAJOR_MINOR};use_cuda_wheels=false"
 repos:
   - name: rmm
     path: rmm
