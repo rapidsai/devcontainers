@@ -44,7 +44,7 @@ x-openmpi: &openmpi { name: "openmpi", version: "5.0.10" }
 
 x-cccl-dev: &cccl_dev { name: "cccl-dev", hide: true, doxygenVersion: "1.9.6" }
 x-clangd-dev-bionic: &clangd_dev_bionic { name: "llvm", version: "19", packages: "clangd", setLLVMVersion: false, hide: true }
-x-clangd-dev-jammy: &clangd_dev_jammy { name: "llvm", version: "23", packages: "clangd", setLLVMVersion: false, hide: true }
+x-clangd-dev-jammy: &clangd_dev_jammy { name: "llvm", version: "22", packages: "clangd", setLLVMVersion: false, hide: true }
 x-clangd-dev: &clangd_dev { name: "llvm", version: "23", packages: "clangd", setLLVMVersion: false, hide: true }
 # Clang utils always available:
 x-clang-extra-cccl: &clang_extra_cccl { name: "llvm", version: "22", packages: "clang-format clang-tidy llvm-tools", setLLVMVersion: false, hide: true }
