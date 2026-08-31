@@ -39,6 +39,8 @@ jobs:
       - name: Checkout ${{ github.repository }}
         uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
         with:
+          repository: ${{ job.workflow_repository }}
+          ref: ${{ job.workflow_sha }}
           fetch-depth: 0
           persist-credentials: false
 
@@ -68,10 +70,19 @@ jobs:
           EOF
 
       - name: Login to Docker Hub
+        if: ${{ ! startsWith(inputs.repo, 'ghcr.io/') }}
         uses: docker/login-action@4907a6ddec9925e35a0a9e82d7399ccc52663121 # v4
         with:
           username: ${{ secrets.GPUCIBOT_DOCKERHUB_USER || vars.DOCKERHUB_USER }}
           password: ${{ secrets.GPUCIBOT_DOCKERHUB_TOKEN || secrets.DOCKERHUB_TOKEN }}
+
+      - name: Login to GHCR
+        if: ${{ startsWith(inputs.repo, 'ghcr.io/') }}
+        uses: docker/login-action@4907a6ddec9925e35a0a9e82d7399ccc52663121 # v4
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ github.token }}
 
       - name: Build ${{ steps.info.outputs.tag }}
         uses: ./.github/actions/build-windows-image
