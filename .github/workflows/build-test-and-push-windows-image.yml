@@ -69,20 +69,12 @@ jobs:
           tag=${tag_without_os}-${INPUT_OS}${MATRIX_EDITION}
           EOF
 
-      - name: Login to Docker Hub
-        if: ${{ ! startsWith(inputs.repo, 'ghcr.io/') }}
+      - name: Login to container registry
         uses: docker/login-action@4907a6ddec9925e35a0a9e82d7399ccc52663121 # v4
         with:
-          username: ${{ secrets.GPUCIBOT_DOCKERHUB_USER || vars.DOCKERHUB_USER }}
-          password: ${{ secrets.GPUCIBOT_DOCKERHUB_TOKEN || secrets.DOCKERHUB_TOKEN }}
-
-      - name: Login to GHCR
-        if: ${{ startsWith(inputs.repo, 'ghcr.io/') }}
-        uses: docker/login-action@4907a6ddec9925e35a0a9e82d7399ccc52663121 # v4
-        with:
-          registry: ghcr.io
-          username: ${{ github.actor }}
-          password: ${{ github.token }}
+          registry: ${{ case(startsWith(inputs.repo, 'ghcr.io/'), 'ghcr.io', 'docker.io') }}
+          username: ${{ case(startsWith(inputs.repo, 'ghcr.io/'), github.actor, secrets.GPUCIBOT_DOCKERHUB_USER || vars.DOCKERHUB_USER) }}
+          password: ${{ case(startsWith(inputs.repo, 'ghcr.io/'), github.token, secrets.GPUCIBOT_DOCKERHUB_TOKEN || secrets.DOCKERHUB_TOKEN) }}
 
       - name: Build ${{ steps.info.outputs.tag }}
         uses: ./.github/actions/build-windows-image
