@@ -69,6 +69,16 @@ jobs:
           tag=${tag_without_os}-${INPUT_OS}${MATRIX_EDITION}
           EOF
 
+      # https://github.com/actions/runner-images/issues/13729
+      - if: runner.environment != 'self-hosted'
+        name: Ensure Docker Engine is running
+        shell: powershell
+        run: |
+          $dockerState = Get-Service -Name docker
+          if ($dockerState.Status -ne 'Running') {
+            Start-Service -Name docker
+          }
+
       - name: Login to container registry
         uses: docker/login-action@4907a6ddec9925e35a0a9e82d7399ccc52663121 # v4
         with:
