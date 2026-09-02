@@ -182,7 +182,7 @@ repos:
     cpp:
       - name: cuvs
         sub_dir: cpp
-        depends: [rmm, raft]
+        depends: [kvikio, rmm, raft]
         parallelism:
           max_device_obj_memory_usage: 3Gi
         args: {cmake: -DBUILD_C_LIBRARY=ON}
