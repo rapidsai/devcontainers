@@ -43,6 +43,7 @@ $cudaComponents = @(
     "nvrtc_$mmVersionTag",
     "nvrtc_dev_$mmVersionTag",
     "nvtx_$mmVersionTag",
+    "tileiras_$mmVersionTag",
     "visual_studio_integration_$mmVersionTag"
 )
 
