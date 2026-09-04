@@ -61,7 +61,7 @@ if ([int]$major -ge 13) {
 
 # The following components first appeared in 13.3.
 if ([int]$major -ge 13 -and [int]$minor -ge 3) {
-    $cudaComponents += "tileiras_$mmVersionTag",
+    $cudaComponents += "tileiras_$mmVersionTag"
 }
 
 Write-Output "Installing CUDA Components: $($cudaComponents -join ', ')"
