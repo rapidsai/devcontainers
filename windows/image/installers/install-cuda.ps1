@@ -43,7 +43,6 @@ $cudaComponents = @(
     "nvrtc_$mmVersionTag",
     "nvrtc_dev_$mmVersionTag",
     "nvtx_$mmVersionTag",
-    "tileiras_$mmVersionTag",
     "visual_studio_integration_$mmVersionTag"
 )
 
@@ -58,6 +57,11 @@ if ([int]$major -ge 13) {
     $cudaComponents += "nvfatbin_$mmVersionTag"
     $cudaComponents += "nvvm_$mmVersionTag"
     $cudaComponents += "nvptxcompiler_$mmVersionTag"
+}
+
+# The following components first appeared in 13.3.
+if ([int]$major -ge 13 -and [int]$minor -ge 3) {
+    $cudaComponents += "tileiras_$mmVersionTag",
 }
 
 Write-Output "Installing CUDA Components: $($cudaComponents -join ', ')"
