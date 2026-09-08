@@ -59,6 +59,11 @@ if ([int]$major -ge 13) {
     $cudaComponents += "nvptxcompiler_$mmVersionTag"
 }
 
+# The following components first appeared in 13.3.
+if ([int]$major -ge 13 -and [int]$minor -ge 3) {
+    $cudaComponents += "tileiras_$mmVersionTag"
+}
+
 Write-Output "Installing CUDA Components: $($cudaComponents -join ', ')"
 
 Invoke-WebRequest -Uri "$cudaVersionUrl" -OutFile "./cuda_network.exe" -UseBasicParsing
