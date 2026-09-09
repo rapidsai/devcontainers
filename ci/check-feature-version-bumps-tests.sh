@@ -104,6 +104,16 @@ expect_auto_bump() {
   fi
 }
 
+expect_success_with_auto_bump() {
+  local name="$1"
+  shift
+  if ! run_checker_with_auto_bump "$@"; then
+    echo "FAIL: ${name} should have passed without another version bump" >&2
+    sed 's/^/  /' "${output_file}" >&2
+    exit 1
+  fi
+}
+
 make_fixture payload_without_bump
 printf '%s\n' 'echo changed' >> "${fixture_dir}/features/src/alpha/install.sh"
 git -C "${fixture_dir}" add features/src/alpha/install.sh
@@ -127,11 +137,12 @@ git -C "${fixture_dir}" add features/src/alpha/install.sh
 expect_failure payload_with_auto_bump_from_git_config
 [[ "$(feature_version alpha)" == 1.0.1 ]]
 
-make_fixture payload_with_bump
+make_fixture payload_with_manual_bump_and_auto_enabled
 printf '%s\n' 'echo changed' >> "${fixture_dir}/features/src/alpha/install.sh"
 git -C "${fixture_dir}" add features/src/alpha/install.sh
 bump_feature alpha
-expect_success payload_with_bump
+expect_success_with_auto_bump payload_with_manual_bump_and_auto_enabled
+[[ "$(feature_version alpha)" == 1.0.1 ]]
 
 make_fixture descriptor_payload_without_bump
 manifest="${fixture_dir}/features/src/alpha/devcontainer-feature.json"
