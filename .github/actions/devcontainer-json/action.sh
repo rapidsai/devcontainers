@@ -1,13 +1,17 @@
 #! /usr/bin/env bash
 
 # cd to the repo root
-cd "$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )/../../../";
+script_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+cd "${script_dir}/../../../" || exit 1
 
 os="${1:-"ubuntu:22.04"}";
 features="${2:-"[]"}";
 container_env="${3:-"null"}";
 
-VERSION="$(git describe --abbrev=0 --tags --first-parent | sed 's/[a-zA-Z]//g' | cut -d '.' -f -2)";
+# VERSION is updated before the alpha tag is created during release rollover.
+# Use it as the source of truth so a release workflow triggered by that update
+# publishes the new image namespace instead of the previous tagged version.
+VERSION="$(cut -d '.' -f 1-2 VERSION)";
 tag="$(node -p "$(cat <<EOF
 ['cpp', ...${features}.filter((x) => !x.hide).map(({ name = '', version = '', suffix = '' }) => {
     if (name.includes(':')) {
