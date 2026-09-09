@@ -65,6 +65,17 @@ run_checker() {
   ) > "${output_file}" 2>&1
 }
 
+run_checker_with_auto_bump() {
+  (
+    cd "${fixture_dir}"
+    FEATURE_VERSION_AUTO_BUMP=1 ./ci/check-feature-version-bumps.sh "$@"
+  ) > "${output_file}" 2>&1
+}
+
+feature_version() {
+  jq -er '.version' "${fixture_dir}/features/src/$1/devcontainer-feature.json"
+}
+
 expect_success() {
   local name="$1"
   shift
@@ -84,11 +95,37 @@ expect_failure() {
   fi
 }
 
+expect_auto_bump() {
+  local name="$1"
+  shift
+  if run_checker_with_auto_bump "$@"; then
+    echo "FAIL: ${name} should have stopped the commit after updating files" >&2
+    exit 1
+  fi
+}
+
 make_fixture payload_without_bump
 printf '%s\n' 'echo changed' >> "${fixture_dir}/features/src/alpha/install.sh"
 git -C "${fixture_dir}" add features/src/alpha/install.sh
 expect_failure payload_without_bump
 grep -q 'alpha:.*still 1.0.0' "${output_file}"
+grep -q 'git config devcontainers.auto-bump-feature-versions true' "${output_file}"
+
+make_fixture payload_with_auto_bump
+printf '%s\n' 'echo changed' >> "${fixture_dir}/features/src/alpha/install.sh"
+git -C "${fixture_dir}" add features/src/alpha/install.sh
+expect_auto_bump payload_with_auto_bump
+[[ "$(feature_version alpha)" == 1.0.1 ]]
+grep -q 'alpha: 1.0.0 -> 1.0.1' "${output_file}"
+git -C "${fixture_dir}" add features/src/alpha/devcontainer-feature.json
+expect_success payload_with_auto_bump_retry
+
+make_fixture payload_with_auto_bump_from_git_config
+git -C "${fixture_dir}" config devcontainers.auto-bump-feature-versions true
+printf '%s\n' 'echo changed' >> "${fixture_dir}/features/src/alpha/install.sh"
+git -C "${fixture_dir}" add features/src/alpha/install.sh
+expect_failure payload_with_auto_bump_from_git_config
+[[ "$(feature_version alpha)" == 1.0.1 ]]
 
 make_fixture payload_with_bump
 printf '%s\n' 'echo changed' >> "${fixture_dir}/features/src/alpha/install.sh"
@@ -129,6 +166,17 @@ bump_feature_to alpha 1.0.0
 expect_failure historical_version_reset
 grep -q 'alpha: 1.0.0 is not newer than 1.0.5' "${output_file}"
 
+make_fixture payload_auto_bump_above_high_water_mark
+bump_feature_to alpha 1.0.5
+git -C "${fixture_dir}" commit -qm high_water_mark
+bump_feature_to alpha 1.0.0
+git -C "${fixture_dir}" commit -qm reset
+printf '%s\n' 'echo changed' >> "${fixture_dir}/features/src/alpha/install.sh"
+git -C "${fixture_dir}" add features/src/alpha/install.sh
+expect_auto_bump payload_auto_bump_above_high_water_mark
+[[ "$(feature_version alpha)" == 1.0.6 ]]
+grep -q 'alpha: 1.0.0 -> 1.0.6' "${output_file}"
+
 make_fixture other_version_series_ignored
 bump_feature_to alpha 1.1.5
 git -C "${fixture_dir}" commit -qm other_series_high_water_mark
@@ -136,6 +184,16 @@ bump_feature_to alpha 1.0.0
 git -C "${fixture_dir}" commit -qm reset_original_series
 bump_feature_to alpha 1.0.1
 expect_success other_version_series_ignored
+
+make_fixture auto_bump_ignores_other_version_series
+bump_feature_to alpha 1.1.5
+git -C "${fixture_dir}" commit -qm other_series_high_water_mark
+bump_feature_to alpha 1.0.0
+git -C "${fixture_dir}" commit -qm reset_original_series
+printf '%s\n' 'echo changed' >> "${fixture_dir}/features/src/alpha/install.sh"
+git -C "${fixture_dir}" add features/src/alpha/install.sh
+expect_auto_bump auto_bump_ignores_other_version_series
+[[ "$(feature_version alpha)" == 1.0.1 ]]
 
 make_fixture generated_docs_only
 printf '%s\n' 'Generated details' >> "${fixture_dir}/features/src/alpha/README.md"
@@ -148,6 +206,33 @@ git -C "${fixture_dir}" add features/common/utilities.sh
 expect_failure shared_payload_without_bumps
 grep -q 'alpha:.*still 1.0.0' "${output_file}"
 grep -q 'beta:.*still 1.0.0' "${output_file}"
+
+make_fixture shared_payload_with_auto_bumps
+printf '%s\n' 'echo changed' >> "${fixture_dir}/features/common/utilities.sh"
+git -C "${fixture_dir}" add features/common/utilities.sh
+expect_auto_bump shared_payload_with_auto_bumps
+[[ "$(feature_version alpha)" == 1.0.1 ]]
+[[ "$(feature_version beta)" == 1.0.1 ]]
+
+make_fixture auto_bump_refuses_unstaged_manifest_changes
+printf '%s\n' 'echo changed' >> "${fixture_dir}/features/src/alpha/install.sh"
+git -C "${fixture_dir}" add features/src/alpha/install.sh
+manifest="${fixture_dir}/features/src/alpha/devcontainer-feature.json"
+jq '.description = "Unstaged change"' "${manifest}" > "${manifest}.tmp"
+mv "${manifest}.tmp" "${manifest}"
+expect_auto_bump auto_bump_refuses_unstaged_manifest_changes
+[[ "$(feature_version alpha)" == 1.0.0 ]]
+grep -q 'has unstaged manifest changes; refusing to overwrite them' "${output_file}"
+
+make_fixture shared_auto_bump_is_atomic
+printf '%s\n' 'echo changed' >> "${fixture_dir}/features/common/utilities.sh"
+git -C "${fixture_dir}" add features/common/utilities.sh
+manifest="${fixture_dir}/features/src/beta/devcontainer-feature.json"
+jq '.description = "Unstaged change"' "${manifest}" > "${manifest}.tmp"
+mv "${manifest}.tmp" "${manifest}"
+expect_auto_bump shared_auto_bump_is_atomic
+[[ "$(feature_version alpha)" == 1.0.0 ]]
+[[ "$(feature_version beta)" == 1.0.0 ]]
 
 make_fixture shared_payload_with_bumps
 printf '%s\n' 'echo changed' >> "${fixture_dir}/features/common/utilities.sh"
@@ -178,5 +263,17 @@ expect_failure pull_request_range_without_bump "${base_sha}"
 bump_feature alpha
 git -C "${fixture_dir}" commit -qm bump
 expect_success pull_request_range_with_bump "${base_sha}"
+
+make_fixture pull_request_range_is_always_check_only
+base_sha="$(git -C "${fixture_dir}" rev-parse HEAD)"
+printf '%s\n' 'echo changed' >> "${fixture_dir}/features/src/alpha/install.sh"
+git -C "${fixture_dir}" add features/src/alpha/install.sh
+git -C "${fixture_dir}" commit -qm payload
+expect_auto_bump pull_request_range_is_always_check_only "${base_sha}"
+[[ "$(feature_version alpha)" == 1.0.0 ]]
+if grep -q 'Automatically updated required feature versions' "${output_file}"; then
+  echo "FAIL: pull-request checking must not modify feature versions" >&2
+  exit 1
+fi
 
 echo "All feature version bump checks passed."

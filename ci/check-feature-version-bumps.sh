@@ -5,6 +5,26 @@ set -euo pipefail
 cd "$(dirname "${BASH_SOURCE[0]}")/.."
 
 base_ref="${FEATURE_VERSION_BASE_SHA:-${1:-}}"
+auto_bump=false
+if [[ -z "${base_ref}" ]]; then
+  auto_bump_value="${FEATURE_VERSION_AUTO_BUMP:-}"
+  if [[ -z "${auto_bump_value}" ]]; then
+    auto_bump_value="$(git config --get devcontainers.auto-bump-feature-versions 2>/dev/null || true)"
+  fi
+
+  case "${auto_bump_value}" in
+    "" | 0 | false | no | off)
+      ;;
+    1 | true | yes | on)
+      auto_bump=true
+      ;;
+    *)
+      echo "FEATURE_VERSION_AUTO_BUMP must be a boolean value, got '${auto_bump_value}'." >&2
+      exit 2
+      ;;
+  esac
+fi
+
 if [[ -n "${base_ref}" ]]; then
   if ! git cat-file -e "${base_ref}^{commit}" 2>/dev/null; then
     echo "Feature version check cannot find base commit '${base_ref}'." >&2
@@ -35,11 +55,17 @@ affected_features="$(mktemp)"
 changed_version_features="$(mktemp)"
 unchanged_version_failures="$(mktemp)"
 historical_version_failures="$(mktemp)"
+auto_bump_features="$(mktemp)"
+auto_bump_plan="$(mktemp)"
+auto_bump_errors="$(mktemp)"
 trap 'rm -f \
   "${affected_features}" \
   "${changed_version_features}" \
   "${unchanged_version_failures}" \
-  "${historical_version_failures}"' EXIT
+  "${historical_version_failures}" \
+  "${auto_bump_features}" \
+  "${auto_bump_plan}" \
+  "${auto_bump_errors}"' EXIT
 
 object_exists() {
   git cat-file -e "${1}${2}" 2>/dev/null
@@ -123,6 +149,23 @@ highest_historical_version() {
   printf '%s\n' "${highest}"
 }
 
+next_patch_version() {
+  local version="$1"
+  local patch="${version##*.}"
+
+  printf '%s.%d\n' "${version%.*}" "$((10#${patch} + 1))"
+}
+
+rewrite_manifest_version() {
+  local manifest="$1"
+  local old_version="$2"
+  local new_version="$3"
+
+  OLD_VERSION="${old_version}" NEW_VERSION="${new_version}" perl -pi -e \
+    '$count += s{("version"\s*:\s*)"\Q$ENV{OLD_VERSION}\E"}{$1 . qq{"$ENV{NEW_VERSION}"}}e; END { die "version replacement failed\n" unless $count == 1; }' \
+    "${manifest}"
+}
+
 while IFS= read -r -d '' path; do
   if [[ "${path}" == features/common/* ]]; then
     mark_all_features
@@ -185,6 +228,62 @@ while IFS= read -r feature; do
   fi
 done < <(sort -u "${changed_version_features}")
 
+if [[ "${auto_bump}" == true ]]; then
+  {
+    cut -f1 "${unchanged_version_failures}"
+    cut -f1 "${historical_version_failures}"
+  } | sort -u > "${auto_bump_features}"
+
+  while IFS= read -r feature; do
+    [[ -n "${feature}" ]] || continue
+    manifest="features/src/${feature}/devcontainer-feature.json"
+    current_version="$(read_object "${new_prefix}" "${manifest}" | jq -er '.version | strings')"
+
+    if ! is_numeric_version "${current_version}"; then
+      printf '%s\t%s\n' "${feature}" \
+        "cannot auto-bump non-numeric version ${current_version}" >> "${auto_bump_errors}"
+      continue
+    fi
+
+    if ! git diff --quiet -- "${manifest}"; then
+      printf '%s\t%s\n' "${feature}" \
+        "has unstaged manifest changes; refusing to overwrite them" >> "${auto_bump_errors}"
+      continue
+    fi
+
+    highest_version="$(highest_historical_version "${manifest}" "${current_version}")"
+    bump_from="${current_version}"
+    if [[ -n "${highest_version}" ]] && version_is_greater "${highest_version}" "${bump_from}"; then
+      bump_from="${highest_version}"
+    fi
+    next_version="$(next_patch_version "${bump_from}")"
+    printf '%s\t%s\t%s\t%s\n' \
+      "${feature}" "${current_version}" "${next_version}" "${manifest}" >> "${auto_bump_plan}"
+  done < "${auto_bump_features}"
+
+  if [[ ! -s "${auto_bump_errors}" && -s "${auto_bump_plan}" ]]; then
+    while IFS=$'\t' read -r feature current_version next_version manifest; do
+      rewrite_manifest_version "${manifest}" "${current_version}" "${next_version}"
+    done < "${auto_bump_plan}"
+
+    echo "Automatically updated required feature versions:" >&2
+    while IFS=$'\t' read -r feature current_version next_version manifest; do
+      echo "  - ${feature}: ${current_version} -> ${next_version}" >&2
+    done < "${auto_bump_plan}"
+    echo >&2
+    echo "Review and stage the updated manifests, then retry the commit." >&2
+    exit 1
+  fi
+
+  if [[ -s "${auto_bump_errors}" ]]; then
+    echo "Feature versions could not be updated automatically:" >&2
+    while IFS=$'\t' read -r feature message; do
+      echo "  - ${feature}: ${message}" >&2
+    done < "${auto_bump_errors}"
+    echo >&2
+  fi
+fi
+
 status=0
 if [[ -s "${unchanged_version_failures}" ]]; then
   echo "Feature contents changed without changing the published version:" >&2
@@ -208,6 +307,13 @@ if [[ -s "${historical_version_failures}" ]]; then
   echo >&2
   echo "Choose a version above the historical high-water mark; the current file may contain an earlier reset value." >&2
   status=1
+fi
+
+if ((status != 0)) && [[ -z "${base_ref}" && "${auto_bump}" == false ]]; then
+  echo >&2
+  echo "For formatter-style automatic bumps in this checkout, opt in with:" >&2
+  echo "  git config devcontainers.auto-bump-feature-versions true" >&2
+  echo "Or enable it for one command with FEATURE_VERSION_AUTO_BUMP=1." >&2
 fi
 
 exit "${status}"

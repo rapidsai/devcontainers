@@ -6,6 +6,8 @@ repos:
       - id: zizmor
   - repo: local
     hooks:
+      # Opt in to automatic feature version updates in this checkout with:
+      # git config devcontainers.auto-bump-feature-versions true
       - id: check-feature-version-bumps
         name: check feature version bumps
         entry: ci/check-feature-version-bumps.sh
