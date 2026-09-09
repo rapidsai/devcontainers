@@ -1,9 +1,6 @@
 export NVARCH="${NVARCH}";
-# A package-managed CUDA toolkit can override the system toolkit installed by
-# this feature. This keeps tools such as conda's tileiras compiler paired with
-# the CUDA compiler libraries from the same environment.
-export CUDA_HOME="${RAPIDS_CUDA_HOME:-${CUDA_HOME}}";
-export CUDA_PATH="${RAPIDS_CUDA_HOME:-${CUDA_HOME}}";
+export CUDA_HOME="${CUDA_HOME}";
+export CUDA_PATH="${CUDA_HOME}";
 export CUDA_VERSION="${CUDA_VERSION}";
 export CUDA_VERSION_MAJOR="${CUDA_VERSION_MAJOR}";
 export CUDA_VERSION_MINOR="${CUDA_VERSION_MINOR}";
