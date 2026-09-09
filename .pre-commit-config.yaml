@@ -4,3 +4,11 @@ repos:
     rev: v1.25.2
     hooks:
       - id: zizmor
+  - repo: local
+    hooks:
+      - id: check-feature-version-bumps
+        name: check feature version bumps
+        entry: ci/check-feature-version-bumps.sh
+        language: system
+        always_run: true
+        pass_filenames: false

@@ -38,10 +38,30 @@ jobs:
       - name: Checkout ${{ github.repository }}
         uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
         with:
+          fetch-depth: 0
           persist-credentials: false
 
       - name: Run pre-commit
+        env:
+          FEATURE_VERSION_BASE_SHA: ${{ github.event.pull_request.base.sha }}
         run: pip install pre-commit && pre-commit run --all-files
+
+  feature-version-check-tests:
+    name: Feature version check tests
+    permissions:
+      contents: read
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout ${{ github.repository }}
+        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+        with:
+          persist-credentials: false
+
+      - name: Run feature version check tests
+        run: ci/check-feature-version-bumps-tests.sh
+
+      - name: Shellcheck feature version check scripts
+        run: shellcheck ci/check-feature-version-bumps.sh ci/check-feature-version-bumps-tests.sh
 
   build-all-rapids-repos:
     if: needs.check-event.outputs.ok == 'true' && github.repository_owner == 'rapidsai'
