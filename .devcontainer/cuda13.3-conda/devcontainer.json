@@ -18,7 +18,10 @@
     "--ulimit",
     "nofile=500000"
   ],
-  "containerEnv": {"PYTHON_VERSION": "3.13"},
+  "containerEnv": {
+    "PYTHON_VERSION": "3.13",
+    "RAPIDS_CUDA_HOME": "/home/coder/.conda/envs/rapids"
+  },
   "hostRequirements": {"gpu": "optional"},
   "features": {
     "./features/src/cuda": {
