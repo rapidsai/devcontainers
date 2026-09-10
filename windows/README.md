@@ -40,7 +40,7 @@ Build desired configuration. Windows 2019 and Windows 2022 versions map to Windo
 
 Start up the container and mount workspace directories as needed.
 
-`$> docker run --mount type=bind,src="$(pwd)",dst="C:\thrust" -it local:windows-cuda-12.1-cl-14.36 powershell`
+`$> docker run --mount type=bind,src="$(pwd)",dst="C:\thrust" -it local:latest-cl14.36-cuda12.1-windows2019 powershell`
 
 ### Step 3 - Build your projects
 
