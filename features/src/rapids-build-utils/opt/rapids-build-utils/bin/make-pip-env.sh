@@ -43,11 +43,24 @@ make_pip_env() {
     local -r new_env_path="$(realpath -m "/tmp/${env_file_name}")";
     local -r old_env_path="$(realpath -m "${HOME}/.local/share/venvs/${env_file_name}")";
 
+    local -a excluded_packages=(ninja);
+
+    # The PyPI OpenMPI wheel bundles its own UCX libraries. Do not install it when the
+    # devcontainer is configured to use system UCX, because loading those bundled
+    # libraries alongside system UCX can produce an ABI-incompatible mix. The base
+    # image already provides an OpenMPI build linked against its system UCX.
+    if [ "${RAPIDS_LIBUCX_PREFER_SYSTEM_LIBRARY:-false}" = true ]; then
+        excluded_packages+=(openmpi);
+    fi
+
     # Create the python env without ninja.
     # ninja -$(ulimit -n) fails with `ninja: FATAL: pipe: Too many open files`.
     # This appears to have been fixed 13 years ago (https://github.com/ninja-build/ninja/issues/233),
     # so that fix needs to be integrated into the kitware pip ninja builds.
-    rapids-make-pip-dependencies --exclude <(echo ninja) "${OPTS[@]}" > "${new_env_path}";
+    rapids-make-pip-dependencies \
+        --exclude <(printf '%s\n' "${excluded_packages[@]}") \
+        "${OPTS[@]}" \
+        > "${new_env_path}";
 
     if test -f "${new_env_path}"; then
 
@@ -63,7 +76,6 @@ make_pip_env() {
             . "${HOME}/.local/share/venvs/${env_name}/bin/activate";
             python -m pip install -U pip;
             python -m pip install "${pre[@]}" -U -r "${new_env_path}";
-            python -m pip uninstall -y ninja >/dev/null 2>&1;
         # If the venv does exist but it's different from the generated one,
         # print the diff between the envs and update it
         elif ! diff -BNqw "${old_env_path}" "${new_env_path}" >/dev/null 2>&1; then
@@ -82,8 +94,12 @@ make_pip_env() {
             . "${HOME}/.local/share/venvs/${env_name}/bin/activate";
             python -m pip install -U pip;
             python -m pip install "${pre[@]}" -U -r "${new_env_path}";
-            python -m pip uninstall -y ninja >/dev/null 2>&1;
         fi
+
+        # Keep excluded packages out of reused venvs as well as newly-created ones.
+        # shellcheck disable=SC1090
+        . "${HOME}/.local/share/venvs/${env_name}/bin/activate";
+        python -m pip uninstall -y "${excluded_packages[@]}" >/dev/null 2>&1;
 
         cp -a "${new_env_path}" "${old_env_path}";
     fi
