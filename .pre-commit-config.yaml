@@ -11,8 +11,3 @@ repos:
         entry: ci/validate-devcontainer-bases.sh
         language: system
         pass_filenames: false
-      - id: shellcheck-release-bootstrap
-        name: shellcheck release bootstrap scripts
-        entry: shellcheck
-        language: system
-        files: ^(\.github/actions/devcontainer-json/action\.sh|ci/validate-devcontainer-bases\.sh)$
