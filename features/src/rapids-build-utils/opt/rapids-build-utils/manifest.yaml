@@ -220,8 +220,6 @@ repos:
   - name: cuml
     path: cuml
     git: {!!merge <<: *git_defaults, repo: cuml}
-    dependency_keys:
-      - devcontainers
     cpp:
       - name: cuml
         sub_dir: cpp
