@@ -211,7 +211,7 @@ include:
 
 # RAPIDS devcontainers
 
-- os: "ubuntu:24.04"
+- os: "ubuntu:26.04"
   images:
   # cuda
   - { features: [*gcc_rapids, *python_rapids, *clang_extra_rapids, *clangd_dev, *cuda_prev_max_rapids                       ], env: *gcc_env_rapids }
