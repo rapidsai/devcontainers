@@ -5,6 +5,7 @@ function TestReturnCode {
 }
 
 $mismatch_nvcc_cl_flags = @(
+    '-std=c++17'
     # Tell NVCC that old msvc is okay
     '--allow-unsupported-compiler',
     # Tell MSVC that new nvcc is okay
