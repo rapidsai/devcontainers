@@ -22,7 +22,7 @@ $mmbVersionTag = "${major}.${minor}.${build}"
 $mmVersionTag = "${major}.${minor}"
 
 # The _x86_64 arch suffix was introduced in the network installer filename at 13.4.
-if ($major -gt 13 -or ($major -eq 13 -and $minor -ge 4)) {
+if ([int]$major -gt 13 -or ([int]$major -eq 13 -and [int]$minor -ge 4)) {
     $arch = "_x86_64"
 }
 else {
@@ -57,7 +57,7 @@ $cudaComponents = @(
 )
 
 # nvfatbin first appeared as a separate VS component in 12.4.
-if ($major -eq 12 -and $minor -ge 4) {
+if ([int]$major -gt 12 -or ([int]$major -eq 12 -and [int]$minor -ge 4)) {
     $cudaComponents += "nvfatbin_$mmVersionTag"
 }
 
@@ -70,7 +70,7 @@ if ([int]$major -ge 13) {
 }
 
 # The following components first appeared in 13.3.
-if ($major -gt 13 -or ($major -eq 13 -and $minor -ge 3)) {
+if ([int]$major -gt 13 -or ([int]$major -eq 13 -and [int]$minor -ge 3)) {
     $cudaComponents += "tileiras_$mmVersionTag"
 }
 
