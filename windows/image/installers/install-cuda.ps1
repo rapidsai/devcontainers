@@ -21,8 +21,18 @@ $mmbVersionTag = "${major}.${minor}.${build}"
 # mm = major minor
 $mmVersionTag = "${major}.${minor}"
 
-$cudaMajorUri = "${mmbVersionTag}/network_installers/cuda_${mmbVersionTag}_windows_network.exe"
+# The _x86_64 arch suffix was introduced in the network installer filename at 13.4.
+if ([int]$major -gt 13 -or ([int]$major -eq 13 -and [int]$minor -ge 4)) {
+    $arch = "_x86_64"
+}
+else {
+    $arch = ""
+}
+
+$cudaMajorUri = "${mmbVersionTag}/network_installers/cuda_${mmbVersionTag}_windows${arch}_network.exe"
 $cudaVersionUrl = "https://developer.download.nvidia.com/compute/cuda/$cudaMajorUri"
+
+Write-Output "Downloading: ${cudaVersionUrl}"
 
 # Keep the following list sorted.
 $cudaComponents = @(
@@ -47,7 +57,7 @@ $cudaComponents = @(
 )
 
 # nvfatbin first appeared as a separate VS component in 12.4.
-if ([int]$major -eq 12 -and [int]$minor -ge 4) {
+if ([int]$major -gt 12 -or ([int]$major -eq 12 -and [int]$minor -ge 4)) {
     $cudaComponents += "nvfatbin_$mmVersionTag"
 }
 
@@ -60,7 +70,7 @@ if ([int]$major -ge 13) {
 }
 
 # The following components first appeared in 13.3.
-if ([int]$major -ge 13 -and [int]$minor -ge 3) {
+if ([int]$major -gt 13 -or ([int]$major -eq 13 -and [int]$minor -ge 3)) {
     $cudaComponents += "tileiras_$mmVersionTag"
 }
 
