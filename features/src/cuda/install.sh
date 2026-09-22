@@ -82,7 +82,7 @@ echo "Installing dev CUDA toolkit...";
 export CUDA_HOME="/usr/local/cuda";
 
 cuda_ver="${VERSION}";
-cuda_ver=$(grep -Po '^[0-9]+\.[0-9]+' <<< "${cuda_ver}");
+cuda_ver="$(grep -Po '^[0-9]+\.[0-9]+' <<< "${cuda_ver}")";
 cuda_ver_major="$(cut -d'.' -f1 <<< "${cuda_ver}")";
 cuda_ver_minor="$(cut -d'.' -f2 <<< "${cuda_ver}")";
 
@@ -258,11 +258,12 @@ if ! test -n "${CUDA_VERSION:+x}"; then
         CUDA_VERSION="$CUDA_VERSION_MAJOR.$CUDA_VERSION_MINOR.$CUDA_VERSION_PATCH";
     else
         CUDA_VERSION="${VERSION}";
-        CUDA_VERSION_MAJOR="$(cut -d'.' -f1 <<< "${VERSION}")";
-        CUDA_VERSION_MINOR="$(cut -d'.' -f2 <<< "${VERSION}")";
-        CUDA_VERSION_PATCH="$(cut -d'.' -f3 <<< "${VERSION}")";
     fi
 fi
+
+CUDA_VERSION_MAJOR="${CUDA_VERSION_MAJOR:-$(cut -d'.' -f1 <<< "${CUDA_VERSION}")}";
+CUDA_VERSION_MINOR="${CUDA_VERSION_MINOR:-$(cut -d'.' -f2 <<< "${CUDA_VERSION}")}";
+CUDA_VERSION_PATCH="${CUDA_VERSION_PATCH:-$(cut -d'.' -f3 <<< "${CUDA_VERSION}.0")}";
 
 export CUDA_VERSION;
 export CUDA_VERSION_MAJOR;
