@@ -31,7 +31,7 @@ jobs:
     if: needs.check-event.outputs.ok == 'true'
     needs: check-event
     secrets: inherit  # zizmor: ignore[secrets-inherit]
-    uses: rapidsai/shared-workflows/.github/workflows/build-in-devcontainer.yaml@main  # zizmor: ignore[unpinned-uses]
+    uses: rapidsai/shared-workflows/.github/workflows/build-in-devcontainer.yaml@fix/define-sccache-dist-auth-type  # zizmor: ignore[unpinned-uses]
     permissions:
       actions: read
       packages: read
