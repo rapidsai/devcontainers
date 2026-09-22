@@ -83,7 +83,8 @@ export CUDA_HOME="/usr/local/cuda";
 
 cuda_ver="${VERSION}";
 cuda_ver=$(grep -Po '^[0-9]+\.[0-9]+' <<< "${cuda_ver}");
-cuda_ver_major=$(grep -Po '^[0-9]+' <<< "${cuda_ver}");
+cuda_ver_major="$(cut -d'.' -f1 <<< "${cuda_ver}")";
+cuda_ver_minor="$(cut -d'.' -f2 <<< "${cuda_ver}")";
 
 cudapath="${CUDA_HOME}-${cuda_ver}";
 cuda_tag="cuda${cuda_ver}";
@@ -104,6 +105,9 @@ if [ "${INSTALLCOMPILERS:-false}" = true ]; then
     PKGS+=("cuda-command-line-tools-${cuda_ver}");
     if [ "$NVARCH" = x86_64 ] && [ "$cuda_ver_major" -lt 13 ]; then
         PKGS+=("cuda-nvprof-${cuda_ver}");
+    fi
+    if [ "$cuda_ver_major" -ge 13 ] && [ "$cuda_ver_minor" -ge 1 ]; then
+        PKGS+=("cuda-tileiras-${cuda_ver}");
     fi
 fi
 
@@ -248,15 +252,15 @@ fi
 if ! test -n "${CUDA_VERSION:+x}"; then
     if test -f "${CUDA_HOME}/include/cuda.h"; then
         cuda_ver=$(grep "#define CUDA_VERSION" "${CUDA_HOME}/include/cuda.h" | cut -d' ' -f3);
-        CUDA_VERSION_MAJOR=$((cuda_ver / 1000));
-        CUDA_VERSION_MINOR=$((cuda_ver / 10 % 100));
-        CUDA_VERSION_PATCH=$((cuda_ver % 10));
+        CUDA_VERSION_MAJOR="$((cuda_ver / 1000))";
+        CUDA_VERSION_MINOR="$((cuda_ver / 10 % 100))";
+        CUDA_VERSION_PATCH="$((cuda_ver % 10))";
         CUDA_VERSION="$CUDA_VERSION_MAJOR.$CUDA_VERSION_MINOR.$CUDA_VERSION_PATCH";
     else
         CUDA_VERSION="${VERSION}";
-        CUDA_VERSION_MAJOR=$(cut -d'.' -f1 <<< "${VERSION}");
-        CUDA_VERSION_MINOR=$(cut -d'.' -f2 <<< "${VERSION}");
-        CUDA_VERSION_PATCH=$(cut -d'.' -f3 <<< "${VERSION}");
+        CUDA_VERSION_MAJOR="$(cut -d'.' -f1 <<< "${VERSION}")";
+        CUDA_VERSION_MINOR="$(cut -d'.' -f2 <<< "${VERSION}")";
+        CUDA_VERSION_PATCH="$(cut -d'.' -f3 <<< "${VERSION}")";
     fi
 fi
 
