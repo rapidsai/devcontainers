@@ -14,13 +14,13 @@ export CUDA_VERSION_MAJOR="${__cuda_version_major}";
 export CUDA_VERSION_MINOR="${__cuda_version_minor}";
 export CUDA_VERSION_PATCH="${__cuda_version_patch}";
 
-if [ -n "${PATH##*"/usr/local/nvidia/bin:${_cuda_home}/bin"*}" ]; then
-    export PATH="/usr/local/nvidia/bin:${_cuda_home}/bin:${PATH}";
+if [ -n "${PATH##*"/usr/local/nvidia/bin:${__cuda_home}/bin"*}" ]; then
+    export PATH="/usr/local/nvidia/bin:${__cuda_home}/bin:${PATH}";
 fi
 
 if [ -z "${LIBRARY_PATH:-}" ] \
-|| [ -n "${LIBRARY_PATH##*"${_cuda_home}/lib64/stubs"*}" ]; then
-    export LIBRARY_PATH="${_cuda_home}/lib64/stubs${LIBRARY_PATH:+:$LIBRARY_PATH}"
+|| [ -n "${LIBRARY_PATH##*"${__cuda_home}/lib64/stubs"*}" ]; then
+    export LIBRARY_PATH="${__cuda_home}/lib64/stubs${LIBRARY_PATH:+:$LIBRARY_PATH}"
 fi
 
 if [ -z "${LD_LIBRARY_PATH:-}" ] \
