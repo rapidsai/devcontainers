@@ -13,11 +13,16 @@ check_cuda_minor_matrix_selector() (
     mkdir -p "${test_dir}/bin" "${test_dir}/home/fixture"
     touch "${test_dir}/home/fixture/dependencies.yaml"
 
+    cat > "${test_dir}/bin/rapids-generate-docstring" <<'EOF'
+_parse_args() {
+    printf '%s\n' 'exclude=()' 'include=()' 'matrix_entry=()' 'key=()' 'OPTS=()'
+}
+EOF
+
+    : > "${test_dir}/bin/devcontainer-utils-debug-output"
+
     cat > "${test_dir}/bin/rapids-list-repos" <<'EOF'
 #!/usr/bin/env bash
-if [[ "${1:-}" == "-h" ]]; then
-    exec "${REAL_RAPIDS_LIST_REPOS}" "$@"
-fi
 printf '%s\n' 'repos_length=1' 'repos_0_name=fixture' 'repos_0_path=fixture'
 EOF
 
@@ -35,7 +40,6 @@ EOF
 
     chmod +x "${test_dir}/bin/rapids-list-repos" "${test_dir}/bin/rapids-dependency-file-generator"
 
-    REAL_RAPIDS_LIST_REPOS="$(command -v rapids-list-repos)" \
     MATRIX_SELECTOR_FILE="${test_dir}/matrix-selector" \
     HOME="${test_dir}/home" \
     CUDA_VERSION=99.99.0 \
