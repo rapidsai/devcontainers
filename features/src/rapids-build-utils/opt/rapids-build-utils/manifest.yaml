@@ -81,7 +81,7 @@ repos:
     cpp:
       - name: rapidsmpf
         sub_dir: cpp
-        depends: [rmm, ucxx]
+        depends: [rmm, ucxx, kvikio]
         test: ci/run_ctests.sh
     python:
       - name: librapidsmpf
