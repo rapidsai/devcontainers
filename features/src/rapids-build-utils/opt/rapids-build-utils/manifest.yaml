@@ -81,7 +81,7 @@ repos:
     cpp:
       - name: rapidsmpf
         sub_dir: cpp
-        depends: [rmm, ucxx]
+        depends: [rmm, ucxx, kvikio]
         test: ci/run_ctests.sh
     python:
       - name: librapidsmpf
@@ -185,6 +185,9 @@ repos:
           max_device_obj_memory_usage: 3Gi
         args: {cmake: -DBUILD_C_LIBRARY=ON}
         test: ci/run_ctests.sh
+        env: |
+          CUDA_HOME="${CONDA_PREFIX:-$CUDA_HOME}"
+          CUDA_PATH="${CONDA_PREFIX:-$CUDA_PATH}"
     python:
       - name: libcuvs
         sub_dir: python/libcuvs
