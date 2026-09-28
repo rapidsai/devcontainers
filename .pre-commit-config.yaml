@@ -4,3 +4,10 @@ repos:
     rev: v1.25.2
     hooks:
       - id: zizmor
+  - repo: local
+    hooks:
+      - id: validate-devcontainer-bases
+        name: validate devcontainer base images
+        entry: ci/validate-devcontainer-bases.sh
+        language: system
+        pass_filenames: false

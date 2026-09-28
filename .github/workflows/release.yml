@@ -84,10 +84,25 @@ jobs:
           scenarios: "${{ needs.features-matrix.outputs.scenarios }}"
           full_matrix: "${{ github.event_name == 'workflow_dispatch' && 'true' || 'false' }}"
 
+  validate-devcontainer-bases:
+    name: Validate devcontainer base images
+    needs: check-event
+    permissions:
+      contents: read
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout ${{ github.repository }}
+        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+        with:
+          persist-credentials: false
+
+      - name: Validate unified devcontainer bases
+        run: ci/validate-devcontainer-bases.sh
+
   release-linux:
     if: needs.image-matrix.outputs.linux != '{"include":[]}'
     name: ${{ matrix.name || 'Linux' }}
-    needs: image-matrix
+    needs: [image-matrix, validate-devcontainer-bases]
     permissions:
       contents: read
     secrets: inherit  # zizmor: ignore[secrets-inherit]

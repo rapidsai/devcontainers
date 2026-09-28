@@ -43,6 +43,20 @@ jobs:
       - name: Run pre-commit
         run: pip install pre-commit && pre-commit run --all-files
 
+  shellcheck:
+    name: ShellCheck
+    permissions:
+      contents: read
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout ${{ github.repository }}
+        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+        with:
+          persist-credentials: false
+
+      - name: Run ShellCheck
+        run: shellcheck .github/actions/devcontainer-json/action.sh ci/validate-devcontainer-bases.sh
+
   build-all-rapids-repos:
     if: needs.check-event.outputs.ok == 'true' && github.repository_owner == 'rapidsai'
     name: Build
