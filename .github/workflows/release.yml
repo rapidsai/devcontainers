@@ -155,7 +155,7 @@ jobs:
       packages: write
     with:
       push: true
-      cuda: '["12.9", "13.3"]'
+      cuda: '["12.9", "13.4"]'
 
   build-devcontainers-after-features-released:
     if: needs.image-matrix.outputs.linux == '{"include":[]}' && (needs.features-matrix.outputs.features != '[]' || needs.features-matrix.outputs.scenarios != '[]')
@@ -167,4 +167,4 @@ jobs:
       packages: write
     with:
       push: true
-      cuda: '["12.9", "13.3"]'
+      cuda: '["12.9", "13.4"]'

@@ -55,7 +55,7 @@ jobs:
 
     with:
       arch: '["amd64", "arm64"]'
-      cuda: '["12.9", "13.3"]'
+      cuda: '["12.9", "13.4"]'
       node_type: ${{ inputs.node_type }}
       timeout-minutes: 720
       # 1. Prohibit sccache from shutting down automatically
