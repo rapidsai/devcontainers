@@ -5,7 +5,19 @@ concurrency:
   cancel-in-progress: true
 
 on:
+  workflow_call:
+    inputs:
+      repo:
+        description: Image repository to publish to
+        required: true
+        type: string
   workflow_dispatch:
+    inputs:
+      repo:
+        description: Image repository to publish to (defaults to Docker Hub)
+        required: false
+        default: ""
+        type: string
 
 permissions: {}
 
@@ -22,6 +34,8 @@ jobs:
       - name: Checkout ${{ github.repository }}
         uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
         with:
+          repository: ${{ job.workflow_repository }}
+          ref: ${{ job.workflow_sha }}
           fetch-depth: 0
           persist-credentials: false
 
@@ -37,6 +51,7 @@ jobs:
     needs: image-matrix
     permissions:
       contents: read
+      packages: write
     secrets: inherit  # zizmor: ignore[secrets-inherit]
     uses: ./.github/workflows/build-test-and-push-windows-image.yml
     strategy:
@@ -47,4 +62,4 @@ jobs:
       os: "${{ matrix.os }}"
       features: "${{ toJSON(matrix.features) }}"
       container_env: "${{ toJSON(matrix.env) }}"
-      repo: "${{ vars.DOCKERHUB_REPOSITORY || github.repository }}"
+      repo: "${{ inputs.repo || vars.DOCKERHUB_REPOSITORY || github.repository }}"
