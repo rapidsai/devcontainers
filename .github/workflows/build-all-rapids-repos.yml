@@ -58,6 +58,7 @@ jobs:
       # 3. Enable debug logging to track cache misses
       # 4. Never fallback to locally compiling
       env: |
+        CUDA_VERSION=13.3
         PYTHON_VERSION=3.13
         CONDA_ENV_CREATE_QUIET=1
         INCLUDE_REPOS="${{ matrix.libs }}"
