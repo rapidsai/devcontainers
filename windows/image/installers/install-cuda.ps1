@@ -7,13 +7,18 @@ Param(
 # Use System.Version to tokenize version
 $version = [Version]$cudaVersion
 
-$major = $version.Major
-$minor = $version.Minor
-$build = $version.Build
+$major = [int]$version.Major
+$minor = [int]$version.Minor
+$build = [int]$version.Build
 
 # Minimum build is 0, not -1 as default in case "12.9" is passed
 if ($build -lt 0) {
     $build = 0
+}
+
+# Use 13.4.2 for 13.4
+if ($major -eq 13 -and $minor -eq 4) {
+    $build = 2
 }
 
 # mmb == major minor build
@@ -22,7 +27,7 @@ $mmbVersionTag = "${major}.${minor}.${build}"
 $mmVersionTag = "${major}.${minor}"
 
 # The _x86_64 arch suffix was introduced in the network installer filename at 13.4.
-if ([int]$major -gt 13 -or ([int]$major -eq 13 -and [int]$minor -ge 4)) {
+if ($major -gt 13 -or ($major -eq 13 -and $minor -ge 4)) {
     $arch = "_x86_64"
 }
 else {
@@ -57,12 +62,12 @@ $cudaComponents = @(
 )
 
 # nvfatbin first appeared as a separate VS component in 12.4.
-if ([int]$major -gt 12 -or ([int]$major -eq 12 -and [int]$minor -ge 4)) {
+if ($major -gt 12 -or ($major -eq 12 -and $minor -ge 4)) {
     $cudaComponents += "nvfatbin_$mmVersionTag"
 }
 
 # The following components first appeared in 13.0.
-if ([int]$major -ge 13) {
+if ($major -ge 13) {
     $cudaComponents += "crt_$mmVersionTag"
     $cudaComponents += "nvfatbin_$mmVersionTag"
     $cudaComponents += "nvvm_$mmVersionTag"
@@ -70,7 +75,7 @@ if ([int]$major -ge 13) {
 }
 
 # The following components first appeared in 13.3.
-if ([int]$major -gt 13 -or ([int]$major -eq 13 -and [int]$minor -ge 3)) {
+if ($major -gt 13 -or ($major -eq 13 -and $minor -ge 3)) {
     $cudaComponents += "tileiras_$mmVersionTag"
 }
 
