@@ -82,11 +82,6 @@ make_conda_env() {
         fi
 
         cp -a "${new_env_path}" "${old_env_path}";
-
-        # Keep excluded packages out of reused venvs as well as newly-created ones.
-        # shellcheck disable=SC1090
-        . /etc/profile.d/*-miniforge.sh;
-        mamba uninstall -y "${excluded_packages[@]}" >/dev/null 2>&1 || :
     else
         rm -f "${new_env_path}" "${old_env_path}";
         echo -e "Not creating '${env_name}' conda environment because '${env_file_name}' is empty." 1>&2;
