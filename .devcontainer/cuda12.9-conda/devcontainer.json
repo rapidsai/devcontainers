@@ -15,6 +15,10 @@
     "--rm",
     "--name",
     "${localEnv:USER:anon}-rapids-${localWorkspaceFolderBasename}-26.12-cuda12.9-conda",
+    "--env-file",
+    "${localWorkspaceFolder}/.devcontainer/.env",
+    "--env-file",
+    "${localWorkspaceFolder}/.devcontainer/cuda12.9-conda/.env",
     "--ulimit",
     "nofile=500000"
   ],
@@ -51,7 +55,7 @@
     "./features/src/utils",
     "./features/src/rapids-build-utils"
   ],
-  "initializeCommand": ["/bin/bash", "-c", "mkdir -m 0755 -p ${localWorkspaceFolder}/../.{aws,cache,config,conda/pkgs,conda/${localWorkspaceFolderBasename}-cuda12.9-envs,log/devcontainer-utils} ${localWorkspaceFolder}/../{rmm,dask-cuda,kvikio,ucxx,cudf,rapidsmpf,raft,cuvs,cuml,nvforest,cugraph,cugraph-gnn,nx-cugraph,cuopt}"],
+  "initializeCommand": ["/bin/bash", "-c", "mkdir -m 0755 -p ${localWorkspaceFolder}/../.{aws,cache,config,conda/pkgs,conda/${localWorkspaceFolderBasename}-cuda12.9-envs,log/devcontainer-utils} ${localWorkspaceFolder}/../{rmm,dask-cuda,kvikio,ucxx,cudf,rapidsmpf,raft,cuvs,cuml,nvforest,cugraph,cugraph-gnn,nx-cugraph,cuopt} && touch .devcontainer{,/cuda12.9-conda}/.env"],
   "postAttachCommand": ["/bin/bash", "-c", "if [ ${CODESPACES:-false} = 'true' ]; then . devcontainer-utils-post-attach-command; fi"],
   "workspaceFolder": "/home/coder",
   "workspaceMount": "source=${localWorkspaceFolder},target=/home/coder/devcontainers,type=bind,consistency=consistent",
