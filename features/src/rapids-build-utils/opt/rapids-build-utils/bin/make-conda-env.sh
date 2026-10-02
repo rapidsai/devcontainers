@@ -43,7 +43,12 @@ make_conda_env() {
     # ninja -j$(ulimit -n) fails with `ninja: FATAL: pipe: Too many open files`.
     # This appears to have been fixed 13 years ago (https://github.com/ninja-build/ninja/issues/233),
     # so that fix needs to be integrated into the kitware pip ninja builds.
-    rapids-make-conda-dependencies --exclude <(echo ninja) "${OPTS[@]}" > "${new_env_path}";
+    local -a excluded_packages="(ninja ${RAPIDS_BUILD_UTILS_EXCLUDED_CONDA_PACKAGES:-})";
+
+    rapids-make-conda-dependencies \
+        --exclude <(printf '%s\n' "${excluded_packages[@]}") \
+        "${OPTS[@]}" \
+        > "${new_env_path}";
 
     if test -f "${new_env_path}" && test "$(wc -l "${new_env_path}" | cut -d' ' -f1)" -gt 0; then
 
@@ -77,6 +82,11 @@ make_conda_env() {
         fi
 
         cp -a "${new_env_path}" "${old_env_path}";
+
+        # Keep excluded packages out of reused venvs as well as newly-created ones.
+        # shellcheck disable=SC1090
+        . /etc/profile.d/*-miniforge.sh;
+        mamba uninstall -y "${excluded_packages[@]}" >/dev/null 2>&1 || :
     else
         rm -f "${new_env_path}" "${old_env_path}";
         echo -e "Not creating '${env_name}' conda environment because '${env_file_name}' is empty." 1>&2;
