@@ -155,8 +155,6 @@ repos:
       - name: raft
         sub_dir: cpp
         depends: [rmm]
-        parallelism:
-          max_device_obj_memory_usage: 3Gi
         args: {cmake: -DRAFT_COMPILE_LIBRARY=ON}
         test: ci/run_ctests.sh
     python:
@@ -181,8 +179,6 @@ repos:
       - name: cuvs
         sub_dir: cpp
         depends: [kvikio, rmm, raft]
-        parallelism:
-          max_device_obj_memory_usage: 3Gi
         args: {cmake: -DBUILD_C_LIBRARY=ON}
         test: ci/run_ctests.sh
         env: |
@@ -207,8 +203,6 @@ repos:
       - name: nvforest
         sub_dir: cpp
         depends: [rmm, raft]
-        parallelism:
-          max_device_obj_memory_usage: 3Gi
         test: ci/run_ctests.sh
     python:
       - name: libnvforest
@@ -227,8 +221,6 @@ repos:
       - name: cuml
         sub_dir: cpp
         depends: [rmm, raft, cuvs, nvforest]
-        parallelism:
-          max_device_obj_memory_usage: 3Gi
         test: ci/run_ctests.sh
     python:
       - name: libcuml

@@ -41,7 +41,7 @@ _creds_github_generate() {
         --role-arn "${AWS_ROLE_ARN}"
         --aud "${AWS_AUDIENCE:-sts.amazonaws.com}"
         --duration "${AWS_S3_TTL:-${VAULT_S3_TTL:-43200}}"
-        --idp-url "${AWS_IDP_URL:-https://token.gha-runners.nvidia.com}"
+        --idp-url "${AWS_IDP_URL:-https://token.rapids.nvidia.com}"
     );
 
     mkdir -p ~/.aws;

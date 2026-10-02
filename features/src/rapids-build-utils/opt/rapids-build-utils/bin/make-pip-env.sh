@@ -43,7 +43,11 @@ make_pip_env() {
     local -r new_env_path="$(realpath -m "/tmp/${env_file_name}")";
     local -r old_env_path="$(realpath -m "${HOME}/.local/share/venvs/${env_file_name}")";
 
-    local -a excluded_packages=(ninja);
+    # Create the python env without ninja.
+    # ninja -$(ulimit -n) fails with `ninja: FATAL: pipe: Too many open files`.
+    # This appears to have been fixed 13 years ago (https://github.com/ninja-build/ninja/issues/233),
+    # so that fix needs to be integrated into the kitware pip ninja builds.
+    local -a excluded_packages="(ninja ${RAPIDS_BUILD_UTILS_EXCLUDED_PIP_PACKAGES:-})";
 
     # The PyPI OpenMPI wheel bundles its own UCX libraries. Do not install it when the
     # devcontainer is configured to use system UCX, because loading those bundled
@@ -53,10 +57,6 @@ make_pip_env() {
         excluded_packages+=(openmpi);
     fi
 
-    # Create the python env without ninja.
-    # ninja -$(ulimit -n) fails with `ninja: FATAL: pipe: Too many open files`.
-    # This appears to have been fixed 13 years ago (https://github.com/ninja-build/ninja/issues/233),
-    # so that fix needs to be integrated into the kitware pip ninja builds.
     rapids-make-pip-dependencies \
         --exclude <(printf '%s\n' "${excluded_packages[@]}") \
         "${OPTS[@]}" \
@@ -96,12 +96,12 @@ make_pip_env() {
             python -m pip install "${pre[@]}" -U -r "${new_env_path}";
         fi
 
+        cp -a "${new_env_path}" "${old_env_path}";
+
         # Keep excluded packages out of reused venvs as well as newly-created ones.
         # shellcheck disable=SC1090
         . "${HOME}/.local/share/venvs/${env_name}/bin/activate";
-        python -m pip uninstall -y "${excluded_packages[@]}" >/dev/null 2>&1;
-
-        cp -a "${new_env_path}" "${old_env_path}";
+        python -m pip uninstall -y "${excluded_packages[@]}" >/dev/null 2>&1 || :
     fi
 }
 
