@@ -15,6 +15,7 @@ x-gcc-12: &gcc_12 { name: "gcc", version: "12" }
 x-gcc-13: &gcc_13 { name: "gcc", version: "13" }
 x-gcc-14: &gcc_14 { name: "gcc", version: "14" }
 x-gcc-15: &gcc_15 { name: "gcc", version: "15" }
+x-gcc-15: &gcc_16 { name: "gcc", version: "16" }
 x-gcc-env: &gcc_env { CC: "gcc", CXX: "g++", CUDAHOSTCXX: "g++" }
 x-gcc-rapids: &gcc_rapids { name: "gcc", version: "14", hide: true }
 x-gcc-env-rapids: &gcc_env_rapids { CC: "gcc", CXX: "g++", CUDAHOSTCXX: "g++", PYTHON_VERSION: "3.14" }
@@ -169,6 +170,8 @@ include:
   - { features: [*python, *dood, *gcc_15,  *clang_extra_cccl, *clangd_dev, { <<: *cuda_prev_max, <<: *cccl_cuda_opts }, *cccl_dev], env: *gcc_env }
   - { features: [*python, *dood, *gcc_15,  *clang_extra_cccl, *clangd_dev, { <<: *cuda_curr_min, <<: *cccl_cuda_opts }, *cccl_dev], env: *gcc_env }
 
+  - { features: [*python, *dood, *gcc_16,  *clang_extra_cccl, *clangd_dev, { <<: *cuda_curr_max, <<: *cccl_cuda_opts }, *cccl_dev], env: *gcc_env }
+
   - { features: [*python, *dood, *llvm_20, *clang_extra_cccl, *clangd_dev, { <<: *cuda_prev_max, <<: *cccl_cuda_opts }, *cccl_dev], env: *llvm_env }
   - { features: [*python, *dood, *llvm_20, *clang_extra_cccl, *clangd_dev, { <<: *cuda_curr_min, <<: *cccl_cuda_opts }, *cccl_dev], env: *llvm_env }
   - { features: [*python, *dood, *llvm_20, *clang_extra_cccl, *clangd_dev, { <<: *cuda_curr_max, <<: *cccl_cuda_opts }, *cccl_dev], env: *llvm_env }
@@ -200,6 +203,8 @@ include:
 - os: "ubuntu:26.04"
   images:
   - { features: [*python, *dood, *gcc_15,  *clang_extra_cccl, *clangd_dev, { <<: *cuda_curr_max, <<: *cccl_cuda_opts }, *cccl_dev], env: *gcc_env }
+
+  - { features: [*python, *dood, *gcc_16,  *clang_extra_cccl, *clangd_dev, { <<: *cuda_curr_max, <<: *cccl_cuda_opts }, *cccl_dev], env: *gcc_env }
 
   # cuda-ext images:
   - { features: [*python, *dood, *gcc_15,  *clang_extra_cccl, *clangd_dev, { <<: *cuda_curr_max, <<: *cccl_cuda_ext_opts }, *cccl_dev], env: *gcc_env }
