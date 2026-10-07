@@ -113,6 +113,7 @@ declare -a commands_and_sources=(
     "configure-sccache-dist             sccache/dist/configure.sh"
     "sccache-dist-status                sccache/dist/status.sh"
     "list-active-sccache-dist-compiles  sccache/dist/list-active-compiles.sh"
+    "print-sccache-dist-compile-times   sccache/dist/print-compile-times.sh"
 )
 
 # Install alternatives
