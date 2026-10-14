@@ -1,7 +1,7 @@
 {
   "name": "CUDA Toolkit",
   "id": "cuda",
-  "version": "26.12.1",
+  "version": "26.12.2",
   "description": "A feature to install the NVIDIA CUDA Toolkit",
   "options": {
     "version": {
@@ -85,6 +85,11 @@
       "type": "boolean",
       "default": true,
       "description": "Install CUDA Runtime Library (cudart)"
+    },
+    "installCudaCompat": {
+      "type": "boolean",
+      "default": false,
+      "description": "Install CUDA Compatibility Package (cuda-compat)"
     },
     "installNVRTC": {
       "type": "boolean",
