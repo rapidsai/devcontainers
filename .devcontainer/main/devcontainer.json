@@ -1,5 +1,5 @@
 {
-  "image": "mcr.microsoft.com/devcontainers/javascript-node:0-18",
+  "image": "mcr.microsoft.com/devcontainers/javascript-node:24",
   "customizations": {
     "vscode": {
       "extensions": [
@@ -8,7 +8,9 @@
     }
   },
   "features": {
-    "ghcr.io/devcontainers/features/docker-in-docker:2": {}
+    "ghcr.io/devcontainers/features/docker-in-docker:4.1.3": {
+      "moby": false
+    }
   },
   "remoteUser": "node",
   "updateContentCommand": "sudo apt update && sudo apt install -y bash-completion && npm i -g @devcontainers/cli"
