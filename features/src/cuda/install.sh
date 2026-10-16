@@ -201,6 +201,10 @@ if "${INSTALLCUDSS:-false}"; then
     PKGS+=("cudss-cuda-${cuda_ver_major}");
 fi
 
+if [ "${INSTALLCUDACOMPAT:-false}" = true ]; then
+    PKGS+=("cuda-compat-${cuda_ver}");
+fi
+
 if [ "${INSTALLNCCL:-false}" = true ] \
 && test -n "$(apt-cache search libnccl2 2>/dev/null)" \
 && apt-cache policy libnccl2 2>/dev/null | grep -q "+${cuda_tag}"; then
@@ -270,6 +274,15 @@ export CUDA_VERSION_MAJOR;
 export CUDA_VERSION_MINOR;
 export CUDA_VERSION_PATCH;
 
+# Track whether the cuda-compat forward compatibility package was
+# installed, so container entrypoints (via setup-cuda-compat) can decide
+# whether to configure the system to use it.
+CUDA_COMPAT_INSTALLED="false";
+if [ "${INSTALLCUDACOMPAT:-false}" = true ]; then
+    CUDA_COMPAT_INSTALLED="true";
+fi
+export CUDA_COMPAT_INSTALLED;
+
 if [ "${INSTALLCUTENSOR:-false}" = true ]; then
     # Remove extra libcutensor versions
     source ./prune-extra-cutensor-libs.sh;
@@ -282,6 +295,7 @@ vars_+=('$CUDA_VERSION');
 vars_+=('$CUDA_VERSION_MAJOR');
 vars_+=('$CUDA_VERSION_MINOR');
 vars_+=('$CUDA_VERSION_PATCH');
+vars_+=('$CUDA_COMPAT_INSTALLED');
 printf -v vars_ '%s,' "${vars_[@]}";
 
 # export envvars in bashrc files
@@ -295,6 +309,9 @@ cat <<EOF > /etc/ld.so.conf.d/nvidia.conf
 /usr/local/nvidia/lib
 /usr/local/nvidia/lib64
 EOF
+
+# Install the cuda-compat setup script for use by container entrypoints.
+install -m 0755 setup-cuda-compat.sh /usr/local/bin/setup-cuda-compat;
 
 # Clean up
 # rm -rf /tmp/*;

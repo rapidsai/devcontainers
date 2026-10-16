@@ -5,6 +5,7 @@ __cuda_version="${CUDA_VERSION:-${CUDA_VERSION}}";
 __cuda_version_major="${CUDA_VERSION_MAJOR:-${CUDA_VERSION_MAJOR}}";
 __cuda_version_minor="${CUDA_VERSION_MINOR:-${CUDA_VERSION_MINOR}}";
 __cuda_version_patch="${CUDA_VERSION_PATCH:-${CUDA_VERSION_PATCH}}";
+__cuda_compat_installed="${CUDA_COMPAT_INSTALLED:-${CUDA_COMPAT_INSTALLED}}";
 
 export NVARCH="${__nvarch}";
 export CUDA_HOME="${__cuda_home}";
@@ -13,6 +14,7 @@ export CUDA_VERSION="${__cuda_version}";
 export CUDA_VERSION_MAJOR="${__cuda_version_major}";
 export CUDA_VERSION_MINOR="${__cuda_version_minor}";
 export CUDA_VERSION_PATCH="${__cuda_version_patch}";
+export CUDA_COMPAT_INSTALLED="${__cuda_compat_installed}";
 
 if [ -n "${PATH##*"/usr/local/nvidia/bin:${__cuda_home}/bin"*}" ]; then
     export PATH="/usr/local/nvidia/bin:${__cuda_home}/bin:${PATH}";
@@ -28,4 +30,4 @@ if [ -z "${LD_LIBRARY_PATH:-}" ] \
     export LD_LIBRARY_PATH="/usr/local/nvidia/lib:/usr/local/nvidia/lib64${LD_LIBRARY_PATH:+:$LD_LIBRARY_PATH}"
 fi
 
-unset __nvarch __cuda_home __cuda_path __cuda_version __cuda_version_major __cuda_version_minor __cuda_version_patch
+unset __nvarch __cuda_home __cuda_path __cuda_version __cuda_version_major __cuda_version_minor __cuda_version_patch __cuda_compat_installed
