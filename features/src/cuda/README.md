@@ -26,6 +26,7 @@ A feature to install the NVIDIA CUDA Toolkit
 | installcuTensor | Install CUDA Tensor Linear Algebra Library (cuTensor) | boolean | false |
 | installNCCL | Install NVIDIA Collective Communications Library (NCCL) | boolean | true |
 | installCUDARuntime | Install CUDA Runtime Library (cudart) | boolean | true |
+| installCudaCompat | Install CUDA Compatibility Package (cuda-compat) | boolean | false |
 | installNVRTC | Install NVIDIA Runtime Compilation Library (NVRTC) | boolean | false |
 | installOpenCL | Install NVIDIA CUDA OpenCL Library | boolean | false |
 | installcuBLAS | Install CUDA Basic Linear Algebra Library (cuBLAS) | boolean | false |

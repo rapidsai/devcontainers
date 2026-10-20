@@ -87,6 +87,11 @@
       "default": true,
       "description": "Install CUDA Runtime Library (cudart)"
     },
+    "installCudaCompat": {
+      "type": "boolean",
+      "default": false,
+      "description": "Install CUDA Compatibility Package (cuda-compat)"
+    },
     "installNVRTC": {
       "type": "boolean",
       "default": false,
