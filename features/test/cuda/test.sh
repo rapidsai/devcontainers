@@ -17,7 +17,7 @@ source dev-container-features-test-lib
 
 # Feature-specific tests
 # The 'check' command comes from the dev-container-features-test-lib.
-check "CUDA version" bash -c "echo '$CUDA_VERSION' | grep '13.4.2'";
+check "CUDA version" bash -c "echo '$CUDA_VERSION' | grep '13.4.3'";
 check "CUDA major version" bash -c "echo '$CUDA_VERSION_MAJOR' | grep '13'";
 check "CUDA minor version" bash -c "echo '$CUDA_VERSION_MINOR' | grep '4'";
 check "CUDA patch version" bash -c "echo '$CUDA_VERSION_PATCH' | grep '2'";
