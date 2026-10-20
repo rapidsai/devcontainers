@@ -4,6 +4,7 @@
     "config:recommended"
   ],
   "enabledManagers": [
+    "github-actions",
     "custom.regex"
   ],
   "packageRules": [
@@ -20,6 +21,13 @@
         "*"
       ],
       "ignoreUnstable": true
+    },
+    {
+      "description": "Group all GitHub Actions updates into a single PR",
+      "matchManagers": [
+        "github-actions"
+      ],
+      "groupName": "github-actions"
     },
     {
       "description": "Keep UCX version updates in their own PR, and skip -rcN and other pre-releases",
