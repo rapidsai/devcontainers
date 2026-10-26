@@ -26,13 +26,13 @@ runs:
 
     - if: runner.environment == 'self-hosted'
       name: Setup Node.js
-      uses: actions/setup-node@48b55a011bda9f5d6aeb4c2d9c7362e8dae4041e # v6
+      uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38 # v6
       with:
         node-version: '24'
 
     - if: runner.environment != 'self-hosted'
       name: Set up QEMU
-      uses: docker/setup-qemu-action@ce360397dd3f832beb865e1373c09c0e9f86d70a # v4
+      uses: docker/setup-qemu-action@99012661954931238ded8c8b007157a8430204e1 # v4
 
     - name: Create docker context
       shell: bash
@@ -40,14 +40,14 @@ runs:
 
     - if: runner.environment != 'self-hosted'
       name: Setup docker buildx on github-hosted runners
-      uses: docker/setup-buildx-action@4d04d5d9486b7bd6fa91e7baf45bbb4f8b9deedd # v4
+      uses: docker/setup-buildx-action@f87e5991a6d7451dcb8d9637bfbc97413f497069 # v4
       with:
         buildkitd-flags: --debug
         endpoint: builder
 
     - if: runner.environment == 'self-hosted'
       name: Setup docker buildx on self-hosted runners
-      uses: docker/setup-buildx-action@4d04d5d9486b7bd6fa91e7baf45bbb4f8b9deedd # v4
+      uses: docker/setup-buildx-action@f87e5991a6d7451dcb8d9637bfbc97413f497069 # v4
       with:
         buildkitd-flags: --debug --config /etc/buildkit/buildkitd.toml
         endpoint: builder
