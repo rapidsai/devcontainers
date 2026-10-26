@@ -1,0 +1,67 @@
+{
+  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+  "extends": [
+    "config:recommended"
+  ],
+  "enabledManagers": [
+    "github-actions",
+    "custom.regex"
+  ],
+  "packageRules": [
+    {
+      "description": "Wait for 7 days post-release before updating",
+      "matchPackageNames": [
+        "*"
+      ],
+      "minimumReleaseAge": "7 days"
+    },
+    {
+      "description": "Ignore alphas, release candidates, and other 'unstable' versions",
+      "matchPackageNames": [
+        "*"
+      ],
+      "ignoreUnstable": true
+    },
+    {
+      "description": "Group all GitHub Actions updates into a single PR",
+      "matchManagers": [
+        "github-actions"
+      ],
+      "groupName": "github-actions"
+    },
+    {
+      "description": "Keep UCX version updates in their own PR, and skip -rcN and other pre-releases",
+      "matchPackageNames": [
+        "openucx/ucx"
+      ],
+      "allowedVersions": "/^\\d+\\.\\d+\\.\\d+$/",
+      "groupName": "ucx"
+    }
+  ],
+  "customManagers": [
+    {
+      "description": "UCX version in the build matrix (x-ucx-rapids anchor)",
+      "customType": "regex",
+      "managerFilePatterns": ["/^matrix\\.yml$/"],
+      "matchStrings": [
+        "x-ucx-rapids: &ucx_rapids \\{ name: \"ucx\", version: \"(?<currentValue>[^\"]+)\" \\}"
+      ],
+      "depNameTemplate": "openucx/ucx",
+      "datasourceTemplate": "github-tags",
+      "extractVersionTemplate": "^v(?<version>.+)$",
+      "versioningTemplate": "semver"
+    },
+    {
+      "description": "UCX version in rapidsai/devcontainers image tags (e.g. 26.12-cpp-cuda13.3-ucx1.21.0-openmpi5.0.10)",
+      "customType": "regex",
+      "managerFilePatterns": ["/^\\.devcontainer/[^/]+/devcontainer\\.json$/"],
+      "matchStrings": [
+        "\"BASE\": \"rapidsai/devcontainers:[^\"]*-ucx(?<currentValue>\\d+\\.\\d+\\.\\d+)-[^\"]*\""
+      ],
+      "depNameTemplate": "openucx/ucx",
+      "datasourceTemplate": "github-tags",
+      "extractVersionTemplate": "^v(?<version>.+)$",
+      "versioningTemplate": "semver"
+    }
+  ]
+}
