@@ -311,7 +311,12 @@ repos:
       - name: libcuopt
         sub_dir: python/libcuopt
         depends: [cuopt]
-        args: {install: *rapids_build_backend_args}
+        args:
+          install: *rapids_build_backend_args
+          cmake: |
+            -DCUOPT_FIND_CLIENT_EXTERNALLY=ON
+            -DCUOPT_FIND_MATHOPT_EXTERNALLY=ON
+            -DCUOPT_FIND_ROUTING_EXTERNALLY=ON
       - name: cuopt
         sub_dir: python/cuopt
         depends: [cuopt, cudf, raft]
