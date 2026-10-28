@@ -103,8 +103,6 @@ jobs:
           return "$exit_code"
         }
 
-        mkdir telemetry-artifacts
-
         # Clone all the repos
         run_command "Clone RAPIDS repositories" \
           clone-all -j$(nproc) -v -q --clone-upstream --depth 1 --single-branch --shallow-submodules --no-update-env;
@@ -113,7 +111,7 @@ jobs:
           rapids-post-start-command;
 
         # Configure all the C++ libs
-        run_command "Configure C++ libraries" bash -ceuo pipefail "\
+        run_command "Configure C++ libraries" \
           time configure-all \
             -j${PARALLEL_LEVEL} \
             -GNinja \
@@ -123,20 +121,19 @@ jobs:
             -DBUILD_PRIMS_BENCH=ON \
             -DBUILD_SHARED_LIBS=ON \
             -DRAFT_COMPILE_LIBRARY=ON \
-            -DBUILD_CUGRAPH_MG_TESTS=ON 2>&1 \
-          | tee -a telemetry-artifacts/build.log";
+            -DBUILD_CUGRAPH_MG_TESTS=ON;
 
         # Build all the C++ libs
-        run_command "Build C++ libraries" bash -ceuo pipefail "\
-          time build-all-cpp -j${PARALLEL_LEVEL} 2>&1 | tee -a telemetry-artifacts/build.log";
+        run_command "Build C++ libraries" \
+          time build-all-cpp -j${PARALLEL_LEVEL};
 
         # Build all the Python libs
-        run_command "Build Python libraries" bash -ceuo pipefail "\
-          time build-all-python -j${PARALLEL_LEVEL} 2>&1 | tee -a telemetry-artifacts/build.log";
+        run_command "Build Python libraries" \
+          time build-all-python -j${PARALLEL_LEVEL};
 
         # Print cache and dist stats
-        run_command "sccache stats" bash -ceuo pipefail "\
-          sccache --show-adv-stats | tee -a telemetry-artifacts/sccache-stats.txt";
+        run_command "sccache stats" \
+          sccache --show-adv-stats;
 
         # Print build times
         run_command "Build times" bash -ceuo pipefail "\
