@@ -311,6 +311,8 @@ repos:
       - name: libcuopt
         sub_dir: python/libcuopt
         depends: [cuopt]
+        env: |
+          CUDSS_DIR=/usr
         args:
           install: *rapids_build_backend_args
           cmake: |
