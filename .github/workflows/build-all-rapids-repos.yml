@@ -103,6 +103,8 @@ jobs:
           return "$exit_code"
         }
 
+        mkdir telemetry-artifacts
+
         # Clone all the repos
         run_command "Clone RAPIDS repositories" \
           clone-all -j$(nproc) -v -q --clone-upstream --depth 1 --single-branch --shallow-submodules --no-update-env;
