@@ -11,6 +11,14 @@ on:
         type: string
         required: false
         default: cpu32
+      sccache_repo:
+        type: string
+        required: false
+        default: rapidsai/sccache
+      sccache_version:
+        type: string
+        required: false
+        default: latest
 
 permissions: {}
 
@@ -66,10 +74,12 @@ jobs:
         PYTHON_VERSION=3.13
         CONDA_ENV_CREATE_QUIET=1
         PARALLEL_LEVEL=0
-        SCCACHE_IDLE_TIMEOUT=0
-        SCCACHE_SERVER_LOG=sccache=debug
         SCCACHE_DIST_MAX_RETRIES=inf
         SCCACHE_DIST_FALLBACK_TO_LOCAL_COMPILE=false
+        SCCACHE_IDLE_TIMEOUT=0
+        SCCACHE_SERVER_LOG=sccache=debug
+        SCCACHE_REPOSITORY=${{ inputs.sccache_repo }}
+        SCCACHE_VERSION=${{ inputs.sccache_version }}
         ${{ matrix.env }}
       build_command: |
         function begin_group() {
@@ -161,9 +171,9 @@ jobs:
 
         sleep 1
 
-        for ENVVAR in "SCCACHE_RECACHE=1" \
-                      "SCCACHE_S3_USE_PREPROCESSOR_CACHE_MODE=0" \
-                      "SCCACHE_S3_USE_PREPROCESSOR_CACHE_MODE=1" ; do
+        for ENVVAR in "SCCACHE_RECACHE=1 SCCACHE_RECACHE_DEPENDENCIES=1 SCCACHE_S3_USE_PREPROCESSOR_CACHE_MODE=1" \
+                      "SCCACHE_RECACHE=0 SCCACHE_RECACHE_DEPENDENCIES=1 SCCACHE_S3_USE_PREPROCESSOR_CACHE_MODE=0" \
+                      "SCCACHE_RECACHE=0 SCCACHE_RECACHE_DEPENDENCIES=0 SCCACHE_S3_USE_PREPROCESSOR_CACHE_MODE=1" ; do
 
           # Restart sccache
           run_command "Start sccache (${ENVVAR})" bash -ceuo pipefail "\
