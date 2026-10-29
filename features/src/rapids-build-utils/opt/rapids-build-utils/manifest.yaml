@@ -108,6 +108,7 @@ repos:
       - name: cudf_streaming
         sub_dir: cpp/libcudf_streaming
         depends: [cudf, rapidsmpf]
+        test: ci/run_cudf_streaming_ctests.sh
     python:
       - name: libcudf
         sub_dir: python/libcudf
