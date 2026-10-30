@@ -60,7 +60,7 @@ fi
 check_packages curl ca-certificates ${gcc_pkgs} libc6-dev libssl-dev gnupg2 gettext-base;
 
 if ! dpkg -s gnupg2 ${lldb_pkg} python3-minimal pkg-config > /dev/null 2>&1; then
-    apt-get install -y --no-install-recommends ${lldb_pkg} python3-minimal libpython3.? pkg-config;
+    check_packages ${lldb_pkg} python3-minimal libpython3.? pkg-config;
 fi
 
 architecture="${TARGETARCH:-$(uname -m | sed -e 's/x86_/amd/' -e 's/aarch/arm/')}";
