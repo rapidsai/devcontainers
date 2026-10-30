@@ -35,11 +35,16 @@
       "installcuSPARSE": true,
       "installProfilers": true
     },
+    "./features/src/rust": {
+      "profile": "minimal",
+      "components": "rustfmt,clippy"
+    },
     "./features/src/utils": {},
     "./features/src/rapids-build-utils": {}
   },
   "overrideFeatureInstallOrder": [
     "./features/src/cuda",
+    "./features/src/rust",
     "./features/src/utils",
     "./features/src/rapids-build-utils"
   ],
