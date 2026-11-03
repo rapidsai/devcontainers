@@ -52,7 +52,7 @@
       "versioningTemplate": "semver"
     },
     {
-      "description": "UCX version in rapidsai/devcontainers image tags (e.g. 26.12-cpp-cuda13.3-ucx1.21.0-openmpi5.0.10)",
+      "description": "UCX version in rapidsai/devcontainers image tags (e.g. 26.12-cpp-cuda13.4-ucx1.21.0-openmpi5.0.10)",
       "customType": "regex",
       "managerFilePatterns": ["/^\\.devcontainer/[^/]+/devcontainer\\.json$/"],
       "matchStrings": [
