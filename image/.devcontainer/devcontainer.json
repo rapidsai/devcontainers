@@ -15,7 +15,7 @@
   },
   "workspaceFolder": "/home/coder",
   "features": {
-    "ghcr.io/devcontainers/features/common-utils:2": {
+    "ghcr.io/devcontainers/features/common-utils:2.7.0": {
       "userUid": "1001",
       "userGid": "1001",
       "username": "coder",
