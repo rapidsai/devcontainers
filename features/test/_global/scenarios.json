@@ -15,7 +15,7 @@
   "cpp_llvm_cuda_nvhpc": {
     "image": "ubuntu:22.04",
     "features": {
-      "ghcr.io/devcontainers/features/common-utils:2": {
+      "ghcr.io/devcontainers/features/common-utils:2.7.0": {
         "uid": "1001",
         "gid": "1001",
         "username": "coder",
