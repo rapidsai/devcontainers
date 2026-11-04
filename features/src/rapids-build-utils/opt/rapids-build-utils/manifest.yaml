@@ -309,6 +309,18 @@ repos:
           CUDSS_DIR=/usr
         test: ci/run_ctests.sh
     python:
+      - name: libcuopt_client
+        sub_dir: python/libcuopt_client
+        depends: [cuopt]
+        args: {install: *rapids_build_backend_args}
+      - name: libcuopt_mathopt
+        sub_dir: python/libcuopt_mathopt
+        depends: [cuopt]
+        args: {install: *rapids_build_backend_args}
+      - name: libcuopt_routing
+        sub_dir: python/libcuopt_routing
+        depends: [cuopt]
+        args: {install: *rapids_build_backend_args}
       - name: libcuopt
         sub_dir: python/libcuopt
         depends: [cuopt]

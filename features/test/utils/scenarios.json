@@ -13,7 +13,7 @@
       "sccache_dist_scheduler_url": "${localEnv:sccache_dist_scheduler_url}"
     },
     "features": {
-      "ghcr.io/devcontainers/features/common-utils:2": {
+      "ghcr.io/devcontainers/features/common-utils:2.7.0": {
         "uid": "1001",
         "gid": "1001",
         "username": "coder",
@@ -60,7 +60,7 @@
       "sccache_dist_scheduler_url": "${localEnv:sccache_dist_scheduler_url}"
     },
     "features": {
-      "ghcr.io/devcontainers/features/common-utils:2": {
+      "ghcr.io/devcontainers/features/common-utils:2.7.0": {
         "uid": "1001",
         "gid": "1001",
         "username": "coder",
@@ -107,7 +107,7 @@
       "sccache_dist_scheduler_url": "${localEnv:sccache_dist_scheduler_url}"
     },
     "features": {
-      "ghcr.io/devcontainers/features/common-utils:2": {
+      "ghcr.io/devcontainers/features/common-utils:2.7.0": {
         "uid": "1001",
         "gid": "1001",
         "username": "coder",
@@ -154,7 +154,7 @@
       "sccache_dist_scheduler_url": "${localEnv:sccache_dist_scheduler_url}"
     },
     "features": {
-      "ghcr.io/devcontainers/features/common-utils:2": {
+      "ghcr.io/devcontainers/features/common-utils:2.7.0": {
         "uid": "1001",
         "gid": "1001",
         "username": "coder",
