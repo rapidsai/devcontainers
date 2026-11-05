@@ -16,9 +16,9 @@ if ($build -lt 0) {
     $build = 0
 }
 
-# Use 13.4.3 for 13.4
-if ($major -eq 13 -and $minor -eq 4) {
-    $build = 3
+# Use 13.5.0 for 13.5
+if ($major -eq 13 -and $minor -eq 5) {
+    $build = 0
 }
 
 # mmb == major minor build
