@@ -55,7 +55,12 @@ jobs:
           persist-credentials: false
 
       - name: Run ShellCheck
-        run: shellcheck .github/actions/devcontainer-json/action.sh ci/validate-devcontainer-bases.sh
+        run: shellcheck .github/actions/devcontainer-json/action.sh ci/validate-devcontainer-bases.sh ci/release/test-feature-version-update.sh
+
+      - name: Test feature version updates
+        run: |
+          python3 -m pip install packaging
+          bash ci/release/test-feature-version-update.sh
 
   build-all-rapids-repos:
     if: needs.check-event.outputs.ok == 'true' && github.repository_owner == 'rapidsai'

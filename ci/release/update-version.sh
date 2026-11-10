@@ -107,10 +107,28 @@ for file in $(find .devcontainer -name devcontainer.json); do
   sed_runner "s@rapids-\${localWorkspaceFolderBasename}-[0-9.]*@rapids-\${localWorkspaceFolderBasename}-${NEXT_SHORT_TAG}@g" "${file}"
 done
 
-for file in $(find features -name devcontainer-feature.json); do
-  tmp=$(mktemp)
-  jq --arg ver "$NEXT_FULL_TAG_PEP440" '.version = $ver' "$file" > "$tmp" && mv "$tmp" "$file"
-done
+# Update the payload before deciding whether its feature needs a patch bump.
+manifest=features/src/rapids-build-utils/opt/rapids-build-utils/manifest.yaml
+previous_manifest=$(mktemp)
+cp "$manifest" "$previous_manifest"
+yq -i --yaml-fix-merge-anchor-to-spec ".x-git-defaults.tag = \"$RAPIDS_BRANCH_NAME\"" "$manifest"
+yq -i --yaml-fix-merge-anchor-to-spec "(.repos[] | select(.name == \"ucxx\") | .git.tag) = \"$UCXX_BRANCH_NAME\"" "$manifest"
+manifest_changed=false
+if ! cmp -s "$previous_manifest" "$manifest"; then
+  manifest_changed=true
+fi
+rm -f "$previous_manifest"
 
-yq -i --yaml-fix-merge-anchor-to-spec ".x-git-defaults.tag = \"$RAPIDS_BRANCH_NAME\"" features/src/rapids-build-utils/opt/rapids-build-utils/manifest.yaml
-yq -i --yaml-fix-merge-anchor-to-spec "(.repos[] | select(.name == \"ucxx\") | .git.tag) = \"$UCXX_BRANCH_NAME\"" features/src/rapids-build-utils/opt/rapids-build-utils/manifest.yaml
+for file in $(find features -name devcontainer-feature.json); do
+  feature_version="$NEXT_FULL_TAG_PEP440"
+  current_version=$(jq -r '.version' "$file")
+  if [[ "${current_version%.*}" == "$NEXT_SHORT_TAG_PEP440" ]]; then
+    # Feature patches are independent of the repository's .00 version.
+    feature_version="$current_version"
+    if [[ "$file" == features/src/rapids-build-utils/devcontainer-feature.json && "$manifest_changed" == true ]]; then
+      feature_version="${current_version%.*}.$((10#${current_version##*.} + 1))"
+    fi
+  fi
+  tmp=$(mktemp)
+  jq --arg ver "$feature_version" '.version = $ver' "$file" > "$tmp" && mv "$tmp" "$file"
+done
