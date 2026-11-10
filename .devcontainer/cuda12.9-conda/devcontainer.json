@@ -5,16 +5,16 @@
     "args": {
       "CUDA": "12.9",
       "PYTHON_PACKAGE_MANAGER": "conda",
-      "BASE": "rapidsai/devcontainers:26.12-cpp-mambaforge"
+      "BASE": "rapidsai/devcontainers:27.02-cpp-mambaforge"
     },
     "cacheFrom": [
-      "ghcr.io/rapidsai/devcontainers/devcontainer:26.12-cuda12.9-conda"
+      "ghcr.io/rapidsai/devcontainers/devcontainer:27.02-cuda12.9-conda"
     ]
   },
   "runArgs": [
     "--rm",
     "--name",
-    "${localEnv:USER:anon}-rapids-${localWorkspaceFolderBasename}-26.12-cuda12.9-conda",
+    "${localEnv:USER:anon}-rapids-${localWorkspaceFolderBasename}-27.02-cuda12.9-conda",
     "--env-file",
     "${localWorkspaceFolder}/.devcontainer/.env",
     "--env-file",
