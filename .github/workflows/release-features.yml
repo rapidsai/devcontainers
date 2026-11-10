@@ -24,7 +24,7 @@ jobs:
         uses: ./.github/actions/install-devcontainers-cli
 
       - name: Release features
-        uses: devcontainers/action@1082abd5d2bf3a11abccba70eef98df068277772 # v1.4.3
+        uses: devcontainers/action@1082abd5d2bf3a11abccba70eef98df068277772 # v1
         with:
           generate-docs: true
           publish-features: true

@@ -82,7 +82,7 @@ jobs:
           }
 
       - name: Login to container registry
-        uses: docker/login-action@4907a6ddec9925e35a0a9e82d7399ccc52663121 # v4.1.0
+        uses: docker/login-action@4907a6ddec9925e35a0a9e82d7399ccc52663121 # v4
         with:
           registry: ${{ case(startsWith(inputs.repo, 'ghcr.io/'), 'ghcr.io', 'docker.io') }}
           username: ${{ case(startsWith(inputs.repo, 'ghcr.io/'), github.actor, secrets.GPUCIBOT_DOCKERHUB_USER || vars.DOCKERHUB_USER) }}

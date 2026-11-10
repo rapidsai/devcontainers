@@ -92,7 +92,7 @@ jobs:
         uses: ./.github/actions/install-devcontainers-cli
 
       - name: Validate devcontainer-feature.json files
-        uses: devcontainers/action@1082abd5d2bf3a11abccba70eef98df068277772 # v1.4.3
+        uses: devcontainers/action@1082abd5d2bf3a11abccba70eef98df068277772 # v1
         with:
           validate-only: true
           base-path-to-features: "./features/src"
