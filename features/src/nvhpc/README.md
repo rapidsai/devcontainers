@@ -7,7 +7,7 @@ A feature to install the NVHPC SDK
 
 ```json
 "features": {
-    "ghcr.io/rapidsai/devcontainers/features/nvhpc:26": {}
+    "ghcr.io/rapidsai/devcontainers/features/nvhpc:27": {}
 }
 ```
 

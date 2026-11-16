@@ -7,7 +7,7 @@ A feature to install UCX
 
 ```json
 "features": {
-    "ghcr.io/rapidsai/devcontainers/features/ucx:26": {}
+    "ghcr.io/rapidsai/devcontainers/features/ucx:27": {}
 }
 ```
 
