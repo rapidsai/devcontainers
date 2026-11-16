@@ -7,7 +7,7 @@ A feature to install OpenMPI with optional CUDA and UCX support
 
 ```json
 "features": {
-    "ghcr.io/rapidsai/devcontainers/features/openmpi:26": {}
+    "ghcr.io/rapidsai/devcontainers/features/openmpi:27": {}
 }
 ```
 
