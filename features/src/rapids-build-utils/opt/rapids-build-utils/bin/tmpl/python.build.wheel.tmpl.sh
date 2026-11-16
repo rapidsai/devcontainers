@@ -78,6 +78,9 @@ build_${PY_LIB}_python_wheel() {
 
     pip_args+=("${PY_SRC}");
 
+    export PIP_CONSTRAINTS=/tmp/constraints.txt;
+    echo 'rapids-dependency-file-generator @ git+https://github.com/KyleFromNVIDIA/rapids-dependency-file-generator.git@4a42c76999ef986c884c2f57bdc2e48d4b3b7f1a' > "${PIP_CONSTRAINTS}";
+
     # Ensure SCCACHE_NO_DIST_COMPILE=1 is set while configuring
     # so CMake's compiler tests never use the build cluster.
 

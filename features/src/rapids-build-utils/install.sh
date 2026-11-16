@@ -43,17 +43,12 @@ if [[ "${DISTRIB_RELEASE}" > "22.04" ]]; then
     fi
 fi
 
-git clone https://github.com/KyleFromNVIDIA/rapids-dependency-file-generator.git /tmp/rapids-dependency-file-generator
-git -C /tmp/rapids-dependency-file-generator checkout 4a42c76999ef986c884c2f57bdc2e48d4b3b7f1a
-
 python3 -m pip install "${_PIP_INSTALL_ARGS[@]}" "${_PIP_UPGRADE_ARGS[@]}" pip;
 # Install RAPIDS dependency file generator, conda-merge, and toml
 python3 -m pip install "${_PIP_INSTALL_ARGS[@]}" \
-    '/tmp/rapids-dependency-file-generator' \
+    'rapids-dependency-file-generator @ git+https://github.com/KyleFromNVIDIA/rapids-dependency-file-generator.git@4a42c76999ef986c884c2f57bdc2e48d4b3b7f1a' \
     conda-merge \
     toml;
-
-rm -r /tmp/rapids-dependency-file-generator;
 
 # Install RAPIDS build utility scripts to /opt/
 
