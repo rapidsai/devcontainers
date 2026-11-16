@@ -96,9 +96,6 @@ install_${PY_LIB}_python() {
         pip_args+=("${PY_SRC}");
     fi
 
-    # Use DFG prototype
-    pip_args+=('rapids-dependency-file-generator @ git+https://github.com/KyleFromNVIDIA/rapids-dependency-file-generator.git@4a42c76999ef986c884c2f57bdc2e48d4b3b7f1a');
-
     # Ensure SCCACHE_NO_DIST_COMPILE=1 is set while configuring
     # so CMake's compiler tests never use the build cluster.
 
@@ -121,6 +118,12 @@ EOF
     time (
         echo "Installing ${PY_LIB}";
         export ${PY_ENV} PATH="$PATH";
+        # Install the DFG prototype before pip prepares package metadata. Editable
+        # builds disable isolation, so build constraints do not affect their backend.
+        # Force replacement because the prototype shares its version with PyPI.
+        python -m pip install --force-reinstall \
+            'rapids-dependency-file-generator @ git+https://github.com/KyleFromNVIDIA/rapids-dependency-file-generator.git@4a42c76999ef986c884c2f57bdc2e48d4b3b7f1a';
+
         local cudaflags="${CUDAFLAGS:+$CUDAFLAGS }-t=${n_arch}";
         local build_type="$(rapids-select-cmake-build-type "${cmake_args[@]}" || echo "Release")";
         local nvcc_append_flags="${NVCC_APPEND_FLAGS:+$NVCC_APPEND_FLAGS }-t=${n_arch}";
