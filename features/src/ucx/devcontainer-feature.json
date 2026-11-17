@@ -1,13 +1,14 @@
 {
   "name": "UCX",
   "id": "ucx",
-  "version": "27.2.0",
+  "version": "27.2.1",
   "description": "A feature to install UCX",
   "options": {
     "version": {
       "type": "string",
       "proposals": [
         "latest",
+        "1.21.1",
         "1.21.0",
         "1.20.1",
         "1.20.0",
