@@ -122,7 +122,7 @@ EOF
         # builds disable isolation, so build constraints do not affect their backend.
         # Force replacement because the prototype shares its version with PyPI.
         python -m pip install --force-reinstall \
-            'rapids-dependency-file-generator @ git+https://github.com/KyleFromNVIDIA/rapids-dependency-file-generator.git@4a42c76999ef986c884c2f57bdc2e48d4b3b7f1a';
+            'rapids-dependency-file-generator @ git+https://github.com/KyleFromNVIDIA/rapids-dependency-file-generator.git@7ad2dedcb53b173280ba26cb85794e96b1d51585';
 
         local cudaflags="${CUDAFLAGS:+$CUDAFLAGS }-t=${n_arch}";
         local build_type="$(rapids-select-cmake-build-type "${cmake_args[@]}" || echo "Release")";
