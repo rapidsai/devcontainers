@@ -26,7 +26,7 @@ fi
 # Install Ninja
 wget --no-hsts -q -O /tmp/ninja-linux.zip \
     "https://github.com/ninja-build/ninja/releases/download/v${NINJA_VERSION}/${_name}.zip";
-unzip -d /usr/bin /tmp/ninja-linux.zip;
+unzip -o -d /usr/bin /tmp/ninja-linux.zip;
 chmod +x /usr/bin/ninja;
 
 # Install Ninja bash completions
