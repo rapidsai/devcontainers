@@ -90,6 +90,7 @@ clone_git_repo() {
 
     if test -n "${branch:+x}"; then
         local remote;
+        local found_ref="false";
         for remote in upstream origin; do
             # if remote has branch
             if git -C "${directory}" ls-remote -q --exit-code --heads "${remote}" "${branch}"; then
@@ -100,6 +101,7 @@ clone_git_repo() {
                     git -C "${directory}" branch "${branch}" -u "${remote}/${branch}";
                 fi
                 git -C "${directory}" pull "${remote}" "${branch}";
+                found_ref="true"
                 break;
             # if remote has tag
             elif git -C "${directory}" ls-remote -q --exit-code --tags "${remote}" "${branch}"; then
@@ -109,9 +111,15 @@ clone_git_repo() {
                     # local branch already exists, just check it out
                     git -C "${directory}" checkout "${q[@]}" "${remote}/tag/${branch}";
                 fi
+                found_ref="true"
                 break;
             fi
         done
+
+        if test "${found_ref}" == "false"; then
+            echo "Error: failed to find ref '${branch}' in remotes for repo '${directory}'" >&2;
+            exit 1;
+        fi
     fi
 
     # shellcheck disable=SC2086
