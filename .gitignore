@@ -6,3 +6,4 @@
 /features/src/*.[0-9]
 /.devcontainer/.env
 /.devcontainer/*/.env
+devcontainer-lock.json
