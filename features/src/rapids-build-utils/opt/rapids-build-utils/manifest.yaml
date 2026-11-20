@@ -95,7 +95,7 @@ repos:
         test: ci/run_pytests.sh
   - name: cudf
     path: cudf
-    git: {!!merge <<: *git_defaults, repo: cudf}
+    git: {host: github, upstream: KyleFromNVIDIA, repo: cudf, tag: test-dfg-conda-recipe}
     cpp:
       - name: cudf
         sub_dir: cpp
