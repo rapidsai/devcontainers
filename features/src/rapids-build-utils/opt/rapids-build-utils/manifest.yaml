@@ -291,13 +291,6 @@ repos:
         sub_dir: python/cugraph-pyg
         args: {install: *rapids_build_backend_args}
         test: ci/run_cugraph_pyg_pytests.sh
-  - name: nx-cugraph
-    path: nx-cugraph
-    git: {!!merge <<: *git_defaults, repo: nx-cugraph}
-    python:
-      - name: nx-cugraph
-        sub_dir: .
-        args: {install: *rapids_build_backend_args}
   - name: cuopt
     path: cuopt
     git: {!!merge <<: *git_defaults, repo: cuopt, upstream: NVIDIA}
