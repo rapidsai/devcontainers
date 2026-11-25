@@ -80,6 +80,7 @@ jobs:
         SCCACHE_SERVER_LOG=sccache=debug
         SCCACHE_REPOSITORY=${{ inputs.sccache_repo }}
         SCCACHE_VERSION=${{ inputs.sccache_version }}
+        EXCLUDE_REPOS=cuopt
         ${{ matrix.env }}
       build_command: |
         function begin_group() {

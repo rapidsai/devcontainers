@@ -45,7 +45,6 @@ jobs:
           - libs: "rmm ucxx kvikio dask-cuda cudf cudf_kafka rapidsmpf"
           - libs: "rmm ucxx dask-cuda raft cuvs nvforest cuml"
           - libs: "rmm ucxx dask-cuda raft cuvs cugraph cugraph-gnn nx-cugraph"
-          - libs: "cuopt"
           - libs: ""
 
     with:
