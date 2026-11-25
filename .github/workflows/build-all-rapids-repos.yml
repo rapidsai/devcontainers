@@ -44,8 +44,7 @@ jobs:
         include:
           - libs: "rmm ucxx kvikio dask-cuda cudf cudf_kafka rapidsmpf"
           - libs: "rmm ucxx dask-cuda raft cuvs nvforest cuml"
-          - libs: "rmm ucxx dask-cuda raft cuvs cugraph cugraph-gnn nx-cugraph"
-          - libs: "cuopt"
+          - libs: "rmm ucxx dask-cuda raft cuvs cugraph cugraph-gnn"
           - libs: ""
 
     with:
@@ -66,6 +65,7 @@ jobs:
         SCCACHE_SERVER_LOG=sccache=debug
         SCCACHE_DIST_MAX_RETRIES=inf
         SCCACHE_DIST_FALLBACK_TO_LOCAL_COMPILE=false
+        EXCLUDE_REPOS=cuopt
       build_command: |
         function begin_group() {
           local blue="34"
