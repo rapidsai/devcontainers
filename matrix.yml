@@ -187,7 +187,7 @@ include:
   - { features: [*python, *dood, *llvm_23, *clang_extra_cccl, *clangd_dev, { <<: *cuda_clang_23, <<: *cccl_cuda_opts }, *cccl_dev], env: *llvm_env }
 
   # clang-tidy images:
-  - { features: [*python, *dood, *llvm_22, *clang_tidy_libs_cccl, { <<: *cuda_prev_max, <<: *cccl_cuda_tidy_opts }, *cccl_dev], env: *llvm_env }
+  - { features: [*python, *dood, *llvm_23, *clang_tidy_libs_cccl, { <<: *cuda_clang_23, <<: *cccl_cuda_tidy_opts }, *cccl_dev], env: *llvm_env }
 
   # cuda-ext images:
   - { features: [*python, *dood, *gcc_14,  *clang_extra_cccl, *clangd_dev, { <<: *cuda_prev_max, <<: *cccl_cuda_ext_opts }, *cccl_dev], env: *gcc_env }
@@ -204,7 +204,7 @@ include:
   - { features: [*python, *dood, *llvm_22, *clang_extra_cccl, *clangd_dev, { <<: *cuda_prev_max, <<: *cccl_cuda_ext_opts }, *cccl_dev], env: *llvm_env }
   - { features: [*python, *dood, *llvm_22, *clang_extra_cccl, *clangd_dev, { <<: *cuda_curr_min, <<: *cccl_cuda_ext_opts }, *cccl_dev], env: *llvm_env }
   - { features: [*python, *dood, *llvm_22, *clang_extra_cccl, *clangd_dev, { <<: *cuda_curr_max, <<: *cccl_cuda_ext_opts }, *cccl_dev], env: *llvm_env }
-  
+
   - { features: [*python, *dood, *llvm_23, *clang_extra_cccl, *clangd_dev, { <<: *cuda_clang_23, <<: *cccl_cuda_ext_opts }, *cccl_dev], env: *llvm_env }
 
 - os: "ubuntu:26.04"
